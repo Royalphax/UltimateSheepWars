@@ -1,0 +1,155 @@
+#===============# UltimateSheepWars settings #===============#
+#Edit this file to suit your needs and Have Fun~!
+#
+#You can change the in-game prefix
+#Note: Use color codes (&1, &3, &l,...)
+prefix: '&8[&9SheepWars&8]'
+#
+#The fallback server is the name of the server where
+#people are automatically redirect after the game.
+#Note: For BungeeCord ONLY!
+fallback-server-name: none
+#
+#Countdown before game starts (in seconds)
+countdown-before-starting: 60
+#
+#Amount of players which are required
+#to start the countdown (minimum of 2)
+min-players-to-start: 6
+#
+#To set up max players, simply
+#change it in your server.properties
+#Players with 'sheepwars.vip' permission will be able 
+#to join full servers
+#
+#The game time (in minutes)
+game-time: 20
+#
+#Time when all players will be given a boarding sheep every minute (in minutes)
+#Occasionally used to stop the game faster.(put 0 to disable)
+boarding-time: 10
+#
+#Interval between a give of sheep
+give-sheep-seconds: 40
+#
+#Interval between a spawn of a booster
+booster-interval-seconds: 30
+#
+#Time before a booster disapeared
+booster-life-time-seconds: 10
+#
+#Command to execute
+#when the game is finished ('stop' or 'restart')
+dispatch-command: 'stop'
+#
+#Enable or not players to join
+#a game which is already started (in spectator mode)
+enable-join-for-spectate: true
+#
+#Wright down your server name, place holder or 
+#whatever you want to be show in the scoreboard
+#[!] MAXIMUM LENGTH = 21 LETTERS
+scoreboard-decoration: 'my.server.com'
+#
+#Automatically generate a new language file when
+#a player from another country join the game.
+#Example: A french Guy join the game and as
+#the plugin have no French language in its language/ folder
+#it will create a new one.
+auto-generate-language: true
+#
+#===============# Sheep settings #===============#
+#
+#Countdown before a sheep explode (in seconds) (useful only for explosive, incendiary and fragmentation sheep)
+sheep-countdown-before-explosion: 5
+#
+#The power when you launch sheep (depending on your map size to launch the sheep from one side to another)
+sheep-launch-velocity: 2.2
+#
+#The default health of sheeps (half-hearts)
+sheep-health: 8
+#
+#===============# Item settings #===============#
+#You can configure the item
+#id of each items on join
+item:
+  kit-id: ENDER_CHEST
+  return-to-hub-id: BED
+  particles-on-id: BLAZE_ROD
+  particles-off-id: STICK
+  #-----# Team items #-----#
+  team-blue: BANNER
+  team-red: BANNER
+  #To use only: BANNER, INK_SACK, WOOL & STAINED_GLASS
+#
+#===============# Reward settings #===============#
+#Here you can specify a reward for a player
+#when he got a kill/dead/win/lose
+#For example: do a command or give money
+#NOTE: If you want to send a message without the "CONSOLE: ..."
+#which is used by the "tell" command, you could use "tellraw"
+#Tellraw generator: https://www.minecraftjson.com/
+rewards:
+  on-kill:
+    vault-reward: 0
+    do-command: false
+    commands:
+      - 'tell %PLAYER% You got a kill!'
+      - 'eco give %PLAYER% 10'
+  on-death:
+    vault-reward: 0
+    do-command: false
+    commands: 
+      - 'eco remove %PLAYER% 10'
+  on-win:
+    vault-reward: 0
+    do-command: false
+    commands: 
+      - 'eco give %PLAYER% 50'
+  on-lose:
+    vault-reward: 0
+    do-command: false
+    commands: 
+      - 'eco remove %PLAYER% 50' 
+#
+#===============# Kit settings #===============#
+#Enable permissions to get a kit. (Permission plugin required to manage them)
+enable-permissions: false
+#
+#Enable ingame shop (Vault, economy and permission plugin are required)
+#Note: kits bought by players will be stored thanks to permissions and in database if available.
+enable-ingame-shop: false
+#
+#Enable all kits for free ?
+enable-all-kits: true
+#
+#Also and Either you can require a certain amount of wins to get a kit (You will need a database).
+enable-required-wins: false
+#
+#===============# MySQL settings #===============#
+#Connect the game to a mysql database to save
+#players stats (Not needed but better).
+mysql:
+  #Enable or not mysql settings ?
+  enable: false
+  free-host: false
+  #If you have no database and you want to save stats, you just have to put free-host to true.
+  #[!] THE FREE-HOST FEATURE ISN'T OBLIGATED TO WORK AT ALL TIME.
+  #If you have your own database, you can setup the host, database, user and password used. 
+  #(port used is 3306 by default)
+  host: localhost
+  port: 3306
+  database: sheepwars
+  user: root
+  pass: root
+#If database was enabled, put the amount of players to show in the ranking.
+ranking-top: 10
+#===============# MOTD states #===============#
+#Setup the MOTD of the server for different game states.
+game-state:
+  lobby: "&2\u2714 &aWaiting &2\u2714"
+  in-game: "&4\u2716 &cRunning &4\u2716"
+  post-game: "&6\u2261 &eEnding &6\u2261"
+  terminated: "&5\u26A0 &dRestarting &5\u26A0"
+#
+#===============# End of file #===============#

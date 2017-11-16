@@ -1,0 +1,43 @@
+name: UltimateSheepWars
+author: Asynchronous
+version: 3.8.8
+main: fr.asynchronous.sheepwars.a.UltimateSheepWarsPlugin
+softdepend: [Vault]
+website: http://roytreo28.ddns.net/
+commands:
+  sheepwars:
+    description: Manage your sheepwars in game settings
+    aliases: [sw]
+    permission: sheepwars.admin
+  lang:
+    description: Change your language
+    aliases: [language, langage]
+  stats:
+    description: Check player stats
+  hub:
+    description: Return to hub
+  contributor:
+    aliases: [contrib, c]
+    description: Only for contributors :)
+permissions:
+  sheepwars.admin:
+    description: Become an admin of sheepwars
+    default: op
+  sheepwars.teams.bypass:
+    description: Bypass team conditions 
+  sheepwars.vip:
+    description: Ability to join full servers
+  sheepwars.kit.morehealth:
+    description: Unlock the More health kit
+  sheepwars.kit.betterbow:
+    description: Unlock the Better bow kit
+  sheepwars.kit.bettersword:
+    description: Unlock the Better sword kit
+  sheepwars.kit.moresheep:
+    description: Unlock the More sheep kit
+  sheepwars.kit.builder:
+    description: Unlock the Builder kit
+  sheepwars.kit.mobility:
+    description: Unlock the Mobility kit
+  sheepwars.kit.armoredsheep:
+    description: Unlock the Armored sheep kit
