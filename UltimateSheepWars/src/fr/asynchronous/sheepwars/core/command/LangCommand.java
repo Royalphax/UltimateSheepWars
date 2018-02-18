@@ -36,7 +36,7 @@ public class LangCommand implements CommandExecutor {
             final String sub = args[0];
             if (Language.getLanguage(sub) != null)
             {
-            	data.setLocale(Language.getLanguage(sub).getLocale());
+            	data.setLanguage(Language.getLanguage(sub));
             	if (GameState.isStep(GameState.LOBBY)) {
             		PlayerJoin.equip(this.plugin, PlayerData.getPlayerData(player));
             	}

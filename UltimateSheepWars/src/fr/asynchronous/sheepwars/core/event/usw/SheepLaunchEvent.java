@@ -1,20 +1,27 @@
-package fr.roytreo.hikabrain.core.arena.event;
+package fr.asynchronous.sheepwars.core.event.usw;
 
+import org.bukkit.entity.Player;
+import org.bukkit.entity.Sheep;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
-
-import fr.roytreo.hikabrain.core.arena.Arena;
 
 public class SheepLaunchEvent extends Event {
 
 	private static final HandlerList handlers = new HandlerList();
+	private final Player launcher;
+	private final Sheep entity;
 	
-	public SheepLaunchEvent(Arena arena) {
-		this.arena = arena;
+	public SheepLaunchEvent(Player launcher, Sheep entity) {
+		this.launcher = launcher;
+		this.entity = entity;
 	}
 	
-	public Arena getArena() {
-		return this.arena;
+	public Player getLauncher() {
+		return this.launcher;
+	}
+	
+	public Sheep getEntity() {
+		return this.entity;
 	}
 	
 	@Override
@@ -25,5 +32,4 @@ public class SheepLaunchEvent extends Event {
 	public static HandlerList getHandlerList() {
 		return handlers;
 	}
-
 }

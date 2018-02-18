@@ -51,7 +51,7 @@ public class MainCommand implements CommandExecutor {
             	player.sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + ChatColor.STRIKETHROUGH + "=============" + ChatColor.RESET + " " + ChatColor.AQUA + ChatColor.BOLD + "UltimateSheepWars " + ChatColor.GREEN + "" + ChatColor.BOLD + ChatColor.STRIKETHROUGH + "=============");
             	player.sendMessage("");
             	if (this.plugin.SETUP_MODE)
-            	{//❘
+            	{
             		String ok = ChatColor.DARK_GRAY + "| " + ChatColor.GREEN + "✔" + ChatColor.DARK_GRAY + " |" + ChatColor.GRAY;
                 	String no = ChatColor.DARK_GRAY + "| " + ChatColor.DARK_RED + "✖" + ChatColor.DARK_GRAY + " |" + ChatColor.GRAY;
             		player.sendMessage(ChatColor.GRAY + "/sw setLobby "+(this.plugin.LOBBY_LOCATION == null ? no : ok)+" (set the lobby)");

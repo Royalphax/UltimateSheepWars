@@ -118,8 +118,6 @@ public class UltimateSheepWarsPlugin extends JavaPlugin {
     public Boolean LEADER_HEADS_INSTALLED;
     public File SETTINGS_FILE;
     public Boolean MySQL_ENABLE;
-    public Boolean CHRISTMAS_MODE;
-    public Boolean APRIL_FOOL_MODE;
     private BeginCountdown PRE_GAME_TASK;
 	private GameTask GAME_TASK;
 	
@@ -371,10 +369,6 @@ public class UltimateSheepWarsPlugin extends JavaPlugin {
     	}
         TeamManager.RED.updateScoreboardTeamCount();
         TeamManager.BLUE.updateScoreboardTeamCount();
-
-        Calendar cal = Calendar.getInstance();
-       	this.CHRISTMAS_MODE = (Integer.valueOf(new SimpleDateFormat("MM").format(cal.getTime())) == 12);
-       	this.APRIL_FOOL_MODE = (new SimpleDateFormat("dd-MM").format(cal.getTime()).equals("01-04"));
 	}
 	
 	/**
