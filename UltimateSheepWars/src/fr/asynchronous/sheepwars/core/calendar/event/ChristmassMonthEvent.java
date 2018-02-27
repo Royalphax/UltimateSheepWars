@@ -4,8 +4,16 @@ import java.util.Calendar;
 import java.util.Random;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Snowball;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
@@ -13,13 +21,16 @@ import org.bukkit.scheduler.BukkitTask;
 import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.calendar.CalendarEvent;
 import fr.asynchronous.sheepwars.core.handler.Particles;
+import fr.asynchronous.sheepwars.core.handler.Sounds;
+import fr.asynchronous.sheepwars.core.util.BlockUtils;
+import fr.asynchronous.sheepwars.core.util.MathUtils;
 
 public class ChristmassMonthEvent extends CalendarEvent {
 
 	private BukkitTask task;
-	
+
 	public ChristmassMonthEvent() {
-		super(2, "Christmass");
+		super(1, "Christmass");
 	}
 
 	@Override
@@ -44,7 +55,7 @@ public class ChristmassMonthEvent extends CalendarEvent {
 
 	@Override
 	public void activate(Plugin activatingPlugin) {
-		if (this.task != null) 
+		if (this.task != null)
 			this.task.cancel();
 		this.task = new BukkitRunnable() {
 			final World world = Bukkit.getWorlds().get(0);
@@ -65,7 +76,43 @@ public class ChristmassMonthEvent extends CalendarEvent {
 
 	@Override
 	public void deactivate(Plugin deactivatingPlugin) {
-		this.task.cancel();		
+		if (this.task != null)
+			this.task.cancel();
 	}
 
+	@EventHandler(priority = EventPriority.LOW)
+	public void onInteract(PlayerInteractEvent event) {
+		Player player = event.getPlayer();
+		if (!event.hasItem()) {
+			player.launchProjectile(Snowball.class);
+			Sounds.playSound(player, null, Sounds.NOTE_STICKS, 1.0f, 2.0f);
+		}
+	}
+
+	@EventHandler
+	public void onSnowballImpact(ProjectileHitEvent event) {
+		if (!(event.getEntity() instanceof Snowball))
+			return;
+		Block block = event.getEntity().getLocation().getBlock();
+		Block top = block.getRelative(BlockFace.UP);
+		if (block.getType() == Material.AIR) {
+			if (block.getRelative(BlockFace.DOWN).getType() != Material.AIR) {
+				top = block;
+			} else {
+				return;
+			}
+		}
+
+		if (MathUtils.randomBoolean() && (top.getType() == Material.AIR || top.getType() == Material.SNOW) && BlockUtils.fullSolid(top.getRelative(BlockFace.DOWN))) {
+			if (top.getType() != Material.SNOW) {
+				top.setType(Material.SNOW);
+				top.setData((byte) 0);
+			} else {
+				final byte data = top.getData();
+				if (data < 7) {
+					top.setData((byte) (data + 1));
+				}
+			}
+		}
+	}
 }

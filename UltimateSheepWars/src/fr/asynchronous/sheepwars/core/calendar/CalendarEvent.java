@@ -12,6 +12,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
 public abstract class CalendarEvent implements Listener {
+	
 	private static List<CalendarEvent> enabledEvents = new ArrayList<>();
 
 	private int id;
@@ -86,9 +87,10 @@ public abstract class CalendarEvent implements Listener {
 
 	public static boolean enableCalendarEvent(CalendarEvent calendarEvent, Plugin owningPlugin) {
 		for (CalendarEvent calEvent : enabledEvents) {
-			if (calEvent.getID() == calendarEvent.getID())
+			if (calEvent.getID() == calendarEvent.getID()) {
 				Bukkit.getLogger().info("NOTE: Something tried to register a new CalendarEvent however, it can't have two CalendarEvents whith same ID (" + calEvent.getID() + ").");
 				return false;
+			}
 		}
 		if (calendarEvent.isTimePeriod()) {
 			calendarEvent.registerEvents(owningPlugin);
