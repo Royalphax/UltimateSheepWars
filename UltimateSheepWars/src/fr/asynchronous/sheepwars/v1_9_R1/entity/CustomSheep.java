@@ -6,6 +6,7 @@ import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_9_R1.CraftWorld;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -14,7 +15,9 @@ import com.google.common.collect.Sets;
 import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.handler.Particles;
 import fr.asynchronous.sheepwars.core.handler.PlayerData;
-import fr.asynchronous.sheepwars.core.handler.Sheeps;
+import fr.asynchronous.sheepwars.core.handler.SheepAbility;
+import fr.asynchronous.sheepwars.core.manager.ExceptionManager;
+import fr.asynchronous.sheepwars.core.manager.SheepManager;
 import fr.asynchronous.sheepwars.core.util.BlockUtils;
 import net.minecraft.server.v1_9_R1.Entity;
 import net.minecraft.server.v1_9_R1.EntityHuman;
@@ -30,7 +33,7 @@ import net.minecraft.server.v1_9_R1.PathfinderGoalRandomLookaround;
 import net.minecraft.server.v1_9_R1.PathfinderGoalSelector;
 
 public class CustomSheep extends EntitySheep {
-	private Sheeps sheep;
+	private SheepManager sheep;
 	private Player player;
 	private net.minecraft.server.v1_9_R1.World world;
 	private boolean explosion = true;
@@ -39,13 +42,13 @@ public class CustomSheep extends EntitySheep {
 	private long ticks;
 	private boolean drop;
 	private int noclipDistance;
-	private UltimateSheepWarsPlugin plugin;
+	private Plugin plugin;
 
 	public CustomSheep(net.minecraft.server.v1_9_R1.World world) {
 		super(world);
 	}
 
-	public CustomSheep(net.minecraft.server.v1_9_R1.World world, Player player, UltimateSheepWarsPlugin plugin) {
+	public CustomSheep(net.minecraft.server.v1_9_R1.World world, Player player, Plugin plugin) {
 		super(world);
 		this.player = player;
 		this.plugin = plugin;
@@ -57,9 +60,8 @@ public class CustomSheep extends EntitySheep {
 		sheep.getColor().getWoolData();
 	}
 
-	@SuppressWarnings({ "rawtypes", "deprecation", "unchecked" })
-	public CustomSheep(net.minecraft.server.v1_9_R1.World world, Player player, Sheeps sheep,
-			UltimateSheepWarsPlugin plugin) {
+	@SuppressWarnings({"rawtypes", "deprecation", "unchecked"})
+	public CustomSheep(net.minecraft.server.v1_9_R1.World world, Player player, SheepManager sheep, Plugin plugin) {
 		this(world, player, plugin);
 		getNavigation();
 		a(0.9F, 1.3F);
@@ -67,18 +69,16 @@ public class CustomSheep extends EntitySheep {
 		this.sheep = sheep;
 		this.ticks = (sheep.getDuration() == -1 ? Long.MAX_VALUE : sheep.getDuration() * 20);
 		this.defaultTicks = this.ticks;
-		this.ground = (!sheep.isOnGround());
 		this.drop = sheep.isDrop();
 		this.noclip = !sheep.isFriendly();
 		this.noclipDistance = BlockUtils.getViewField(player, 6);
 
 		setColor((EnumColor.fromColorIndex(sheep.getColor().getWoolData())));
-		if (sheep != null) {
-			sheep.getAction().onSpawn(player, getBukkitSheep(), plugin);
-		}
-		if ((sheep == Sheeps.INTERGALACTIC) || (sheep == Sheeps.LIGHTNING)) {
+		sheep.onSpawn(player, getBukkitSheep(), plugin);
+
+		if (sheep.getAbilities().contains(SheepAbility.FIRE_PROOF))
 			this.fireProof = true;
-		} else if (sheep == Sheeps.SEEKER) {
+		if (sheep.getAbilities().contains(SheepAbility.SEEK_PLAYERS)) {
 			try {
 				Field bField = PathfinderGoalSelector.class.getDeclaredField("b");
 				bField.setAccessible(true);
@@ -89,7 +89,7 @@ public class CustomSheep extends EntitySheep {
 				cField.set(this.goalSelector, Sets.newLinkedHashSet());
 				cField.set(this.targetSelector, Sets.newLinkedHashSet());
 			} catch (Exception e) {
-				e.printStackTrace();
+				new ExceptionManager(e).register(true);
 			}
 			this.getNavigation();
 			this.goalSelector.a(2, new PathfinderGoalMeleeAttack(this, 1.0D, false));// 1.5
@@ -97,13 +97,12 @@ public class CustomSheep extends EntitySheep {
 			this.goalSelector.a(8, new PathfinderGoalRandomLookaround(this));
 			this.targetSelector.a(1, new PathfinderGoalHurtByTarget(this, true));
 			this.targetSelector.a(2, new PathfinderGoalNearestAttackableTarget(this, EntityHuman.class, true));
-			// getAttributeInstance(GenericAttributes.MOVEMENT_SPEED).setValue(1.5D);
 		} else {
 			PotionEffect effect = new PotionEffect(PotionEffectType.SLOW, Integer.MAX_VALUE, 1, false, false);
 			getBukkitSheep().addPotionEffect(effect);
 		}
 	}
-	
+
 	@Override
 	public void move(double d0, double d1, double d2) {
 		if (this.noclip && this.player.getLocation().distance(getBukkitEntity().getLocation()) > noclipDistance) {
@@ -116,9 +115,9 @@ public class CustomSheep extends EntitySheep {
 	}
 
 	public void g(float sideMot, float forMot) {
-		if (this.sheep != null && this.onGround && this.sheep == Sheeps.REMOTE && this.passengers.size() == 1) {
+		if (this.sheep != null && this.onGround && this.sheep.getAbilities().contains(SheepAbility.CONTROLLABLE) && this.passengers.size() == 1) {
 			for (Entity passenger : this.passengers) {
-				if (passenger == null || !(passenger instanceof EntityHuman) || this.sheep != Sheeps.REMOTE) {
+				if (passenger == null || !(passenger instanceof EntityHuman)) {
 					super.g(sideMot, forMot);
 					this.P = 1.0f;
 					this.aO = 0.02f;
@@ -185,25 +184,23 @@ public class CustomSheep extends EntitySheep {
 				if (!this.ground) {
 					this.ground = (this.sheep.isFriendly() || this.onGround || this.inWater);
 				} else {
-					if (((this.sheep.isFriendly()) || (this.ticks <= this.defaultTicks - 20L))
-							&& ((this.ticks == 0L) || (this.sheep.getAction().onTicking(this.player, this.ticks,
-									getBukkitSheep(), this.plugin)) || (!isAlive()))) {
+					if (((this.sheep.isFriendly()) || (this.ticks <= this.defaultTicks - 20L)) && ((this.ticks == 0L) || (this.sheep.onTicking(this.player, this.ticks, getBukkitSheep(), this.plugin)) || (!isAlive()))) {
 						boolean death = true;
-						if (getBukkitSheep().getPassenger() != null)
-							getBukkitSheep().getPassenger().eject();
+						if (!getBukkitSheep().getPassengers().isEmpty())
+							for (org.bukkit.entity.Entity ent : getBukkitSheep().getPassengers())
+								ent.eject();
 						if (isAlive()) {
 							die();
 							death = false;
 						}
-						this.sheep.getAction().onFinish(this.player, getBukkitSheep(), death, this.plugin);
+						this.sheep.onFinish(this.player, getBukkitSheep(), death, this.plugin);
 						this.dropDeathLoot();
 						return;
 					}
 					--this.ticks;
 				}
 				if (!this.onGround && this.ticksLived < 100 && !sheep.isFriendly()) {
-					this.plugin.versionManager.getParticleFactory().playParticles(Particles.FIREWORKS_SPARK,
-							location.add(0, 0.5, 0), 0.0F, 0.0F, 0.0F, 1, 0.0F);
+					UltimateSheepWarsPlugin.getVersionManager().getParticleFactory().playParticles(Particles.FIREWORKS_SPARK, location.add(0, 0.5, 0), 0.0F, 0.0F, 0.0F, 1, 0.0F);
 				}
 				this.explosion = !this.explosion;
 			}
@@ -220,14 +217,13 @@ public class CustomSheep extends EntitySheep {
 			this.drop = false;
 			if (getBukkitEntity().getLastDamageCause().getCause() == DamageCause.ENTITY_ATTACK) {
 				if (getBukkitSheep().getKiller() instanceof Player) {
-					PlayerData.getPlayerData(plugin, getBukkitSheep().getKiller()).increaseSheepKilled(1);
-					fr.asynchronous.sheepwars.core.handler.Sheeps.giveSheep(getBukkitSheep().getKiller(), this.sheep, this.plugin);
+					PlayerData.getPlayerData(getBukkitSheep().getKiller()).increaseSheepKilled(1);
+					SheepManager.giveSheep(getBukkitSheep().getKiller(), this.sheep);
 				}
 			} else if (getBukkitEntity().getLastDamageCause().getCause() == DamageCause.PROJECTILE) {
 				if (getBukkitSheep().getKiller() instanceof Player) {
-					PlayerData.getPlayerData(plugin, getBukkitSheep().getKiller()).increaseSheepKilled(1);
-					getBukkitSheep().getWorld().dropItem(getBukkitSheep().getLocation(),
-							this.sheep.getIcon(getBukkitSheep().getKiller()));
+					PlayerData.getPlayerData(getBukkitSheep().getKiller()).increaseSheepKilled(1);
+					getBukkitSheep().getWorld().dropItem(getBukkitSheep().getLocation(), this.sheep.getIcon(getBukkitSheep().getKiller()));
 				}
 			}
 		}
@@ -252,7 +248,6 @@ public class CustomSheep extends EntitySheep {
 	public void explode(float power, boolean breakBlocks, boolean fire) {
 		this.drop = false;
 		getBukkitEntity().remove();
-		this.plugin.versionManager.getWorldUtils().createExplosion(this.player, getBukkitSheep().getWorld(), this.locX,
-				this.locY, this.locZ, power, breakBlocks, fire);
+		UltimateSheepWarsPlugin.getVersionManager().getWorldUtils().createExplosion(this.player, getBukkitSheep().getWorld(), this.locX, this.locY, this.locZ, power, breakBlocks, fire);
 	}
 }

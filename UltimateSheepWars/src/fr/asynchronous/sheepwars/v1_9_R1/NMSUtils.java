@@ -1,15 +1,11 @@
 package fr.asynchronous.sheepwars.v1_9_R1;
 
 import java.lang.reflect.Field;
-import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.boss.BarColor;
-import org.bukkit.boss.BarFlag;
-import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
 import org.bukkit.craftbukkit.v1_9_R1.entity.CraftArrow;
 import org.bukkit.craftbukkit.v1_9_R1.entity.CraftPlayer;
@@ -22,8 +18,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
+import fr.asynchronous.sheepwars.core.manager.ExceptionManager;
 import fr.asynchronous.sheepwars.core.message.Language;
-import fr.asynchronous.sheepwars.core.util.Utils;
 import fr.asynchronous.sheepwars.core.version.INMSUtils;
 import fr.asynchronous.sheepwars.v1_9_R1.util.SpecialMessage;
 import net.minecraft.server.v1_9_R1.ChatClickable.EnumClickAction;
@@ -61,12 +57,12 @@ public class NMSUtils implements INMSUtils {
             final int z = fieldZ.getInt(entityArrow);
             final Block block = arrow.getWorld().getBlockAt(x, y, z);
             entityArrow.die();
-            if (block.getType() == Material.WOOL && plugin.GAME_TASK.isBooster(block.getLocation())) {
+            if (block.getType() == Material.WOOL && plugin.getGameTask().isBooster(block.getLocation())) {
             	return block;
             }
         }
         catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
-            Utils.registerException(e, true);
+            new ExceptionManager(e).register(true);
         }
 		return null;
 	}
@@ -123,12 +119,5 @@ public class NMSUtils implements INMSUtils {
 	@Override
 	public void setMaxHealth(final LivingEntity ent, final Double maxHealth) {
 		ent.setMaxHealth(maxHealth);
-	}
-
-	@Override
-	public void tryBar(Player player) {
-		BossBar bar = Bukkit.getServer().createBossBar(arg0, arg1, arg2, arg3);
-		player.remove
-		
 	}
 }

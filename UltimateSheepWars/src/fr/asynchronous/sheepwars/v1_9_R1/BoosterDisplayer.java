@@ -10,6 +10,7 @@ import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Player;
 
 import fr.asynchronous.sheepwars.core.handler.DisplayColor;
+import fr.asynchronous.sheepwars.core.handler.PlayerData;
 import fr.asynchronous.sheepwars.core.manager.BoosterManager;
 import fr.asynchronous.sheepwars.core.message.Language;
 import fr.asynchronous.sheepwars.core.message.Message;
@@ -22,7 +23,7 @@ public class BoosterDisplayer implements IBoosterDisplayer {
 	@Override
 	public void startDisplay(BoosterManager booster) {
 		if (!this.barMap.containsKey(booster))
-			this.barMap.put(booster, new CustomBossBar(booster.getName(), booster.getBarColor()));
+			this.barMap.put(booster, new CustomBossBar(booster.getName(), booster.getDisplayColor()));
 		this.barMap.get(booster).show();
 	}
 
@@ -54,7 +55,7 @@ public class BoosterDisplayer implements IBoosterDisplayer {
 		public void show() {
 			World world = Bukkit.getWorlds().get(0);
 			for (Player online : world.getPlayers()) {
-				Language lang = Language.getLanguage(online);
+				Language lang = PlayerData.getPlayerData(online).getLanguage();
 				if (!this.bossBars.containsKey(lang))
 					addLanguage(lang);
 				BossBar bar = this.bossBars.get(lang);
@@ -70,7 +71,7 @@ public class BoosterDisplayer implements IBoosterDisplayer {
 		public void hide() {
 			World world = Bukkit.getWorlds().get(0);
 			for (Player online : world.getPlayers()) {
-				Language lang = Language.getLanguage(online);
+				Language lang = PlayerData.getPlayerData(online).getLanguage();
 				if (!this.bossBars.containsKey(lang))
 					addLanguage(lang);
 				BossBar bar = this.bossBars.get(lang);
