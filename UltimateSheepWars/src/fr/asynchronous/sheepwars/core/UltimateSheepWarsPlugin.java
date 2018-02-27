@@ -6,8 +6,6 @@ import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.List;
 import java.util.logging.Level;
 
@@ -62,12 +60,13 @@ import fr.asynchronous.sheepwars.core.event.player.PlayerRespawn;
 import fr.asynchronous.sheepwars.core.event.player.PlayerSwapItem;
 import fr.asynchronous.sheepwars.core.event.projectile.ProjectileHit;
 import fr.asynchronous.sheepwars.core.event.projectile.ProjectileLaunch;
-import fr.asynchronous.sheepwars.core.event.server.bfA;
-import fr.asynchronous.sheepwars.core.event.server.bfB;
+import fr.asynchronous.sheepwars.core.event.server.ServerCommand;
+import fr.asynchronous.sheepwars.core.event.server.ServerListPing;
 import fr.asynchronous.sheepwars.core.handler.GameState;
 import fr.asynchronous.sheepwars.core.handler.MinecraftVersion;
 import fr.asynchronous.sheepwars.core.manager.BoosterManager;
 import fr.asynchronous.sheepwars.core.manager.ConfigManager;
+import fr.asynchronous.sheepwars.core.manager.DataManager;
 import fr.asynchronous.sheepwars.core.manager.ConfigManager.Field;
 import fr.asynchronous.sheepwars.core.manager.ExceptionManager;
 import fr.asynchronous.sheepwars.core.manager.KitManager;
@@ -94,43 +93,66 @@ import net.milkbowl.vault.permission.Permission;
 
 public class UltimateSheepWarsPlugin extends JavaPlugin {
 
+	/** Static fields **/
 	public static final String PACKAGE = "fr.asynchronous.sheepwars";
 	public static final File DATAFOLDER = new File("plugins/UltimateSheepWars/");
+	
+	/** Spigot premium placeholders **/
 	public static final String user_id = "%%__USER__%%";
 	public static final String download_id = "%%__NONCE__%%";
 	
-	private static VersionManager versionManager;
+	/** Instance variables **/
+	private AccountManager accountManager;
+	private RewardsManager rewardManager;
 	
-	public UltimateSheepWarsPlugin instance;
-	public AccountManager accountManager;
-	public RewardsManager rewardManager;
-    public Boolean isUpToDate;
-    public Boolean LOCALHOST;
-    public World WORLD;
-    public Boolean VAULT_INSTALLED;
-    public Boolean CHAT_PROVIDER_INSTALLED;
-    public Boolean ENABLE_PLUGIN;
-	public MySQL DATABASE;
-    public FileConfiguration SETTINGS_CONFIG;
-    public Economy ECONOMY_PROVIDER;
-    public Permission PERMISSION_PROVIDER;
-    public Chat CHAT_PROVIDER;
-    public Boolean LEADER_HEADS_INSTALLED;
-    public File SETTINGS_FILE;
-    public Boolean MySQL_ENABLE;
-    private BeginCountdown PRE_GAME_TASK;
-	private GameTask GAME_TASK;
+    /** Providers & Soft Dependencies **/
+    private Boolean vaultInstalled;
+    private Boolean leaderHeadsInstalled;
+    
+    private Permission permissionProvider;
+    private Economy economyProvider;
+    private Chat chatProvider;
+    
+    /** Settings file & config **/
+    private FileConfiguration settingsConfig;
+    private File settingsFile;
+    
+    /** MySQL & Stats **/
+    
+    /** USW **/
+    private static VersionManager versionManager;
+    private Boolean enablePlugin;
+    private BeginCountdown preGameTask;
+	private GameTask gameTask;
+	private Boolean upToDate;
+    private Boolean localhost;
+    private World world;
 	
 	public UltimateSheepWarsPlugin() {
-        this.ECONOMY_PROVIDER = null;
-        this.ENABLE_PLUGIN = true;
-        this.isUpToDate = true;
-        this.MySQL_ENABLE = false;
-        this.VAULT_INSTALLED = false;
+        this.economyProvider = null;
+        this.enablePlugin = true;
+        this.upToDate = true;
+        this.vaultInstalled = false;
         
         /** Ne pas oublier de changer la valeur **/
-        this.LOCALHOST = true;
+        this.localhost = true;
 	}
+	
+	public void disablePlugin(Level level, String reason)
+	{
+		this.enablePlugin = false;
+		this.getLogger().log(level, reason);
+		this.getPluginLoader().disablePlugin(this);
+	}
+	
+	public static Boolean isSpigotServer(){
+        try{
+            Class.forName("org.bukkit.entity.Player$Spigot");
+            return true;
+        }catch(Exception e){
+            return false;
+        }
+    }
 	
 	@Override
 	public void onLoad() {
@@ -142,61 +164,67 @@ public class UltimateSheepWarsPlugin extends JavaPlugin {
 			versionManager = new VersionManager();
 		} catch (ReflectiveOperationException e) {
 			disablePlugin(Level.WARNING, "ReflectiveOperationException occurs. Please contact the developer.");
+			new ExceptionManager(e).register(false);
 			return;
 		}
-		if (!versionManager.getVersion().inRange(MinecraftVersion.v1_8_R3, MinecraftVersion.v1_9_R1, MinecraftVersion.v1_9_R2, MinecraftVersion.v1_10_R1, MinecraftVersion.v1_11_R1))
+		if (!versionManager.getVersion().inRange(MinecraftVersion.v1_8_R3, MinecraftVersion.v1_11_R1))
 		{
 			disablePlugin(Level.WARNING, "UltimateSheepWars doesn't support your server version (" + versionManager.getVersion().toString() + ")");
 			return;
 		}
 		if (!Bukkit.getWorlds().get(0).getName().equals("world"))
 		{
-			disablePlugin(Level.WARNING, "The server.properties's level name must be \"world\".");
+			disablePlugin(Level.WARNING, "The server properties level name must be \"world\". Stop your server, change \"level-name\" in server.properties file, and switch back on your server.");
 			return;
 		}
 		try {
             Bukkit.unloadWorld("world", true);
-            this.getLogger().info("Loading directories...");
+            this.getLogger().info("Loading directories ...");
             final File worldContainer = this.getServer().getWorldContainer();
             final File worldFolder = new File(worldContainer, "world");
             final File copyFolder = new File(worldContainer, "sheepwars-backup");
             if (copyFolder.exists()) {
-            	this.getLogger().info("World is reseting...");
+            	this.getLogger().info("World is reseting ...");
                 ReflectionUtils.getClass("RegionFileCache", ReflectionUtils.PackageType.MINECRAFT_SERVER).getMethod("a", (Class<?>[])new Class[0]).invoke(null, new Object[0]);
                 FileUtils.delete(worldFolder);
                 FileUtils.copyFolder(copyFolder, worldFolder);
-                this.getLogger().info("World reset!");
+                this.getLogger().info("World reset !");
             } else {
-            	this.getLogger().info("Didn't find the world backup save, creating it...");
+            	this.getLogger().info("Didn't find the world backup save, creating it ...");
             	FileUtils.copyFolder(worldFolder, copyFolder);
-            	this.getLogger().info("Backup save created!");
+            	this.getLogger().info("Backup save created !");
             }
         }
-        catch (Throwable ex) {
-            try {
-				throw ex;
-			} catch (Throwable th) {
-				this.getLogger().severe("*** An error occured when reseting the map. Please contact the developer. ***");
-				new ExceptionManager(th).register(true);
-			}
+        catch (Exception ex) {
+        	disablePlugin(Level.SEVERE, "*** An error occured when reseting the map. Please contact the developer. ***");
+			new ExceptionManager(ex).register(true);
         }
 	}
 	
 	@SuppressWarnings("unchecked")
 	@Override
 	public void onEnable() {
+		/** Init custom sheeps **/
 		versionManager.getCustomEntities().registerEntities();
-		GameState.setCurrentStep(GameState.LOBBY, this);
-        this.WORLD = Bukkit.getWorlds().get(0);
-        this.WORLD.setGameRuleValue("doDaylightCycle", "false");
-        this.WORLD.setTime(6000L);
-        this.WORLD.setStorm(false);
-        this.WORLD.setThundering(false);
+		
+		/** Init Game **/ 
+		GameState.setCurrentStep(GameState.LOBBY);
+		
+		/** Init world settings **/
+        this.world = Bukkit.getWorlds().get(0);
+        this.world.setGameRuleValue("doDaylightCycle", "false");
+        this.world.setTime(6000L);
+        this.world.setStorm(false);
+        this.world.setThundering(false);
+        
+        /** Init commands **/
         this.getCommand("sheepwars").setExecutor(new MainCommand(this));
         this.getCommand("lang").setExecutor(new LangCommand(this));
         this.getCommand("stats").setExecutor(new StatsCommand(this));
         this.getCommand("hub").setExecutor(new HubCommand(this));
         this.getCommand("contributor").setExecutor(new ContributorCommand(this));
+        
+        /** Register Events **/
         this.register(BlockBreak.class, BlockPlace.class, BlockSpread.class, 
         		
         		CreatureSpawn.class, EntityBlockForm.class, EntityChangeBlock.class, 
@@ -213,63 +241,41 @@ public class UltimateSheepWarsPlugin extends JavaPlugin {
         		
         		ProjectileHit.class, ProjectileLaunch.class, 
         		
-        		bfA.class, bfB.class);
+        		ServerCommand.class, ServerListPing.class);
         if (versionManager.getVersion().newerThan(MinecraftVersion.v1_9_R1))
         	this.register(PlayerSwapItem.class);
-		VAULT_INSTALLED = Bukkit.getPluginManager().isPluginEnabled("Vault");
-		if (VAULT_INSTALLED)
-			getLogger().info("Vault hooked!");
-		LEADER_HEADS_INSTALLED = Bukkit.getPluginManager().isPluginEnabled("LeaderHeads");
-		if (LEADER_HEADS_INSTALLED)
-			getLogger().info("LeaderHeads hooked!");
+        
+		/** Load most common things **/
 		this.load();
+		
+		/** Init stats & mySQL things at the end (cause it can take time ... ) **/
+		DataManager.initDatabaseConnections(this);
 		new BukkitRunnable()
 		{
 			public void run()
 			{
 				try {
 					if (!URLManager.checkVersion(getDescription().getVersion(), false, URLManager.Link.GITHUB_PATH)) {
-						isUpToDate = false;
-						getLogger().info("A new version is available, with following new functionalities, improvements and fixes : ");
+						upToDate = false;
+						getLogger().info("A new version is available, with following new functionalitie(s), improvement(s) and fixe(s) : ");
 						List<String> news = URLManager.getInfoVersion(URLManager.Link.GITHUB_PATH);
 						for (int i = 0; i < news.size(); i++) {
 							String newsLine = news.get(i);
 							Bukkit.getConsoleSender().sendMessage(ChatColor.GREEN + (i == (news.size()-1) ? "\\_/ " : (newsLine.startsWith("#") ? " + " : " |  ")) + ChatColor.RESET + (newsLine.startsWith("#") ? ChatColor.YELLOW + newsLine.replaceFirst("#", "") : newsLine));
 						}
-						getLogger().info("Please stay updated at https://org.spigot.mc/ressources/UltimateSheepWars");
+						getLogger().info("Please stay updated at https://www.spigotmc.org/resources/17393/");
 					} else {
 						getLogger().info("Plugin is up-to-date.");
 					}
+				} catch (FileNotFoundException ex) {
+					new ExceptionManager(ex).register(false);
+					disablePlugin(Level.SEVERE, "You don't have a valid internet connection, please connect to the internet for the plugin to work.");
 				} catch (IOException ex) {
-					if (!(ex instanceof FileNotFoundException)) {
-						new ExceptionManager(ex).register(false);
-						disablePlugin(Level.SEVERE, "You don't have a valid internet connection, please connect to the internet for the plugin to work.");
-					}
+					// Do nothing
 				}
 			}
 		}.runTaskAsynchronously(this);
-		new DataRegister(this, LOCALHOST, true);
-	}
-	
-	@Override
-	public void onDisable() {
-		if (this.MySQL_ENABLE)
-			try {
-				this.DATABASE.closeConnection();
-			} catch (SQLException e) {
-				new ExceptionManager(e).register(true);
-			}
-		if (this.ENABLE_PLUGIN) {
-			this.save();
-			getVersionManager().getCustomEntities().unregisterEntities();
-		}
-	}
-	
-	public void disablePlugin(Level level, String reason)
-	{
-		this.ENABLE_PLUGIN = false;
-		this.getLogger().log(level, reason);
-		this.getPluginLoader().disablePlugin(this);
+		new DataRegister(this, this.localhost, true);
 	}
 	
 	private void register(@SuppressWarnings("unchecked") final Class<? extends UltimateSheepWarsEventListener>... classes) {
@@ -288,56 +294,26 @@ public class UltimateSheepWarsPlugin extends JavaPlugin {
 		}
 	}
 	
-	private void save() {
-    	this.SETTINGS_CONFIG.set("lobby", Utils.toString(ConfigManager.getLocation(Field.LOBBY)));
-        for (int i = 0; i < ConfigManager.getLocations(Field.BOOSTERS).size(); ++i) {
-        	this.SETTINGS_CONFIG.set("boosters." + i, Utils.toString(ConfigManager.getLocations(Field.BOOSTERS).get(i)));
-        }
-        for (TeamManager team : TeamManager.values())
-          for (int i = 0; i < team.getSpawns().size(); i++)
-        	  this.SETTINGS_CONFIG.set("teams." + team.getName() + ".spawns." + i, Utils.toString(team.getSpawns().get(i)));
-        try {
-			this.SETTINGS_CONFIG.save(this.SETTINGS_FILE);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-    }
-	
 	public void load()
 	{
         this.saveDefaultConfig();
         this.initClasses();
-        if (ConfigManager.getBoolean(Field.ENABLE_INGAME_SHOP))
-        {
-        	ConfigManager.setBoolean(Field.ENABLE_KIT_PERMISSIONS, true);
-        	if (VAULT_INSTALLED)
-        	{
-        		if (!setupEconomy()) {
-        			getLogger().info("KIT: You have enable ingame-shop but there is no economy plugin. This is conflicting :(");
-        			ConfigManager.setBoolean(Field.ENABLE_KIT_PERMISSIONS, false);
-        		} else if (!setupPermissions()) {
-        			getLogger().info("KIT: You have enable ingame-shop but there is no permission plugin. This is conflicting :(");
-        			ConfigManager.setBoolean(Field.ENABLE_KIT_PERMISSIONS, false);
-        		}
-        	} else {
-        		getLogger().info("KIT: You have enable ingame-shop but vault isn't installed. This is conflicting :(");
-        		ConfigManager.setBoolean(Field.ENABLE_KIT_PERMISSIONS, false);
-        	}
-        }
-        if (ConfigManager.getBoolean(Field.ENABLE_KIT_REQUIRED_WINS))
-        {
-        	if (!MySQL_ENABLE)
-        	{
-        		getLogger().info("KIT: You have enable required-wins but no database was detected. This is conflicting :(");
-        		ConfigManager.setBoolean(Field.ENABLE_KIT_REQUIRED_WINS, false);
-        	}
-        }
-        if (VAULT_INSTALLED) {
-        	this.CHAT_PROVIDER_INSTALLED = setupChat();
-        } else {
-        	this.CHAT_PROVIDER_INSTALLED = false;
-        }
-        if (this.LEADER_HEADS_INSTALLED && this.MySQL_ENABLE)
+        
+        /** Setup Vault **/
+		vaultInstalled = Bukkit.getPluginManager().isPluginEnabled("Vault");
+		if (vaultInstalled)
+			getLogger().info("Vault hooked !");
+		
+		/** Setup Providers **/
+		this.setupProviders();
+        boolean ecop = (this.economyProvider != null);
+        boolean permp = (this.permissionProvider != null);
+		
+        /** Setup Soft-Depends (LeaderHeads) **/
+		leaderHeadsInstalled = Bukkit.getPluginManager().isPluginEnabled("LeaderHeads");
+		if (leaderHeadsInstalled)
+			getLogger().info("LeaderHeads hooked !");
+		if (this.leaderHeadsInstalled && DataManager.isConnected())
         {
         	String[] list = {"Deaths", "Games", "KDRatio", "Kills", "SheepKilled", "SheepThrown", "TotalTime", "WinRate", "Wins"};
         	try {
@@ -347,34 +323,89 @@ public class UltimateSheepWarsPlugin extends JavaPlugin {
 				new ExceptionManager(ex).register(true);
 			}
         }
-        SETTINGS_FILE = new File(getDataFolder(), "settings.yml");
-        if (!SETTINGS_FILE.exists())
+		
+        /** Check for config issues **/
+        if (ConfigManager.getBoolean(Field.ENABLE_INGAME_SHOP))
+        {
+        	ConfigManager.setBoolean(Field.ENABLE_KIT_PERMISSIONS, true);
+        	if (vaultInstalled)
+        	{
+        		if (!ecop) {
+        			getLogger().info("KIT: You have enable ingame-shop but there is no economy plugin. This is conflicting :(");
+        			ConfigManager.setBoolean(Field.ENABLE_KIT_PERMISSIONS, false);
+        		} else if (!permp) {
+        			getLogger().info("KIT: You have enable ingame-shop but there is no permission plugin. This is conflicting :(");
+        			ConfigManager.setBoolean(Field.ENABLE_KIT_PERMISSIONS, false);
+        		}
+        	} else {
+        		getLogger().info("KIT: You have enable ingame-shop but vault isn't installed. This is conflicting :(");
+        		ConfigManager.setBoolean(Field.ENABLE_KIT_PERMISSIONS, false);
+        	}
+        }
+        if (ConfigManager.getBoolean(Field.ENABLE_KIT_REQUIRED_WINS) && !DataManager.isConnected())
+        {
+        	getLogger().info("KIT: You have enable required-wins but no database was detected. This is conflicting :(");
+        	ConfigManager.setBoolean(Field.ENABLE_KIT_REQUIRED_WINS, false);
+        }
+
+        /** Setup settings config file **/
+        settingsFile = new File(getDataFolder(), "settings.yml");
+        if (!settingsFile.exists())
         {
         	try {
-        		SETTINGS_FILE.createNewFile();
+        		settingsFile.createNewFile();
 			} catch (IOException ex) {
 				new ExceptionManager(ex).register(true);
 			}
         }
-        this.SETTINGS_CONFIG = YamlConfiguration.loadConfiguration(this.SETTINGS_FILE);
-        this.WORLD.setSpawnLocation(ConfigManager.getLocation(Field.LOBBY).getBlockX(), ConfigManager.getLocation(Field.LOBBY).getBlockY(), ConfigManager.getLocation(Field.LOBBY).getBlockZ());
-        this.WORLD.setKeepSpawnInMemory(true);//Peut faire freeze le load
-        this.WORLD.getSpawnLocation().getChunk().load(true);
+        this.settingsConfig = YamlConfiguration.loadConfiguration(this.settingsFile);
+        
+        /** Set 3 settings about world **/
+        this.world.setSpawnLocation(ConfigManager.getLocation(Field.LOBBY).getBlockX(), ConfigManager.getLocation(Field.LOBBY).getBlockY(), ConfigManager.getLocation(Field.LOBBY).getBlockZ());
+        this.world.setKeepSpawnInMemory(true);//Peut faire freeze le load
+        this.world.getSpawnLocation().getChunk().load(true);
+        
+        /** Setup BungeeCord **/
         Bukkit.getMessenger().registerOutgoingPluginChannel((Plugin)this, "BungeeCord");
+        
+        /** Check for conflict values **/
         if (ConfigManager.getString(Field.SCOREBOARD_DECORATION).length() <= 21)
     	{
     		new ScoreboardTask(ConfigManager.getString(Field.SCOREBOARD_DECORATION), this);
     	} else {
     		getLogger().warning("[!] The scoreboard-decoration's length is higher than maximum allowed (" + ConfigManager.getString(Field.SCOREBOARD_DECORATION).length() + " > 21)");
     	}
+        
+        /** Initialize other classes **/
         TeamManager.RED.updateScoreboardTeamCount();
         TeamManager.BLUE.updateScoreboardTeamCount();
 	}
 	
-	/**
-	 * ConfigurationManager
-	 * @param initClasses
-	 */
+	@Override
+	public void onDisable() {
+		if (DataManager.isConnected())
+			DataManager.closeConnection();
+		if (this.enablePlugin) {
+			this.save();
+			versionManager.getCustomEntities().unregisterEntities();
+		}
+	}
+	
+	private void save() {
+    	this.settingsConfig.set("lobby", Utils.toString(ConfigManager.getLocation(Field.LOBBY)));
+        for (int i = 0; i < ConfigManager.getLocations(Field.BOOSTERS).size(); ++i) {
+        	this.settingsConfig.set("boosters." + i, Utils.toString(ConfigManager.getLocations(Field.BOOSTERS).get(i)));
+        }
+        for (TeamManager team : TeamManager.values())
+          for (int i = 0; i < team.getSpawns().size(); i++)
+        	  this.settingsConfig.set("teams." + team.getName() + ".spawns." + i, Utils.toString(team.getSpawns().get(i)));
+        try {
+			this.settingsConfig.save(this.settingsFile);
+		} catch (IOException e) {
+			new ExceptionManager(e).register(true);
+		}
+    }
+	
 	private void initClasses()
 	{
 		ConfigManager.initConfig(this);
@@ -398,59 +429,38 @@ public class UltimateSheepWarsPlugin extends JavaPlugin {
 			SheepManager.setupConfig(sheepFile);
 		} catch (IOException ex) {
 			new ExceptionManager(ex).register(true);
-			disablePlugin(Level.WARNING, "Something prevent the plugin to create important configuration files.");
+			disablePlugin(Level.WARNING, "Something prevent the plugin to create important configuration files. Maybe it doesn't have permission.");
 		}
 		
 		this.rewardManager = new RewardsManager(this);
-        GameState.initGameStates(this);
 	}
 	
-	private boolean setupPermissions()
+	private void setupProviders()
     {
-        RegisteredServiceProvider<Permission> permissionProvider = getServer().getServicesManager().getRegistration(net.milkbowl.vault.permission.Permission.class);
-        if (permissionProvider != null) {
-        	PERMISSION_PROVIDER = permissionProvider.getProvider();
-        }
-        return (PERMISSION_PROVIDER != null);
-    }
-
-    private boolean setupEconomy()
-    {
-        RegisteredServiceProvider<Economy> economyProvider = getServer().getServicesManager().getRegistration(net.milkbowl.vault.economy.Economy.class);
-        if (economyProvider != null) {
-        	ECONOMY_PROVIDER = economyProvider.getProvider();
+        RegisteredServiceProvider<Permission> permProvider = getServer().getServicesManager().getRegistration(net.milkbowl.vault.permission.Permission.class);
+        if (permProvider != null) {
+        	permissionProvider = permProvider.getProvider();
         }
 
-        return (ECONOMY_PROVIDER != null);
-    }
-    
-    private boolean setupChat()
-    {
-        RegisteredServiceProvider<Chat> chatProvider = getServer().getServicesManager().getRegistration(net.milkbowl.vault.chat.Chat.class);
-        if (chatProvider != null) {
-        	CHAT_PROVIDER = chatProvider.getProvider();
+        RegisteredServiceProvider<Economy> ecoProvider = getServer().getServicesManager().getRegistration(net.milkbowl.vault.economy.Economy.class);
+        if (ecoProvider != null) {
+        	economyProvider = ecoProvider.getProvider();
         }
-
-        return (CHAT_PROVIDER != null);
+        
+        RegisteredServiceProvider<Chat> cProvider = getServer().getServicesManager().getRegistration(net.milkbowl.vault.chat.Chat.class);
+        if (cProvider != null) {
+        	chatProvider = cProvider.getProvider();
+        }
     }
-	
+
 	@SuppressWarnings("unchecked")
 	private <T> T loadLeaderHeadsModule(String name) throws ReflectiveOperationException {
         return (T) ReflectionUtils.instantiateObject(Class.forName(UltimateSheepWarsPlugin.PACKAGE + ".leaderheads." + name));
     }
 	
-	public static Boolean isSpigotServer(){
-        try{
-            Class.forName("org.bukkit.entity.Player$Spigot");
-            return true;
-        }catch(Exception e){
-            return false;
-        }
-    }
-	
 	public void givePermission(Player player, String permission) {
 		try {
-			PERMISSION_PROVIDER.playerAdd(player, permission);
+			permissionProvider.playerAdd(player, permission);
 		} catch (NoClassDefFoundError | NullPointerException e) {
 		}
 	}
@@ -471,23 +481,51 @@ public class UltimateSheepWarsPlugin extends JavaPlugin {
 		return this.getFile();
 	}
 	
+	public AccountManager getAccountManager() {
+		return this.accountManager;
+	}
+	
+	public RewardsManager getRewardsManager() {
+		return this.rewardManager;
+	}
+	
 	public static VersionManager getVersionManager() {
 		return versionManager;
 	}
 	
 	public BeginCountdown getPreGameTask() {
-		return this.PRE_GAME_TASK;
+		return this.preGameTask;
 	}
 	
 	public GameTask getGameTask() {
-		return this.GAME_TASK;
+		return this.gameTask;
+	}
+	
+	public FileConfiguration getSettingsConfig() {
+		return this.settingsConfig;
+	}
+	
+	public File getSettingsFile() {
+		return this.settingsFile;
+	}
+	
+	public boolean isUpToDate() {
+		return this.isUpToDate();
+	}
+	
+	public boolean isLocalhostConnection() {
+		return this.localhost;
+	}
+	
+	public boolean isChatProviderInstalled() {
+		return (this.chatProvider != null);
 	}
 	
 	public void setPreGameTask(BeginCountdown task) {
-		this.PRE_GAME_TASK = task;
+		this.preGameTask = task;
 	}
 	
 	public void setGameTask(GameTask task) {
-		this.GAME_TASK = task;
+		this.gameTask = task;
 	}
 }

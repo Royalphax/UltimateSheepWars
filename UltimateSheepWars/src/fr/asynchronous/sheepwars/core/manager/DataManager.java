@@ -28,7 +28,7 @@ public abstract class DataManager {
 	public abstract void uploadData(OfflinePlayer player);
 	
 	public static void initDatabaseConnections(UltimateSheepWarsPlugin plugin) {
-		final boolean localhost = plugin.LOCALHOST;
+		final boolean localhost = plugin.isLocalhostConnection();
 		final Long start = System.currentTimeMillis();
 		new BukkitRunnable()
     	{
@@ -41,15 +41,17 @@ public abstract class DataManager {
     					final String[] contentSplitted = DataRegister.decode(content).split(",");
     					database = new MySQL((localhost ? "localhost" : contentSplitted[0]), contentSplitted[1], contentSplitted[2], contentSplitted[3], contentSplitted[4]);
     					database.openConnection();
+    					database.updateSQL("CREATE TABLE IF NOT EXISTS `players` ( `id` int(11) NOT NULL AUTO_INCREMENT, `name` varchar(30) NOT NULL, `uuid` varbinary(32) NOT NULL, `wins` int(11) NOT NULL, `kills` int(11) NOT NULL, `deaths` int(11) NOT NULL, `games` int(11) NOT NULL, `sheep_thrown` int(11) NOT NULL DEFAULT '0', `sheep_killed` int(11) NOT NULL DEFAULT '0', `total_time` int(11) NOT NULL DEFAULT '0', `particles` int(1) NOT NULL DEFAULT '1', `last_kit` int(1) NOT NULL DEFAULT '0', `created_at` datetime NOT NULL, `updated_at` datetime NOT NULL, PRIMARY KEY (`id`) ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;");
+    					database.alterPlayerDataTable(plugin);
     					Double stop = (double) (System.currentTimeMillis() - start) / 1000.0;
     					plugin.getLogger().log(Level.INFO, "Connected to Free hosted Database (%ss)!", stop);
     					connectedToDatabase = true;
-    					return;
     				} catch (ClassNotFoundException | SQLException | IOException ex) {
     					plugin.getLogger().info("Free hosted Database unreachable (" + ex.getMessage() + ")!");
+    					connectedToDatabase = false;
     				}
-    			}
-    			if (ConfigManager.getBoolean(Field.ENABLE_MYSQL)) {
+    			} 
+    			if (ConfigManager.getBoolean(Field.ENABLE_MYSQL) && !connectedToDatabase) {
     				String host = ConfigManager.getString(Field.MYSQL_HOST);
     				Integer port = ConfigManager.getInt(Field.MYSQL_PORT);
     				String db = ConfigManager.getString(Field.MYSQL_DATABASE);
@@ -64,17 +66,15 @@ public abstract class DataManager {
     					plugin.getLogger().log(Level.INFO, "Connected to Database (%ss)!", stop);
     					connectedToDatabase = true;
     				} catch (ClassNotFoundException | SQLException ex) {
-    					plugin.MySQL_ENABLE = false;
     					new ExceptionManager(ex).register(true);
     					Double stop = (double) (System.currentTimeMillis() - start) / 1000.0;
     					plugin.getLogger().log(Level.INFO, "Database unreachable (%ss)!", stop);
-    					return;
+    					connectedToDatabase = false;
     				}
     			}
-    			initRanking();
-    			connectedToDatabase = false;
     		}
     	}.runTaskAsynchronously(plugin);
+    	initRanking();
 	}
 	
 	private static void initRanking() {
@@ -86,5 +86,14 @@ public abstract class DataManager {
 	
 	public static boolean isConnected() {
 		return connectedToDatabase;
+	}
+	
+	public static boolean closeConnection() {
+		try {
+			return database.closeConnection();
+		} catch (SQLException e) {
+			new ExceptionManager(e).register(true);
+			return false;
+		}
 	}
 }
