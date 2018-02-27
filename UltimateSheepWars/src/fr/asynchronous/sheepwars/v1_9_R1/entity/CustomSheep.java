@@ -18,7 +18,6 @@ import fr.asynchronous.sheepwars.core.handler.PlayerData;
 import fr.asynchronous.sheepwars.core.handler.SheepAbility;
 import fr.asynchronous.sheepwars.core.manager.ExceptionManager;
 import fr.asynchronous.sheepwars.core.manager.SheepManager;
-import fr.asynchronous.sheepwars.core.util.BlockUtils;
 import net.minecraft.server.v1_9_R1.Entity;
 import net.minecraft.server.v1_9_R1.EntityHuman;
 import net.minecraft.server.v1_9_R1.EntityLiving;
@@ -33,6 +32,7 @@ import net.minecraft.server.v1_9_R1.PathfinderGoalRandomLookaround;
 import net.minecraft.server.v1_9_R1.PathfinderGoalSelector;
 
 public class CustomSheep extends EntitySheep {
+	
 	private SheepManager sheep;
 	private Player player;
 	private net.minecraft.server.v1_9_R1.World world;
@@ -40,8 +40,6 @@ public class CustomSheep extends EntitySheep {
 	private boolean ground;
 	private long defaultTicks;
 	private long ticks;
-	private boolean drop;
-	private int noclipDistance;
 	private Plugin plugin;
 
 	public CustomSheep(net.minecraft.server.v1_9_R1.World world) {
@@ -69,9 +67,6 @@ public class CustomSheep extends EntitySheep {
 		this.sheep = sheep;
 		this.ticks = (sheep.getDuration() == -1 ? Long.MAX_VALUE : sheep.getDuration() * 20);
 		this.defaultTicks = this.ticks;
-		this.drop = sheep.isDrop();
-		this.noclip = !sheep.isFriendly();
-		this.noclipDistance = BlockUtils.getViewField(player, 6);
 
 		setColor((EnumColor.fromColorIndex(sheep.getColor().getWoolData())));
 		sheep.onSpawn(player, getBukkitSheep(), plugin);
@@ -105,74 +100,75 @@ public class CustomSheep extends EntitySheep {
 
 	@Override
 	public void move(double d0, double d1, double d2) {
-		if (this.noclip && this.player.getLocation().distance(getBukkitEntity().getLocation()) > noclipDistance) {
-			this.noclip = false;
-		}
+		
+		/**
+		 * Voir ce que cela renvoie. Si chaque double est en fait ce qui va être ajouté à la position,
+		 * tester si le bloque de cette position est solide ou pas. S'il l'est pas, on active le noclip !
+		 */
 		super.move(d0, d1, d2);
 	}
 
-	public void g(double d0, double d1, double d2) {
-	}
+	/**UTILE ? public void g(double d0, double d1, double d2) {
+	}**/
 
 	public void g(float sideMot, float forMot) {
 		if (this.sheep != null && this.onGround && this.sheep.getAbilities().contains(SheepAbility.CONTROLLABLE) && this.passengers.size() == 1) {
-			for (Entity passenger : this.passengers) {
-				if (passenger == null || !(passenger instanceof EntityHuman)) {
-					super.g(sideMot, forMot);
-					this.P = 1.0f;
-					this.aO = 0.02f;
-					return;
-				}
-				this.lastYaw = (this.yaw = passenger.yaw);
-				this.pitch = (passenger.pitch * 0.5F);
-				setYawPitch(this.yaw, this.pitch);
-				this.aM = (this.aK = this.yaw);
-				sideMot = ((EntityLiving) passenger).bd * 0.15F;
-				forMot = ((EntityLiving) passenger).be * 0.15F;// 0.5
-				if (forMot <= 0.0F) {
-					forMot *= 0.15F;// 0.25
-				}
-
-				Field jump = null;
-				try {
-					jump = EntityLiving.class.getDeclaredField("bc");
-				} catch (NoSuchFieldException localNoSuchFieldException) {
-				} catch (SecurityException localSecurityException) {
-				}
-
-				jump.setAccessible(true);
-
-				if ((jump != null) && (this.onGround)) {
-					try {
-						if (jump.getBoolean(passenger)) {
-							double jumpHeight = 0.5D;
-
-							this.motY = jumpHeight;
-						}
-					} catch (IllegalAccessException localIllegalAccessException) {
-					}
-
-				}
-
-				this.P = 1.0F;
-
-				this.aO = (bK() * 0.1F);
-				if (!this.world.isClientSide) {
-					l(0.35F);
-					super.g(sideMot, forMot);
-				}
-
-				this.aB = this.aC;
-				double d0 = this.locX - this.lastX;
-				double d1 = this.locZ - this.lastZ;
-				float f4 = MathHelper.sqrt(d0 * d0 + d1 * d1) * 4.0F;
-				if (f4 > 1.0F) {
-					f4 = 1.0F;
-				}
-
-				this.aC += (f4 - this.aC) * 0.4F;
-				this.aE += this.aC;
+			final Entity passenger = this.passengers.get(0);
+			if (passenger == null || !(passenger instanceof EntityHuman)) {
+				super.g(sideMot, forMot);
+				this.P = 1.0f;
+				this.aO = 0.02f;
+				return;
 			}
+			this.lastYaw = (this.yaw = passenger.yaw);
+			this.pitch = (passenger.pitch * 0.5F);
+			setYawPitch(this.yaw, this.pitch);
+			this.aM = (this.aK = this.yaw);
+			sideMot = ((EntityLiving) passenger).bd * 0.15F;
+			forMot = ((EntityLiving) passenger).be * 0.15F;// 0.5
+			if (forMot <= 0.0F) {
+				forMot *= 0.15F;// 0.25
+			}
+
+			Field jump = null;
+			try {
+				jump = EntityLiving.class.getDeclaredField("bc");
+			} catch (NoSuchFieldException localNoSuchFieldException) {
+			} catch (SecurityException localSecurityException) {
+			}
+
+			jump.setAccessible(true);
+
+			if ((jump != null) && (this.onGround)) {
+				try {
+					if (jump.getBoolean(passenger)) {
+						double jumpHeight = 0.5D;
+
+						this.motY = jumpHeight;
+					}
+				} catch (IllegalAccessException localIllegalAccessException) {
+				}
+
+			}
+
+			this.P = 1.0F;
+
+			this.aO = (bK() * 0.1F);
+			if (!this.world.isClientSide) {
+				l(0.35F);
+				super.g(sideMot, forMot);
+			}
+
+			this.aB = this.aC;
+			double d0 = this.locX - this.lastX;
+			double d1 = this.locZ - this.lastZ;
+			float f4 = MathHelper.sqrt(d0 * d0 + d1 * d1) * 4.0F;
+			if (f4 > 1.0F) {
+				f4 = 1.0F;
+			}
+
+			this.aC += (f4 - this.aC) * 0.4F;
+			this.aE += this.aC;
 		}
 		super.g(sideMot, forMot);
 	}
@@ -184,11 +180,11 @@ public class CustomSheep extends EntitySheep {
 				if (!this.ground) {
 					this.ground = (this.sheep.isFriendly() || this.onGround || this.inWater);
 				} else {
-					if (((this.sheep.isFriendly()) || (this.ticks <= this.defaultTicks - 20L)) && ((this.ticks == 0L) || (this.sheep.onTicking(this.player, this.ticks, getBukkitSheep(), this.plugin)) || (!isAlive()))) {
+					if ((this.sheep.isFriendly() || (this.ticks <= this.defaultTicks - 20L)) && ((this.ticks == 0L) || (this.sheep.onTicking(this.player, this.ticks, getBukkitSheep(), this.plugin)) || (!isAlive()))) {
 						boolean death = true;
-						if (!getBukkitSheep().getPassengers().isEmpty())
-							for (org.bukkit.entity.Entity ent : getBukkitSheep().getPassengers())
-								ent.eject();
+						if (!this.passengers.isEmpty())
+							for (Entity ent : this.passengers)
+								ent.getBukkitEntity().eject();
 						if (isAlive()) {
 							die();
 							death = false;
@@ -213,8 +209,7 @@ public class CustomSheep extends EntitySheep {
 	}
 
 	public void dropDeathLoot() {
-		if (this.drop) {
-			this.drop = false;
+		if (this.sheep.isDrop()) {
 			if (getBukkitEntity().getLastDamageCause().getCause() == DamageCause.ENTITY_ATTACK) {
 				if (getBukkitSheep().getKiller() instanceof Player) {
 					PlayerData.getPlayerData(getBukkitSheep().getKiller()).increaseSheepKilled(1);
@@ -246,7 +241,6 @@ public class CustomSheep extends EntitySheep {
 	}
 
 	public void explode(float power, boolean breakBlocks, boolean fire) {
-		this.drop = false;
 		getBukkitEntity().remove();
 		UltimateSheepWarsPlugin.getVersionManager().getWorldUtils().createExplosion(this.player, getBukkitSheep().getWorld(), this.locX, this.locY, this.locZ, power, breakBlocks, fire);
 	}
