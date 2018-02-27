@@ -7,9 +7,9 @@ import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.event.UltimateSheepWarsEventListener;
 import fr.asynchronous.sheepwars.core.handler.GameState;
 
-public class bfB extends UltimateSheepWarsEventListener
+public class ServerListPing extends UltimateSheepWarsEventListener
 {
-    public bfB(final UltimateSheepWarsPlugin plugin) {
+    public ServerListPing(final UltimateSheepWarsPlugin plugin) {
         super(plugin);
     }
     

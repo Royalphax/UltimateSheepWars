@@ -7,9 +7,9 @@ import org.bukkit.event.server.ServerCommandEvent;
 import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.event.UltimateSheepWarsEventListener;
 
-public class bfA extends UltimateSheepWarsEventListener
+public class ServerCommand extends UltimateSheepWarsEventListener
 {
-    public bfA(final UltimateSheepWarsPlugin plugin) {
+    public ServerCommand(final UltimateSheepWarsPlugin plugin) {
         super(plugin);
     }
     
