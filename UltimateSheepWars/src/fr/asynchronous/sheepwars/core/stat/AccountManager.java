@@ -91,9 +91,9 @@ public class AccountManager {
 			return false;
 		this.owner = newOwner;
 		ConfigManager.setString(Field.OWNER, newOwner);
-        plugin.SETTINGS_CONFIG.set("owner", newOwner);
+        plugin.getSettingsConfig().set("owner", newOwner);
         try {
-			plugin.SETTINGS_CONFIG.save(plugin.SETTINGS_FILE);
+			plugin.getSettingsConfig().save(plugin.getSettingsFile());
 		} catch (IOException e) {
 			new ExceptionManager(e).register(true);
 		}

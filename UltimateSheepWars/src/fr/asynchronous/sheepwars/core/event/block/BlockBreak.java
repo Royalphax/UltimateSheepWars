@@ -7,6 +7,7 @@ import org.bukkit.event.block.BlockBreakEvent;
 import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.event.UltimateSheepWarsEventListener;
 import fr.asynchronous.sheepwars.core.handler.GameState;
+import fr.asynchronous.sheepwars.core.handler.PlayerData;
 import fr.asynchronous.sheepwars.core.manager.TeamManager;
 
 public class BlockBreak extends UltimateSheepWarsEventListener
@@ -17,7 +18,7 @@ public class BlockBreak extends UltimateSheepWarsEventListener
     
     @EventHandler
     public void onBlockBreak(final BlockBreakEvent event) {
-        if ((!GameState.isStep(GameState.LOBBY) && TeamManager.getPlayerTeam(event.getPlayer()) != TeamManager.SPEC && !event.getPlayer().isInsideVehicle()) || event.getPlayer().isOp()) {
+        if ((!GameState.isStep(GameState.LOBBY) && PlayerData.getPlayerData(event.getPlayer()).getTeam() != TeamManager.SPEC && !event.getPlayer().isInsideVehicle()) || event.getPlayer().isOp()) {
             event.getBlock().setType(Material.AIR);
         } else {
         	event.setCancelled(true);

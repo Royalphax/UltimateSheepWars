@@ -13,8 +13,8 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 
 import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.event.UltimateSheepWarsEventListener;
+import fr.asynchronous.sheepwars.core.handler.PlayerData;
 import fr.asynchronous.sheepwars.core.handler.Sounds;
-import fr.asynchronous.sheepwars.core.manager.TeamManager;
 import fr.asynchronous.sheepwars.core.util.MathUtils;
 
 public class EntityDamageByPlayer extends UltimateSheepWarsEventListener
@@ -39,7 +39,7 @@ public class EntityDamageByPlayer extends UltimateSheepWarsEventListener
                 }
                 if (damagerEntity instanceof Player)
                 {
-                	if (TeamManager.getPlayerTeam((Player) damagerEntity) != TeamManager.getPlayerTeam(victim))
+                	if (PlayerData.getPlayerData((Player) damagerEntity).getTeam() != PlayerData.getPlayerData(victim).getTeam())
                 	{
                 		victim.setNoDamageTicks(0);
                 		victim.damage(event.getFinalDamage(), damagerEntity);

@@ -4,6 +4,7 @@ import fr.asynchronous.sheepwars.core.manager.ConfigManager;
 import fr.asynchronous.sheepwars.core.manager.ConfigManager.Field;
 
 public enum GameState {
+	
 	LOBBY(ConfigManager.getString(Field.LOBBY_GAME_STATE_MOTD)),
 	IN_GAME(ConfigManager.getString(Field.INGAME_GAME_STATE_MOTD)),
 	POST_GAME(ConfigManager.getString(Field.POST_GAME_GAME_STATE_MOTD)),
@@ -19,9 +20,13 @@ public enum GameState {
 	public static boolean isStep(final GameState step) {
 		return GameState.currentStep == step;
 	}
+	
+	public static GameState getCurrentStep() {
+		return currentStep;
+	}
 
-	public static void setCurrentStep(final GameState currentStep) {
-		GameState.currentStep = currentStep;
+	public static void setCurrentStep(final GameState currStep) {
+		currentStep = currStep;
 	}
 
 	private GameState(final String motd) {

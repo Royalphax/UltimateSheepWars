@@ -11,9 +11,9 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.event.UltimateSheepWarsEventListener;
+import fr.asynchronous.sheepwars.core.handler.GameState;
 import fr.asynchronous.sheepwars.core.handler.PlayerData;
 import fr.asynchronous.sheepwars.core.handler.Sounds;
-import fr.asynchronous.sheepwars.core.handler.GameState;
 import fr.asynchronous.sheepwars.core.message.Language;
 import fr.asynchronous.sheepwars.core.message.Message;
 import fr.asynchronous.sheepwars.core.util.ItemBuilder;
@@ -33,17 +33,17 @@ public class InventoryClick extends UltimateSheepWarsEventListener
             event.setCancelled(true);
             if (event.getSlot() == event.getRawSlot() && current != null && current.hasItemMeta()) {
             	final Player player = (Player)event.getWhoClicked();
-                final PlayerData data = PlayerData.getPlayerData(this.plugin, player);
+                final PlayerData data = PlayerData.getPlayerData(player);
                 if (current.getType() == Material.ARROW && (event.getSlot() == 21 || event.getSlot() == 23) && event.getClickedInventory() == player.getInventory())
                 {
                 	if (player.hasMetadata("stats_top_loading"))
                 	{
-                		Utils.playSound(player, null, Sounds.VILLAGER_HAGGLE, 1f, 1f);
+                		Sounds.playSound(player, null, Sounds.VILLAGER_HAGGLE, 1f, 1f);
                 		return;
                 	}
                 	player.setMetadata("stats_top_loading", new FixedMetadataValue(this.plugin, true));
                 	
-                	Utils.playSound(player, null, Sounds.CLICK, 1f, 1f);
+                	Sounds.playSound(player, null, Sounds.CLICK, 1f, 1f);
                 	PlayerData.DATA_TYPE actual = PlayerData.DATA_TYPE.getFromId((int) player.getMetadata("stats_top").get(0).value());
                 	PlayerData.DATA_TYPE before = PlayerData.DATA_TYPE.before(actual);
                 	PlayerData.DATA_TYPE after = PlayerData.DATA_TYPE.after(actual);
@@ -66,7 +66,7 @@ public class InventoryClick extends UltimateSheepWarsEventListener
                 	inv.setItem(22, new ItemBuilder(Material.AIR).toItemStack());
                 	inv.setItem(23, new ItemBuilder(Material.ARROW).setName(Language.getMessageByLanguage(data.getLocale(), Message.RANKING_GOTO_RIGHT)
                 			.replace("%RANKING%", Language.getMessageByLanguage(data.getLocale(), after.message))).toItemStack());
-                	Utils.playSound(player, null, Sounds.CLICK, 1f, 1f);
+                	Sounds.playSound(player, null, Sounds.CLICK, 1f, 1f);
                 	new BukkitRunnable()
                 	{
                 		public void run()

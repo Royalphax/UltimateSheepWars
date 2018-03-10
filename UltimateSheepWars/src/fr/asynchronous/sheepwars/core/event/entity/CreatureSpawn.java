@@ -17,11 +17,7 @@ public class CreatureSpawn extends UltimateSheepWarsEventListener
     
     @EventHandler(priority=EventPriority.HIGHEST) 
     public void onCreatureSpawn(final CreatureSpawnEvent event) {
-        if (event.getEntity() instanceof Sheep) {
-            return;
-        }
-        else {
-        	event.setCancelled(!(event.getEntity() instanceof ArmorStand));
-        }
+        if (!(event.getEntity() instanceof Sheep || event.getEntity() instanceof ArmorStand))
+        	event.setCancelled(true);
     }
 }

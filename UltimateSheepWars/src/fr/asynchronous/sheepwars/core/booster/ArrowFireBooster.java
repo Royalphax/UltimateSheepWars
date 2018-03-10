@@ -8,6 +8,7 @@ import org.bukkit.event.Event;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 
 import fr.asynchronous.sheepwars.core.handler.DisplayColor;
+import fr.asynchronous.sheepwars.core.handler.PlayerData;
 import fr.asynchronous.sheepwars.core.manager.BoosterManager;
 import fr.asynchronous.sheepwars.core.manager.TeamManager;
 import fr.asynchronous.sheepwars.core.message.Message.MsgEnum;
@@ -32,7 +33,7 @@ public class ArrowFireBooster extends BoosterManager
     public void onEvent(final Player player, final Event event, final BoosterManager.TriggerBoosterAction trigger) {
         if (trigger == BoosterManager.TriggerBoosterAction.ARROW_LAUNCH) {
             final ProjectileLaunchEvent launchEvent = (ProjectileLaunchEvent)event;
-            final TeamManager team = TeamManager.getPlayerTeam(player);
+            final TeamManager team = PlayerData.getPlayerData(player).getTeam();
             if (team != null && this.teams.containsKey(team)) {
                 final long time = (long)this.teams.get(team);
                 if (System.currentTimeMillis() - time <= 15000L) {

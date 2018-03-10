@@ -12,55 +12,55 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
 public abstract class CalendarEvent implements Listener {
-	
+
 	private static List<CalendarEvent> enabledEvents = new ArrayList<>();
 
 	private int id;
 	private String name;
 	private BukkitTask currentTask;
-	
+
 	public CalendarEvent(int id, String name) {
 		this.id = id;
 		this.name = name;
 	}
-	
+
 	public int getID() {
 		return this.id;
 	}
-	
+
 	public String getName() {
 		return this.name;
 	}
-	
+
 	public abstract void activate(Plugin activatingPlugin);
-	
+
 	public abstract void deactivate(Plugin deactivatingPlugin);
-	
+
 	public abstract Calendar getEndDate();
-	
+
 	public abstract Calendar getStartDate();
-	
+
 	public boolean isTimePeriod() {
 		Calendar cal = Calendar.getInstance();
 		return (cal.before(getEndDate()) && cal.after(getStartDate()));
 	}
-	
+
 	public int secBeforeEnd() {
 		Calendar cal = Calendar.getInstance();
 		Calendar endDate = getEndDate();
 		if (cal.after(endDate))
 			return 0;
-		return Math.toIntExact((endDate.getTimeInMillis()-cal.getTimeInMillis())/1000);
+		return Math.toIntExact((endDate.getTimeInMillis() - cal.getTimeInMillis()) / 1000);
 	}
-	
+
 	public int secBeforeStart() {
 		Calendar cal = Calendar.getInstance();
 		Calendar startDate = getStartDate();
 		if (cal.after(startDate))
 			return 0;
-		return Math.toIntExact((startDate.getTimeInMillis()-cal.getTimeInMillis())/1000);
+		return Math.toIntExact((startDate.getTimeInMillis() - cal.getTimeInMillis()) / 1000);
 	}
-	
+
 	private void registerEvents(final Plugin plugin) {
 		Bukkit.getPluginManager().registerEvents(this, plugin);
 		this.activate(plugin);
@@ -68,21 +68,21 @@ public abstract class CalendarEvent implements Listener {
 			public void run() {
 				unregisterEvents(plugin);
 			}
-		}.runTaskLater(plugin, secBeforeEnd()*20);
+		}.runTaskLater(plugin, secBeforeEnd() * 20);
 	}
-	
+
 	private void unregisterEvents(final Plugin plugin) {
 		this.deactivate(plugin);
 		HandlerList.unregisterAll(this);
 		this.startTask(plugin);
 	}
-	
+
 	private void startTask(final Plugin plugin) {
 		this.currentTask = new BukkitRunnable() {
 			public void run() {
 				registerEvents(plugin);
 			}
-		}.runTaskLater(plugin, secBeforeStart()*20);
+		}.runTaskLater(plugin, secBeforeStart() * 20);
 	}
 
 	public static boolean enableCalendarEvent(CalendarEvent calendarEvent, Plugin owningPlugin) {
@@ -100,7 +100,7 @@ public abstract class CalendarEvent implements Listener {
 		enabledEvents.add(calendarEvent);
 		return true;
 	}
-	
+
 	public static boolean disableCalendarEvent(CalendarEvent calendarEvent) {
 		if (enabledEvents.contains(calendarEvent)) {
 			enabledEvents.remove(calendarEvent);

@@ -6,6 +6,7 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.event.UltimateSheepWarsEventListener;
 import fr.asynchronous.sheepwars.core.handler.GameState;
+import fr.asynchronous.sheepwars.core.handler.PlayerData;
 import fr.asynchronous.sheepwars.core.manager.TeamManager;
 
 public class BlockPlace extends UltimateSheepWarsEventListener
@@ -16,7 +17,7 @@ public class BlockPlace extends UltimateSheepWarsEventListener
     
     @EventHandler
     public void onBlockPlace(final BlockPlaceEvent event) {
-        if ((GameState.isStep(GameState.LOBBY) || TeamManager.getPlayerTeam(event.getPlayer()) == TeamManager.SPEC && !event.getPlayer().isInsideVehicle()) && !event.getPlayer().isOp()) {
+        if ((GameState.isStep(GameState.LOBBY) || PlayerData.getPlayerData(event.getPlayer()).getTeam() == TeamManager.SPEC && !event.getPlayer().isInsideVehicle()) && !event.getPlayer().isOp()) {
             event.setCancelled(true);
         }
     }
