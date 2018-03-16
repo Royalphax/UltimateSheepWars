@@ -190,6 +190,23 @@ public class ConfigManager {
 		checkForException(field, FieldType.STRING);
 		field.setValue(arg0);
 	}
+	
+	public static void setLocation(Field field, Location arg0) {
+		checkForException(field, FieldType.LOCATION);
+		field.setValue(arg0);
+	}
+	
+	public static void addLocation(Field field, Location arg0) {
+		checkForException(field, FieldType.LOCATION_LIST);
+		field.setValue(getLocations(field).add(arg0));
+	}
+	
+	public static void clearLocations(Field field) {
+		checkForException(field, FieldType.LOCATION_LIST);
+		List<Location> value = getLocations(field);
+		value.clear();
+		field.setValue(value);
+	}
 
 	public static String getString(Field field) {
 		checkForException(field, FieldType.STRING);
@@ -240,7 +257,7 @@ public class ConfigManager {
 		if (!initialized)
 			new ConfigurationManagerClassHasntBeenInitialized("You can't get any field before the ConfigurationManager class hasn't been initialized first.").printStackTrace();
 		if (field.getType() != type)
-			new InvalidFieldTypeException("You can't get the field '" + field.toString() + "' as a/an " + type.toString() + " when it's an instance of a/an " + field.getType().toString()).printStackTrace();
+			new InvalidFieldTypeException("You can't get the field '" + field.toString() + "' as a/an " + type.toString() + " cause it's an instance of a/an " + field.getType().toString()).printStackTrace();
 	}
 
 	public static void initConfig(UltimateSheepWarsPlugin instance) {
@@ -248,7 +265,7 @@ public class ConfigManager {
 			instance.getDataFolder().mkdirs();
 		File file = new File(instance.getDataFolder(), "config.yml");
 		if (!file.exists()) {
-			instance.getLogger().info("Thanks for using UltimateSheepWars from Asynchronous.");
+			instance.getLogger().info("Thanks for using UltimateSheepWars from Roytreo28 (@Asynchronous).");
 			instance.getLogger().info("Generating configuration file ...");
 			try (InputStream in = instance.getResource("config.yml")) {
 				Files.copy(in, file.toPath());
