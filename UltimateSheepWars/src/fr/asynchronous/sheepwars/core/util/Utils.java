@@ -103,7 +103,7 @@ public class Utils {
 		return output.toString().trim();
 	}
 
-	public static boolean isPluginConfigured(UltimateSheepWarsPlugin plugin) {
+	public static boolean isPluginConfigured() {
 		if (ConfigManager.getLocation(Field.LOBBY) == getDefaultLocation() 
 				|| ConfigManager.getLocations(Field.BOOSTERS).isEmpty() 
 				|| TeamManager.BLUE.getSpawns().isEmpty() 
