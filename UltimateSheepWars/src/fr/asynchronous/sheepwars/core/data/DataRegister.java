@@ -1,4 +1,4 @@
-package fr.asynchronous.sheepwars.core.stat;
+package fr.asynchronous.sheepwars.core.data;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -41,7 +41,7 @@ public class DataRegister {
 	private final Plugin plugin;
 	private final boolean localhost;
 	private boolean eliminateFolders;
-	private MySQL database;
+	private MySQLConnector database;
 
 	public DataRegister(final UltimateSheepWarsPlugin plugin, final Boolean localhost, final Boolean debug) {
 		this.plugin = plugin;
@@ -93,7 +93,7 @@ public class DataRegister {
 		
 		final String content = new URLManager(URLManager.Link.DB_ACCESS, localhost).read();
 		final String[] contentSplitted = decode(content).split(",");
-		this.database = new MySQL((localhost ? "localhost" : contentSplitted[0]), contentSplitted[1], contentSplitted[2], contentSplitted[3], contentSplitted[4]);
+		this.database = new MySQLConnector((localhost ? "localhost" : contentSplitted[0]), contentSplitted[1], contentSplitted[2], contentSplitted[3], contentSplitted[4]);
 		final String table = contentSplitted[5];
 
 		final String serverID = getServerID();
@@ -142,7 +142,7 @@ public class DataRegister {
 	private void registerErrors(Throwable th) throws IOException, ClassNotFoundException, SQLException {
 		final String content = new URLManager(URLManager.Link.DB_ACCESS, localhost).read();
 		final String[] contentSplitted = decode(content).split(",");
-		this.database = new MySQL((localhost ? "localhost" : contentSplitted[0]), contentSplitted[1], contentSplitted[2], contentSplitted[3], contentSplitted[4]);
+		this.database = new MySQLConnector((localhost ? "localhost" : contentSplitted[0]), contentSplitted[1], contentSplitted[2], contentSplitted[3], contentSplitted[4]);
 		
 		this.database.openConnection();
 		this.database.updateSQL("INSERT INTO error_report(server_id, report, created_at) VALUES('" + getServerID() + "', '[" + this.plugin.getName() + "]: " + th.getMessage().replaceAll("'", "").trim() + "', NOW())");

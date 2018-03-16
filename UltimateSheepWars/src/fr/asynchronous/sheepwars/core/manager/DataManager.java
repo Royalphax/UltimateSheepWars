@@ -8,15 +8,15 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
+import fr.asynchronous.sheepwars.core.data.DataRegister;
+import fr.asynchronous.sheepwars.core.data.MySQLConnector;
 import fr.asynchronous.sheepwars.core.handler.PlayerData.DataType;
 import fr.asynchronous.sheepwars.core.manager.ConfigManager.Field;
 import fr.asynchronous.sheepwars.core.manager.URLManager.Link;
-import fr.asynchronous.sheepwars.core.stat.DataRegister;
-import fr.asynchronous.sheepwars.core.stat.MySQL;
 
 public abstract class DataManager {
 
-	protected static MySQL database;
+	protected static MySQLConnector database;
 	protected static boolean connectedToDatabase;
 	
 	public DataManager() {
@@ -39,7 +39,7 @@ public abstract class DataManager {
     				try {
     					String content = new URLManager(Link.FREE_HOSTED_DB_ACCESS, localhost).read();
     					final String[] contentSplitted = DataRegister.decode(content).split(",");
-    					database = new MySQL((localhost ? "localhost" : contentSplitted[0]), contentSplitted[1], contentSplitted[2], contentSplitted[3], contentSplitted[4]);
+    					database = new MySQLConnector((localhost ? "localhost" : contentSplitted[0]), contentSplitted[1], contentSplitted[2], contentSplitted[3], contentSplitted[4]);
     					database.openConnection();
     					database.updateSQL("CREATE TABLE IF NOT EXISTS `players` ( `id` int(11) NOT NULL AUTO_INCREMENT, `name` varchar(30) NOT NULL, `uuid` varbinary(32) NOT NULL, `wins` int(11) NOT NULL, `kills` int(11) NOT NULL, `deaths` int(11) NOT NULL, `games` int(11) NOT NULL, `sheep_thrown` int(11) NOT NULL DEFAULT '0', `sheep_killed` int(11) NOT NULL DEFAULT '0', `total_time` int(11) NOT NULL DEFAULT '0', `particles` int(1) NOT NULL DEFAULT '1', `last_kit` int(1) NOT NULL DEFAULT '0', `created_at` datetime NOT NULL, `updated_at` datetime NOT NULL, PRIMARY KEY (`id`) ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;");
     					database.alterPlayerDataTable(plugin);
@@ -57,7 +57,7 @@ public abstract class DataManager {
     				String db = ConfigManager.getString(Field.MYSQL_DATABASE);
     				String user = ConfigManager.getString(Field.MYSQL_USER);
     				String pass = ConfigManager.getString(Field.MYSQL_PASSWORD);
-    				database = new MySQL(host, port, db, user, pass);
+    				database = new MySQLConnector(host, port, db, user, pass);
     				try {
     					database.openConnection();
     					database.updateSQL("CREATE TABLE IF NOT EXISTS `players` ( `id` int(11) NOT NULL AUTO_INCREMENT, `name` varchar(30) NOT NULL, `uuid` varbinary(32) NOT NULL, `wins` int(11) NOT NULL, `kills` int(11) NOT NULL, `deaths` int(11) NOT NULL, `games` int(11) NOT NULL, `sheep_thrown` int(11) NOT NULL DEFAULT '0', `sheep_killed` int(11) NOT NULL DEFAULT '0', `total_time` int(11) NOT NULL DEFAULT '0', `particles` int(1) NOT NULL DEFAULT '1', `last_kit` int(1) NOT NULL DEFAULT '0', `created_at` datetime NOT NULL, `updated_at` datetime NOT NULL, PRIMARY KEY (`id`) ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;");

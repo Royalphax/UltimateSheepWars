@@ -1,4 +1,4 @@
-package fr.asynchronous.sheepwars.core.stat;
+package fr.asynchronous.sheepwars.core.data;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -13,7 +13,7 @@ import fr.asynchronous.sheepwars.core.handler.PlayerData;
 import fr.asynchronous.sheepwars.core.manager.ExceptionManager;
 import fr.asynchronous.sheepwars.core.manager.KitManager;
 
-public class MySQL extends Database {
+public class MySQLConnector extends Database {
 
 	private final String user;
 	private final String database;
@@ -21,11 +21,11 @@ public class MySQL extends Database {
 	private final String port;
 	private final String hostname;
 
-	public MySQL(String hostname, Integer port, String database, String username, String password) {
+	public MySQLConnector(String hostname, Integer port, String database, String username, String password) {
 		this(hostname, Integer.toString(port), database, username, password);
 	}
 	
-	public MySQL(String hostname, String port, String database, String username, String password) {
+	public MySQLConnector(String hostname, String port, String database, String username, String password) {
 		super();
 		this.hostname = hostname;
 		this.port = port;

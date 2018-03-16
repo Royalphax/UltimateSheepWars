@@ -1,4 +1,4 @@
-package fr.asynchronous.sheepwars.core.stat;
+package fr.asynchronous.sheepwars.core.data;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
