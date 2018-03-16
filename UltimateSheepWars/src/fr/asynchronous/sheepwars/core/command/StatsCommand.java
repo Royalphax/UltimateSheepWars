@@ -9,19 +9,13 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.handler.PlayerData;
+import fr.asynchronous.sheepwars.core.manager.DataManager;
 import fr.asynchronous.sheepwars.core.message.Message;
 import fr.asynchronous.sheepwars.core.message.Message.MsgEnum;
 import fr.asynchronous.sheepwars.core.util.Utils;
 
 public class StatsCommand implements CommandExecutor {
-
-	public UltimateSheepWarsPlugin plugin;
-
-	public StatsCommand(UltimateSheepWarsPlugin plugin) {
-		this.plugin = plugin;
-	}
 
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		if (!(sender instanceof Player)) {
@@ -29,7 +23,7 @@ public class StatsCommand implements CommandExecutor {
             return true;
         }
 		Player player = (Player) sender;
-        if (!this.plugin.MySQL_ENABLE) 
+        if (!DataManager.isConnected()) 
     	{
     		sender.sendMessage(Message.getMessage(player, MsgEnum.DATABASE_NOT_CONNECTED));
     		return true;

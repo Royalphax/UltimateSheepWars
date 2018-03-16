@@ -5,7 +5,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.sql.SQLException;
 import java.util.List;
 import java.util.logging.Level;
 
@@ -27,7 +26,6 @@ import fr.asynchronous.sheepwars.core.command.MainCommand;
 import fr.asynchronous.sheepwars.core.command.StatsCommand;
 import fr.asynchronous.sheepwars.core.data.AccountManager;
 import fr.asynchronous.sheepwars.core.data.DataRegister;
-import fr.asynchronous.sheepwars.core.data.MySQLConnector;
 import fr.asynchronous.sheepwars.core.event.UltimateSheepWarsEventListener;
 import fr.asynchronous.sheepwars.core.event.block.BlockBreak;
 import fr.asynchronous.sheepwars.core.event.block.BlockPlace;
@@ -69,8 +67,8 @@ import fr.asynchronous.sheepwars.core.handler.GameState;
 import fr.asynchronous.sheepwars.core.handler.MinecraftVersion;
 import fr.asynchronous.sheepwars.core.manager.BoosterManager;
 import fr.asynchronous.sheepwars.core.manager.ConfigManager;
-import fr.asynchronous.sheepwars.core.manager.DataManager;
 import fr.asynchronous.sheepwars.core.manager.ConfigManager.Field;
+import fr.asynchronous.sheepwars.core.manager.DataManager;
 import fr.asynchronous.sheepwars.core.manager.ExceptionManager;
 import fr.asynchronous.sheepwars.core.manager.KitManager;
 import fr.asynchronous.sheepwars.core.manager.RewardsManager;
@@ -220,7 +218,7 @@ public class UltimateSheepWarsPlugin extends JavaPlugin {
         /** Init commands **/
         this.getCommand("sheepwars").setExecutor(new MainCommand(this));
         this.getCommand("lang").setExecutor(new LangCommand(this));
-        this.getCommand("stats").setExecutor(new StatsCommand(this));
+        this.getCommand("stats").setExecutor(new StatsCommand());
         this.getCommand("hub").setExecutor(new HubCommand(this));
         this.getCommand("contributor").setExecutor(new ContributorCommand(this));
         
@@ -392,13 +390,17 @@ public class UltimateSheepWarsPlugin extends JavaPlugin {
 	}
 	
 	private void save() {
+		/** Save the Lobby loc **/
     	this.settingsConfig.set("lobby", Utils.toString(ConfigManager.getLocation(Field.LOBBY)));
-        for (int i = 0; i < ConfigManager.getLocations(Field.BOOSTERS).size(); ++i) {
+    	/** Save the Boosters loc **/
+    	for (int i = 0; i < ConfigManager.getLocations(Field.BOOSTERS).size(); ++i) {
         	this.settingsConfig.set("boosters." + i, Utils.toString(ConfigManager.getLocations(Field.BOOSTERS).get(i)));
         }
+    	/** Save the Teams spawns **/
         for (TeamManager team : TeamManager.values())
           for (int i = 0; i < team.getSpawns().size(); i++)
         	  this.settingsConfig.set("teams." + team.getName() + ".spawns." + i, Utils.toString(team.getSpawns().get(i)));
+        /** Save the file **/
         try {
 			this.settingsConfig.save(this.settingsFile);
 		} catch (IOException e) {
