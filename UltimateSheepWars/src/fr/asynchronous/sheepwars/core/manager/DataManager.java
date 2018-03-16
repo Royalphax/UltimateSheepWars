@@ -16,6 +16,8 @@ import fr.asynchronous.sheepwars.core.manager.URLManager.Link;
 
 public abstract class DataManager {
 
+	private static final String CREATE_DATABASE_REQUEST = "\"CREATE TABLE IF NOT EXISTS `players` ( `id` int(11) NOT NULL AUTO_INCREMENT, `name` varchar(30) NOT NULL, `uuid` varbinary(32) NOT NULL, `wins` int(11) NOT NULL, `kills` int(11) NOT NULL, `deaths` int(11) NOT NULL, `games` int(11) NOT NULL, `sheep_thrown` int(11) NOT NULL DEFAULT '0', `sheep_killed` int(11) NOT NULL DEFAULT '0', `total_time` int(11) NOT NULL DEFAULT '0', `particles` int(1) NOT NULL DEFAULT '1', `kits` int NOT NULL DEFAULT '0', `created_at` datetime NOT NULL, `updated_at` datetime NOT NULL, PRIMARY KEY (`id`) ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;";
+	
 	protected static MySQLConnector database;
 	protected static boolean connectedToDatabase;
 	
@@ -41,8 +43,8 @@ public abstract class DataManager {
     					final String[] contentSplitted = DataRegister.decode(content).split(",");
     					database = new MySQLConnector((localhost ? "localhost" : contentSplitted[0]), contentSplitted[1], contentSplitted[2], contentSplitted[3], contentSplitted[4]);
     					database.openConnection();
-    					database.updateSQL("CREATE TABLE IF NOT EXISTS `players` ( `id` int(11) NOT NULL AUTO_INCREMENT, `name` varchar(30) NOT NULL, `uuid` varbinary(32) NOT NULL, `wins` int(11) NOT NULL, `kills` int(11) NOT NULL, `deaths` int(11) NOT NULL, `games` int(11) NOT NULL, `sheep_thrown` int(11) NOT NULL DEFAULT '0', `sheep_killed` int(11) NOT NULL DEFAULT '0', `total_time` int(11) NOT NULL DEFAULT '0', `particles` int(1) NOT NULL DEFAULT '1', `last_kit` int(1) NOT NULL DEFAULT '0', `created_at` datetime NOT NULL, `updated_at` datetime NOT NULL, PRIMARY KEY (`id`) ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;");
-    					database.alterPlayerDataTable(plugin);
+    					database.updateSQL(CREATE_DATABASE_REQUEST);
+    					alterPlayerDataTable();
     					Double stop = (double) (System.currentTimeMillis() - start) / 1000.0;
     					plugin.getLogger().log(Level.INFO, "Connected to Free hosted Database (%ss)!", stop);
     					connectedToDatabase = true;
@@ -60,8 +62,8 @@ public abstract class DataManager {
     				database = new MySQLConnector(host, port, db, user, pass);
     				try {
     					database.openConnection();
-    					database.updateSQL("CREATE TABLE IF NOT EXISTS `players` ( `id` int(11) NOT NULL AUTO_INCREMENT, `name` varchar(30) NOT NULL, `uuid` varbinary(32) NOT NULL, `wins` int(11) NOT NULL, `kills` int(11) NOT NULL, `deaths` int(11) NOT NULL, `games` int(11) NOT NULL, `sheep_thrown` int(11) NOT NULL DEFAULT '0', `sheep_killed` int(11) NOT NULL DEFAULT '0', `total_time` int(11) NOT NULL DEFAULT '0', `particles` int(1) NOT NULL DEFAULT '1', `last_kit` int(1) NOT NULL DEFAULT '0', `created_at` datetime NOT NULL, `updated_at` datetime NOT NULL, PRIMARY KEY (`id`) ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;");
-    					database.alterPlayerDataTable(plugin);
+    					database.updateSQL(CREATE_DATABASE_REQUEST);
+    					alterPlayerDataTable();
     					Double stop = (double) (System.currentTimeMillis() - start) / 1000.0;
     					plugin.getLogger().log(Level.INFO, "Connected to Database (%ss)!", stop);
     					connectedToDatabase = true;
@@ -75,6 +77,39 @@ public abstract class DataManager {
     		}
     	}.runTaskAsynchronously(plugin);
     	initRanking();
+	}
+	
+	private static void alterPlayerDataTable() {
+		try {
+			database.updateSQL("ALTER TABLE `players` DROP `lang`");
+		} catch (ClassNotFoundException | SQLException exception) {
+			// Do nothing
+		}
+		try {
+			database.updateSQL("ALTER TABLE `players` ADD `total_time` INT(11) NOT NULL DEFAULT '0' AFTER `games`");
+		} catch (ClassNotFoundException | SQLException exception) {
+			// Do nothing
+		}
+		try {
+			database.updateSQL("ALTER TABLE `players` ADD `sheep_killed` INT(11) NOT NULL DEFAULT '0' AFTER `games`");
+		} catch (ClassNotFoundException | SQLException exception) {
+			// Do nothing
+		}
+		try {
+			database.updateSQL("ALTER TABLE `players` ADD `sheep_thrown` INT(11) NOT NULL DEFAULT '0' AFTER `games`");
+		} catch (ClassNotFoundException | SQLException exception) {
+			// Do nothing
+		}
+		try {
+			database.updateSQL("ALTER TABLE `players` ADD `last_kit` INT(1) NOT NULL DEFAULT '0' AFTER `particles`");
+		} catch (ClassNotFoundException | SQLException exception) {
+			// Do nothing
+		}
+		try {
+			database.updateSQL("ALTER TABLE `players` CHANGE `last_kit` `kits` INT NOT NULL DEFAULT '0'");
+		} catch (ClassNotFoundException | SQLException exception) {
+			// Do nothing
+		}
 	}
 	
 	private static void initRanking() {

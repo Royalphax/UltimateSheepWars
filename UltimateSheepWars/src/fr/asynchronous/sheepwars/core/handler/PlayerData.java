@@ -351,13 +351,13 @@ public class PlayerData extends DataManager {
 		private int id;
 		private Message message;
 		private String tableColumn;
-		private List<String> playerTop;
+		private HashMap<String, Integer> playerTop;
 
 		private DataType(int id, MsgEnum msgEnum, String tableColumn) {
 			this.id = id;
 			this.message = Message.getMessageByEnum(msgEnum);
 			this.tableColumn = tableColumn;
-			this.playerTop = new ArrayList<>();
+			this.playerTop = new HashMap<>();
 		}
 		
 		public Message getMessage() {
@@ -390,9 +390,9 @@ public class PlayerData extends DataManager {
 			int rankingSize = ConfigManager.getInt(Field.RANKING_TOP);
 			ResultSet res = null;
 			try {
-				res = database.querySQL("SELECT * FROM players ORDER BY " + this.tableColumn + " DESC LIMIT " + rankingSize);
+				res = database.querySQL("SELECT `name`,`" + this.tableColumn + "` FROM `players` ORDER BY `" + this.tableColumn + "` DESC LIMIT " + rankingSize + " ;");
 				while (res.next())
-					this.playerTop.add(res.getString("name"));
+					this.playerTop.put(res.getString("name"), res.getInt(this.tableColumn));
 			} catch (SQLException | ClassNotFoundException ex) {
 				new ExceptionManager(ex).register(true);
 			} finally {
