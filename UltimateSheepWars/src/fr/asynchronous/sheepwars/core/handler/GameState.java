@@ -5,12 +5,12 @@ import fr.asynchronous.sheepwars.core.manager.ConfigManager.Field;
 
 public enum GameState {
 	
-	LOBBY(ConfigManager.getString(Field.LOBBY_GAME_STATE_MOTD)),
-	IN_GAME(ConfigManager.getString(Field.INGAME_GAME_STATE_MOTD)),
-	POST_GAME(ConfigManager.getString(Field.POST_GAME_GAME_STATE_MOTD)),
-	TERMINATED(ConfigManager.getString(Field.TERMINATED_GAME_STATE_MOTD));
+	WAITING(ConfigManager.getString(Field.WAITING_GAME_STATE_MOTD)),
+	INGAME(ConfigManager.getString(Field.INGAME_GAME_STATE_MOTD)),
+	TERMINATED(ConfigManager.getString(Field.TERMINATED_GAME_STATE_MOTD)),
+	RESTARTING(ConfigManager.getString(Field.RESTARTING_GAME_STATE_MOTD));
 
-	private static GameState currentStep = GameState.LOBBY;
+	private static GameState currentStep = GameState.RESTARTING;
 	private String motd;
 
 	public static String getMOTD() {

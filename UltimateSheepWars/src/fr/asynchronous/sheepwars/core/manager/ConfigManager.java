@@ -61,10 +61,10 @@ public class ConfigManager {
 		MYSQL_USER("mysql.user", FieldType.STRING, "root"),
 		MYSQL_PASSWORD("mysql.pass", FieldType.STRING, "root"),
 		RANKING_TOP("ranking-top", FieldType.INT, 10),
-		LOBBY_GAME_STATE_MOTD("game-state.lobby", FieldType.STRING, "&2\\u2714 &aWaiting &2\\u2714"),
+		WAITING_GAME_STATE_MOTD("game-state.waiting", FieldType.STRING, "&2\\u2714 &aWaiting &2\\u2714"),
 		INGAME_GAME_STATE_MOTD("game-state.in-game", FieldType.STRING, "&4\\u2716 &cRunning &4\\u2716"),
-		POST_GAME_GAME_STATE_MOTD("game-state.post-game", FieldType.STRING, "&6\\u2261 &eEnding &6\\u2261"),
-		TERMINATED_GAME_STATE_MOTD("game-state.terminated", FieldType.STRING, "&5\\u26A0 &dRestarting &5\\u26A0"),
+		TERMINATED_GAME_STATE_MOTD("game-state.terminated", FieldType.STRING, "&6\\u2261 &eTerminated &6\\u2261"),
+		RESTARTING_GAME_STATE_MOTD("game-state.restarting", FieldType.STRING, "&5\\u26A0 &dRestarting &5\\u26A0"),
 		
 		LOBBY("lobby", FieldType.LOCATION, new Location(Bukkit.getWorlds().get(0), 0, 0, 0), "settings.yml"),
 		OWNER("owner", FieldType.STRING, "null", "settings.yml"),

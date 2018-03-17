@@ -1,0 +1,2 @@
+- corriger la class event login
+- préparer le fait de stocker les kits que le joueur a acheté dans la db. Donc plus besoin des permissions ?

@@ -9,10 +9,13 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.event.UltimateSheepWarsEventListener;
-import fr.asynchronous.sheepwars.core.handler.PlayerData;
 import fr.asynchronous.sheepwars.core.handler.GameState;
+import fr.asynchronous.sheepwars.core.handler.PlayerData;
+import fr.asynchronous.sheepwars.core.manager.ConfigManager;
+import fr.asynchronous.sheepwars.core.manager.ConfigManager.Field;
+import fr.asynchronous.sheepwars.core.manager.DataManager;
+import fr.asynchronous.sheepwars.core.manager.ExceptionManager;
 import fr.asynchronous.sheepwars.core.message.Language;
-import fr.asynchronous.sheepwars.core.util.Utils;
 
 public class PlayerLogin extends UltimateSheepWarsEventListener {
 	public PlayerLogin(final UltimateSheepWarsPlugin plugin) {
@@ -22,17 +25,12 @@ public class PlayerLogin extends UltimateSheepWarsEventListener {
 	@EventHandler
 	public void onPlayerLogin(final PlayerLoginEvent event) {
 		final Player player = event.getPlayer();
-		final PlayerData data = PlayerData.getPlayerData(this.plugin, player);
-		if (this.plugin.MySQL_ENABLE)
-			try {
-				this.plugin.DATABASE.openConnection();
-			} catch (ClassNotFoundException | SQLException e) {
-				Utils.registerException(e, true);
-			}
-		if (GameState.canJoin() && event.getResult() == PlayerLoginEvent.Result.KICK_FULL
+		if (GameState.getCurrentStep() == GameState.RESTARTINGs)
+		final PlayerData data = PlayerData.getPlayerData(player);
+		if (event.getResult() == PlayerLoginEvent.Result.KICK_FULL
 				&& player.hasPermission("sheepwars.vip")) {
 			event.allow();
-		} else if (!GameState.canJoin()) {
+		} else if (!GameState.RESTARTING) {
 			if (this.plugin.JOIN_DURING_GAME) {
 				event.allow();
 			} else {
@@ -45,8 +43,7 @@ public class PlayerLogin extends UltimateSheepWarsEventListener {
 			public void run()
 			{
 				String locale = event.getPlayer().spigot().getLocale();
-				data.setLocale(locale);
-				if (plugin.AUTO_GENERATE_LANGUAGE)
+				if (ConfigManager.getBoolean(Field.AUTO_GENERATE_LANGUAGES))
 					Language.createLanguageIfNotExist(locale, null, null, true, plugin);
 			}
 		}.runTaskLater(this.plugin, 20*10);

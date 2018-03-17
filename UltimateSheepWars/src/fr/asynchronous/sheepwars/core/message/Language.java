@@ -66,7 +66,7 @@ public class Language {
 		} catch (IOException ex) {
 			new ExceptionManager(ex).register(true);
 		}
-		this.scoreboard_wrapper = new ScoreboardManager(ChatColor.DARK_GRAY + "- " + Message.getMessageByEnum(MsgEnum.SCOREBOARD_TITLE) + ChatColor.DARK_GRAY + " -", this.name);
+		this.scoreboard_wrapper = new ScoreboardManager(ChatColor.DARK_GRAY + "- " + Message.getMessage(MsgEnum.SCOREBOARD_TITLE) + ChatColor.DARK_GRAY + " -", this.name);
 		this.scoreboard_wrapper.setLine(2, ChatColor.BLUE + "", true);
 		this.scoreboard_wrapper.setLine(5, ChatColor.WHITE + "", true);
 		if (GameState.isStep(GameState.IN_GAME))
@@ -96,11 +96,11 @@ public class Language {
 	}
 
 	public void refreshSheepCountdown(int countdown) {
-		this.scoreboard_wrapper.setLine(3, getMessage(Message.getMessageByEnum(MsgEnum.SCOREBOARD_NEXT_SHEEP_COUNTDOWN)).replace("%TIME%", countdown + ""), true);
+		this.scoreboard_wrapper.setLine(3, getMessage(Message.getMessage(MsgEnum.SCOREBOARD_NEXT_SHEEP_COUNTDOWN)).replace("%TIME%", countdown + ""), true);
 	}
 
 	public void refreshBoosterCountdown(int countdown) {
-		this.scoreboard_wrapper.setLine(4, getMessage(Message.getMessageByEnum(MsgEnum.SCOREBOARD_NEXT_BOOSTER_COUNTDOWN)).replace("%TIME%", countdown + ""), true);
+		this.scoreboard_wrapper.setLine(4, getMessage(Message.getMessage(MsgEnum.SCOREBOARD_NEXT_BOOSTER_COUNTDOWN)).replace("%TIME%", countdown + ""), true);
 	}
 
 	public org.bukkit.scoreboard.Team getTeam(String name) {
@@ -251,8 +251,8 @@ public class Language {
 			try {
 				FileUtils.copyFile(DEFAULT_LANGUAGE_FILE, newLanguage);
 				FileConfiguration config = YamlConfiguration.loadConfiguration(newLanguage);
-				config.set("language-name", (name == null ? locale : name));
-				config.set("language-intro", (intro == null ? "Current language: &a%NAME%" : intro));
+				config.set("language-name", (name.trim().equals("") ? locale : name));
+				config.set("language-intro", (intro.trim().equals("") ? "Current language: &a%NAME%" : intro));
 				try {
 					config.save(newLanguage);
 				} catch (IOException ex) {

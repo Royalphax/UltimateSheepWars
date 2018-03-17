@@ -50,13 +50,14 @@ public class AccountManager {
                     event.setWillDestroy(true);
                     String output = event.getName();
                     if (setOwner(output.trim()))
-                    	player.sendMessage(ChatColor.GREEN + "This plugin was linked to " + ChatColor.AQUA + output + ChatColor.GREEN + "'s spigot account. " + ChatColor.GREEN + "You are able to update this name at any moment with /sw changeowner. " + (!Utils.isPluginConfigured(plugin) ? ChatColor.RED + "Now, begin to setup the game with /sw help." : ""));
+                    	player.sendMessage(ChatColor.GREEN + "This plugin was linked to " + ChatColor.AQUA + output + ChatColor.GREEN + "'s spigot account. " + ChatColor.GREEN + "You are able to update this name at any moment with /sw changeowner. "  
+                    + (!Utils.isPluginConfigured() ? ChatColor.RED + "Now, begin to setup the game with /sw help." : ""));
                 } else {
                     event.setWillClose(false);
                     event.setWillDestroy(false);
                 }
             }
-        }, "Spigot Account Name", ChatColor.GRAY + "NOTE: It is very important that", ChatColor.GRAY + "you enter your real spigot's", ChatColor.GRAY + "account name or the plugin", ChatColor.GRAY + "may be disabled on your server.").open();
+        }, "Spigot Account Name", ChatColor.GRAY + "NOTE: It is very important that", ChatColor.GRAY + "you type your real spigot", ChatColor.GRAY + "account name or the plugin", ChatColor.GRAY + "may be disabled on your server.").open();
 	}
 	
 	public String getAccountName(String user_id) {

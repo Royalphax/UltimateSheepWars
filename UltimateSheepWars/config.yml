@@ -136,7 +136,6 @@ mysql:
   #If you have no database and you want to save stats, you just have to put free-host to true.
   #[!] THE FREE-HOST FEATURE ISN'T OBLIGATED TO WORK AT ALL TIME.
   #If you have your own database, you can setup the host, database, user and password used. 
-  #(port used is 3306 by default)
   host: localhost
   port: 3306
   database: sheepwars
@@ -147,9 +146,9 @@ ranking-top: 10
 #===============# MOTD states #===============#
 #Setup the MOTD of the server for different game states.
 game-state:
-  lobby: "&2\u2714 &aWaiting &2\u2714"
+  waiting: "&2\u2714 &aWaiting &2\u2714"
   in-game: "&4\u2716 &cRunning &4\u2716"
-  post-game: "&6\u2261 &eEnding &6\u2261"
-  terminated: "&5\u26A0 &dRestarting &5\u26A0"
+  terminated: "&6\u2261 &eEnding &6\u2261"
+  restarting: "&5\u26A0 &dRestarting &5\u26A0"
 #
 #===============# End of file #===============#

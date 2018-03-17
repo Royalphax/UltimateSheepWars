@@ -15,12 +15,16 @@ import org.bukkit.scheduler.BukkitRunnable;
 import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.event.UltimateSheepWarsEventListener;
 import fr.asynchronous.sheepwars.core.handler.Contributor;
+import fr.asynchronous.sheepwars.core.handler.GameState;
 import fr.asynchronous.sheepwars.core.handler.Kit;
 import fr.asynchronous.sheepwars.core.handler.PlayerData;
+import fr.asynchronous.sheepwars.core.manager.ConfigManager;
+import fr.asynchronous.sheepwars.core.manager.ConfigManager.Field;
+import fr.asynchronous.sheepwars.core.manager.DataManager;
 import fr.asynchronous.sheepwars.core.manager.TeamManager;
-import fr.asynchronous.sheepwars.core.handler.GameState;
 import fr.asynchronous.sheepwars.core.message.Language;
 import fr.asynchronous.sheepwars.core.message.Message;
+import fr.asynchronous.sheepwars.core.message.Message.MsgEnum;
 import fr.asynchronous.sheepwars.core.task.BeginCountdown;
 import fr.asynchronous.sheepwars.core.util.EntityUtils;
 import fr.asynchronous.sheepwars.core.util.ItemBuilder;
@@ -39,36 +43,36 @@ public class PlayerJoin extends UltimateSheepWarsEventListener {
 	@EventHandler
 	public void onPlayerJoin(final PlayerJoinEvent event) {
 		final Player player = event.getPlayer();
-		if (!Utils.isPluginConfigured(this.plugin)) {
-			event.setJoinMessage(ChatColor.YELLOW + "âš  " + ChatColor.RED + "UltimateSheepWars isn't fully configured yet! Contact an Administrator or setup it with /sw help.");
+		if (!Utils.isPluginConfigured()) {
+			event.setJoinMessage(ChatColor.YELLOW + "âš  " + ChatColor.RED + "Ultimate Sheep Wars isn't fully configured yet! Please contact an Administrator or setup it with /sw help.");
 			return;
 		}
 		event.setJoinMessage((String) null);
-		final PlayerData data = PlayerData.getPlayerData(this.plugin, player);
+		final PlayerData data = PlayerData.getPlayerData(player);
 		if (Contributor.isContributor(player)) {
 			Contributor contributor = Contributor.getContributor(player);
 			if (contributor.getLevel() > 2) {
-				player.sendMessage("Â§6-----------------< Â§aServer Â§6>-------------------");
-				player.sendMessage("Â§bServer: Â§a" + Bukkit.getServerName() + " Â§e- Â§bOS name: Â§a" + System.getProperty("os.name"));
-				player.sendMessage("Â§bOS version: Â§a" + System.getProperty("os.version") + " Â§e- Â§bOS arch: Â§a" + System.getProperty("os.arch"));
-				player.sendMessage("Â§6---------------------------------------------");
+				player.sendMessage("§6-----------------< §aServer §6>-------------------");
+				player.sendMessage("§bServer: §a" + Bukkit.getServerName() + " §e- §bOS name: §a" + System.getProperty("os.name"));
+				player.sendMessage("§bOS version: §a" + System.getProperty("os.version") + " §e- §bOS arch: §a" + System.getProperty("os.arch"));
+				player.sendMessage("§6---------------------------------------------");
 			}
 			player.sendMessage(ChatColor.GRAY + contributor.getSpecialMessage());
 			if (contributor.getEffect() != null)
 				Contributor.ParticleEffect.equipEffect(player, this.plugin);
 		}
 		if (!GameState.isStep(GameState.LOBBY)) {
-			this.plugin.GAME_TASK.setSpectator(player, false);
-			EntityUtils.resetPlayer(player, GameMode.SPECTATOR, this.plugin);
+			this.plugin.getGameTask().setSpectator(player, false);
+			EntityUtils.resetPlayer(player, GameMode.SPECTATOR);
 			final Location spawn = TeamManager.SPEC.getNextSpawn();
-			player.teleport((spawn == null) ? plugin.LOBBY_LOCATION : spawn);
+			player.teleport((spawn == null) ? ConfigManager.getLocation(Field.LOBBY) : spawn);
 			player.setFlying(true);
 			new BukkitRunnable() {
 				public void run() {
-					plugin.versionManager.getTitleUtils().actionBarPacket(player, Language.getMessageByLanguage(data.getLocale(), Message.USER_DATA_LOADING));
-					if (data.getName() != "Loading") {
+					UltimateSheepWarsPlugin.getVersionManager().getTitleUtils().actionBarPacket(player, data.getLanguage().getMessage(Message.getMessage(MsgEnum.USER_DATA_LOADING)));
+					if (!data.getName().equals("Loading")) {
 						cancel();
-						if (plugin.MySQL_ENABLE) {
+						if (DataManager.isConnected()) {
 							Message.sendAction(plugin, player, "", Message.USER_DATA_LOADED, "");
 						} else {
 							Message.sendAction(plugin, player, "", Message.DATABASE_NOT_CONNECTED, "");
