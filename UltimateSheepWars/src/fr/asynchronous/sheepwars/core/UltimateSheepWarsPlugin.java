@@ -42,7 +42,6 @@ import fr.asynchronous.sheepwars.core.event.entity.FoodLevelChange;
 import fr.asynchronous.sheepwars.core.event.inventory.InventoryClick;
 import fr.asynchronous.sheepwars.core.event.inventory.InventoryOpenEvent;
 import fr.asynchronous.sheepwars.core.event.player.AsyncPlayerChat;
-import fr.asynchronous.sheepwars.core.event.player.PlayerAchievementAwarded;
 import fr.asynchronous.sheepwars.core.event.player.PlayerArmorStandManipulate;
 import fr.asynchronous.sheepwars.core.event.player.PlayerCommandPreprocess;
 import fr.asynchronous.sheepwars.core.event.player.PlayerDamage;
@@ -114,8 +113,6 @@ public class UltimateSheepWarsPlugin extends JavaPlugin {
     /** Settings file & config **/
     private FileConfiguration settingsConfig;
     private File settingsFile;
-    
-    /** MySQL & Stats **/
     
     /** USW **/
     private static VersionManager versionManager;
@@ -206,7 +203,7 @@ public class UltimateSheepWarsPlugin extends JavaPlugin {
 		versionManager.getCustomEntities().registerEntities();
 		
 		/** Init Game **/ 
-		GameState.setCurrentStep(GameState.LOBBY);
+		GameState.setCurrentStep(GameState.WAITING);
 		
 		/** Init world settings **/
         this.world = Bukkit.getWorlds().get(0);
@@ -231,7 +228,7 @@ public class UltimateSheepWarsPlugin extends JavaPlugin {
         		
         		InventoryClick.class, 
         		
-        		AsyncPlayerChat.class, PlayerAchievementAwarded.class, PlayerArmorStandManipulate.class, 
+        		AsyncPlayerChat.class, PlayerArmorStandManipulate.class, 
         		PlayerCommandPreprocess.class, PlayerDamage.class, PlayerDamageByEntity.class,
         		PlayerDeath.class, PlayerDropItem.class, PlayerInteract.class, PlayerJoin.class, 
         		PlayerKick.class, PlayerLogin.class, PlayerMove.class, PlayerPickupItem.class,
@@ -521,6 +518,14 @@ public class UltimateSheepWarsPlugin extends JavaPlugin {
 	
 	public boolean isChatProviderInstalled() {
 		return (this.chatProvider != null);
+	}
+	
+	public Chat getChatProvider() {
+		return this.chatProvider;
+	}
+	
+	public Economy getEconomyProvider() {
+		return this.economyProvider;
 	}
 	
 	public void setPreGameTask(BeginCountdown task) {
