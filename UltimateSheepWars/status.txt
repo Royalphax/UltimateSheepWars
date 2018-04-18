@@ -1,2 +1,5 @@
 - corriger la class event login
-- préparer le fait de stocker les kits que le joueur a acheté dans la db. Donc plus besoin des permissions ?
+- prÃ©parer le fait de stocker les kits que le joueur a achetÃ© dans la db. Donc plus besoin des permissions ?
+- Faire les inv
+- Aller piocher les locations de booster dans config manager
+- Aller piocher les locations de spawn de team dans la class de la team
