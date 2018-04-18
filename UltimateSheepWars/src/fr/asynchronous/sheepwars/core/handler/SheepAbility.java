@@ -3,7 +3,7 @@ package fr.asynchronous.sheepwars.core.handler;
 public enum SheepAbility {
 
 	SEEK_PLAYERS(),
-	CONTROLLABLE(),
+	RIDEABLE(),
 	FIRE_PROOF();
 	
 }
