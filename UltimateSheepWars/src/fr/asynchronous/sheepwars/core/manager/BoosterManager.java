@@ -37,7 +37,7 @@ public abstract class BoosterManager {
 	}
 	
 	public BoosterManager(final MsgEnum name, final DisplayColor displayColor, final int duration, final TriggerBoosterAction... triggers) {
-		this(Message.getMessageByEnum(name), name.toString().replaceAll("BOOSTER_", ""), displayColor, duration, triggers);
+		this(Message.getMessage(name), name.toString().replaceAll("BOOSTER_", ""), displayColor, duration, triggers);
 	}
 	
 	public BoosterManager(final Message name, final String configPath, final DisplayColor displayColor, final int duration, final TriggerBoosterAction... triggers) {
