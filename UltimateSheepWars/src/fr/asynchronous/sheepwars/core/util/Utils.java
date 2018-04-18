@@ -17,13 +17,14 @@ import org.bukkit.inventory.ItemStack;
 
 import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.handler.Contributor;
+import fr.asynchronous.sheepwars.core.handler.DisplayStyle;
 import fr.asynchronous.sheepwars.core.handler.PlayerData;
 import fr.asynchronous.sheepwars.core.manager.ConfigManager;
 import fr.asynchronous.sheepwars.core.manager.ConfigManager.Field;
 import fr.asynchronous.sheepwars.core.manager.TeamManager;
 import fr.asynchronous.sheepwars.core.message.Language;
 import fr.asynchronous.sheepwars.core.message.Message;
-import fr.asynchronous.sheepwars.core.message.Message.MsgEnum;(MsgEnum.MsgEnum;
+import fr.asynchronous.sheepwars.core.message.Message.MsgEnum;
 
 public class Utils {
 
@@ -31,34 +32,36 @@ public class Utils {
 		throw new IllegalStateException("Utility class");
 	}
 
-	public static List<String> getPlayerStats(Player player, PlayerData data, boolean inventoryStyle) {
-		PlayerData playerData = PlayerData.getPlayerData(player);
-		ChatColor color = playerData.getTeam().getColor();
+	public static ArrayList<String> getPlayerStats(PlayerData data, Language lang, DisplayStyle style) {
+		ChatColor color = data.getTeam().getColor();
 		ArrayList<String> output = new ArrayList<>();
-		if (inventoryStyle) {
-			int[] totalTimes = splitToComponentTimes(data.getTotalTime());
-			String bar = ChatColor.YELLOW + "-------------------------------------";
-			output.add(ChatColor.GOLD + "Stats : " + Contributor.getPrefix(data.getPlayer()) + data.getName());
-			output.add(bar);
-			output.add(ChatColor.AQUA + Language.getMessageByLocale(playerData.getLocale(), Message.getMessageByEnum(MsgEnum.STATS_GAME_PLAYED)) + ": " + ChatColor.YELLOW + data.getGames());
-			output.add(ChatColor.AQUA + Language.getMessageByLocale(playerData.getLocale(), Message.getMessageByEnum(MsgEnum.STATS_DEATH)) + ": " + ChatColor.YELLOW + data.getDeaths());
-			output.add(ChatColor.AQUA + Language.getMessageByLocale(playerData.getLocale(), Message.getMessageByEnum(MsgEnum.STATS_KILL)) + ": " + ChatColor.YELLOW + data.getKills());
-			output.add(ChatColor.AQUA + Language.getMessageByLocale(playerData.getLocale(), Message.getMessageByEnum(MsgEnum.STATS_VICTORY)) + ": " + ChatColor.YELLOW + data.getWins());
-			output.add(ChatColor.AQUA + Language.getMessageByLocale(playerData.getLocale(), Message.getMessageByEnum(MsgEnum.STATS_SHEEP_THROWN)) + ": " + ChatColor.YELLOW + data.getSheepThrown());
-			output.add(ChatColor.AQUA + Language.getMessageByLocale(playerData.getLocale(), Message.getMessageByEnum(MsgEnum.STATS_SHEEP_KILLED)) + ": " + ChatColor.YELLOW + data.getSheepKilled());
-			output.add(bar);
-			output.add(ChatColor.LIGHT_PURPLE + Language.getMessageByLocale(playerData.getLocale(), Message.getMessageByEnum(MsgEnum.STATS_WIN_RATE)) + ": " + ChatColor.YELLOW + data.getWinRate() + ChatColor.GREEN + " %");
-			output.add(ChatColor.LIGHT_PURPLE + Language.getMessageByLocale(playerData.getLocale(), Message.getMessageByEnum(MsgEnum.STATS_KD_RATIO)) + ": " + ChatColor.YELLOW + data.getKDRatio());
-			output.add(ChatColor.LIGHT_PURPLE + Language.getMessageByLocale(playerData.getLocale(), Message.getMessageByEnum(MsgEnum.STATS_TOTAL_TIME)) + ": " + Language.getMessageByLanguage(playerData.getLocale(), Message.getMessageByEnum(MsgEnum.STATS_TOTAL_TIME_FORMAT).replace("%HOURS%", ChatColor.YELLOW + "" + totalTimes[0] + " " + ChatColor.GREEN + Language.getMessageByLanguage(playerData.getLocale(), (totalTimes[0] > 1 ? Message.getMessageByEnum(MsgEnum.HOURS : Message.getMessageByEnum(MsgEnum.HOUR))).replace("%MINUTES%", ChatColor.YELLOW + "" + totalTimes[1] + " " + ChatColor.GREEN + Language.getMessageByLanguage(playerData.getLocale(), (totalTimes[1] > 1 ? Message.getMessageByEnum(MsgEnum.MINUTES : Message.getMessageByEnum(MsgEnum.MINUTE))).replace("%SECONDS%", ChatColor.YELLOW + "" + totalTimes[2] + " " + ChatColor.GREEN + Language.getMessageByLanguage(playerData.getLocale(), (totalTimes[2] > 1 ? Message.getMessageByEnum(MsgEnum.SECONDS : Message.getMessageByEnum(MsgEnum.SECOND))));
-		} else {
-			output.add(Language.getMessageByLanguage(playerData.getLocale(), Message.getMessageByEnum(MsgEnum.RECORDS).replaceAll("%PLAYER%", color + "" + ChatColor.BOLD + data.getPlayer().getName()));
-			output.add("");
-			output.add(ChatColor.WHITE + Language.getMessageByLocale(playerData.getLocale(), Message.getMessageByEnum(MsgEnum.STATS_GAME_PLAYED)) + ": " + ChatColor.GRAY + data.getGames());
-			output.add(ChatColor.WHITE + Language.getMessageByLocale(playerData.getLocale(), Message.getMessageByEnum(MsgEnum.STATS_DEATH)) + ": " + ChatColor.GRAY + data.getDeaths());
-			output.add(ChatColor.WHITE + Language.getMessageByLocale(playerData.getLocale(), Message.getMessageByEnum(MsgEnum.STATS_KILL)) + ": " + ChatColor.GRAY + data.getKills());
-			output.add(ChatColor.WHITE + Language.getMessageByLanguage(playerData.getLocale(), Message.getMessageByEnum(MsgEnum.STATS_VICTORY)) + ": " + ChatColor.GRAY + data.getWins());
-			output.add(ChatColor.WHITE + Language.getMessageByLanguage(playerData.getLocale(), Message.getMessageByEnum(MsgEnum.STATS_SHEEP_THROWN)) + ": " + ChatColor.GRAY + data.getSheepThrown());
-			output.add(ChatColor.WHITE + Language.getMessageByLanguage(playerData.getLocale(), Message.getMessageByEnum(MsgEnum.STATS_SHEEP_KILLED)) + ": " + ChatColor.GRAY + data.getSheepKilled());
+		switch (style) {
+			case CHAT :
+				output.add(data.getLanguage().getMessage(MsgEnum.RECORDS).replaceAll("%PLAYER%", color + "" + ChatColor.BOLD + data.getPlayer().getName()));
+				output.add("");
+				output.add(ChatColor.WHITE + lang.getMessage(MsgEnum.STATS_GAME_PLAYED) + ": " + ChatColor.GRAY + data.getGames());
+				output.add(ChatColor.WHITE + lang.getMessage(MsgEnum.STATS_DEATH) + ": " + ChatColor.GRAY + data.getDeaths());
+				output.add(ChatColor.WHITE + lang.getMessage(MsgEnum.STATS_KILL) + ": " + ChatColor.GRAY + data.getKills());
+				output.add(ChatColor.WHITE + lang.getMessage(MsgEnum.STATS_VICTORY) + ": " + ChatColor.GRAY + data.getWins());
+				output.add(ChatColor.WHITE + lang.getMessage(MsgEnum.STATS_SHEEP_THROWN) + ": " + ChatColor.GRAY + data.getSheepThrown());
+				output.add(ChatColor.WHITE + lang.getMessage(MsgEnum.STATS_SHEEP_KILLED) + ": " + ChatColor.GRAY + data.getSheepKilled());
+				break;
+
+			case INVENTORY :
+				final String bar = ChatColor.YELLOW + "-------------------------------------";
+				output.add(ChatColor.GOLD + "Stats : " + Contributor.getPrefix(data.getPlayer()) + data.getName());
+				output.add(bar);
+				output.add(ChatColor.AQUA + lang.getMessage(MsgEnum.STATS_GAME_PLAYED) + ": " + ChatColor.YELLOW + data.getGames());
+				output.add(ChatColor.AQUA + lang.getMessage(MsgEnum.STATS_DEATH) + ": " + ChatColor.YELLOW + data.getDeaths());
+				output.add(ChatColor.AQUA + lang.getMessage(MsgEnum.STATS_KILL) + ": " + ChatColor.YELLOW + data.getKills());
+				output.add(ChatColor.AQUA + lang.getMessage(MsgEnum.STATS_VICTORY) + ": " + ChatColor.YELLOW + data.getWins());
+				output.add(ChatColor.AQUA + lang.getMessage(MsgEnum.STATS_SHEEP_THROWN) + ": " + ChatColor.YELLOW + data.getSheepThrown());
+				output.add(ChatColor.AQUA + lang.getMessage(MsgEnum.STATS_SHEEP_KILLED) + ": " + ChatColor.YELLOW + data.getSheepKilled());
+				output.add(bar);
+				output.add(ChatColor.LIGHT_PURPLE + lang.getMessage(MsgEnum.STATS_WIN_RATE) + ": " + ChatColor.YELLOW + data.getWinRate() + ChatColor.GREEN + " %");
+				output.add(ChatColor.LIGHT_PURPLE + lang.getMessage(MsgEnum.STATS_KD_RATIO) + ": " + ChatColor.YELLOW + data.getKDRatio());
+				output.add(ChatColor.LIGHT_PURPLE + lang.getMessage(MsgEnum.STATS_TOTAL_TIME) + ": " + ChatColor.YELLOW + formatTime(lang, data.getTotalTime()));
+				break;
 		}
 		return output;
 	}
@@ -108,9 +111,8 @@ public class Utils {
 				|| ConfigManager.getLocations(Field.BOOSTERS).isEmpty() 
 				|| TeamManager.BLUE.getSpawns().isEmpty() 
 				|| TeamManager.RED.getSpawns().isEmpty() 
-				|| TeamManager.SPEC.getSpawns().isEmpty()) {
+				|| TeamManager.SPEC.getSpawns().isEmpty())
 			return false;
-		}
 		return true;
 	}
 
@@ -145,7 +147,7 @@ public class Utils {
 		return mid;
 	}
 
-	public static String formatTime(int time) {
+	public static String formatTime(Language lang, int time) {
 		time = time * 1000;
 		long days = TimeUnit.MILLISECONDS.toDays(time);
 		time -= TimeUnit.DAYS.toMillis(days);
@@ -156,20 +158,28 @@ public class Utils {
 		long seconds = TimeUnit.MILLISECONDS.toSeconds(time);
 
 		String ret = "";
-		if (days > 0)
-			ret += days + " jours ";
+		if (days > 0) {
+			String str = lang.getMessage((days > 1 ? MsgEnum.DAYS : MsgEnum.DAY));
+			ret += days + " " + str + " ";
+		}
 
-		if (hours > 0)
-			ret += hours + " heures ";
+		if (hours > 0) {
+			String str = lang.getMessage((days > 1 ? MsgEnum.HOURS : MsgEnum.HOUR));
+			ret += hours + " " + str + " ";
+		}
 
-		if (minutes > 0)
-			ret += minutes + " minutes ";
+		if (minutes > 0) {
+			String str = lang.getMessage((days > 1 ? MsgEnum.MINUTES : MsgEnum.MINUTE));
+			ret += minutes + " " + str + " ";
+		}
 
-		if (seconds > 0)
-			ret += seconds + " secondes";
+		if (seconds > 0) {
+			String str = lang.getMessage((days > 1 ? MsgEnum.SECONDS : MsgEnum.SECOND));
+			ret += seconds + " " + str;
+		}
 
 		if (ret.isEmpty() && minutes == 0)
-			ret += "moins d'une minute";
+			ret += lang.getMessage(MsgEnum.LESS_THAN_ONE_MINUTE);
 
 		return ret;
 	}
