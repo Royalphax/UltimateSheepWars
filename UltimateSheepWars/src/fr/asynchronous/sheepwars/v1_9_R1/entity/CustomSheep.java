@@ -100,7 +100,7 @@ public class CustomSheep extends EntitySheep {
 
 	@Override
 	public void move(double d0, double d1, double d2) {
-		
+		player.sendMessage("CUSTOMSHEEP.JAVA MOVE(): " + d0 + " / " + d1 + " / " + d2);
 		/**
 		 * Voir ce que cela renvoie. Si chaque double est en fait ce qui va être ajouté à la position,
 		 * tester si le bloque de cette position est solide ou pas. S'il l'est pas, on active le noclip !

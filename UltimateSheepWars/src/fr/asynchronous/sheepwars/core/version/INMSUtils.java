@@ -25,4 +25,5 @@ public interface INMSUtils {
 	public void displayAvailableLanguages(final Player player);
 	
 	public void displayRedScreen(final Player player, final boolean activate);
+	
 }
