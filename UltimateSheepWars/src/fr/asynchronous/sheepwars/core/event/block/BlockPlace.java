@@ -17,7 +17,7 @@ public class BlockPlace extends UltimateSheepWarsEventListener
     
     @EventHandler
     public void onBlockPlace(final BlockPlaceEvent event) {
-        if ((GameState.isStep(GameState.LOBBY) || PlayerData.getPlayerData(event.getPlayer()).getTeam() == TeamManager.SPEC && !event.getPlayer().isInsideVehicle()) && !event.getPlayer().isOp()) {
+        if ((GameState.isStep(GameState.WAITING) || PlayerData.getPlayerData(event.getPlayer()).getTeam() == TeamManager.SPEC && !event.getPlayer().isInsideVehicle()) && !event.getPlayer().isOp()) {
             event.setCancelled(true);
         }
     }

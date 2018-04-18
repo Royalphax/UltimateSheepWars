@@ -19,7 +19,7 @@ public class EntityExplode extends UltimateSheepWarsEventListener {
 
 	@EventHandler
 	public void onEntityExplode(final EntityExplodeEvent event) {
-		if (GameState.isStep(GameState.LOBBY)) {
+		if (GameState.isStep(GameState.WAITING)) {
 			event.blockList().clear();
 		} else {
 			final Location center = event.getLocation();

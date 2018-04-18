@@ -29,7 +29,7 @@ public class InventoryClick extends UltimateSheepWarsEventListener
     public void onInventoryClick(final InventoryClickEvent event) {
     	if (event.getCurrentItem() == null) return;
         final ItemStack current = event.getCurrentItem();
-        if (GameState.isStep(GameState.LOBBY)) {
+        if (GameState.isStep(GameState.WAITING)) {
             event.setCancelled(true);
             if (event.getSlot() == event.getRawSlot() && current != null && current.hasItemMeta()) {
             	final Player player = (Player)event.getWhoClicked();

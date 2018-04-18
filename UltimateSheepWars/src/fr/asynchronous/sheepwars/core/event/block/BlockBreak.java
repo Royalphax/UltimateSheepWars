@@ -18,7 +18,7 @@ public class BlockBreak extends UltimateSheepWarsEventListener
     
     @EventHandler
     public void onBlockBreak(final BlockBreakEvent event) {
-        if ((!GameState.isStep(GameState.LOBBY) && PlayerData.getPlayerData(event.getPlayer()).getTeam() != TeamManager.SPEC && !event.getPlayer().isInsideVehicle()) || event.getPlayer().isOp()) {
+        if ((!GameState.isStep(GameState.WAITING) && PlayerData.getPlayerData(event.getPlayer()).getTeam() != TeamManager.SPEC && !event.getPlayer().isInsideVehicle()) || event.getPlayer().isOp()) {
             event.getBlock().setType(Material.AIR);
         } else {
         	event.setCancelled(true);

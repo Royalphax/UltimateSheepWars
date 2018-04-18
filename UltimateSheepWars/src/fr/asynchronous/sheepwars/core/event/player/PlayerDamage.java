@@ -14,6 +14,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.event.UltimateSheepWarsEventListener;
 import fr.asynchronous.sheepwars.core.handler.Particles;
+import fr.asynchronous.sheepwars.core.handler.PlayerData;
 import fr.asynchronous.sheepwars.core.manager.TeamManager;
 import fr.asynchronous.sheepwars.core.handler.GameState;
 
@@ -30,24 +31,20 @@ public class PlayerDamage extends UltimateSheepWarsEventListener {
 		if (event.getEntity() instanceof Player) {
 			boolean cancelled = false;
 			final Player player = (Player) event.getEntity();
-			final TeamManager playerTeam = TeamManager.getPlayerTeam(player);
-			if (GameState.isStep(GameState.LOBBY) || GameState.isStep(GameState.POST_GAME) || playerTeam == TeamManager.SPEC)
+			final TeamManager playerTeam = PlayerData.getPlayerData(player).getTeam();
+			if (GameState.isStep(GameState.WAITING) || GameState.isStep(GameState.TERMINATED) || playerTeam == TeamManager.SPEC)
 			{
 				cancelled = true;
-			} else if (GameState.isStep(GameState.IN_GAME))
+			} else if (GameState.isStep(GameState.INGAME))
 			{
-				if (event.getCause() == DamageCause.SUFFOCATION)
+				if (event.getCause() == DamageCause.SUFFOCATION || (player.getVehicle() != null && player.getVehicle() instanceof Sheep))
 				{
 					cancelled = true;
-				} else if (player.getVehicle() != null)
-				{
-					if (player.getVehicle() instanceof Sheep)
-						cancelled = true;
 				}
 				if (event.getCause() == DamageCause.PROJECTILE && event.getDamage() > 2.0) {
 					int i = (int)(event.getDamage() * 0.5D);
-					this.plugin.versionManager.getParticleFactory().playParticles(Particles.DAMAGE_INDICATOR, player.getLocation().add(0, 1.5, 0), 0.1f, 0.0f, 0.1f, i, 0.2f);
-				}
+					UltimateSheepWarsPlugin.getVersionManager().getParticleFactory().playParticles(Particles.DAMAGE_INDICATOR, player.getLocation().add(0, 1.5, 0), 0.1f, 0.0f, 0.1f, i, 0.2f);
+				} 
 			}
 			if (!cancelled && player.getHealth() <= 3.0D && player.getHealth() > 0.0D)
 				redScreen(player);
@@ -60,17 +57,18 @@ public class PlayerDamage extends UltimateSheepWarsEventListener {
 		if (!redScreeners.contains(player))
 		{
 			redScreeners.add(player);
-			this.plugin.versionManager.getNMSUtils().displayRedScreen(player, true);
+			UltimateSheepWarsPlugin.getVersionManager().getNMSUtils().displayRedScreen(player, true);
 			new BukkitRunnable()
 			{
 				public void run()
 				{
-					if (player.getGameMode() == GameMode.SPECTATOR || player.getGameMode() == GameMode.CREATIVE
-							|| player.getHealth() > 3.0D)
+					if (!player.isOnline() || player.getGameMode() != GameMode.SURVIVAL || player.getHealth() > 3.0D)
 					{
 						cancel();
-						plugin.versionManager.getNMSUtils().displayRedScreen(player, false);
-						redScreeners.remove(player);
+						if (player.isOnline()) {
+							UltimateSheepWarsPlugin.getVersionManager().getNMSUtils().displayRedScreen(player, false);
+							redScreeners.remove(player);
+						}
 					}
 				}
 			}.runTaskTimer(this.plugin, 0, 0);
