@@ -69,7 +69,7 @@ public class Language {
 		this.scoreboard_wrapper = new ScoreboardManager(ChatColor.DARK_GRAY + "- " + Message.getMessage(MsgEnum.SCOREBOARD_TITLE) + ChatColor.DARK_GRAY + " -", this.name);
 		this.scoreboard_wrapper.setLine(2, ChatColor.BLUE + "", true);
 		this.scoreboard_wrapper.setLine(5, ChatColor.WHITE + "", true);
-		if (GameState.isStep(GameState.IN_GAME))
+		if (GameState.isStep(GameState.INGAME))
 			this.scoreboard_wrapper.setLine(8, ChatColor.RED + "", true);
 		this.initTeams();
 		languages.add(this);
@@ -184,6 +184,11 @@ public class Language {
 		}
 		return this.messages.get(m);
 	}
+	
+	public String getMessage(MsgEnum en) {
+		Message m = Message.getMessage(en);
+		return getMessage(m);
+	}
 
 	public HashMap<Message, String> getMessages() {
 		return this.messages;
@@ -223,8 +228,8 @@ public class Language {
 			try {
 				DEFAULT_LANGUAGE_FILE.createNewFile();
 				FileConfiguration config = YamlConfiguration.loadConfiguration(DEFAULT_LANGUAGE_FILE);
-				config.set("language-name", "Default");
-				config.set("language-intro", "Current language: &a%NAME%");
+				config.set("language-name", "Default - English");
+				config.set("language-intro", "Current language: &aEnglish &7(default)");
 				try {
 					config.save(DEFAULT_LANGUAGE_FILE);
 				} catch (IOException ex) {
@@ -258,7 +263,7 @@ public class Language {
 				} catch (IOException ex) {
 					new ExceptionManager(ex).register(true);
 				}
-				Bukkit.getLogger().info("A new language file has been created: " + locale);
+				Bukkit.getLogger().info("A new language file has been created: " + newLanguage.getAbsolutePath());
 			} catch (IOException ex) {
 				new ExceptionManager(ex).register(true);
 			}

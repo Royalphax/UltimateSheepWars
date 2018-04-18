@@ -87,6 +87,10 @@ public class Message {
 		for (Player online : Bukkit.getOnlinePlayers())
 			sendMessage(online, prefix, message1, between, message2, suffix);
 	}
+	
+	public static void sendMessage(Player player, MsgEnum message) {
+		sendMessage(player, "", message, "");
+	}
 
 	public static void sendMessage(Player player, String prefix, MsgEnum message, String suffix) {
 		sendMessage(player, prefix, message, suffix, null, "");
@@ -196,10 +200,13 @@ public class Message {
 		SECOND("second"),
 		MINUTES("minutes"),
 		MINUTE("minute"),
+		DAYS("days"),
+		DAY("day"),
+		LESS_THAN_ONE_MINUTE("less than one minute"),
 		BLUE_NAME("Blue"),
 		RED_NAME("Red"),
 		SPEC_NAME("Spectator"),
-		HUB_TELEPORTATION("Â§aTeleportation to Hub.."),
+		HUB_TELEPORTATION("Â§aTeleporting you to the Hub ..."),
 		CONNECTION_FAILED("Â§cConnection failed."),
 		SCOREBOARD_TEAM_RED("Â§cTeam Red Â§8(Â§e%SIZE%Â§8) "),
 		SCOREBOARD_TEAM_BLUE("Â§9Team Blue Â§8(Â§e%SIZE%Â§8) "),
@@ -284,7 +291,7 @@ public class Message {
 		PLAYERS_DEFICIT("Â§cThere's not enough players."),
 		LEAVE_ITEM("Back to Hub"),
 		OUT_OF_THE_GAME("Â§cReturn to the fighting area !"),
-		SCOREBOARD_TITLE("Â§6SheepWars"),
+		GAME_DISPLAY_NAME("Â§6SheepWars"),
 		SCOREBOARD_NEXT_SHEEP_COUNTDOWN("Â§aNext Sheep: Â§e%TIME%"),
 		SCOREBOARD_NEXT_BOOSTER_COUNTDOWN("Â§aNext Booster: Â§e%TIME%"),
 		ACTION_KILLS_STATS("Â§aKills: Â§e%KILLS%"),
