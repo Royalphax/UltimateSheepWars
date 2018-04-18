@@ -5,13 +5,14 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Sheep;
 import org.bukkit.plugin.Plugin;
 
+import fr.asynchronous.sheepwars.core.handler.SheepAbility;
 import fr.asynchronous.sheepwars.core.manager.SheepManager;
 import fr.asynchronous.sheepwars.core.message.Message.MsgEnum;
 
 public class BoardingSheep extends SheepManager
 {
 	public BoardingSheep() {
-		super(MsgEnum.BOARDING_SHEEP_NAME, DyeColor.WHITE, -1, false, false, 0.25f);
+		super(MsgEnum.BOARDING_SHEEP_NAME, DyeColor.WHITE, -1, false, false, 0.25f, SheepAbility.RIDEABLE);
 	}
 	
 	@Override
