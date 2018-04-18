@@ -28,7 +28,8 @@ import fr.asynchronous.sheepwars.core.util.MathUtils;
 import fr.asynchronous.sheepwars.core.util.RandomUtils;
 
 public abstract class SheepManager {
-
+	
+	private static final double SHEEP_DEFAULT_HEALTH = 8.0;
 	private static List<SheepManager> availableSheeps = new ArrayList<>();
 	private static File configFile;
     private static FileConfiguration config;
@@ -72,8 +73,8 @@ public abstract class SheepManager {
 		this(new Message(name), name, color, duration, friendly, health, drop, random, sheepAbilities);
 	}
 	
-	public SheepManager(final MsgEnum name, final DyeColor color, final int duration, final boolean friendly, final double health, final boolean drop, final float random, final SheepAbility... sheepAbilities) {
-		this(Message.getMessageByEnum(name), name.toString().replaceAll("_NAME", ""), color, duration, friendly, health, drop, random, sheepAbilities);
+	public SheepManager(final MsgEnum name, final DyeColor color, final int duration, final boolean friendly, final boolean drop, final float random, final SheepAbility... sheepAbilities) {
+		this(Message.getMessage(name), name.toString().replaceAll("_NAME", ""), color, duration, friendly, SHEEP_DEFAULT_HEALTH, drop, random, sheepAbilities);
 	}
 
 	public SheepManager(final Message name, final String configPath, final DyeColor color, final int duration, final boolean friendly, final double health, final boolean drop, final float random, final SheepAbility... sheepAbilities) {
@@ -162,11 +163,15 @@ public abstract class SheepManager {
 	public static List<SheepManager> getAvailableSheeps() {
 		return availableSheeps;
 	}
+	
+	public static void throwSheep(SheepManager sheep) {
+		
+	}
 
 	public static boolean registerSheep(SheepManager sheep) throws ConfigFileNotSet, IOException {
 		if (!availableSheeps.contains(sheep)) {
 			if (configFile == null || config == null)
-				throw new ConfigFileNotSet("You have to set the config file used to store booster's data before registering a booster.");
+				throw new ConfigFileNotSet("You have to set the config file used to store sheep's data before registering a custom sheep.");
 			boolean enable = config.getBoolean(sheep.getConfigFieldPath("enable"), true);
 			if (!enable)
 				return false;
