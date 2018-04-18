@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.bukkit.configuration.file.FileConfiguration;
@@ -46,19 +47,20 @@ public abstract class KitManager
     private Message description;
     private String permission;
     private ItemBuilder icon;
+    private List<TriggerKitAction> triggers;
     
     private Double price;
     private int wins;
     
-    public KitManager(final int id, final String name, final String description, final String permission, final double price, final int requiredWins, final ItemBuilder icon) {
-    	this(id, name, new Message(name), new Message(description), permission, price, requiredWins, icon);
+    public KitManager(final int id, final String name, final String description, final String permission, final double price, final int requiredWins, final ItemBuilder icon, final TriggerKitAction... triggers) {
+    	this(id, name, new Message(name), new Message(description), permission, price, requiredWins, icon, triggers);
     }
     
-    public KitManager(final int id, final MsgEnum name, final MsgEnum description, final String permission, final double price, final int requiredWins, final ItemBuilder icon) {
-    	this(id, name.toString().replaceAll("KIT_", "").replaceAll("_NAME", ""), Message.getMessageByEnum(name), Message.getMessageByEnum(description), permission, price, requiredWins, icon);
+    public KitManager(final int id, final MsgEnum name, final MsgEnum description, final String permission, final double price, final int requiredWins, final ItemBuilder icon, final TriggerKitAction... triggers) {
+    	this(id, name.toString().replaceAll("KIT_", "").replaceAll("_NAME", ""), Message.getMessage(name), Message.getMessage(description), permission, price, requiredWins, icon, triggers);
     }
     
-    public KitManager(final int id, final String configPath, final Message name, final Message description, final String permission, final double price, final int requiredWins, final ItemBuilder icon) {
+    public KitManager(final int id, final String configPath, final Message name, final Message description, final String permission, final double price, final int requiredWins, final ItemBuilder icon, final TriggerKitAction... triggers) {
     	this.id = id;
     	this.configPath = "kit." + configPath.replaceAll("_", "-").toLowerCase();
         this.name = name;
@@ -67,6 +69,7 @@ public abstract class KitManager
     	this.icon = icon;
     	this.price = price;
     	this.wins = requiredWins;
+    	this.triggers = Arrays.<TriggerKitAction>asList(triggers);
     }
     
     public String getName(Player player) {
@@ -97,7 +100,7 @@ public abstract class KitManager
     			output.add(KitResult.FAILURE_NOT_ENOUGH_WINS);
     		}
     		if (ConfigManager.getBoolean(Field.ENABLE_INGAME_SHOP)) {
-    			Double diff = (plugin.ECONOMY_PROVIDER.getBalance(player) - this.price);
+    			Double diff = (plugin.getEconomyProvider().getBalance(player) - this.price);
     			output.add(diff >= 0 ? KitResult.FAILURE_NOT_PURCHASED : KitResult.FAILURE_TOO_EXPENSIVE);
     		} else {
     			output.add(KitResult.FAILURE_NOT_ALLOWED);
@@ -118,14 +121,32 @@ public abstract class KitManager
         return this.id;
     }
     
+    public List<TriggerKitAction> getTriggers() {
+        return this.triggers;
+    }
+    
     private String getConfigFieldPath(String field) {
     	return this.configPath + "." + field;
     }
     
     public static enum TriggerKitAction {
 		OTHER,
-		ARROW_LAUNCH;
+		PLAYER_DAMAGE,
+		ARROW_LAUNCH,
+		PLAYER_INTERACT,
+		SHEEP_LAUNCH;
 	}
+    
+    public static void triggerKit(Player player, Event event, TriggerKitAction triggerAction) {
+    	PlayerData data = PlayerData.getPlayerData(player);
+    	triggerKit(data, event, triggerAction);
+    }
+    
+    public static void triggerKit(PlayerData playerData, Event event, TriggerKitAction triggerAction) {
+    	KitManager kit = playerData.getKit();
+    	if (kit.getTriggers().contains(triggerAction))
+    		kit.onEvent(playerData.getPlayer(), event, triggerAction);
+    }
     
     public enum KitResult {
     	SUCCESS,
@@ -154,7 +175,7 @@ public abstract class KitManager
 	public static boolean registerKit(KitManager kit) throws ConfigFileNotSet, IOException {
 		if (!availableKits.contains(kit)) {
 			if (configFile == null || config == null)
-				throw new ConfigFileNotSet("You have to set the config file used to store booster's data before registering a booster.");
+				throw new ConfigFileNotSet("You have to set the config file used to store kit's data before registering a new kit.");
 			boolean enable = config.getBoolean(kit.getConfigFieldPath("enable"), true);
 			if (!enable)
 				return false;

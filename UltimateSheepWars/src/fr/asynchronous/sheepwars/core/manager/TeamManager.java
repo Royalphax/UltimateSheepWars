@@ -30,9 +30,9 @@ import fr.asynchronous.sheepwars.core.util.ReflectionUtils;
 import fr.asynchronous.sheepwars.core.util.ReflectionUtils.PackageType;
 
 public enum TeamManager {
-	BLUE((byte) 11, "blue", Message.getMessageByEnum(MsgEnum.BLUE_NAME), ConfigManager.getMaterial(Field.TEAM_BLUE_MATERIAL), ConfigManager.getLocations(Field.BLUE_SPAWNS), DyeColor.BLUE, ChatColor.BLUE, 85, 85, 255),
-	RED((byte) 14, "red", Message.getMessageByEnum(MsgEnum.RED_NAME), ConfigManager.getMaterial(Field.TEAM_RED_MATERIAL), ConfigManager.getLocations(Field.RED_SPAWNS), DyeColor.RED, ChatColor.RED, 255, 50, 50),
-	SPEC((byte) 2, "spec", Message.getMessageByEnum(MsgEnum.SPEC_NAME), Material.STONE, ConfigManager.getLocations(Field.SPEC_SPAWNS), DyeColor.SILVER, ChatColor.GRAY, 0, 0, 0);
+	BLUE((byte) 11, "blue", Message.getMessage(MsgEnum.BLUE_NAME), ConfigManager.getMaterial(Field.TEAM_BLUE_MATERIAL), ConfigManager.getLocations(Field.BLUE_SPAWNS), DyeColor.BLUE, ChatColor.BLUE, 85, 85, 255),
+	RED((byte) 14, "red", Message.getMessage(MsgEnum.RED_NAME), ConfigManager.getMaterial(Field.TEAM_RED_MATERIAL), ConfigManager.getLocations(Field.RED_SPAWNS), DyeColor.RED, ChatColor.RED, 255, 50, 50),
+	SPEC((byte) 2, "spec", Message.getMessage(MsgEnum.SPEC_NAME), Material.STONE, ConfigManager.getLocations(Field.SPEC_SPAWNS), DyeColor.SILVER, ChatColor.GRAY, 0, 0, 0);
 
 	public static int redSlot;
 	public static int blueSlot;
@@ -112,7 +112,7 @@ public enum TeamManager {
 
 	public void updateScoreboardTeamCount() {
 		for (Language langs : Language.getLanguages())
-			langs.getScoreboardWrapper().setLine((this == TeamManager.RED ? redSlot : blueSlot), langs.getMessage((this == TeamManager.RED ? Message.getMessageByEnum(MsgEnum.SCOREBOARD_TEAM_RED) : Message.getMessageByEnum(MsgEnum.SCOREBOARD_TEAM_BLUE))).replaceAll("%SIZE%", this.players.size() + ""), true);
+			langs.getScoreboardWrapper().setLine((this == TeamManager.RED ? redSlot : blueSlot), langs.getMessage((this == TeamManager.RED ? Message.getMessage(MsgEnum.SCOREBOARD_TEAM_RED) : Message.getMessage(MsgEnum.SCOREBOARD_TEAM_BLUE))).replaceAll("%SIZE%", this.players.size() + ""), true);
 	}
 
 	public List<Player> getOnlinePlayers() {
