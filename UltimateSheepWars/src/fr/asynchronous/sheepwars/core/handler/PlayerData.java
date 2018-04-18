@@ -51,6 +51,7 @@ public class PlayerData extends DataManager {
 	private int sheepKilled;
 	private int totalTime;
 	private KitManager kit;
+	private ArrayList<KitManager> kits;
 	private TeamManager team;
 	private String winRate;
 	private String kdRatio;
@@ -72,6 +73,7 @@ public class PlayerData extends DataManager {
 		this.sheepKilled = 0;
 		this.totalTime = 0;
 		this.kit = new NoneKit();
+		this.kits = new ArrayList<>();
 		this.team = null;
 		this.winRate = "0.0";
 		this.kdRatio = "0.0";
@@ -118,6 +120,19 @@ public class PlayerData extends DataManager {
 
 	public KitManager getKit() {
 		return this.kit;
+	}
+	
+	public List<KitManager> getKits() {
+		return this.kits;
+	}
+	
+	public String getKitsString() {
+		StringBuilder output = new StringBuilder("");
+		for (KitManager k : this.kits)
+			if (k.getId() != this.kit.getId())
+				output.append(k.getId());
+		output.append(this.kit.getId());
+		return output.toString().trim();
 	}
 	
 	public TeamManager getTeam() {
@@ -197,7 +212,12 @@ public class PlayerData extends DataManager {
 	public void setKit(final KitManager kit) {
 		this.kit = kit;
 		if (this.player.isOnline())
-			this.player.getPlayer().sendMessage(ConfigManager.getString(Field.PREFIX) + Message.getMessage(this.player.getPlayer(), MsgEnum.KIT_CHOOSE_MESSAGE).replace("%KIT%", kit.getName(this.player.getPlayer())));
+			this.player.getPlayer().sendMessage(Message.getMessage(this.player.getPlayer(), MsgEnum.KIT_CHOOSE_MESSAGE).replace("%KIT%", kit.getName(this.player.getPlayer())));
+	}
+	
+	public void addKit(final KitManager kit) {
+		if (!this.kits.contains(kit))
+			this.kits.add(kit);
 	}
 	
 	public void setTeam(TeamManager team) {
@@ -293,7 +313,10 @@ public class PlayerData extends DataManager {
 						setSheepThrown(res.getInt("sheep_thrown"));
 						setSheepKilled(res.getInt("sheep_killed"));
 						setTotalTime(res.getInt("total_time"));
-						setKit(KitManager.getFromId(res.getInt("last_kit")));
+						String[] availableKits = res.getString("kits").split("");
+						for (String kitId : availableKits)
+							addKit(KitManager.getFromId(Integer.parseInt(kitId)));
+						setKit(KitManager.getFromId(Integer.parseInt(availableKits[availableKits.length-1])));
 						setUpdatedAt(res.getDate("updated_at"));
 						setCreatedAt(res.getDate("created_at"));
 					}
@@ -314,9 +337,9 @@ public class PlayerData extends DataManager {
 				try {
 					ResultSet res = database.querySQL("SELECT * FROM players WHERE " + identifier);
 					if (res.first()) {
-						database.updateSQL("UPDATE players SET name='" + this.name + "', wins=" + this.wins + ", kills=" + this.kills + ", deaths=" + this.deaths + ", games=" + this.games + ", sheep_thrown=" + this.sheepThrown + ", sheep_killed=" + this.sheepKilled + ", total_time=" + this.totalTime + ", particles=" + (this.particle ? "1" : "0") + ", last_kit=" + this.kit.getId() + ", updated_at=NOW() WHERE " + identifier);
+						database.updateSQL("UPDATE players SET name='" + this.name + "', wins=" + this.wins + ", kills=" + this.kills + ", deaths=" + this.deaths + ", games=" + this.games + ", sheep_thrown=" + this.sheepThrown + ", sheep_killed=" + this.sheepKilled + ", total_time=" + this.totalTime + ", particles=" + (this.particle ? "1" : "0") + ", kits='" + getKitsString() + "', updated_at=NOW() WHERE " + identifier);
 					} else {
-						database.updateSQL("INSERT INTO players(name, uuid, wins, kills, deaths, games, sheep_thrown, sheep_killed, total_time, particles, last_kit, created_at, updated_at) VALUES('" + this.name + "', UNHEX('" + this.uid + "'), " + this.wins + ", " + this.kills + ", " + this.deaths + ", " + this.games + ", " + this.sheepThrown + ", " + this.sheepKilled + ", " + this.totalTime + ", " + (this.particle ? "1" : "0") + ", " + this.kit.getId() + ", NOW(), NOW())");
+						database.updateSQL("INSERT INTO players(name, uuid, wins, kills, deaths, games, sheep_thrown, sheep_killed, total_time, particles, kits, created_at, updated_at) VALUES('" + this.name + "', UNHEX('" + this.uid + "'), " + this.wins + ", " + this.kills + ", " + this.deaths + ", " + this.games + ", " + this.sheepThrown + ", " + this.sheepKilled + ", " + this.totalTime + ", " + (this.particle ? "1" : "0") + ", '" + getKitsString() + "', NOW(), NOW())");
 					}
 					res.close();
 				} catch (ClassNotFoundException | SQLException ex) {
@@ -355,7 +378,7 @@ public class PlayerData extends DataManager {
 
 		private DataType(int id, MsgEnum msgEnum, String tableColumn) {
 			this.id = id;
-			this.message = Message.getMessageByEnum(msgEnum);
+			this.message = Message.getMessage(msgEnum);
 			this.tableColumn = tableColumn;
 			this.playerTop = new HashMap<>();
 		}
