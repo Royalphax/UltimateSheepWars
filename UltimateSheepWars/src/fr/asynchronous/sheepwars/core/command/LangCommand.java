@@ -6,19 +6,16 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.event.player.PlayerJoin;
-import fr.asynchronous.sheepwars.core.handler.PlayerData;
 import fr.asynchronous.sheepwars.core.handler.GameState;
+import fr.asynchronous.sheepwars.core.handler.PlayerData;
 import fr.asynchronous.sheepwars.core.message.Language;
 import fr.asynchronous.sheepwars.core.util.Utils;
 
 public class LangCommand implements CommandExecutor {
 
-	public UltimateSheepWarsPlugin plugin;
-
-	public LangCommand(UltimateSheepWarsPlugin plugin) {
-		this.plugin = plugin;
+	public LangCommand() {
+		// Do nothing
 	}
 
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
@@ -26,7 +23,7 @@ public class LangCommand implements CommandExecutor {
             sender.sendMessage(ChatColor.RED + "Please connect on the server, then do this command again.");
             return true;
         }
-        if (!Utils.isPluginConfigured(this.plugin)) {
+        if (!Utils.isPluginConfigured()) {
     		sender.sendMessage(ChatColor.RED + "You can't use this command until the plugin isn't fully configured.");
     		return true;
     	}
@@ -37,8 +34,8 @@ public class LangCommand implements CommandExecutor {
             if (Language.getLanguage(sub) != null)
             {
             	data.setLanguage(Language.getLanguage(sub));
-            	if (GameState.isStep(GameState.LOBBY)) {
-            		PlayerJoin.equip(this.plugin, PlayerData.getPlayerData(player));
+            	if (GameState.isStep(GameState.WAITING)) {
+            		PlayerJoin.equip(PlayerData.getPlayerData(player));
             	}
             	player.setScoreboard(Language.getLanguage(sub).getScoreboardWrapper().getScoreboard());
             	player.sendMessage(ChatColor.GRAY + Language.getLanguage(sub).getIntro());

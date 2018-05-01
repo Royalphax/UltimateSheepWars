@@ -9,7 +9,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import fr.asynchronous.sheepwars.core.handler.PlayerData;
+import fr.asynchronous.sheepwars.core.handler.DisplayStyle;
 import fr.asynchronous.sheepwars.core.manager.DataManager;
 import fr.asynchronous.sheepwars.core.message.Message;
 import fr.asynchronous.sheepwars.core.message.Message.MsgEnum;
@@ -33,8 +33,7 @@ public class StatsCommand implements CommandExecutor {
             if (Bukkit.getPlayer(sub) == null) return false;
             if (Bukkit.getPlayer(sub).isOnline()) {
             	final Player bukkitPlayer = Bukkit.getPlayer(sub);
-            	final PlayerData data = PlayerData.getPlayerData(bukkitPlayer);
-            	final List<String> stats = Utils.getPlayerStats(bukkitPlayer, data, true);
+            	final List<String> stats = Utils.getPlayerStats(bukkitPlayer, player, DisplayStyle.CHAT);
             	for (int i = 0; i < stats.size(); i++)
             		bukkitPlayer.sendMessage(stats.get(i));
             }

@@ -119,7 +119,7 @@ public class MainCommand implements CommandExecutor {
                 }
             }
             else if (sub.equalsIgnoreCase("start")) {
-            	if (!BeginCountdown.hasStarted())
+            	if (!this.plugin.getPreGameTask().hasStarted())
             		new BeginCountdown(this.plugin);
             	this.plugin.getPreGameTask().shortenCountdown();
             }
@@ -130,7 +130,7 @@ public class MainCommand implements CommandExecutor {
             	GuiManager.openGui(this.plugin, new GuiValidateOwner(this.plugin, player));
             }
             else if (sub.equalsIgnoreCase("give")) {
-            	if (GameState.isStep(GameState.IN_GAME))
+            	if (GameState.isStep(GameState.INGAME))
             	{
             		for (SheepManager sheep : SheepManager.getAvailableSheeps()) {
                 		ItemStack i = sheep.getIcon(player).clone();
