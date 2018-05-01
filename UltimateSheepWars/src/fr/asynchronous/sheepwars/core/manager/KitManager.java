@@ -134,6 +134,7 @@ public abstract class KitManager
 		PLAYER_DAMAGE,
 		ARROW_LAUNCH,
 		PLAYER_INTERACT,
+		ITEM_PICKUP,
 		SHEEP_LAUNCH;
 	}
     
