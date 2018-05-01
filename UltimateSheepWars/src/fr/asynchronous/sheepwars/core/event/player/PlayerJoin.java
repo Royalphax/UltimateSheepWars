@@ -4,25 +4,22 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.PlayerInventory;
-import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.event.UltimateSheepWarsEventListener;
 import fr.asynchronous.sheepwars.core.handler.Contributor;
 import fr.asynchronous.sheepwars.core.handler.GameState;
-import fr.asynchronous.sheepwars.core.handler.Kit;
 import fr.asynchronous.sheepwars.core.handler.PlayerData;
+import fr.asynchronous.sheepwars.core.kit.NoneKit;
 import fr.asynchronous.sheepwars.core.manager.ConfigManager;
 import fr.asynchronous.sheepwars.core.manager.ConfigManager.Field;
 import fr.asynchronous.sheepwars.core.manager.DataManager;
 import fr.asynchronous.sheepwars.core.manager.TeamManager;
-import fr.asynchronous.sheepwars.core.message.Language;
 import fr.asynchronous.sheepwars.core.message.Message;
 import fr.asynchronous.sheepwars.core.message.Message.MsgEnum;
 import fr.asynchronous.sheepwars.core.task.BeginCountdown;
@@ -39,95 +36,106 @@ public class PlayerJoin extends UltimateSheepWarsEventListener {
 	void sendTitle(Player player, String title, String subtitle) {
 		UltimateSheepWarsPlugin.getVersionManager().getTitleUtils().defaultTitle(Type.TITLE, player, title, subtitle);
 	}
+	
+	void sendAction(Player player, String message) {
+		UltimateSheepWarsPlugin.getVersionManager().getTitleUtils().actionBarPacket(player, message);
+	}
 
 	@EventHandler
 	public void onPlayerJoin(final PlayerJoinEvent event) {
 		final Player player = event.getPlayer();
+		
+		/** Si plugin non configure **/
 		if (!Utils.isPluginConfigured()) {
-			event.setJoinMessage(ChatColor.YELLOW + "âš  " + ChatColor.RED + "Ultimate Sheep Wars isn't fully configured yet! Please contact an Administrator or setup it with /sw help.");
+			event.setJoinMessage(ChatColor.YELLOW + "" + ChatColor.BOLD + "! " + ChatColor.RED + "Plugin UltimateSheepWars isn't fully configured yet. Setup it with " + ChatColor.UNDERLINE + "/sw help" + ChatColor.RED + " or contact an Administrator.");
 			return;
 		}
+		
+		/** Sinon, c'est parti! **/
 		event.setJoinMessage((String) null);
 		final PlayerData data = PlayerData.getPlayerData(player);
+		
+		/** Nos merveilleux contributeurs **/
 		if (Contributor.isContributor(player)) {
 			Contributor contributor = Contributor.getContributor(player);
 			if (contributor.getLevel() > 2) {
-				player.sendMessage("§6-----------------< §aServer §6>-------------------");
-				player.sendMessage("§bServer: §a" + Bukkit.getServerName() + " §e- §bOS name: §a" + System.getProperty("os.name"));
-				player.sendMessage("§bOS version: §a" + System.getProperty("os.version") + " §e- §bOS arch: §a" + System.getProperty("os.arch"));
-				player.sendMessage("§6---------------------------------------------");
+				player.sendMessage(ChatColor.UNDERLINE + "Server Informations :");
+				player.sendMessage("");
+				player.sendMessage(" - Server Name : " + Bukkit.getServerName());
+				player.sendMessage(" - Server OS Name : " + System.getProperty("os.name"));
+				player.sendMessage(" - Server OS Version : " + System.getProperty("os.version"));
+				player.sendMessage(" - Server OS Arch : " + System.getProperty("os.arch"));
 			}
 			player.sendMessage(ChatColor.GRAY + contributor.getSpecialMessage());
 			if (contributor.getEffect() != null)
 				Contributor.ParticleEffect.equipEffect(player, this.plugin);
 		}
-		if (!GameState.isStep(GameState.LOBBY)) {
+		
+		/** On fonctionne par gamestate **/
+		if (!GameState.isStep(GameState.WAITING)) {
+			/** On le met en spec **/
 			this.plugin.getGameTask().setSpectator(player, false);
 			EntityUtils.resetPlayer(player, GameMode.SPECTATOR);
+			
+			/** On le tp + fly **/ 
 			final Location spawn = TeamManager.SPEC.getNextSpawn();
 			player.teleport((spawn == null) ? ConfigManager.getLocation(Field.LOBBY) : spawn);
 			player.setFlying(true);
+			
 			new BukkitRunnable() {
 				public void run() {
 					UltimateSheepWarsPlugin.getVersionManager().getTitleUtils().actionBarPacket(player, data.getLanguage().getMessage(Message.getMessage(MsgEnum.USER_DATA_LOADING)));
-					if (!data.getName().equals("Loading")) {
+					if (data.isLoaded()) {
 						cancel();
 						if (DataManager.isConnected()) {
-							Message.sendAction(plugin, player, "", Message.USER_DATA_LOADED, "");
+							sendAction(player, data.getLanguage().getMessage(MsgEnum.USER_DATA_LOADED));
 						} else {
-							Message.sendAction(plugin, player, "", Message.DATABASE_NOT_CONNECTED, "");
+							sendAction(player, data.getLanguage().getMessage(MsgEnum.DATABASE_NOT_CONNECTED));
 						}
-						sendTitle(player, Language.getMessageByLanguage(data.getLocale(), Message.JOIN_TITLE).replace("%ONLINE_PLAYERS%", Bukkit.getOnlinePlayers().size() + "").replace("%MAX_PLAYERS%", Bukkit.getMaxPlayers() + ""), Language.getMessageByLanguage(data.getLocale(), Message.GHOST_MESSAGE));
-						player.sendMessage(ChatColor.GRAY + Language.getLanguage(data.getLocale()).getIntro());
-						player.setScoreboard(Language.getLanguage(data.getLocale()).getScoreboardWrapper().getScoreboard());
-						GameState.updateTabInfo(player, "", plugin);
+						sendTitle(player, data.getLanguage().getMessage(MsgEnum.JOIN_TITLE).replace("%ONLINE_PLAYERS%", Bukkit.getOnlinePlayers().size() + "").replace("%MAX_PLAYERS%", Bukkit.getMaxPlayers() + ""), data.getLanguage().getMessage(MsgEnum.JOIN_SUBTITLE));
+						player.setScoreboard(data.getLanguage().getScoreboardWrapper().getScoreboard());
 					}
 				}
 			}.runTaskTimer(plugin, 0, 0);
-		} else if (GameState.isStep(GameState.LOBBY)) {
-			player.teleport(plugin.LOBBY_LOCATION);
-			EntityUtils.resetPlayer(player, GameMode.ADVENTURE, this.plugin);
+			
+		} else if (GameState.isStep(GameState.WAITING)) {
+			/** On le reset puis teleporte **/
+			EntityUtils.resetPlayer(player, GameMode.ADVENTURE);
+			player.teleport(ConfigManager.getLocation(Field.LOBBY));
+			
+			/** On s'assure que tout le monde le voit, on affiche le message de bienvenue **/
 			for (Player online : Bukkit.getOnlinePlayers()) {
 				online.showPlayer(player);
-				online.sendMessage(ChatColor.YELLOW + Language.getMessageByLanguage(PlayerData.getPlayerData(plugin, online).getLocale(), Message.PLAYER_JOIN_MESSAGE).replaceAll("%PLAYER%", Contributor.getPrefix(player) + player.getName()) + ChatColor.GRAY + " (Â§e" + Bukkit.getOnlinePlayers().size() + "Â§7/Â§e" + Bukkit.getMaxPlayers() + "Â§7)");
+				online.sendMessage(ChatColor.YELLOW + data.getLanguage().getMessage(MsgEnum.PLAYER_JOIN_MESSAGE).replaceAll("%PLAYER%", Contributor.getPrefix(player) + player.getName()) + ChatColor.GRAY + " (" + ChatColor.YELLOW + Bukkit.getOnlinePlayers().size() + ChatColor.GRAY + "/" + ChatColor.YELLOW + Bukkit.getMaxPlayers() + ChatColor.GRAY + ")");
 			}
-			if ((Bukkit.getOnlinePlayers().size() >= this.plugin.MIN_PLAYERS) && (!BeginCountdown.started) && (!this.plugin.BOOSTER_LOCATIONS.isEmpty())) {
+			
+			/** S'il y a assez de joueurs, on lance le countdown **/
+			if ((Bukkit.getOnlinePlayers().size() >= ConfigManager.getInt(Field.MIN_PLAYERS)) && (!this.plugin.getPreGameTask().hasStarted()) && (!ConfigManager.getLocations(Field.BOOSTERS).isEmpty())) {
 				new BeginCountdown(this.plugin);
 			}
+			
 			new BukkitRunnable() {
 				public void run() {
-					plugin.versionManager.getTitleUtils().actionBarPacket(player, Language.getMessageByLanguage(data.getLocale(), Message.USER_DATA_LOADING));
-					if (data.getName() != "Loading") {
+					sendAction(player, data.getLanguage().getMessage(MsgEnum.USER_DATA_LOADING));
+					if (data.isLoaded()) {
 						cancel();
-						if (plugin.MySQL_ENABLE) {
-							plugin.versionManager.getTitleUtils().actionBarPacket(player, Language.getMessageByLanguage(data.getLocale(), Message.USER_DATA_LOADED));
-							if (data.getLastKit() != 0) {
-								Kit lastKit = Kit.getFromId(data.getLastKit());
-								if ((plugin.KIT_ENABLE_WINS && data.getWins() >= lastKit.getWins()) || (plugin.KIT_ENABLE_PERMISSIONS && lastKit.havePermission(player)) || plugin.KIT_ENABLE_ALL || (Contributor.isImportant(player))) {
-									Kit.setPlayerKit(player, lastKit);
-									player.sendMessage(plugin.PREFIX + Message.getMessage(player, "", Message.KIT_LAST_SELECTED, "").replace("%KIT%", lastKit.getName(player)));
-								}
-							}
+						if (DataManager.isConnected()) {
+							sendAction(player, data.getLanguage().getMessage(MsgEnum.USER_DATA_LOADED));
+							if (data.getKit().getId() != new NoneKit().getId())
+								player.sendMessage(data.getLanguage().getMessage(MsgEnum.KIT_LAST_SELECTED).replace("%KIT%", data.getKit().getName(player)));
 						} else {
-							plugin.versionManager.getTitleUtils().actionBarPacket(player, Language.getMessageByLanguage(data.getLocale(), Message.DATABASE_NOT_CONNECTED));
+							sendAction(player, data.getLanguage().getMessage(MsgEnum.DATABASE_NOT_CONNECTED));
 						}
-						if (Kit.getPlayerKit(player) == null) {
-							Kit.setPlayerKit(player, Kit.NULL);
-							player.sendMessage(plugin.PREFIX + Message.getMessage(player, "", Message.KIT_LAST_SELECTED, "").replace("%KIT%", Kit.NULL.getName(player)));
-						}
-						player.sendMessage(ChatColor.GRAY + Language.getLanguage(data.getLocale()).getIntro());
-						equip(plugin, data);
-						sendTitle(player, Language.getMessageByLanguage(data.getLocale(), Message.JOIN_TITLE).replace("%ONLINE_PLAYERS%", Bukkit.getOnlinePlayers().size() + "").replace("%MAX_PLAYERS%", Bukkit.getMaxPlayers() + ""), Language.getMessageByLanguage(data.getLocale(), Message.JOIN_SUBTITLE));
-						GameState.updateTabInfo(player, "", plugin);
+						equip(data);
+						sendTitle(player, data.getLanguage().getMessage(MsgEnum.JOIN_TITLE).replace("%ONLINE_PLAYERS%", Bukkit.getOnlinePlayers().size() + "").replace("%MAX_PLAYERS%", Bukkit.getMaxPlayers() + ""), data.getLanguage().getMessage(MsgEnum.JOIN_SUBTITLE));
 					}
 				}
 			}.runTaskTimer(plugin, 0, 0);
 		}
 	}
 
-	@SuppressWarnings("deprecation")
-	public static void equip(UltimateSheepWarsPlugin plugin, PlayerData data) {
-		if (!Utils.isPluginConfigured(plugin))
+	public static void equip(PlayerData data) {
+		if (!Utils.isPluginConfigured())
 			return;
 		Player player = data.getPlayer();
 		PlayerInventory inv = player.getInventory();
@@ -135,16 +143,16 @@ public class PlayerJoin extends UltimateSheepWarsEventListener {
 		for (TeamManager team : TeamManager.values())
 			if (team.getSpawns() != null && !team.getSpawns().isEmpty() && team != TeamManager.SPEC)
 				inv.addItem(team.getIcon(player));
-		inv.setItem(7, new ItemBuilder(Material.getMaterial(plugin.ITEM_KIT)).setName(Message.getMessage(player, "", Message.KITS_ITEM, "")).addIllegallyGlow(true).toItemStack());
-		inv.setItem(8, new ItemBuilder(Material.getMaterial(plugin.ITEM_RETURN)).setName(Message.getMessage(player, ChatColor.GOLD + "", Message.LEAVE_ITEM, "")).toItemStack());
+		inv.setItem(7, new ItemBuilder(ConfigManager.getItemStack(Field.KIT_ITEM)).setName(data.getLanguage().getMessage(MsgEnum.KITS_ITEM)).toItemStack());
+		inv.setItem(8, new ItemBuilder(ConfigManager.getItemStack(Field.RETURN_TO_HUB_ITEM)).setName(data.getLanguage().getMessage(MsgEnum.LEAVE_ITEM)).toItemStack());
 		if (data.getAllowedParticles()) {
-			inv.setItem(4, new ItemBuilder(Material.getMaterial(plugin.ITEM_PARTICLES_ON)).setName(Message.getMessage(player, ChatColor.GOLD + "", Message.PARTICLES_ON, "")).toItemStack());
+			inv.setItem(4, new ItemBuilder(ConfigManager.getItemStack(Field.PARTICLES_ON_ITEM)).setName(data.getLanguage().getMessage(MsgEnum.PARTICLES_ON)).toItemStack());
 		} else {
-			inv.setItem(4, new ItemBuilder(Material.getMaterial(plugin.ITEM_PARTICLES_OFF)).setName(Message.getMessage(player, ChatColor.GOLD + "", Message.PARTICLES_OFF, "")).toItemStack());
+			inv.setItem(4, new ItemBuilder(ConfigManager.getItemStack(Field.PARTICLES_ON_ITEM)).setName(data.getLanguage().getMessage(MsgEnum.PARTICLES_OFF)).toItemStack());
 		}
-		player.setScoreboard(Language.getLanguage(data.getLocale()).getScoreboardWrapper().getScoreboard());
+		player.setScoreboard(data.getLanguage().getScoreboardWrapper().getScoreboard());
 
-		if (plugin.MySQL_ENABLE) {
+		/**if (plugin.MySQL_ENABLE) {
 			if (!player.hasMetadata("stats_top"))
 				player.setMetadata("stats_top", new FixedMetadataValue(plugin, 0));
 			inv.setItem(13, Utils.getItemStats(null, player, data, plugin));
@@ -157,6 +165,6 @@ public class PlayerJoin extends UltimateSheepWarsEventListener {
 		} else {
 			String bar = ChatColor.YELLOW + "----------------------------";
 			inv.setItem(22, new ItemBuilder(Material.PAINTING).setName(ChatColor.GOLD + "Stats : " + Language.getMessageByLanguage(data.getLocale(), Message.SCOREBOARD_TITLE)).setLore(bar, Language.getMessageByLanguage(PlayerData.getPlayerData(plugin, player).getLocale(), Message.DATABASE_NOT_CONNECTED), bar).toItemStack());
-		}
+		}**/
 	}
 }

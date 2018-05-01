@@ -20,10 +20,10 @@ public class PlayerKick extends UltimateSheepWarsEventListener
     public void onPlayerKick(final PlayerKickEvent event) {
         event.setLeaveMessage((String)null);
         final Player player = event.getPlayer();
-        if (!GameState.isStep(GameState.POST_GAME) && !GameState.isStep(GameState.TERMINATED) && !GameState.isStep(GameState.LOBBY)){
-        	EntityUtils.resetPlayer(player, GameMode.ADVENTURE, this.plugin);
-        	this.plugin.GAME_TASK.setSpectator(player, true);
-        	this.plugin.GAME_TASK.removePlayer(player);
+        if (GameState.isStep(GameState.INGAME)){
+        	EntityUtils.resetPlayer(player, GameMode.ADVENTURE);
+        	this.plugin.getGameTask().setSpectator(player, true);
+        	this.plugin.getGameTask().removePlayer(player);
         }	
     }
 }
