@@ -37,6 +37,8 @@ public class PlayerData extends DataManager {
 		particlePlayers = new ArrayList<>();
 	}
 
+	private boolean loaded = false;
+	
 	private OfflinePlayer player;
 	private String uid;
 	private String name;
@@ -177,6 +179,10 @@ public class PlayerData extends DataManager {
 
 	public Date getCreatedAt() {
 		return this.createdAt;
+	}
+	
+	public boolean isLoaded() {
+		return this.loaded;
 	}
 
 	public void setUpdatedAt(final Date updatedAt) {
@@ -324,7 +330,10 @@ public class PlayerData extends DataManager {
 				} catch (ClassNotFoundException | SQLException ex) {
 					new ExceptionManager(ex).register(true);
 				}
+				this.loaded = true;
 			}).start();
+		} else {
+			this.loaded = true;
 		}
 		dataMap.put(player, this);
 	}
