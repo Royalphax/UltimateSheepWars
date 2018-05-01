@@ -7,9 +7,6 @@ import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
@@ -17,7 +14,6 @@ import org.bukkit.scoreboard.Scoreboard;
 
 import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.handler.GameState;
-import fr.asynchronous.sheepwars.core.handler.Kit;
 import fr.asynchronous.sheepwars.core.handler.PlayerData;
 import fr.asynchronous.sheepwars.core.handler.Sounds;
 import fr.asynchronous.sheepwars.core.kit.MoreHealthKit;
@@ -33,19 +29,15 @@ import fr.asynchronous.sheepwars.core.util.ItemBuilder;
 import fr.asynchronous.sheepwars.core.version.ATitleUtils.Type;
 
 public class BeginCountdown extends BukkitRunnable {
-	private static boolean started;
-	private static boolean forced;
+	private boolean started = false;
+	private boolean forced = false;
 	private int timeUntilStart;
 	private final UltimateSheepWarsPlugin plugin;
 
-	static {
-		started = false;
-		forced = false;
-	}
-
 	public BeginCountdown(final UltimateSheepWarsPlugin plugin) {
+		this.plugin = plugin;
 		plugin.setPreGameTask(this);
-		this.runTaskTimer((this.plugin = plugin), 0L, 20L);
+		this.runTaskTimer(plugin, 0L, 20L);
 		start();
 	}
 
@@ -55,11 +47,11 @@ public class BeginCountdown extends BukkitRunnable {
 			boolean begin = false;
 			begin = Bukkit.getOnlinePlayers().size() >= (forced ? 2 : ConfigManager.getInt(Field.MIN_PLAYERS));
 			if (!begin) {
-				Message.broadcast(String.valueOf(ConfigManager.getString(Field.PREFIX)) + ChatColor.RED + "", MsgEnum.PLAYERS_DEFICIT, "");
+				Message.broadcast(MsgEnum.PLAYERS_DEFICIT);
 				this.timeUntilStart = ConfigManager.getInt(Field.COUNTDOWN);
-				BeginCountdown.started = false;
+				started = false;
 			} else {
-				GameState.setCurrentStep(GameState.IN_GAME);
+				GameState.setCurrentStep(GameState.INGAME);
 				for (TeamManager team : TeamManager.values())
 					team.inGameRules();
 				for (Language lang : Language.getLanguages()) {
@@ -99,6 +91,7 @@ public class BeginCountdown extends BukkitRunnable {
 						player.getInventory().setBoots(new ItemBuilder(Material.LEATHER_BOOTS).setLeatherArmorColor(color).addEnchant(Enchantment.PROTECTION_PROJECTILE, 2).addEnchant(Enchantment.PROTECTION_FALL, 1).setUnbreakable().toItemStack());
 						player.getInventory().setItem(8, new ItemBuilder(Material.LEATHER_CHESTPLATE).setLeatherArmorColor(color).setName(team.getColor() + "" + ChatColor.BOLD + team.getDisplayName(player)).setUnbreakable().toItemStack());
 					}
+					/**
 					player.getInventory().addItem(new ItemBuilder(Material.BOW).addEnchant(Enchantment.ARROW_INFINITE, 1).setUnbreakable().toItemStack());
 					player.getInventory().addItem(new ItemBuilder((kit == Kit.BETTER_SWORD) ? Material.STONE_SWORD : Material.WOOD_SWORD).setUnbreakable().toItemStack());
 					if (kit == Kit.BUILDER) {
@@ -125,12 +118,13 @@ public class BeginCountdown extends BukkitRunnable {
 						player.setHealthScaled(false);
 						player.setHealth(23.0);
 					}
+					**/
 					for (Language lang : Language.getLanguages())
 						lang.getScoreboardWrapper().getScoreboard().getObjective("health").getScore(player.getName()).setScore((kit == new MoreHealthKit() ? 24 : 20));
 					data.increaseGames(1);
 					player.setFallDistance(0.0f);
 					player.teleport(team.getNextSpawn());
-					UltimateSheepWarsPlugin.getVersionManager().getTitleUtils().defaultTitle(Type.TITLE, player, data.getLanguage().getMessage(essage.GAME_START_TITLE), Language.getMessageByLanguage(data.getLocale(), Message.GAME_START_SUBTITLE).replace("%TIME%", this.plugin.GIVE_SHEEP_INTERVAL.toString()));
+					UltimateSheepWarsPlugin.getVersionManager().getTitleUtils().defaultTitle(Type.TITLE, player, data.getLanguage().getMessage(MsgEnum.GAME_START_TITLE), data.getLanguage().getMessage(MsgEnum.GAME_START_SUBTITLE).replace("%TIME%", ConfigManager.getInt(Field.GIVE_SHEEP_INTERVAL).toString()));
 				}
 				new GameTask(this.plugin);
 			}
@@ -172,19 +166,19 @@ public class BeginCountdown extends BukkitRunnable {
 			this.timeUntilStart = 10;
 	}
 
-	public static void start() {
+	public void start() {
 		started = true;
 	}
 
-	public static void forceStarting() {
+	public void forceStarting() {
 		forced = true;
 	}
 
-	public static boolean hasStarted() {
+	public boolean hasStarted() {
 		return started;
 	}
 
-	public static boolean wasForced() {
+	public boolean wasForced() {
 		return forced;
 	}
 }
