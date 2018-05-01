@@ -65,6 +65,12 @@ public class Utils {
 		}
 		return output;
 	}
+	
+	public static ArrayList<String> getPlayerStats(Player playersData, Player playerToShow, DisplayStyle style) {
+		final PlayerData data = PlayerData.getPlayerData(playersData);
+		final Language lang = PlayerData.getPlayerData(playerToShow).getLanguage();
+		return getPlayerStats(data, lang, style);
+	}
 
 	public static ItemStack getItemStats(PlayerData.DATA_TYPE type, Player player, PlayerData data, UltimateSheepWarsPlugin plugin) {
 		Language lang = Language.getLanguage(data.getLocale());
