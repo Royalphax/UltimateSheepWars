@@ -7,11 +7,11 @@ import org.bukkit.event.player.PlayerQuitEvent;
 
 import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.event.UltimateSheepWarsEventListener;
+import fr.asynchronous.sheepwars.core.handler.GameState;
 import fr.asynchronous.sheepwars.core.handler.PlayerData;
 import fr.asynchronous.sheepwars.core.manager.TeamManager;
-import fr.asynchronous.sheepwars.core.handler.GameState;
-import fr.asynchronous.sheepwars.core.message.Language;
 import fr.asynchronous.sheepwars.core.message.Message;
+import fr.asynchronous.sheepwars.core.message.Message.MsgEnum;
 
 public class PlayerQuit extends UltimateSheepWarsEventListener
 {
@@ -23,18 +23,20 @@ public class PlayerQuit extends UltimateSheepWarsEventListener
     public void onPlayerQuit(final PlayerQuitEvent event) {
         event.setQuitMessage((String)null);
         final Player player = event.getPlayer();
-        if (TeamManager.getPlayerTeam(player) != TeamManager.SPEC && GameState.isStep(GameState.IN_GAME))
+        final PlayerData data = PlayerData.getPlayerData(player);
+        
+        /** On gère les effets **/
+        if (data.getTeam() != TeamManager.SPEC && GameState.isStep(GameState.INGAME))
         {
         	player.getWorld().strikeLightning(player.getLocation().add(0,5,0));
         	for (Player online : Bukkit.getOnlinePlayers())
-        	{
-        		String lang = PlayerData.getPlayerData(plugin, online).getLocale();
-        		player.sendMessage(Language.getMessageByLanguage(lang, Message.DIED_MESSAGE).replace("%VICTIM%", player.getName()));
-        	}
+        		online.sendMessage(Message.getMessage(online, MsgEnum.DIED_MESSAGE).replace("%VICTIM%", player.getName()));
         }
-        if (this.plugin.GAME_TASK != null) {
-        	this.plugin.GAME_TASK.setSpectator(player, true);
-        	this.plugin.GAME_TASK.removePlayer(player);
+        
+        /** On supprime le joueur **/
+        if (this.plugin.getGameTask() != null) {
+        	this.plugin.getGameTask().setSpectator(player, true);
+        	this.plugin.getGameTask().removePlayer(player);
         }
     }
 }

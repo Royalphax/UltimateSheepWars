@@ -24,6 +24,7 @@ public class PlayerLogin extends UltimateSheepWarsEventListener {
 		final Player player = event.getPlayer();
 		final PlayerData data = PlayerData.getPlayerData(player);
 		
+		/** On regarde si on le kick ou pas **/
 		if (GameState.isStep(GameState.WAITING)) {
 			if (event.getResult() == PlayerLoginEvent.Result.KICK_FULL && player.hasPermission("sheepwars.vip")) {
 				event.allow();
@@ -37,6 +38,7 @@ public class PlayerLogin extends UltimateSheepWarsEventListener {
 			}
 		}
 		
+		/** On actualise son langage **/
 		new BukkitRunnable()
 		{
 			public void run()
