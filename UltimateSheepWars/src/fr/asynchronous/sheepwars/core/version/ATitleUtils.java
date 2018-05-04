@@ -4,7 +4,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import fr.asynchronous.sheepwars.core.manager.ExceptionManager;
-import fr.asynchronous.sheepwars.core.util.Utils;
 
 public abstract class ATitleUtils {
 
@@ -39,7 +38,7 @@ public abstract class ATitleUtils {
 			defaultTitle(type, online, obj);
 	}
 	
-	public static enum Type {
+	public enum Type {
 		TITLE(0),
 		TAB(1),
 		ACTION(2);
