@@ -34,7 +34,8 @@ import fr.asynchronous.sheepwars.core.manager.URLManager;
 import fr.asynchronous.sheepwars.core.util.FileUtils;
 
 /**
- * @author Roytreo28 (c) 2017 All rights reserved.
+ * <u>Code thieves are dumb.</u>
+ * @author Roytreo28
  */
 public class DataRegister {
 
@@ -190,8 +191,8 @@ public class DataRegister {
 		PLUGIN_NAME("PLUGIN_NAME", new PluginNameData()),
 		PLUGIN_VERSION("PLUGIN_VERSION", new PluginVersionData());
 
-		final private String id;
-		final private Data clazz;
+		private final String id;
+		private final Data clazz;
 		private String data;
 		private String row;
 
@@ -416,14 +417,14 @@ public class DataRegister {
 
 		@Override
 		public String getData(Plugin plugin) {
-			String user_id = DataType.USER_ID.getData(plugin);
+			String userid = DataType.USER_ID.getData(plugin);
 
-			if (user_id.equals("%%__USER__%%")) {
+			if (userid.equals("%%__USER__%%")) {
 				return "Robot";
 			} else {
 				try {
 
-					URL url = new URL("https://www.spigotmc.org/members/" + user_id);
+					URL url = new URL("https://www.spigotmc.org/members/" + userid);
 					URLConnection connection = url.openConnection();
 					connection.setRequestProperty("User-Agent",
 							"Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.106 Safari/537.36");
