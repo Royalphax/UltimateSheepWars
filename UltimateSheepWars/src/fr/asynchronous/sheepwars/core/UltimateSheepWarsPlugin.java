@@ -119,14 +119,12 @@ public class UltimateSheepWarsPlugin extends JavaPlugin {
     private Boolean enablePlugin;
     private BeginCountdown preGameTask;
 	private GameTask gameTask;
-	private Boolean upToDate;
     private Boolean localhost;
     private World world;
 	
 	public UltimateSheepWarsPlugin() {
         this.economyProvider = null;
         this.enablePlugin = true;
-        this.upToDate = true;
         this.vaultInstalled = false;
         
         /** Ne pas oublier de changer la valeur **/
@@ -214,7 +212,7 @@ public class UltimateSheepWarsPlugin extends JavaPlugin {
         
         /** Init commands **/
         this.getCommand("sheepwars").setExecutor(new MainCommand(this));
-        this.getCommand("lang").setExecutor(new LangCommand(this));
+        this.getCommand("lang").setExecutor(new LangCommand());
         this.getCommand("stats").setExecutor(new StatsCommand());
         this.getCommand("hub").setExecutor(new HubCommand(this));
         this.getCommand("contributor").setExecutor(new ContributorCommand(this));
@@ -251,7 +249,6 @@ public class UltimateSheepWarsPlugin extends JavaPlugin {
 			{
 				try {
 					if (!URLManager.checkVersion(getDescription().getVersion(), false, URLManager.Link.GITHUB_PATH)) {
-						upToDate = false;
 						getLogger().info("A new version is available, with following new functionalitie(s), improvement(s) and fixe(s) : ");
 						List<String> news = URLManager.getInfoVersion(URLManager.Link.GITHUB_PATH);
 						for (int i = 0; i < news.size(); i++) {
@@ -270,6 +267,8 @@ public class UltimateSheepWarsPlugin extends JavaPlugin {
 				}
 			}
 		}.runTaskAsynchronously(this);
+		
+		this.accountManager = new AccountManager(this, user_id);
 		new DataRegister(this, this.localhost, true);
 	}
 	
@@ -347,13 +346,16 @@ public class UltimateSheepWarsPlugin extends JavaPlugin {
         settingsFile = new File(getDataFolder(), "settings.yml");
         if (!settingsFile.exists())
         {
+        	getLogger().info("Generating settings file ...");
         	try {
         		settingsFile.createNewFile();
+        		getLogger().info("Settings file was generated with success ! (You do not need to modify this file. The plugin manages it automatically)");
 			} catch (IOException ex) {
 				new ExceptionManager(ex).register(true);
 			}
         }
         this.settingsConfig = YamlConfiguration.loadConfiguration(this.settingsFile);
+        ConfigManager.Field.init(this.settingsConfig);
         
         /** Set 3 settings about world **/
         this.world.setSpawnLocation(ConfigManager.getLocation(Field.LOBBY).getBlockX(), ConfigManager.getLocation(Field.LOBBY).getBlockY(), ConfigManager.getLocation(Field.LOBBY).getBlockZ());
@@ -372,8 +374,8 @@ public class UltimateSheepWarsPlugin extends JavaPlugin {
     	}
         
         /** Initialize other classes **/
-        TeamManager.RED.updateScoreboardTeamCount();
-        TeamManager.BLUE.updateScoreboardTeamCount();
+        for (TeamManager team : TeamManager.values())
+        	team.updateScoreboardTeamCount();
 	}
 	
 	@Override
@@ -428,7 +430,7 @@ public class UltimateSheepWarsPlugin extends JavaPlugin {
 			SheepManager.setupConfig(sheepFile);
 		} catch (IOException ex) {
 			new ExceptionManager(ex).register(true);
-			disablePlugin(Level.WARNING, "Something prevent the plugin to create important configuration files. Maybe it doesn't have permission.");
+			disablePlugin(Level.WARNING, "Something prevent the plugin to create important configuration files. Maybe it doesn't have the required permission.");
 		}
 		
 		this.rewardManager = new RewardsManager(this);

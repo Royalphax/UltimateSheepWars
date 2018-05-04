@@ -7,6 +7,7 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang.math.RandomUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -25,6 +26,8 @@ import fr.asynchronous.sheepwars.core.util.Utils;
 public class ConfigManager {
 
 	private static boolean initialized = false;
+	private static final String CONFIG_FILE = "config.yml";
+	private static final String SETTINGS_FILE = "settings.yml";
 
 	public enum Field {
 
@@ -66,12 +69,12 @@ public class ConfigManager {
 		TERMINATED_GAME_STATE_MOTD("game-state.terminated", FieldType.STRING, "&6\\u2261 &eTerminated &6\\u2261"),
 		RESTARTING_GAME_STATE_MOTD("game-state.restarting", FieldType.STRING, "&5\\u26A0 &dRestarting &5\\u26A0"),
 		
-		LOBBY("lobby", FieldType.LOCATION, new Location(Bukkit.getWorlds().get(0), 0, 0, 0), "settings.yml"),
-		OWNER("owner", FieldType.STRING, "null", "settings.yml"),
-		BOOSTERS("boosters", FieldType.LOCATION_LIST, null, "settings.yml"),
-		RED_SPAWNS("teams.red.spawns", FieldType.LOCATION_LIST, null, "settings.yml"),
-		BLUE_SPAWNS("teams.blue.spawns", FieldType.LOCATION_LIST, null, "settings.yml"),
-		SPEC_SPAWNS("teams.spec.spawns", FieldType.LOCATION_LIST, null, "settings.yml"),
+		LOBBY("lobby", FieldType.LOCATION, new Location(Bukkit.getWorlds().get(0), 0, 0, 0), SETTINGS_FILE),
+		OWNER("owner", FieldType.STRING, "null", SETTINGS_FILE),
+		BOOSTERS("boosters", FieldType.LOCATION_LIST, null, SETTINGS_FILE),
+		RED_SPAWNS("teams.red.spawns", FieldType.LOCATION_LIST, null, SETTINGS_FILE),
+		BLUE_SPAWNS("teams.blue.spawns", FieldType.LOCATION_LIST, null, SETTINGS_FILE),
+		SPEC_SPAWNS("teams.spec.spawns", FieldType.LOCATION_LIST, null, SETTINGS_FILE),
 		
 		PREFIX("prefix", FieldType.STRING, "&8[&9SheepWars&8]");
 
@@ -82,7 +85,7 @@ public class ConfigManager {
 		private Object value;
 
 		private Field(String path, FieldType type, Object def) {
-			this(path, type, def, "config.yml");
+			this(path, type, def, CONFIG_FILE);
 		}
 
 		private Field(String path, FieldType type, Object def, String configName) {
@@ -252,6 +255,13 @@ public class ConfigManager {
 		checkForException(field, FieldType.LOCATION_LIST);
 		return (List<Location>) field.getValue();
 	}
+	
+	@SuppressWarnings("unchecked")
+	public static Location getRdmLocationFromList(Field field) {
+		checkForException(field, FieldType.LOCATION_LIST);
+		List<Location> locs = (List<Location>) field.getValue();
+		return locs.get(RandomUtils.nextInt(locs.size()));
+	}
 
 	private static void checkForException(Field field, FieldType type) {
 		if (!initialized)
@@ -263,7 +273,7 @@ public class ConfigManager {
 	public static void initConfig(UltimateSheepWarsPlugin instance) {
 		if (!instance.getDataFolder().exists())
 			instance.getDataFolder().mkdirs();
-		File file = new File(instance.getDataFolder(), "config.yml");
+		File file = new File(instance.getDataFolder(), CONFIG_FILE);
 		if (!file.exists()) {
 			instance.getLogger().info("Thanks for using UltimateSheepWars from Roytreo28 (@Asynchronous).");
 			instance.getLogger().info("Generating configuration file ...");
@@ -278,6 +288,7 @@ public class ConfigManager {
 		}
 		FileConfiguration config = YamlConfiguration.loadConfiguration(file);
 		Field.init(config);
+		
 		initialized = true;
 	}
 }
