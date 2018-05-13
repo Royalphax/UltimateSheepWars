@@ -111,17 +111,18 @@ public class ConfigManager {
 			return this.def;
 		}
 
-		public boolean isConfig(FileConfiguration config) {
-			return (this.configName.equals(config.getName()));
+		public boolean isFile(File file) {
+			return (this.configName.equals(file.getName()));
 		}
 
 		private void setValue(Object obj) {
 			this.value = obj;
 		}
 
-		public static void init(FileConfiguration config) {
+		public static void init(File file) {
+			FileConfiguration config = YamlConfiguration.loadConfiguration(file);
 			for (Field field : values()) {
-				if (field.isConfig(config))
+				if (field.isFile(file))
 					switch (field.getType()) {
 						case BOOLEAN :
 							field.setValue(config.getBoolean(field.getPath(), (boolean) field.getDefault()));
@@ -246,6 +247,8 @@ public class ConfigManager {
 	}
 	
 	public static Location getLocation(Field field) {
+		if (field.getType() == FieldType.LOCATION_LIST)
+			return getRdmLocationFromList(field);
 		checkForException(field, FieldType.LOCATION);
 		return (Location) field.getValue();
 	}
@@ -277,7 +280,7 @@ public class ConfigManager {
 		if (!file.exists()) {
 			instance.getLogger().info("Thanks for using UltimateSheepWars from Roytreo28 (@Asynchronous).");
 			instance.getLogger().info("Generating configuration file ...");
-			try (InputStream in = instance.getResource("config.yml")) {
+			try (InputStream in = instance.getResource(CONFIG_FILE)) {
 				Files.copy(in, file.toPath());
 			} catch (IOException e) {
 				new ExceptionManager(e).register(true);
@@ -286,9 +289,7 @@ public class ConfigManager {
 				instance.getLogger().info("Configuration file was generated with success !");
 			}
 		}
-		FileConfiguration config = YamlConfiguration.loadConfiguration(file);
-		Field.init(config);
-		
+		Field.init(file);
 		initialized = true;
 	}
 }
