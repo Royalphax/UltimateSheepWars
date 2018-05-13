@@ -1,7 +1,6 @@
 package fr.asynchronous.sheepwars.core.booster;
 
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
 
 import fr.asynchronous.sheepwars.core.handler.DisplayColor;
 import fr.asynchronous.sheepwars.core.manager.BoosterManager;
@@ -12,7 +11,7 @@ import fr.asynchronous.sheepwars.core.message.Message.MsgEnum;
 public class MoreSheepBooster extends BoosterManager
 {
     public MoreSheepBooster() {
-		super(MsgEnum.BOOSTER_MORE_SHEEP, DisplayColor.WHITE, 0);
+		super(MsgEnum.BOOSTER_MORE_SHEEP, DisplayColor.BLUE, 0);
 	}
 
 	@Override
@@ -21,11 +20,6 @@ public class MoreSheepBooster extends BoosterManager
             SheepManager.giveRandomSheep(teamPlayer);
         }
         return true;
-    }
-    
-    @Override
-    public void onEvent(final Player player, final Event event, final BoosterManager.TriggerBoosterAction trigger) {
-        // Do nothing
     }
     
     @Override

@@ -1,8 +1,13 @@
 package fr.asynchronous.sheepwars.core.kit;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.entity.Arrow;
+import org.bukkit.entity.Player;
 import org.bukkit.entity.TNTPrimed;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -10,12 +15,63 @@ import org.bukkit.util.Vector;
 
 import fr.asynchronous.sheepwars.core.handler.Particles;
 import fr.asynchronous.sheepwars.core.handler.Sounds;
+import fr.asynchronous.sheepwars.core.manager.KitManager;
 import fr.asynchronous.sheepwars.core.manager.TeamManager;
+import fr.asynchronous.sheepwars.core.message.Message.MsgEnum;
+import fr.asynchronous.sheepwars.core.util.ItemBuilder;
+import fr.asynchronous.sheepwars.core.util.RandomUtils;
 import fr.asynchronous.sheepwars.core.util.Utils;
 
-public class DestroyerKit {
+public class DestroyerKit extends KitManager {
+
+	public DestroyerKit() {
+		super(0, MsgEnum.KIT_DESTROYER_NAME, MsgEnum.KIT_DESTROYER_DESCRIPTION, "sheepwars.kit.destroyer", 10, 10, new ItemBuilder(Material.TNT));
+	}
+
+	@Override
+	public boolean onEquip(Player player) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+	
+	@EventHandler
+    public void onProjectileLaunch(final ProjectileLaunchEvent event) {
+        if (event.getEntity() instanceof Arrow) {
+            final Arrow arrow = (Arrow)event.getEntity();
+            if (arrow.getShooter() instanceof Player) {
+                final Player player = (Player)arrow.getShooter();
+                if (Kit.getPlayerKit(player) == Kit.DESTROYER)
+                {
+                	if (RandomUtils.getRandomByPercent(5))
+                	{
+                		arrow.setFireTicks(Integer.MAX_VALUE);
+                	}
+                }
+            }
+        }
+    }
+    
+    private void powerUpArrow(final Arrow arrow)
+    {
+    	new BukkitRunnable()
+    	{
+    		private Location lastLocation = Bukkit.getWorlds().get(0).getSpawnLocation();
+    		public void run() {
+    			if (!arrow.isDead() && !arrow.isOnGround()) {
+    				lastLocation = arrow.getLocation();
+    				plugin.versionManager.getParticleFactory().playParticles(Particles.REDSTONE, arrow.getLocation(), 0.0f, 0.0f, 0.0f, 1, 0.0f);
+    			} else {
+    				cancel();
+    				plugin.versionManager.getParticleFactory().playParticles(Particles.FLAME, lastLocation, 0.1f, 0.1f, 0.1f, 3, 0.05f);
+    			}
+    		}
+    	}.runTaskTimer(this.plugin, 0, 0);
+    }
 
 }
+
+
+
 
 /***
 } else if (item.getType() == Material.TNT) {

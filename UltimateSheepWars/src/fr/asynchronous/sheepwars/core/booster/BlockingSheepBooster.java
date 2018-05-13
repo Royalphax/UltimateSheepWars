@@ -1,7 +1,6 @@
 package fr.asynchronous.sheepwars.core.booster;
 
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
 
 import fr.asynchronous.sheepwars.core.handler.DisplayColor;
 import fr.asynchronous.sheepwars.core.manager.BoosterManager;
@@ -13,7 +12,7 @@ public class BlockingSheepBooster extends BoosterManager {
 	private TeamManager opponents;
 	
 	public BlockingSheepBooster() {
-		super(MsgEnum.BOOSTER_BLOCKING_SHEEP, DisplayColor.WHITE, 8);
+		super(MsgEnum.BOOSTER_BLOCKING_SHEEP, DisplayColor.PURPLE, 8);
 	}
 
 	@Override
@@ -24,11 +23,6 @@ public class BlockingSheepBooster extends BoosterManager {
 		return true;
 	}
 
-	@Override
-	public void onEvent(final Player player, final Event event, final BoosterManager.TriggerBoosterAction trigger) {
-		// Do nothing
-	}
-	
 	@Override
 	public void onFinish() {
 		this.opponents.setBlocked(false);

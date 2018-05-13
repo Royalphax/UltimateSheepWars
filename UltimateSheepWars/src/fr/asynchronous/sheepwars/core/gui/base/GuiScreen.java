@@ -18,7 +18,6 @@ import org.bukkit.inventory.ItemStack;
 import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.gui.manager.GuiManager;
 import fr.asynchronous.sheepwars.core.handler.PlayerData;
-import fr.asynchronous.sheepwars.core.manager.TeamManager;
 import fr.asynchronous.sheepwars.core.util.ItemBuilder;
 
 public abstract class GuiScreen implements Listener {
@@ -43,7 +42,7 @@ public abstract class GuiScreen implements Listener {
 		return this.update;
 	}
 
-	abstract public void drawScreen();
+	public abstract void drawScreen();
 
 	public void open(boolean registerEvents) {
 		player.openInventory(this.inventory);

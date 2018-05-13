@@ -76,7 +76,7 @@ public class PlayerData extends DataManager {
 		this.totalTime = 0;
 		this.kit = new NoneKit();
 		this.kits = new ArrayList<>();
-		this.team = null;
+		this.team = TeamManager.NULL;
 		this.winRate = "0.0";
 		this.kdRatio = "0.0";
 		final Date now = new Date(System.currentTimeMillis());

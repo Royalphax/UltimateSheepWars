@@ -66,7 +66,7 @@ public class Language {
 		} catch (IOException ex) {
 			new ExceptionManager(ex).register(true);
 		}
-		this.scoreboard_wrapper = new ScoreboardManager(ChatColor.DARK_GRAY + "- " + Message.getMessage(MsgEnum.SCOREBOARD_TITLE) + ChatColor.DARK_GRAY + " -", this.name);
+		this.scoreboard_wrapper = new ScoreboardManager(ChatColor.DARK_GRAY + "- " + getMessage(MsgEnum.GAME_DISPLAY_NAME) + ChatColor.DARK_GRAY + " -", this.name);
 		this.scoreboard_wrapper.setLine(2, ChatColor.BLUE + "", true);
 		this.scoreboard_wrapper.setLine(5, ChatColor.WHITE + "", true);
 		if (GameState.isStep(GameState.INGAME))
@@ -263,7 +263,7 @@ public class Language {
 				} catch (IOException ex) {
 					new ExceptionManager(ex).register(true);
 				}
-				Bukkit.getLogger().info("A new language file has been created: " + newLanguage.getAbsolutePath());
+				Bukkit.getLogger().info("[UltimateSheepWars > Multi-Language Manager] A new language file has been created: " + newLanguage.getAbsolutePath());
 			} catch (IOException ex) {
 				new ExceptionManager(ex).register(true);
 			}

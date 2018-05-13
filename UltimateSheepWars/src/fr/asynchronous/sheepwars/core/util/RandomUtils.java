@@ -74,6 +74,17 @@ public final class RandomUtils {
 			return false;
 		}
 	}
+	
+	public static <T> T getRandom(List<T> list) {
+		int rdm = random.nextInt(list.size());
+		return list.get(rdm);
+	}
+	
+	@SafeVarargs
+	public static <T> T getRandom(T... list) {
+		int rdm = random.nextInt(list.length);
+		return list[rdm];
+	}
 
 	public static Color getRandomColor() {
 		Random r = new Random();

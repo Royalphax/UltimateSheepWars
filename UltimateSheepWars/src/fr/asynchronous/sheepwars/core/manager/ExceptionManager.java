@@ -29,8 +29,8 @@ public class ExceptionManager {
 	public boolean register(boolean cast) {
 		if (cast) {
 			Logger logger = Bukkit.getLogger();
-			logger.warning("An error occured: " + throwable.getMessage());
-			logger.info("For more information or any help, please contact the developer.");
+			logger.warning("[UltimateSheepWars > ExceptionManager] An error occured: " + throwable.getMessage());
+			logger.info("[UltimateSheepWars > ExceptionManager] For more information or any help, please contact the developer.");
 		}
 		String timeLog = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(Calendar.getInstance().getTime());
         File folder = new File(UltimateSheepWarsPlugin.DATAFOLDER, "reports/");

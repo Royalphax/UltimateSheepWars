@@ -1,5 +1,11 @@
 package fr.asynchronous.sheepwars.core.kit;
 
+import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
+
+import fr.asynchronous.sheepwars.core.handler.Sounds;
+import fr.asynchronous.sheepwars.core.util.Utils;
+
 public class BuilderKit {
 
 }
@@ -13,4 +19,13 @@ if (event.getAction() == Action.RIGHT_CLICK_BLOCK && block.getType() == Material
 		player.getInventory().addItem(new ItemStack(Material.ANVIL, 1));
 		player.updateInventory();
 	}
-} -- AJOUTER AU KIT BUILDER */ 
+} 
+ON PICKUP
+if (Kit.getPlayerKit(event.getPlayer()) == Kit.BUILDER) {
+				event.getItem().remove();
+				Utils.playSound(event.getPlayer(), event.getPlayer().getLocation(), Sounds.ITEM_PICKUP, 1f, 1f);
+				event.getPlayer().getInventory().addItem(new ItemStack(Material.ANVIL, 1));
+			}
+
+
+-- AJOUTER AU KIT BUILDER */ 

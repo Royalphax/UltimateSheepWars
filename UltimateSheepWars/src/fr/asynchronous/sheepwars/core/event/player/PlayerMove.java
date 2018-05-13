@@ -58,15 +58,18 @@ public class PlayerMove extends UltimateSheepWarsEventListener
         if (to.getBlockY() < 0 && (from.getBlockX() != to.getBlockX() || from.getBlockY() != to.getBlockY() || from.getBlockZ() != to.getBlockZ())) {
         	final PlayerData data = PlayerData.getPlayerData(player);
         	if (GameState.isStep(GameState.WAITING)) {
+        		player.addPotionEffect(new PotionEffect(PotionEffectType.CONFUSION, 60, 5));
         		player.setFallDistance(0.0f);
             	UltimateSheepWarsPlugin.getVersionManager().getTitleUtils().titlePacket(player, 5, 10, 5, "", ChatColor.ITALIC+"Woosh!");
                 player.teleport(ConfigManager.getLocation(Field.LOBBY));
+                Sounds.playSound(player, to, Sounds.ENDERDRAGON_WINGS, 1f, 2.0f);
             
         	} else if (data.getTeam() == TeamManager.SPEC) {
         		Field field = Field.SPEC_SPAWNS;
         		if (ConfigManager.getLocations(field).isEmpty())
         			field = Field.BOOSTERS;
         		player.teleport(ConfigManager.getRdmLocationFromList(field));
+        		
         	} else if (!GameState.isStep(GameState.INGAME))
             {
             	player.setAllowFlight(true);
@@ -76,7 +79,7 @@ public class PlayerMove extends UltimateSheepWarsEventListener
             else {
                 if (!player.hasMetadata(FALLING_METADATA) || System.currentTimeMillis() - (player.getMetadata(FALLING_METADATA).get(0)).asLong() >= 2000L) {
                     if (!player.hasMetadata(FALLING_METADATA))
-                    	Sounds.playSound(player, to, Sounds.BLAZE_HIT, 1f, 1f);
+                    	Sounds.playSound(player, to, Sounds.BLAZE_HIT, 1f, 2.0f);
                     player.setMetadata(FALLING_METADATA, new FixedMetadataValue(this.plugin, System.currentTimeMillis()));
                     UltimateSheepWarsPlugin.getVersionManager().getTitleUtils().defaultTitle(Type.TITLE, player, "", ChatColor.RED + data.getLanguage().getMessage(MsgEnum.OUT_OF_THE_GAME));
                 }

@@ -4,13 +4,12 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
+import org.bukkit.event.Listener;
 
 import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.exception.ConfigFileNotSet;
@@ -21,7 +20,7 @@ import fr.asynchronous.sheepwars.core.message.Message;
 import fr.asynchronous.sheepwars.core.message.Message.MsgEnum;
 import fr.asynchronous.sheepwars.core.util.ItemBuilder;
 
-public abstract class KitManager 
+public abstract class KitManager implements Listener
 {
 	
     /*MORE_HEALTH(1, "sheepwars.kit.morehealth", 24, MsgEnum.KIT_MORE_HEALTH_NAME, MsgEnum.KIT_MORE_HEALTH_DESCRIPTION, new ItemBuilder(Material.APPLE)), 
@@ -47,20 +46,19 @@ public abstract class KitManager
     private Message description;
     private String permission;
     private ItemBuilder icon;
-    private List<TriggerKitAction> triggers;
     
     private Double price;
     private int wins;
     
-    public KitManager(final int id, final String name, final String description, final String permission, final double price, final int requiredWins, final ItemBuilder icon, final TriggerKitAction... triggers) {
-    	this(id, name, new Message(name), new Message(description), permission, price, requiredWins, icon, triggers);
+    public KitManager(final int id, final String name, final String description, final String permission, final double price, final int requiredWins, final ItemBuilder icon) {
+    	this(id, name, new Message(name), new Message(description), permission, price, requiredWins, icon);
     }
     
-    public KitManager(final int id, final MsgEnum name, final MsgEnum description, final String permission, final double price, final int requiredWins, final ItemBuilder icon, final TriggerKitAction... triggers) {
-    	this(id, name.toString().replaceAll("KIT_", "").replaceAll("_NAME", ""), Message.getMessage(name), Message.getMessage(description), permission, price, requiredWins, icon, triggers);
+    public KitManager(final int id, final MsgEnum name, final MsgEnum description, final String permission, final double price, final int requiredWins, final ItemBuilder icon) {
+    	this(id, name.toString().replaceAll("KIT_", "").replaceAll("_NAME", ""), Message.getMessage(name), Message.getMessage(description), permission, price, requiredWins, iconO);
     }
     
-    public KitManager(final int id, final String configPath, final Message name, final Message description, final String permission, final double price, final int requiredWins, final ItemBuilder icon, final TriggerKitAction... triggers) {
+    public KitManager(final int id, final String configPath, final Message name, final Message description, final String permission, final double price, final int requiredWins, final ItemBuilder icon) {
     	this.id = id;
     	this.configPath = "kit." + configPath.replaceAll("_", "-").toLowerCase();
         this.name = name;
@@ -69,7 +67,6 @@ public abstract class KitManager
     	this.icon = icon;
     	this.price = price;
     	this.wins = requiredWins;
-    	this.triggers = Arrays.<TriggerKitAction>asList(triggers);
     }
     
     public String getName(Player player) {
@@ -86,6 +83,10 @@ public abstract class KitManager
     
     public String getPermission() {
         return this.permission;
+    }
+    
+    public boolean isKit(int i) {
+    	return(this.id == i);
     }
     
     public List<KitResult> useKit(Player player, UltimateSheepWarsPlugin plugin) {
@@ -121,32 +122,8 @@ public abstract class KitManager
         return this.id;
     }
     
-    public List<TriggerKitAction> getTriggers() {
-        return this.triggers;
-    }
-    
     private String getConfigFieldPath(String field) {
     	return this.configPath + "." + field;
-    }
-    
-    public static enum TriggerKitAction {
-		OTHER,
-		PLAYER_DAMAGE,
-		ARROW_LAUNCH,
-		PLAYER_INTERACT,
-		ITEM_PICKUP,
-		SHEEP_LAUNCH;
-	}
-    
-    public static void triggerKit(Player player, Event event, TriggerKitAction triggerAction) {
-    	PlayerData data = PlayerData.getPlayerData(player);
-    	triggerKit(data, event, triggerAction);
-    }
-    
-    public static void triggerKit(PlayerData playerData, Event event, TriggerKitAction triggerAction) {
-    	KitManager kit = playerData.getKit();
-    	if (kit.getTriggers().contains(triggerAction))
-    		kit.onEvent(playerData.getPlayer(), event, triggerAction);
     }
     
     public enum KitResult {
@@ -158,8 +135,6 @@ public abstract class KitManager
     }
     
     public abstract boolean onEquip(final Player player);
-    
-    public abstract void onEvent(final Player player, final Event event, final TriggerKitAction triggerAction);
     
     public static KitManager getFromId(int id)
     {
@@ -213,5 +188,12 @@ public abstract class KitManager
     	}
     	configFile = file;
     	config = YamlConfiguration.loadConfiguration(file);
+    }
+    
+    public enum Kit {
+    	ARMORED_SHEEP(),
+    	BETTER_BOW(),
+    	BETTER_SWORD(),
+    	
     }
 }

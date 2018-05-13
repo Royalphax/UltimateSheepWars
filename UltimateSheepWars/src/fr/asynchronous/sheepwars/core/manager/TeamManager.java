@@ -4,7 +4,6 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Random;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
@@ -17,6 +16,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BannerMeta;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.material.Dye;
+import org.bukkit.material.MaterialData;
+import org.bukkit.material.Wool;
 import org.bukkit.scoreboard.Scoreboard;
 
 import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
@@ -26,13 +28,15 @@ import fr.asynchronous.sheepwars.core.message.Language;
 import fr.asynchronous.sheepwars.core.message.Message;
 import fr.asynchronous.sheepwars.core.message.Message.MsgEnum;
 import fr.asynchronous.sheepwars.core.util.ItemBuilder;
+import fr.asynchronous.sheepwars.core.util.RandomUtils;
 import fr.asynchronous.sheepwars.core.util.ReflectionUtils;
 import fr.asynchronous.sheepwars.core.util.ReflectionUtils.PackageType;
 
 public enum TeamManager {
-	BLUE((byte) 11, "blue", Message.getMessage(MsgEnum.BLUE_NAME), ConfigManager.getMaterial(Field.TEAM_BLUE_MATERIAL), ConfigManager.getLocations(Field.BLUE_SPAWNS), DyeColor.BLUE, ChatColor.BLUE, 85, 85, 255),
-	RED((byte) 14, "red", Message.getMessage(MsgEnum.RED_NAME), ConfigManager.getMaterial(Field.TEAM_RED_MATERIAL), ConfigManager.getLocations(Field.RED_SPAWNS), DyeColor.RED, ChatColor.RED, 255, 50, 50),
-	SPEC((byte) 2, "spec", Message.getMessage(MsgEnum.SPEC_NAME), Material.STONE, ConfigManager.getLocations(Field.SPEC_SPAWNS), DyeColor.SILVER, ChatColor.GRAY, 0, 0, 0);
+	BLUE("blue", Message.getMessage(MsgEnum.BLUE_NAME), ConfigManager.getMaterial(Field.TEAM_BLUE_MATERIAL), ConfigManager.getLocations(Field.BLUE_SPAWNS), DyeColor.BLUE, ChatColor.BLUE, 85, 85, 255),
+	RED("red", Message.getMessage(MsgEnum.RED_NAME), ConfigManager.getMaterial(Field.TEAM_RED_MATERIAL), ConfigManager.getLocations(Field.RED_SPAWNS), DyeColor.RED, ChatColor.RED, 255, 50, 50),
+	SPEC("spec", Message.getMessage(MsgEnum.SPEC_NAME), Material.STONE, ConfigManager.getLocations(Field.SPEC_SPAWNS), DyeColor.SILVER, ChatColor.GRAY, 0, 0, 0),
+	NULL("null", new Message("null"), Material.AIR, new ArrayList<>(), DyeColor.WHITE, ChatColor.WHITE, 255, 255, 255);
 
 	public static int redSlot;
 	public static int blueSlot;
@@ -43,7 +47,6 @@ public enum TeamManager {
 	}
 
 	private String name;
-	private byte byteColor;
 	private Material material;
 	private final Message displayName;
 	private DyeColor dyecolor;
@@ -55,8 +58,13 @@ public enum TeamManager {
 	private int lastSpawn;
 
 	public static TeamManager getRandomTeam() {
-		int rdm = new Random().nextInt(2);
-		return ((TeamManager.BLUE.getOnlinePlayers().size() == TeamManager.RED.getOnlinePlayers().size()) ? (rdm == 1 ? TeamManager.RED : TeamManager.BLUE) : ((TeamManager.BLUE.getOnlinePlayers().size() < TeamManager.RED.getOnlinePlayers().size()) ? TeamManager.BLUE : TeamManager.RED));
+		TeamManager rdm = RandomUtils.getRandom(TeamManager.RED, TeamManager.BLUE);
+		if (TeamManager.BLUE.getOnlinePlayers().size() == TeamManager.RED.getOnlinePlayers().size())
+			return rdm;
+		if (TeamManager.BLUE.getOnlinePlayers().size() < TeamManager.RED.getOnlinePlayers().size())
+			return TeamManager.BLUE;
+		else
+			return TeamManager.RED;
 	}
 
 	public static TeamManager getTeam(final String name) {
@@ -77,9 +85,8 @@ public enum TeamManager {
 		return null;
 	}
 
-	private TeamManager(final byte byteColor, final String name, final Message displayName, final Material material, final List<Location> spawns, final DyeColor dyecolor, final ChatColor color, int r, int g, int b) {
+	private TeamManager(final String name, final Message displayName, final Material material, final List<Location> spawns, final DyeColor dyecolor, final ChatColor color, int r, int g, int b) {
 		this.name = name;
-		this.byteColor = byteColor;
 		this.displayName = displayName;
 		this.dyecolor = dyecolor;
 		this.blocked = false;
@@ -175,21 +182,25 @@ public enum TeamManager {
 	}
 
 	public ItemStack getIcon(Player p) {
-		ItemStack i = new ItemBuilder(Material.STONE).setName("NPE").toItemStack();
+		ItemStack i = new ItemBuilder(Material.STONE).setName("null").toItemStack();
 		if (material == null)
 			return i;
-		i = new ItemStack(material, 1, this.byteColor);
+		i = new ItemStack(material, 1);
 		if (material == Material.BANNER) {
 			BannerMeta iMeta = (BannerMeta) i.getItemMeta();
-			iMeta.setDisplayName((this == BLUE ? "" + Message.getMessage(p, ChatColor.BLUE + "", MsgEnum.JOIN_BLUE_ITEM, "") : "" + Message.getMessage(p, ChatColor.RED + "", MsgEnum.JOIN_RED_ITEM, "")));
 			iMeta.setBaseColor(this.dyecolor);
 			iMeta.setPatterns(Arrays.asList(new Pattern(DyeColor.WHITE, PatternType.CREEPER)));
 			i.setItemMeta(iMeta);
-		} else {
-			ItemMeta iMeta = i.getItemMeta();
-			iMeta.setDisplayName((this == BLUE ? "" + Message.getMessage(p, ChatColor.BLUE + "", MsgEnum.JOIN_BLUE_ITEM, "") : "" + Message.getMessage(p, ChatColor.RED + "", MsgEnum.JOIN_RED_ITEM, "")));
-			i.setItemMeta(iMeta);
+		} else if (material == Material.WOOL) {
+			MaterialData data = new Wool(this.dyecolor);
+			i.setData(data);
+		} else if (material == Material.INK_SACK) {
+			MaterialData data = new Dye(this.dyecolor);
+			i.setData(data);
 		}
+		ItemMeta iMeta = i.getItemMeta();
+		iMeta.setDisplayName((this == BLUE ? "" + Message.getMessage(p, ChatColor.BLUE + "", MsgEnum.JOIN_BLUE_ITEM, "") : "" + Message.getMessage(p, ChatColor.RED + "", MsgEnum.JOIN_RED_ITEM, "")));
+		i.setItemMeta(iMeta);
 		return i;
 	}
 
