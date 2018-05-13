@@ -24,6 +24,8 @@ public class ScoreboardManager {
 	private final List<BoardLine> boardLines = new ArrayList<>();
 
 	public ScoreboardManager(String title, String objName) {
+		if (objName.length() > 16)
+			objName = objName.substring(0, 16);
 		scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
 		scoreboard.clearSlot(DisplaySlot.SIDEBAR);
 		if (scoreboard.getObjective(objName) == null) {
