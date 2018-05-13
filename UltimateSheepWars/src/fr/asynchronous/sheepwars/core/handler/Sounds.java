@@ -234,4 +234,9 @@ public enum Sounds {
 	{
 		player.playSound((location == null ? player.getLocation() : location), sound.bukkitSound(), volume, pitch);
 	}
+	
+	public static void playSound(Player player, Sounds sound, float volume, float pitch)
+	{
+		player.playSound(player.getLocation(), sound.bukkitSound(), volume, pitch);
+	}
 }
