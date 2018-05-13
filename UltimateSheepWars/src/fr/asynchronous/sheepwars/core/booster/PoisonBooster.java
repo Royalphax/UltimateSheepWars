@@ -1,7 +1,6 @@
 package fr.asynchronous.sheepwars.core.booster;
 
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -13,7 +12,7 @@ import fr.asynchronous.sheepwars.core.message.Message.MsgEnum;
 public class PoisonBooster extends BoosterManager
 {
     public PoisonBooster() {
-		super(MsgEnum.BOOSTER_POISON, DisplayColor.WHITE, 5);
+		super(MsgEnum.BOOSTER_POISON, DisplayColor.GREEN, 5);
 	}
 
 	@Override
@@ -24,11 +23,6 @@ public class PoisonBooster extends BoosterManager
         }
         this.setDisplayColor(DisplayColor.valueOf(opponents.getDyeColor().toString()));
         return true;
-    }
-    
-    @Override
-    public void onEvent(final Player player, final Event event, final BoosterManager.TriggerBoosterAction trigger) {
-    	// Do nothing
     }
     
     @Override

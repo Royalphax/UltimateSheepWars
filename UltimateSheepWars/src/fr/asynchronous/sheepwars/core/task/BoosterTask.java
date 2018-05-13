@@ -1,12 +1,14 @@
 package fr.asynchronous.sheepwars.core.task;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
+import fr.asynchronous.sheepwars.core.handler.PlayerData;
 import fr.asynchronous.sheepwars.core.manager.BoosterManager;
-import fr.asynchronous.sheepwars.core.manager.TeamManager;
 
 public class BoosterTask extends BukkitRunnable {
 
@@ -16,9 +18,10 @@ public class BoosterTask extends BukkitRunnable {
 	public BoosterTask(BoosterManager booster, Player activator, Plugin plugin) {
 		this.booster = booster;
 		this.duration = booster.getDuration() * 20;
-		this.booster.onStart(activator, TeamManager.getPlayerTeam(activator));
+		this.booster.onStart(activator, PlayerData.getPlayerData(activator).getTeam());
 		if (booster.getDuration() < 1)
 			return;
+		Bukkit.getPluginManager().registerEvents(this.booster, plugin);
 		UltimateSheepWarsPlugin.getVersionManager().getBoosterDisplayer().startDisplay(this.booster);
 		this.runTaskTimer(plugin, 0, 0);
 	}
@@ -31,6 +34,7 @@ public class BoosterTask extends BukkitRunnable {
 			this.cancel();
 			UltimateSheepWarsPlugin.getVersionManager().getBoosterDisplayer().endDisplay(this.booster);
 			this.booster.onFinish();
+			HandlerList.unregisterAll(this.booster);
 		}
 	}
 }

@@ -4,14 +4,13 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Random;
 
+import org.bukkit.DyeColor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
+import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 
 import fr.asynchronous.sheepwars.core.exception.ConfigFileNotSet;
@@ -19,10 +18,10 @@ import fr.asynchronous.sheepwars.core.handler.DisplayColor;
 import fr.asynchronous.sheepwars.core.message.Message;
 import fr.asynchronous.sheepwars.core.message.Message.MsgEnum;
 import fr.asynchronous.sheepwars.core.task.BoosterTask;
+import fr.asynchronous.sheepwars.core.util.RandomUtils;
 
-public abstract class BoosterManager {
+public abstract class BoosterManager implements Listener {
 	private static List<BoosterManager> availableBoosters = new ArrayList<>();
-	private static BoosterManager activatedBooster;
 	private static File configFile;
     private static FileConfiguration config;
 
@@ -30,22 +29,20 @@ public abstract class BoosterManager {
 	private final String configPath;
 	private DisplayColor displayColor;
 	private int duration;
-	private final List<TriggerBoosterAction> triggers;
 
-	public BoosterManager(final String name, final DisplayColor displayColor, final int duration, final TriggerBoosterAction... triggers) {
-		this(new Message(name), name, displayColor, duration, triggers);
+	public BoosterManager(final String name, final DisplayColor displayColor, final int duration) {
+		this(new Message(name), name, displayColor, duration);
 	}
 	
-	public BoosterManager(final MsgEnum name, final DisplayColor displayColor, final int duration, final TriggerBoosterAction... triggers) {
-		this(Message.getMessage(name), name.toString().replaceAll("BOOSTER_", ""), displayColor, duration, triggers);
+	public BoosterManager(final MsgEnum name, final DisplayColor displayColor, final int duration) {
+		this(Message.getMessage(name), name.toString().replaceAll("BOOSTER_", ""), displayColor, duration);
 	}
 	
-	public BoosterManager(final Message name, final String configPath, final DisplayColor displayColor, final int duration, final TriggerBoosterAction... triggers) {
+	public BoosterManager(final Message name, final String configPath, final DisplayColor displayColor, final int duration) {
 		this.name = name;
 		this.configPath = "booster." + configPath.replaceAll("_", "-").toLowerCase();
 		this.displayColor = displayColor;
 		this.duration = duration;
-		this.triggers = Arrays.<TriggerBoosterAction>asList(triggers);
 	}
 	
 	public Message getName() {
@@ -64,38 +61,36 @@ public abstract class BoosterManager {
 		return this.duration;
 	}
 
-	public List<TriggerBoosterAction> getTriggers() {
-		return this.triggers;
-	}
-	
 	private String getConfigFieldPath(String field) {
     	return this.configPath + "." + field;
     }
 
-	public static enum TriggerBoosterAction {
-		OTHER,
-		ARROW_LAUNCH;
-	}
 
 	public abstract boolean onStart(final Player player, final TeamManager team);
 
-	public abstract void onEvent(final Player player, final Event event, final TriggerBoosterAction triggerAction);
-
 	public abstract void onFinish();
 
+	public static BoosterManager activateBooster(Player activator, BoosterManager booster, Plugin plugin) {
+		new BoosterTask(booster, activator, plugin);
+		return booster;
+	}
+	
 	public static BoosterManager activateRandomBooster(Player activator, Plugin plugin) {
-		Random rdm = new Random();
-		activatedBooster = availableBoosters.get(rdm.nextInt(availableBoosters.size()));
-		new BoosterTask(activatedBooster, activator, plugin);
-		return activatedBooster;
+		BoosterManager booster = RandomUtils.getRandom(availableBoosters);
+		return activateBooster(activator, booster, plugin);
 	}
-
-	public static BoosterManager getActivatedBooster() {
-		return activatedBooster;
-	}
-
-	public static boolean isBoosterActivated() {
-		return (activatedBooster != null);
+	
+	public static BoosterManager activateBooster(Player activator, DyeColor color, Plugin plugin) {
+		DisplayColor displayColor = DisplayColor.getFromColor(color);
+		if (displayColor == null)
+			return activateRandomBooster(activator, plugin);
+		List<BoosterManager> boosters = new ArrayList<>();
+		for (BoosterManager boost : availableBoosters) 
+			if (boost.getDisplayColor() == displayColor)
+				boosters.add(boost);
+		if (boosters.isEmpty())
+			return activateRandomBooster(activator, plugin);
+		return activateBooster(activator, RandomUtils.getRandom(boosters), plugin);
 	}
 
 	public static boolean registerBooster(BoosterManager booster) throws ConfigFileNotSet, IOException {

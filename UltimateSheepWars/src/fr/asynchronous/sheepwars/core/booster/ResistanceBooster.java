@@ -1,7 +1,6 @@
 package fr.asynchronous.sheepwars.core.booster;
 
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -25,12 +24,6 @@ public class ResistanceBooster extends BoosterManager
         return true;
     }
     
-    @Override
-    public void onEvent(final Player player, final Event event, final BoosterManager.TriggerBoosterAction trigger) {
-    	// Do nothing
-    }
-    
-    @Override
 	public void onFinish() {
 		// Do nothing
 	}
