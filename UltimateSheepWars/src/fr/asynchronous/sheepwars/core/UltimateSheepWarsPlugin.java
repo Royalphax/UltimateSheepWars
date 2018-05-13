@@ -123,7 +123,9 @@ public class UltimateSheepWarsPlugin extends JavaPlugin {
     private World world;
 	
 	public UltimateSheepWarsPlugin() {
+        this.permissionProvider = null;
         this.economyProvider = null;
+        this.chatProvider = null;
         this.enablePlugin = true;
         this.vaultInstalled = false;
         
@@ -165,11 +167,6 @@ public class UltimateSheepWarsPlugin extends JavaPlugin {
 			disablePlugin(Level.WARNING, "UltimateSheepWars doesn't support your server version (" + versionManager.getVersion().toString() + ")");
 			return;
 		}
-		if (!Bukkit.getWorlds().get(0).getName().equals("world"))
-		{
-			disablePlugin(Level.WARNING, "The server properties level name must be \"world\". Stop your server, change \"level-name\" in server.properties file, and switch back on your server.");
-			return;
-		}
 		try {
             Bukkit.unloadWorld("world", true);
             this.getLogger().info("Loading directories ...");
@@ -197,11 +194,15 @@ public class UltimateSheepWarsPlugin extends JavaPlugin {
 	@SuppressWarnings("unchecked")
 	@Override
 	public void onEnable() {
+		/** On fait les verif qui necessite d'etre faites plus tard **/
+		if (!Bukkit.getWorlds().get(0).getName().equals("world"))
+		{
+			disablePlugin(Level.WARNING, "The server properties level name must be \"world\". Stop your server, change \"level-name\" in server.properties file, and switch back on your server.");
+			return;
+		}
+		
 		/** Init custom sheeps **/
 		versionManager.getCustomEntities().registerEntities();
-		
-		/** Init Game **/ 
-		GameState.setCurrentStep(GameState.WAITING);
 		
 		/** Init world settings **/
         this.world = Bukkit.getWorlds().get(0);
@@ -290,8 +291,11 @@ public class UltimateSheepWarsPlugin extends JavaPlugin {
 	
 	public void load()
 	{
-        this.saveDefaultConfig();
+        /** Pas besoin malotru ! this.saveDefaultConfig(); **/
         this.initClasses();
+        
+        /** Init Game **/ 
+		GameState.setCurrentStep(GameState.WAITING);
         
         /** Setup Vault **/
 		vaultInstalled = Bukkit.getPluginManager().isPluginEnabled("Vault");
@@ -355,7 +359,7 @@ public class UltimateSheepWarsPlugin extends JavaPlugin {
 			}
         }
         this.settingsConfig = YamlConfiguration.loadConfiguration(this.settingsFile);
-        ConfigManager.Field.init(this.settingsConfig);
+        ConfigManager.Field.init(this.settingsFile);
         
         /** Set 3 settings about world **/
         this.world.setSpawnLocation(ConfigManager.getLocation(Field.LOBBY).getBlockX(), ConfigManager.getLocation(Field.LOBBY).getBlockY(), ConfigManager.getLocation(Field.LOBBY).getBlockZ());
@@ -374,8 +378,8 @@ public class UltimateSheepWarsPlugin extends JavaPlugin {
     	}
         
         /** Initialize other classes **/
-        for (TeamManager team : TeamManager.values())
-        	team.updateScoreboardTeamCount();
+        TeamManager.RED.updateScoreboardTeamCount();
+        TeamManager.BLUE.updateScoreboardTeamCount();
 	}
 	
 	@Override
@@ -438,20 +442,24 @@ public class UltimateSheepWarsPlugin extends JavaPlugin {
 	
 	private void setupProviders()
     {
-        RegisteredServiceProvider<Permission> permProvider = getServer().getServicesManager().getRegistration(net.milkbowl.vault.permission.Permission.class);
-        if (permProvider != null) {
-        	permissionProvider = permProvider.getProvider();
-        }
+		try {
+			RegisteredServiceProvider<Permission> permProvider = getServer().getServicesManager().getRegistration(net.milkbowl.vault.permission.Permission.class);
+	        if (permProvider != null) {
+	        	permissionProvider = permProvider.getProvider();
+	        }
 
-        RegisteredServiceProvider<Economy> ecoProvider = getServer().getServicesManager().getRegistration(net.milkbowl.vault.economy.Economy.class);
-        if (ecoProvider != null) {
-        	economyProvider = ecoProvider.getProvider();
-        }
-        
-        RegisteredServiceProvider<Chat> cProvider = getServer().getServicesManager().getRegistration(net.milkbowl.vault.chat.Chat.class);
-        if (cProvider != null) {
-        	chatProvider = cProvider.getProvider();
-        }
+	        RegisteredServiceProvider<Economy> ecoProvider = getServer().getServicesManager().getRegistration(net.milkbowl.vault.economy.Economy.class);
+	        if (ecoProvider != null) {
+	        	economyProvider = ecoProvider.getProvider();
+	        }
+	        
+	        RegisteredServiceProvider<Chat> cProvider = getServer().getServicesManager().getRegistration(net.milkbowl.vault.chat.Chat.class);
+	        if (cProvider != null) {
+	        	chatProvider = cProvider.getProvider();
+	        }
+		} catch (NoClassDefFoundError ex) {
+			// Do Nothing
+		}
     }
 
 	@SuppressWarnings("unchecked")
