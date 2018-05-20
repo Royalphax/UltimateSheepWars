@@ -476,7 +476,7 @@ public class UltimateSheepWarsPlugin extends JavaPlugin {
 	
     public void stop()
     {
-    	GameState.setCurrentStep(GameState.TERMINATED);
+    	GameState.setCurrentStep(GameState.RESTARTING);
     	String commd = ConfigManager.getString(Field.DISPATCH_COMMAND);
     	if (!commd.equals("stop") && !commd.equals("restart")) {
     		Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), commd);

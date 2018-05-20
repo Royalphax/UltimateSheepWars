@@ -1,6 +1,7 @@
 package fr.asynchronous.sheepwars.core.task;
 
 import java.util.ArrayList;
+import java.util.Map.Entry;
 import java.util.Random;
 
 import org.bukkit.Bukkit;
@@ -22,6 +23,7 @@ import fr.asynchronous.sheepwars.core.handler.PlayerData;
 import fr.asynchronous.sheepwars.core.handler.Sheeps;
 import fr.asynchronous.sheepwars.core.handler.Sounds;
 import fr.asynchronous.sheepwars.core.manager.TeamManager;
+import fr.asynchronous.sheepwars.core.manager.DataManager;
 import fr.asynchronous.sheepwars.core.manager.ExceptionManager;
 import fr.asynchronous.sheepwars.core.manager.RewardsManager.Events;
 import fr.asynchronous.sheepwars.core.handler.GameState;
@@ -220,33 +222,20 @@ public class GameTask extends BukkitRunnable
     }
 	
 	public void stopGame(final TeamManager winnerTeam) {
-    	for (Player online : Bukkit.getOnlinePlayers()) {
-            new HubTeleportation(this.plugin, online);
-            online.setAllowFlight(true);
-        }
-        for (OfflinePlayer player : PlayerData.getPlayers()) {
-        	final PlayerData data = PlayerData.getPlayerData(this.plugin, player);
-            if (winnerTeam != null && winnerTeam != TeamManager.SPEC) {
-                if (player != null && player.isOnline() && TeamManager.getPlayerTeam((Player) player) == winnerTeam) {
+		new TerminatedGameTask(this.plugin);
+        for (Entry<OfflinePlayer, PlayerData> entry : PlayerData.getData()) {
+        	final OfflinePlayer player = entry.getKey();
+        	final PlayerData data = entry.getValue();
+            if (winnerTeam != null && winnerTeam != TeamManager.SPEC && player.isOnline()) {
+                if (data.getTeam() == winnerTeam) {
                     data.increaseWins(1);
-                    this.plugin.rewardManager.rewardPlayer(Events.ON_WIN, data.getPlayer());
-                } else if (player != null && player.isOnline() && TeamManager.getPlayerTeam((Player) player) != winnerTeam) {
-                	this.plugin.rewardManager.rewardPlayer(Events.ON_LOOSE, data.getPlayer());
+                    this.plugin.getRewardsManager().rewardPlayer(Events.ON_WIN, data.getPlayer());
+                } else {
+                	this.plugin.getRewardsManager().rewardPlayer(Events.ON_LOOSE, data.getPlayer());
                 }
             }
-            if (this.plugin.MySQL_ENABLE) {
-            	new BukkitRunnable() {
-                    public void run() {
-                    	plugin.DATABASE.updatePlayerData(data);
-                    }
-                }.runTaskAsynchronously(this.plugin);
-            }
+            if (DataManager.isConnected())
+            	data.uploadData(player);
         }
-        new BukkitRunnable() {
-        	public void run()
-            {
-        		plugin.stop();
-            }
-        }.runTaskLater(this.plugin, 360L);
     }
 }
