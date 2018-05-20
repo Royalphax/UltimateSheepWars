@@ -14,6 +14,10 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.Plugin;
+
+import com.google.common.io.ByteArrayDataOutput;
+import com.google.common.io.ByteStreams;
 
 import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.handler.Contributor;
@@ -199,5 +203,12 @@ public class Utils {
 		for (int i = 0; i < ints.length; i++)
 			output.add(new String(new BigInteger(ints[i]).toByteArray()));
 		return output;
+	}
+	
+	public static void returnToHub(final UltimateSheepWarsPlugin plugin, final Player player) {
+		final ByteArrayDataOutput out = ByteStreams.newDataOutput();
+		out.writeUTF("Connect");
+		out.writeUTF(ConfigManager.getString(Field.FALLBACK_SERVER));
+		player.sendPluginMessage((Plugin) plugin, "BungeeCord", out.toByteArray());
 	}
 }
