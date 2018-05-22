@@ -15,7 +15,7 @@ import fr.asynchronous.sheepwars.core.manager.ConfigManager;
 import fr.asynchronous.sheepwars.core.manager.ConfigManager.Field;
 import fr.asynchronous.sheepwars.core.message.Message;
 import fr.asynchronous.sheepwars.core.message.Message.MsgEnum;
-import fr.asynchronous.sheepwars.core.task.HubTeleportation;
+import fr.asynchronous.sheepwars.core.util.Utils;
 
 public class HubCommand implements CommandExecutor {
 
@@ -34,7 +34,7 @@ public class HubCommand implements CommandExecutor {
 		player.addPotionEffect(new PotionEffect(PotionEffectType.CONFUSION, 100, 5));
 		Sounds.playSound(player, player.getLocation(), Sounds.PORTAL_TRAVEL, 1f, 1f);
 		player.sendMessage(ConfigManager.getString(Field.PREFIX) + Message.getMessage(player, MsgEnum.HUB_TELEPORTATION));
-		HubTeleportation.returnToHub(this.plugin, player);
+		Utils.returnToHub(this.plugin, player);
 		new BukkitRunnable() {
 			public void run() {
 				if (player.isOnline())

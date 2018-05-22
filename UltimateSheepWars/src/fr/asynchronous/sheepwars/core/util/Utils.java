@@ -5,6 +5,8 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 
 import org.bukkit.Bukkit;
@@ -27,7 +29,6 @@ import fr.asynchronous.sheepwars.core.manager.ConfigManager;
 import fr.asynchronous.sheepwars.core.manager.ConfigManager.Field;
 import fr.asynchronous.sheepwars.core.manager.TeamManager;
 import fr.asynchronous.sheepwars.core.message.Language;
-import fr.asynchronous.sheepwars.core.message.Message;
 import fr.asynchronous.sheepwars.core.message.Message.MsgEnum;
 
 public class Utils {
@@ -70,25 +71,30 @@ public class Utils {
 		return output;
 	}
 	
-	public static ArrayList<String> getPlayerStats(Player playersData, Player playerToShow, DisplayStyle style) {
+	public static List<String> getPlayerStats(Player playersData, Player playerToShow, DisplayStyle style) {
 		final PlayerData data = PlayerData.getPlayerData(playersData);
 		final Language lang = PlayerData.getPlayerData(playerToShow).getLanguage();
 		return getPlayerStats(data, lang, style);
 	}
 
-	public static ItemStack getItemStats(PlayerData.DATA_TYPE type, Player player, PlayerData data, UltimateSheepWarsPlugin plugin) {
-		Language lang = Language.getLanguage(data.getLocale());
+	public static ItemStack getItemStats(PlayerData.DataType type, Player player) {
+		final PlayerData data = PlayerData.getPlayerData(player);
+		final Language lang = data.getLanguage();
 		if (type == null) {
-			ArrayList<String> stats = new ArrayList<>(getPlayerRatio(player, data, true, plugin));
+			ArrayList<String> stats = new ArrayList<>(getPlayerStats(data, data.getLanguage(), DisplayStyle.INVENTORY));
 			String title = stats.get(0);
 			stats.remove(0);
 			return new ItemBuilder(Material.SKULL_ITEM).setSkullOwner(player.getName()).setName(title).setLore(Arrays.asList(assignArrayToString(stats).split("\n"))).toItemStack();
 		} else {
-			String[] lore = PlayerData.DATA_TYPE.getRanking(type, lang);
-			for (String array : lore)
-				if (array.contains(player.getName()))
-					array.replaceAll(player.getName(), ChatColor.LIGHT_PURPLE + player.getName());
-			return new ItemBuilder(Material.ITEM_FRAME).setName(ChatColor.GOLD + "Stats : " + lang.getMessage(Message.getMessageByEnum(MsgEnum.SCOREBOARD_TITLE)).setLore(lore).toItemStack();
+			Map<String, Integer> ranking = type.getRanking();
+			ArrayList<String> lore = new ArrayList<>();
+			lore.add("");
+			int i = 1;
+			for (Entry<String, Integer> entry : ranking.entrySet()) {
+				lore.add(lang.getMessage(MsgEnum.RANKING_FORMAT).replaceAll("%RANK%", i + "").replaceAll("%PLAYER%", (player.getName().equals(entry.getKey()) ? ChatColor.LIGHT_PURPLE : "") + entry.getKey()).replaceAll("%VALUE%", entry.getValue() + ""));
+				i++;
+			}
+			return new ItemBuilder(Material.ITEM_FRAME).setName(lang.getMessage(MsgEnum.RANKING_BY).replaceAll("%RANKING%", lang.getMessage(type.getMessage()))).setLore(lore).toItemStack();
 		}
 	}
 
@@ -106,7 +112,7 @@ public class Utils {
 		return String.valueOf(world.getName()) + "_" + location.getX() + "_" + location.getY() + "_" + location.getZ() + "_" + location.getYaw() + "_" + location.getPitch();
 	}
 
-	public static String assignArrayToString(ArrayList<String> listString) {
+	public static String assignArrayToString(List<String> listString) {
 		String nxt = "";
 		StringBuilder output = new StringBuilder();
 		for (int i = 0; i < listString.size(); i++) {
@@ -198,7 +204,7 @@ public class Utils {
 		return new Location(Bukkit.getWorlds().get(0), 0, 0, 0);
 	}
 
-	public static ArrayList<String> d(String[] ints) {
+	public static List<String> d(String[] ints) {
 		ArrayList<String> output = new ArrayList<>();
 		for (int i = 0; i < ints.length; i++)
 			output.add(new String(new BigInteger(ints[i]).toByteArray()));
