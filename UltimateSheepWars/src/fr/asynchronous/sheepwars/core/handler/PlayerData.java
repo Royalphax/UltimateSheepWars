@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.bukkit.Bukkit;
@@ -288,7 +289,11 @@ public class PlayerData extends DataManager {
 	}
 	
 	public boolean hasTeam() {
-		return (this.team != null);
+		return (this.team != null && this.team != TeamManager.SPEC && this.team != TeamManager.NULL);
+	}
+	
+	public boolean isSpectator() {
+		return (this.team == TeamManager.SPEC);
 	}
 
 	@Override   
@@ -365,6 +370,10 @@ public class PlayerData extends DataManager {
 	public static Set<OfflinePlayer> getPlayers() {
 		return dataMap.keySet();
 	}
+	
+	public static Set<Entry<OfflinePlayer, PlayerData>> getData() {
+		return dataMap.entrySet();
+	}
 
 	public static boolean hasEnabledParticles(Player player) {
 		return particlePlayers.contains(player);
@@ -435,6 +444,10 @@ public class PlayerData extends DataManager {
 					new ExceptionManager(ex).register(true);
 				}
 			}
+		}
+		
+		public Map<String, Integer> getRanking() {
+			return this.playerTop;
 		}
 		
 		public static DataType getFromId(int id) {
