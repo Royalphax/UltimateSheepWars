@@ -10,12 +10,12 @@ import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.handler.PlayerData;
 import fr.asynchronous.sheepwars.core.manager.BoosterManager;
 
-public class BoosterTask extends BukkitRunnable {
+public class BoosterDisplayTask extends BukkitRunnable {
 
 	private final BoosterManager booster;
 	private int duration;
 
-	public BoosterTask(BoosterManager booster, Player activator, Plugin plugin) {
+	public BoosterDisplayTask(BoosterManager booster, Player activator, Plugin plugin) {
 		this.booster = booster;
 		this.duration = booster.getDuration() * 20;
 		this.booster.onStart(activator, PlayerData.getPlayerData(activator).getTeam());
