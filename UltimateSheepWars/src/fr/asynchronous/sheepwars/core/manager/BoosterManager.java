@@ -17,7 +17,7 @@ import fr.asynchronous.sheepwars.core.exception.ConfigFileNotSet;
 import fr.asynchronous.sheepwars.core.handler.DisplayColor;
 import fr.asynchronous.sheepwars.core.message.Message;
 import fr.asynchronous.sheepwars.core.message.Message.MsgEnum;
-import fr.asynchronous.sheepwars.core.task.BoosterTask;
+import fr.asynchronous.sheepwars.core.task.BoosterDisplayTask;
 import fr.asynchronous.sheepwars.core.util.RandomUtils;
 
 public abstract class BoosterManager implements Listener {
@@ -71,7 +71,7 @@ public abstract class BoosterManager implements Listener {
 	public abstract void onFinish();
 
 	public static BoosterManager activateBooster(Player activator, BoosterManager booster, Plugin plugin) {
-		new BoosterTask(booster, activator, plugin);
+		new BoosterDisplayTask(booster, activator, plugin);
 		return booster;
 	}
 	
@@ -131,4 +131,8 @@ public abstract class BoosterManager implements Listener {
     	configFile = file;
     	config = YamlConfiguration.loadConfiguration(file);
     }
+	
+	public static List<BoosterManager> getAvailableBoosters() {
+		return availableBoosters;
+	}
 }
