@@ -74,7 +74,7 @@ public class EntityUtils {
 
 	public static void resetPlayer(final Player player, final GameMode gameMode) {
 		player.setFireTicks(0);
-		UltimateSheepWarsPlugin.getVersionManager().getNMSUtils().setMaxHealth(player, 20.0D);
+		UltimateSheepWarsPlugin.getVersionManager().getNMSUtils().setHealth(player, 20.0D);
 		player.setHealthScaled(true);
 		player.setHealth(20.0);
 		player.setFoodLevel(20);
