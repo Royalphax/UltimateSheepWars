@@ -7,20 +7,27 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.bukkit.Bukkit;
 import org.bukkit.DyeColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Sheep;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.util.Vector;
 
 import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
+import fr.asynchronous.sheepwars.core.event.usw.SheepLaunchEvent;
 import fr.asynchronous.sheepwars.core.exception.ConfigFileNotSet;
 import fr.asynchronous.sheepwars.core.handler.PlayerData;
 import fr.asynchronous.sheepwars.core.handler.SheepAbility;
+import fr.asynchronous.sheepwars.core.handler.Sounds;
 import fr.asynchronous.sheepwars.core.kit.MoreSheepKit;
+import fr.asynchronous.sheepwars.core.manager.ConfigManager.Field;
 import fr.asynchronous.sheepwars.core.message.Message;
 import fr.asynchronous.sheepwars.core.message.Message.MsgEnum;
 import fr.asynchronous.sheepwars.core.util.ItemBuilder;
@@ -141,6 +148,29 @@ public abstract class SheepManager {
 
 	public abstract void onFinish(final Player player, final org.bukkit.entity.Sheep bukkitSheep, final boolean death, final Plugin plugin);
 
+	public boolean throwSheep(Player launcher, Plugin plugin) {
+		Location playerLocation = launcher.getLocation().add(0, 2, 0);
+		Location location = playerLocation.toVector().add(playerLocation.getDirection().multiply(0.5)).toLocation(launcher.getWorld());
+		
+		Sheep entity = spawnSheep(location, launcher, plugin);
+		
+		UltimateSheepWarsPlugin.getVersionManager().getNMSUtils().setHealth(entity, this.health);
+    	entity.setMetadata("sheepwars_sheep", new FixedMetadataValue(plugin, true));
+		
+		SheepLaunchEvent event = new SheepLaunchEvent(launcher, entity, this);
+		Bukkit.getPluginManager().callEvent(event);
+		
+		if (event.isCancelled()) {
+			entity.remove();
+			return false;
+		} else {
+			if (!this.friendly)
+				entity.setVelocity(playerLocation.getDirection().add(new Vector(0, 0.1, 0)).multiply(ConfigManager.getDouble(Field.SHEEP_VELOCITY)));
+			Sounds.playSoundAll(location, Sounds.HORSE_SADDLE, 1f, 1f);
+			return true;
+		}
+	}
+	
 	@Override
 	public boolean equals(Object obj) {
 		if (obj == this) {
@@ -160,14 +190,18 @@ public abstract class SheepManager {
 				&& this.sheepAbilities == other.sheepAbilities;
 	}
 	
+	public static SheepManager getCorrespondingSheep(ItemStack item, Player player) {
+		for (SheepManager sheep : availableSheeps) {
+			if (item.isSimilar(sheep.getIcon(player)))
+				return sheep;
+		}
+		return null;
+	}
+	
 	public static List<SheepManager> getAvailableSheeps() {
 		return availableSheeps;
 	}
 	
-	public static void throwSheep(SheepManager sheep) {
-		
-	}
-
 	public static boolean registerSheep(SheepManager sheep) throws ConfigFileNotSet, IOException {
 		if (!availableSheeps.contains(sheep)) {
 			if (configFile == null || config == null)
