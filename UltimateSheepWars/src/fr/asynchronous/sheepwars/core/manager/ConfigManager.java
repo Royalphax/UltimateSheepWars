@@ -34,6 +34,7 @@ public class ConfigManager {
 		FALLBACK_SERVER("fallback-server-name", FieldType.STRING, "none"),
 		COUNTDOWN("countdown-before-starting", FieldType.INT, 60),
 		MIN_PLAYERS("min-players-to-start", FieldType.INT, 6),
+		KILLER_VIEW_STAY_TIME("killer-view-stay-time", FieldType.INT, 5),
 		GAME_TIME("game-time", FieldType.INT, 20),
 		BOARDING_TIME("boarding-time", FieldType.INT, 10),
 		GIVE_SHEEP_INTERVAL("give-sheep-seconds", FieldType.INT, 40),
