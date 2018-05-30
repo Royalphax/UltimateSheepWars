@@ -11,8 +11,6 @@ import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.event.UltimateSheepWarsEventListener;
 import fr.asynchronous.sheepwars.core.handler.PlayerData;
 import fr.asynchronous.sheepwars.core.handler.Sounds;
-import fr.asynchronous.sheepwars.core.manager.KitManager;
-import fr.asynchronous.sheepwars.core.manager.KitManager.TriggerKitAction;
 
 public class PlayerDamageByEntity extends UltimateSheepWarsEventListener {
 	public PlayerDamageByEntity(final UltimateSheepWarsPlugin plugin) {
@@ -34,7 +32,6 @@ public class PlayerDamageByEntity extends UltimateSheepWarsEventListener {
 					Sounds.playSound(damager, damager.getLocation(), Sounds.VILLAGER_NO, 1.0f, 1.0f);
 					event.setCancelled(true);
 				} else {
-					KitManager.triggerKit(player, event, TriggerKitAction.PLAYER_DAMAGE);
 					UltimateSheepWarsPlugin.getVersionManager().getNMSUtils().setKiller(player, damager);
 				}
 			} else if (damagerEntity instanceof TNTPrimed && damagerEntity.hasMetadata("no-damage-team-" + playerData.getTeam().getName())) {

@@ -8,8 +8,6 @@ import org.bukkit.event.player.PlayerPickupItemEvent;
 import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.event.UltimateSheepWarsEventListener;
 import fr.asynchronous.sheepwars.core.handler.Sounds;
-import fr.asynchronous.sheepwars.core.manager.KitManager;
-import fr.asynchronous.sheepwars.core.manager.KitManager.TriggerKitAction;
 import fr.asynchronous.sheepwars.core.manager.SheepManager;
 
 public class PlayerPickupItem extends UltimateSheepWarsEventListener {
@@ -31,6 +29,5 @@ public class PlayerPickupItem extends UltimateSheepWarsEventListener {
 				}
 			}
 		}
-		KitManager.triggerKit(event.getPlayer(), event, TriggerKitAction.ITEM_PICKUP);
 	}
 }

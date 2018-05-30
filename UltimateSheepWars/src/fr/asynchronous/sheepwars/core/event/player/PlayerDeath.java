@@ -49,7 +49,7 @@ public class PlayerDeath extends UltimateSheepWarsEventListener
         final Player player = event.getEntity();
         final PlayerData playerData = PlayerData.getPlayerData(player);
         final TeamManager playerTeam = playerData.getTeam();
-        if (!GameState.isStep(GameState.WAITING) && playerTeam != TeamManager.SPEC) {
+        if (!GameState.isStep(GameState.WAITING) && !playerData.isSpectator()) {
             final Player killer = player.getKiller();
             final PlayerData killerData = PlayerData.getPlayerData(killer);
             if (killer != null) {
@@ -77,9 +77,11 @@ public class PlayerDeath extends UltimateSheepWarsEventListener
             this.plugin.getGameTask().setSpectator(event.getEntity(), true);
             Location loc = player.getLocation().add(0,1,0);
             World w = loc.getWorld();
-            ItemStack deathStack = new ItemBuilder(Material.INK_SACK).setDyeColor(DyeColor.RED).toItemStack();
+            final Random rdm = new Random();
             for (int i = 0; i < 5; i++)
             {
+            	final ItemBuilder itemBuilder = RandomUtils.getRandom(new ItemBuilder(Material.INK_SACK).setDyeColor(DyeColor.RED), new ItemBuilder(Material.BONE));
+            	final ItemStack deathStack = itemBuilder.toItemStack();
             	final Item item = w.dropItem(loc, deathStack);
             	item.setVelocity(RandomUtils.getRandomVector());
             	item.setPickupDelay(Integer.MAX_VALUE);
@@ -89,7 +91,7 @@ public class PlayerDeath extends UltimateSheepWarsEventListener
             		{
             			item.remove();
             		}
-            	}.runTaskLater(this.plugin, 20+(new Random().nextInt(90)));
+            	}.runTaskLater(this.plugin, (20 + (rdm.nextInt(90))));
             }
         }
         EntityUtils.resetPlayer(player, GameMode.SPECTATOR);

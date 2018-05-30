@@ -36,7 +36,6 @@ public class ProjectileHit extends UltimateSheepWarsEventListener
             	final Wool wool = (Wool) block;
                 if (data.hasTeam()) {
                     block.setType(Material.AIR);
-                    this.plugin.getGameTask().boosterCountdown = ConfigManager.getInt(Field.BOOSTER_INTERVAL);
                     Sounds.playSoundAll(block.getLocation(), Sounds.CHICKEN_EGG_POP, 5f, 2f);
                     final BoosterManager booster = BoosterManager.activateBooster(player, wool.getColor(), this.plugin);
                     for (Player online : Bukkit.getOnlinePlayers())
