@@ -22,8 +22,7 @@ public class Hologram {
 		this.as.setVisible(false);
 		this.as.setSmall(true);
 		this.as.setMetadata("ultimatesheepwars.hologram", new FixedMetadataValue(plugin, true));
-		UltimateSheepWarsPlugin.getVersionManager().getNMSUtils().setMaxHealth(this.as, 500.0D);
-		//this.as.setMaxHealth(10000.0D); Incompatible < 1.11
+		UltimateSheepWarsPlugin.getVersionManager().getNMSUtils().setHealth(this.as, 500.0D);
 		this.as.setHealth(500.0D);
 	}
 
