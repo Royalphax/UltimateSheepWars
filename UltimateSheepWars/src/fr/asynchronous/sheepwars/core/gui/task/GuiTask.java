@@ -13,11 +13,11 @@ public class GuiTask extends BukkitRunnable {
 	private final Player player;
 	private final GuiScreen gui;
 
-	public GuiTask(UltimateSheepWarsPlugin plugin, Player player, GuiScreen gui) {
+	public GuiTask(UltimateSheepWarsPlugin plugin, Player player, String inventoryName, GuiScreen gui) {
 		this.plugin = plugin;
 		this.player = player;
 		this.gui = gui;
-		gui.open(true);
+		gui.open(plugin, player, inventoryName, true);
 	}
 
 	@Override

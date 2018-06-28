@@ -1,27 +1,33 @@
 package fr.asynchronous.sheepwars.core.gui.manager;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
+import java.util.Map;
 
 import org.bukkit.entity.Player;
 
 import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.gui.base.GuiScreen;
 import fr.asynchronous.sheepwars.core.gui.task.GuiTask;
+import fr.asynchronous.sheepwars.core.manager.ExceptionManager;
+import fr.asynchronous.sheepwars.core.util.ReflectionUtils;
 
 public class GuiManager {
 
-	public static HashMap<String, Class<?>> openGuis = new HashMap<>();
-
+	protected static Map<String, Class<?>> openGuis = new HashMap<>();
+	
+	private static Class<? extends GuiScreen> kitsInventoryClass;
+	
 	private GuiManager() {
 		throw new IllegalStateException("GuiManager.class hasn't to be instantiated.");
 	}
 	
-	public static GuiScreen openGui(UltimateSheepWarsPlugin plugin, GuiScreen gui) {
-		openPlayer(gui.getPlayer(), gui.getClass());
+	public static GuiScreen openGui(UltimateSheepWarsPlugin plugin, Player player, String inventoryName, GuiScreen gui) {
+		openPlayer(player, gui.getClass());
 		if (gui.isUpdate())
-			new GuiTask(plugin, gui.getPlayer(), gui).runTaskTimer(plugin, 0, 20);
+			new GuiTask(plugin, gui.getPlayer(), inventoryName, gui).runTaskTimer(plugin, 0, 20);
 		else {
-			gui.open(true);
+			gui.open(plugin, player, inventoryName, true);
 		}
 		return gui;
 	}
@@ -55,5 +61,18 @@ public class GuiManager {
 				return true;
 		}
 		return false;
+	}
+	
+	public static void setKitsInventory(Class<? extends GuiScreen> clazz) {
+		kitsInventoryClass = clazz;
+	}
+	
+	public static GuiScreen getKitsInventoryNewInstance() {
+		try {
+			return (GuiScreen) ReflectionUtils.instantiateObject(kitsInventoryClass);
+		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException e) {
+			new ExceptionManager(e).register(true);
+		}
+		return null;
 	}
 }

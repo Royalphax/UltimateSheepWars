@@ -16,9 +16,9 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
+import fr.asynchronous.sheepwars.core.data.PlayerData;
 import fr.asynchronous.sheepwars.core.gui.base.GuiScreen;
 import fr.asynchronous.sheepwars.core.handler.Contributor;
-import fr.asynchronous.sheepwars.core.handler.PlayerData;
 import fr.asynchronous.sheepwars.core.handler.Sounds;
 import fr.asynchronous.sheepwars.core.manager.TeamManager;
 import fr.asynchronous.sheepwars.core.task.BeginCountdown;
