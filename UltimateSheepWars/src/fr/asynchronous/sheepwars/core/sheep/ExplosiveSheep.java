@@ -2,33 +2,45 @@ package fr.asynchronous.sheepwars.core.sheep;
 
 import org.bukkit.DyeColor;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Sheep;
+import org.bukkit.plugin.Plugin;
 
 import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
-import fr.asynchronous.sheepwars.core.handler.Sheeps;
 import fr.asynchronous.sheepwars.core.handler.Sounds;
+import fr.asynchronous.sheepwars.core.manager.SheepManager;
+import fr.asynchronous.sheepwars.core.message.Message.MsgEnum;
 
-public class ExplosiveSheep implements Sheeps.SheepAction
+public class ExplosiveSheep extends SheepManager 
 {
-    @Override
-    public void onSpawn(final Player player, final org.bukkit.entity.Sheep sheep, final UltimateSheepWarsPlugin plugin) {
-    }
-    
-    @Override
-    public boolean onTicking(final Player player, final long ticks, final org.bukkit.entity.Sheep sheep, final UltimateSheepWarsPlugin plugin) {
-        
-    	if (ticks <= 60L && ticks % 3L == 0L) {
+	public ExplosiveSheep() {
+		super(MsgEnum.EXPLOSIVE_SHEEP_NAME, DyeColor.RED, 5, false, true);
+	}
+
+	@Override
+	public boolean onGive(Player player) {
+		return true;
+	}
+
+	@Override
+	public void onSpawn(Player player, Sheep bukkitSheep, Plugin plugin) {
+		// Do nothing 
+	}
+
+	@Override
+	public boolean onTicking(Player player, long ticks, Sheep bukkitSheep, Plugin plugin) {
+		if (ticks <= 60L && ticks % 3L == 0L) {
             if (ticks == 60L) { 
-            	Sounds.playSoundAll(sheep.getLocation(), Sounds.FUSE, 1f, 1f);
+            	Sounds.playSoundAll(bukkitSheep.getLocation(), Sounds.FUSE, 1f, 1f);
             }
-            sheep.setColor((sheep.getColor() == DyeColor.WHITE) ? DyeColor.RED : DyeColor.WHITE);
+            bukkitSheep.setColor((bukkitSheep.getColor() == DyeColor.WHITE) ? DyeColor.RED : DyeColor.WHITE);
         }
         return false;
-    }
-    
-    @Override
-    public void onFinish(final Player player, final org.bukkit.entity.Sheep sheep, final boolean death, final UltimateSheepWarsPlugin plugin) {
-        if (!death) {
-        	plugin.versionManager.getWorldUtils().createExplosion(player, sheep.getLocation(), 3.7f);
+	}
+
+	@Override
+	public void onFinish(Player player, Sheep bukkitSheep, boolean death, Plugin plugin) {
+		if (!death) {
+        	UltimateSheepWarsPlugin.getVersionManager().getWorldUtils().createExplosion(player, bukkitSheep.getLocation(), 3.7f);
         }
-    }
+	}
 }

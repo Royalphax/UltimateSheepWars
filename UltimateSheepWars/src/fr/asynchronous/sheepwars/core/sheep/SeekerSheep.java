@@ -3,28 +3,43 @@ package fr.asynchronous.sheepwars.core.sheep;
 import org.bukkit.DyeColor;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Sheep;
+import org.bukkit.plugin.Plugin;
 
 import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
-import fr.asynchronous.sheepwars.core.handler.Sheeps.SheepAction;
+import fr.asynchronous.sheepwars.core.data.PlayerData;
+import fr.asynchronous.sheepwars.core.handler.SheepAbility;
+import fr.asynchronous.sheepwars.core.manager.SheepManager;
 import fr.asynchronous.sheepwars.core.manager.TeamManager;
+import fr.asynchronous.sheepwars.core.message.Message.MsgEnum;
 
-public class SeekerSheep implements SheepAction
+public class SeekerSheep extends SheepManager
 {
-    @Override
-    public void onSpawn(final Player player, final org.bukkit.entity.Sheep sheep, final UltimateSheepWarsPlugin plugin) {
-    }
-    
-    @Override
-    public boolean onTicking(final Player player, final long ticks, final org.bukkit.entity.Sheep sheep, final UltimateSheepWarsPlugin plugin) {
-        if (ticks % 3L == 0L) {
+    public SeekerSheep() {
+		super(MsgEnum.SEEKER_SHEEP_NAME, DyeColor.LIME, 30, false, true, SheepAbility.SEEK_PLAYERS);
+	}
+
+	@Override
+	public boolean onGive(Player player) {
+		return true;
+	}
+
+	@Override
+	public void onSpawn(Player player, Sheep bukkitSheep, Plugin plugin) {
+		// Do nothing 
+	}
+
+	@Override
+	public boolean onTicking(Player player, long ticks, Sheep bukkitSheep, Plugin plugin) {
+		if (ticks % 3L == 0L) {
             if (ticks <= 60L) {
-                sheep.setColor((sheep.getColor() == DyeColor.WHITE) ? DyeColor.LIME : DyeColor.WHITE);
+            	bukkitSheep.setColor((bukkitSheep.getColor() == DyeColor.WHITE) ? DyeColor.LIME : DyeColor.WHITE);
             }
-            final TeamManager playerTeam = TeamManager.getPlayerTeam(player);
-            for (final Entity entity : sheep.getNearbyEntities(2, 0.5, 2)) {
+            final TeamManager playerTeam = PlayerData.getPlayerData(player).getTeam();
+            for (final Entity entity : bukkitSheep.getNearbyEntities(2, 0.5, 2)) {
                 if (entity instanceof Player) {
                     final Player nearby = (Player)entity;
-                    final TeamManager team = TeamManager.getPlayerTeam(nearby);
+                    final TeamManager team = PlayerData.getPlayerData(nearby).getTeam();
                     if (team != playerTeam && team != TeamManager.SPEC) {
                         return true;
                     }
@@ -33,12 +48,12 @@ public class SeekerSheep implements SheepAction
             }
         }
         return false;
-    }
-    
-    @Override
-    public void onFinish(final Player player, final org.bukkit.entity.Sheep sheep, final boolean death, final UltimateSheepWarsPlugin plugin) {
-        if (!death) {
-        	plugin.versionManager.getWorldUtils().createExplosion(player, sheep.getLocation(), 2.2f);
+	}
+
+	@Override
+	public void onFinish(Player player, Sheep bukkitSheep, boolean death, Plugin plugin) {
+		if (!death) {
+        	UltimateSheepWarsPlugin.getVersionManager().getWorldUtils().createExplosion(player, bukkitSheep.getLocation(), 2.2f);
         }
-    }
+	}
 }

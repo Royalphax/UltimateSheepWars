@@ -20,26 +20,26 @@ import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.util.Vector;
 
+import fr.asynchronous.sheepwars.core.UltimateSheepWarsAPI;
 import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
+import fr.asynchronous.sheepwars.core.data.PlayerData;
+import fr.asynchronous.sheepwars.core.event.usw.SheepGiveEvent;
 import fr.asynchronous.sheepwars.core.event.usw.SheepLaunchEvent;
 import fr.asynchronous.sheepwars.core.exception.ConfigFileNotSet;
-import fr.asynchronous.sheepwars.core.handler.PlayerData;
 import fr.asynchronous.sheepwars.core.handler.SheepAbility;
 import fr.asynchronous.sheepwars.core.handler.Sounds;
-import fr.asynchronous.sheepwars.core.kit.MoreSheepKit;
 import fr.asynchronous.sheepwars.core.manager.ConfigManager.Field;
 import fr.asynchronous.sheepwars.core.message.Message;
 import fr.asynchronous.sheepwars.core.message.Message.MsgEnum;
 import fr.asynchronous.sheepwars.core.util.ItemBuilder;
 import fr.asynchronous.sheepwars.core.util.MathUtils;
-import fr.asynchronous.sheepwars.core.util.RandomUtils;
 
 public abstract class SheepManager {
-	
+
 	private static final double SHEEP_DEFAULT_HEALTH = 8.0;
 	private static List<SheepManager> availableSheeps = new ArrayList<>();
 	private static File configFile;
-    private static FileConfiguration config;
+	private static FileConfiguration config;
 
 	private Message msgName;
 	private String configPath;
@@ -52,36 +52,41 @@ public abstract class SheepManager {
 	private List<SheepAbility> sheepAbilities;
 
 	public static void giveRandomSheep(final Player player) {
-		PlayerData playerData = PlayerData.getPlayerData(player);
-		for (int i = 0; i < ((playerData.getKit() == new MoreSheepKit() && RandomUtils.getRandomByPercent(MoreSheepKit.CHANCE_TO_GET_ONE_MORE_SHEEP)) ? 2 : 1); i++) {
-			SheepManager sheep = null;
-			while (sheep == null) {
-				SheepManager temp = availableSheeps.get(MathUtils.random.nextInt(availableSheeps.size()));
-				if (temp.random >= 1.0f || MathUtils.randomBoolean(temp.random))
-					sheep = temp;
-			}
-			giveSheep(player, sheep);
+		SheepManager sheep = null;
+		while (sheep == null) {
+			SheepManager temp = availableSheeps.get(MathUtils.random.nextInt(availableSheeps.size()));
+			if (temp.random >= 1.0f || MathUtils.randomBoolean(temp.random))
+				sheep = temp;
 		}
+		giveSheep(player, sheep);
 	}
 
 	public static void giveSheep(final Player player, final SheepManager sheep) {
 		PlayerData playerData = PlayerData.getPlayerData(player);
 		if (playerData.getTeam() != TeamManager.SPEC) {
 			if (sheep.onGive(player)) {
-				player.getInventory().addItem(sheep.getIcon(player));
-				player.sendMessage(Message.getMessage(player, MsgEnum.SHEEP_RECEIVED).replaceAll("%SHEEP_NAME%", sheep.getName(player)));
+				SheepGiveEvent event = new SheepGiveEvent(player, sheep);
+				Bukkit.getPluginManager().callEvent(event);
+				if (!event.isCancelled()) {
+					player.getInventory().addItem(sheep.getIcon(player));
+					player.sendMessage(Message.getMessage(player, MsgEnum.SHEEP_RECEIVED).replaceAll("%SHEEP_NAME%", sheep.getName(player)));
+				}
 			} else {
 				giveRandomSheep(player);
 			}
 		}
 	}
-	
+
 	public SheepManager(final String name, final DyeColor color, final int duration, final boolean friendly, final double health, final boolean drop, final float random, final SheepAbility... sheepAbilities) {
 		this(new Message(name), name, color, duration, friendly, health, drop, random, sheepAbilities);
 	}
-	
+
 	public SheepManager(final MsgEnum name, final DyeColor color, final int duration, final boolean friendly, final boolean drop, final float random, final SheepAbility... sheepAbilities) {
 		this(Message.getMessage(name), name.toString().replaceAll("_NAME", ""), color, duration, friendly, SHEEP_DEFAULT_HEALTH, drop, random, sheepAbilities);
+	}
+
+	public SheepManager(final MsgEnum name, final DyeColor color, final int duration, final boolean friendly, final boolean drop, final SheepAbility... sheepAbilities) {
+		this(Message.getMessage(name), name.toString().replaceAll("_NAME", ""), color, duration, friendly, SHEEP_DEFAULT_HEALTH, drop, 1.0f, sheepAbilities);
 	}
 
 	public SheepManager(final Message name, final String configPath, final DyeColor color, final int duration, final boolean friendly, final double health, final boolean drop, final float random, final SheepAbility... sheepAbilities) {
@@ -119,7 +124,7 @@ public abstract class SheepManager {
 	public boolean isFriendly() {
 		return this.friendly;
 	}
-	
+
 	public double getHealth() {
 		return this.health;
 	}
@@ -131,14 +136,14 @@ public abstract class SheepManager {
 	public float getRandom() {
 		return this.random;
 	}
-	
+
 	public List<SheepAbility> getAbilities() {
 		return this.sheepAbilities;
 	}
-	
+
 	private String getConfigFieldPath(String field) {
-    	return this.configPath + "." + field;
-    }
+		return this.configPath + "." + field;
+	}
 
 	public abstract boolean onGive(final Player player);
 
@@ -151,15 +156,15 @@ public abstract class SheepManager {
 	public boolean throwSheep(Player launcher, Plugin plugin) {
 		Location playerLocation = launcher.getLocation().add(0, 2, 0);
 		Location location = playerLocation.toVector().add(playerLocation.getDirection().multiply(0.5)).toLocation(launcher.getWorld());
-		
+
 		Sheep entity = spawnSheep(location, launcher, plugin);
-		
+
 		UltimateSheepWarsPlugin.getVersionManager().getNMSUtils().setHealth(entity, this.health);
-    	entity.setMetadata("sheepwars_sheep", new FixedMetadataValue(plugin, true));
-		
+		entity.setMetadata(UltimateSheepWarsAPI.SHEEPWARS_SHEEP_METADATA, new FixedMetadataValue(plugin, true));
+
 		SheepLaunchEvent event = new SheepLaunchEvent(launcher, entity, this);
 		Bukkit.getPluginManager().callEvent(event);
-		
+
 		if (event.isCancelled()) {
 			entity.remove();
 			return false;
@@ -170,7 +175,7 @@ public abstract class SheepManager {
 			return true;
 		}
 	}
-	
+
 	@Override
 	public boolean equals(Object obj) {
 		if (obj == this) {
@@ -180,16 +185,9 @@ public abstract class SheepManager {
 			return false;
 		}
 		SheepManager other = (SheepManager) obj;
-		return this.msgName == other.msgName 
-				&& this.color == other.color 
-				&& this.duration == other.duration 
-				&& this.friendly == other.friendly 
-				&& this.health == other.health
-				&& this.drop == other.drop 
-				&& this.random == other.random
-				&& this.sheepAbilities == other.sheepAbilities;
+		return this.msgName == other.msgName && this.color == other.color && this.duration == other.duration && this.friendly == other.friendly && this.health == other.health && this.drop == other.drop && this.random == other.random && this.sheepAbilities == other.sheepAbilities;
 	}
-	
+
 	public static SheepManager getCorrespondingSheep(ItemStack item, Player player) {
 		for (SheepManager sheep : availableSheeps) {
 			if (item.isSimilar(sheep.getIcon(player)))
@@ -197,11 +195,11 @@ public abstract class SheepManager {
 		}
 		return null;
 	}
-	
+
 	public static List<SheepManager> getAvailableSheeps() {
 		return availableSheeps;
 	}
-	
+
 	public static boolean registerSheep(SheepManager sheep) throws ConfigFileNotSet, IOException {
 		if (!availableSheeps.contains(sheep)) {
 			if (configFile == null || config == null)
@@ -231,7 +229,7 @@ public abstract class SheepManager {
 		}
 		return false;
 	}
-	
+
 	public static boolean unregisterSheep(SheepManager sheep) {
 		if (availableSheeps.contains(sheep)) {
 			availableSheeps.remove(sheep);
@@ -239,14 +237,13 @@ public abstract class SheepManager {
 		}
 		return false;
 	}
-	
-	public static void setupConfig(File file)
-    {
-    	if (!file.exists()) {
-    		new FileNotFoundException(file.getName() + " not found. You probably need to create it.").printStackTrace();
-    		return;
-    	}
-    	configFile = file;
-    	config = YamlConfiguration.loadConfiguration(file);
-    }
+
+	public static void setupConfig(File file) {
+		if (!file.exists()) {
+			new FileNotFoundException(file.getName() + " not found. You probably need to create it.").printStackTrace();
+			return;
+		}
+		configFile = file;
+		config = YamlConfiguration.loadConfiguration(file);
+	}
 }

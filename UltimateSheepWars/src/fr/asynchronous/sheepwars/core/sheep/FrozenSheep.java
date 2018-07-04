@@ -1,34 +1,50 @@
 package fr.asynchronous.sheepwars.core.sheep;
 
+import org.bukkit.DyeColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Sheep;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Vector;
 
 import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
+import fr.asynchronous.sheepwars.core.data.PlayerData;
 import fr.asynchronous.sheepwars.core.handler.Particles;
-import fr.asynchronous.sheepwars.core.handler.Sheeps;
+import fr.asynchronous.sheepwars.core.manager.SheepManager;
 import fr.asynchronous.sheepwars.core.manager.TeamManager;
+import fr.asynchronous.sheepwars.core.message.Message.MsgEnum;
 import fr.asynchronous.sheepwars.core.util.BlockUtils;
 import fr.asynchronous.sheepwars.core.util.MathUtils;
 
-public class FrozenSheep implements Sheeps.SheepAction
+public class FrozenSheep extends SheepManager
 {
 	private static final int RADIUS = 8;
     
-    @Override
-    public void onSpawn(final Player player, final org.bukkit.entity.Sheep sheep, final UltimateSheepWarsPlugin plugin) {
-    }
+    public FrozenSheep() {
+		super(MsgEnum.FROZEN_SHEEP_NAME, DyeColor.LIGHT_BLUE, 10, false, true);
+	}
     
-    @SuppressWarnings("deprecation")
+    @Override
+	public boolean onGive(Player player) {
+		return true;
+	}
+
 	@Override
-	public boolean onTicking(final Player player, final long ticks, final org.bukkit.entity.Sheep sheep, final UltimateSheepWarsPlugin plugin) {
-        if (ticks % 40L == 0L) {
-            final Location location = sheep.getLocation();
+	public void onSpawn(Player player, Sheep bukkitSheep, Plugin plugin) {
+		// Do nothing 
+	}
+
+	@Override
+	public boolean onTicking(Player player, long ticks, Sheep bukkitSheep, Plugin plugin) {
+		if (ticks % 40L == 0L) {
+            final Location location = bukkitSheep.getLocation();
             for (int x = -RADIUS; x < RADIUS; ++x) {
                 for (int y = -RADIUS; y < RADIUS; ++y) {
                     for (int z = -RADIUS; z < RADIUS; ++z) {
@@ -42,7 +58,7 @@ public class FrozenSheep implements Sheeps.SheepAction
                         final Block top = block.getRelative(BlockFace.UP);
 
                         if (MathUtils.randomBoolean() && block.getType() != Material.AIR && block.getType() != Material.ICE && block.getType() != Material.PACKED_ICE && block.getType() != Material.SNOW && BlockUtils.fullSolid(block) && (top.getType() == Material.AIR || top.getType() == Material.SNOW)) {
-                        	plugin.versionManager.getParticleFactory().playParticles(Particles.CLOUD, top.getLocation(), 0f, 0f, 0f, 1, 0.01f);                        	
+                        	UltimateSheepWarsPlugin.getVersionManager().getParticleFactory().playParticles(Particles.CLOUD, top.getLocation(), 0f, 0f, 0f, 1, 0.01f);                        	
                         	if (top.getType() != Material.SNOW) {
                                 top.setData((byte)0);
                                 top.setType(Material.SNOW);
@@ -57,11 +73,11 @@ public class FrozenSheep implements Sheeps.SheepAction
                     }
                 }
             }
-            final TeamManager playerTeam = TeamManager.getPlayerTeam(player);
-            for (final Entity entity : sheep.getNearbyEntities(RADIUS, RADIUS, RADIUS)) {
+            final TeamManager playerTeam = PlayerData.getPlayerData(player).getTeam();
+            for (final Entity entity : bukkitSheep.getNearbyEntities(RADIUS, RADIUS, RADIUS)) {
                 if (entity instanceof Player) {
                     final Player nearby = (Player)entity;
-                    final TeamManager team = TeamManager.getPlayerTeam(nearby);
+                    final TeamManager team = PlayerData.getPlayerData(nearby).getTeam();
                     if (team == playerTeam || team == TeamManager.SPEC) {
                         continue;
                     }
@@ -70,9 +86,30 @@ public class FrozenSheep implements Sheeps.SheepAction
             }
         }
         return false;
-    }
-    
-    @Override
-    public void onFinish(final Player player, final org.bukkit.entity.Sheep sheep, final boolean death, final UltimateSheepWarsPlugin plugin) {
-    }
+	}
+
+	@Override
+	public void onFinish(Player player, Sheep bukkitSheep, boolean death, Plugin plugin) {
+		if (!death) {
+            final Location location = bukkitSheep.getLocation();
+            UltimateSheepWarsPlugin.getVersionManager().getWorldUtils().createExplosion(player, bukkitSheep.getLocation(), 3.5f);
+            for (int i = 0; i < MathUtils.random(3, 6); ++i) {
+            	final org.bukkit.entity.Sheep baby = UltimateSheepWarsPlugin.getVersionManager().getSheepFactory().spawnSheepStatic(location, player, plugin);
+                baby.setColor(DyeColor.values()[MathUtils.random.nextInt(DyeColor.values().length)]);
+                baby.setVelocity(new Vector(MathUtils.random(1.2f), 1.5f, MathUtils.random(1.2f)));
+                baby.setBaby();
+                new BukkitRunnable() {
+                	int t = 0;
+                    public void run() {
+                    	t++;
+                    	if (baby.isOnGround() || t > 20*5) {
+                    		this.cancel();
+                    		baby.remove();
+                    		UltimateSheepWarsPlugin.getVersionManager().getWorldUtils().createExplosion(player, bukkitSheep.getLocation(), 1.5f);
+                    	}
+                    }
+                }.runTaskTimer(plugin, 0, 0);
+            }
+        }
+	}
 }

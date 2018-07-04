@@ -9,8 +9,8 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
+import fr.asynchronous.sheepwars.core.data.PlayerData;
 import fr.asynchronous.sheepwars.core.handler.Particles;
-import fr.asynchronous.sheepwars.core.handler.PlayerData;
 import fr.asynchronous.sheepwars.core.handler.Sounds;
 import fr.asynchronous.sheepwars.core.manager.SheepManager;
 import fr.asynchronous.sheepwars.core.manager.TeamManager;
@@ -21,7 +21,7 @@ public class DarkSheep extends SheepManager
     private static final int RADIUS = 8;
     
 	public DarkSheep() {
-		super(MsgEnum.DARK_SHEEP_NAME, DyeColor.BLACK, -1, false, true, 0.25f);
+		super(MsgEnum.DARK_SHEEP_NAME, DyeColor.BLACK, 5, false, true, 0.25f);
 	}
     
 	@Override

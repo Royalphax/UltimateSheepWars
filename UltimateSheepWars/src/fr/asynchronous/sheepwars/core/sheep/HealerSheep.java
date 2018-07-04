@@ -1,32 +1,47 @@
 package fr.asynchronous.sheepwars.core.sheep;
 
+import org.bukkit.DyeColor;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Sheep;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
+import fr.asynchronous.sheepwars.core.data.PlayerData;
 import fr.asynchronous.sheepwars.core.handler.Particles;
-import fr.asynchronous.sheepwars.core.handler.Sheeps;
+import fr.asynchronous.sheepwars.core.manager.SheepManager;
 import fr.asynchronous.sheepwars.core.manager.TeamManager;
+import fr.asynchronous.sheepwars.core.message.Message.MsgEnum;
 
 
-public class HealerSheep implements Sheeps.SheepAction
+public class HealerSheep extends SheepManager
 {
 	private static final int RADIUS = 10;
 	
-    @Override
-    public void onSpawn(final Player player, final org.bukkit.entity.Sheep sheep, final UltimateSheepWarsPlugin plugin) {
-    }
-    
-    @Override
-    public boolean onTicking(final Player player, final long ticks, final org.bukkit.entity.Sheep sheep, final UltimateSheepWarsPlugin plugin) {
-        if (ticks % 20L == 0L) {
-            final TeamManager playerTeam = TeamManager.getPlayerTeam(player);
-            for (final Entity entity : sheep.getNearbyEntities(RADIUS, RADIUS, RADIUS)) {
+    public HealerSheep() {
+		super(MsgEnum.HEALER_SHEEP_NAME, DyeColor.PINK, 5, true, true);
+	}
+
+	@Override
+	public boolean onGive(Player player) {
+		return true;
+	}
+
+	@Override
+	public void onSpawn(Player player, Sheep bukkitSheep, Plugin plugin) {
+		// Do nothing 
+	}
+
+	@Override
+	public boolean onTicking(Player player, long ticks, Sheep bukkitSheep, Plugin plugin) {
+		if (ticks % 20L == 0L) {
+            final TeamManager playerTeam = PlayerData.getPlayerData(player).getTeam();
+            for (final Entity entity : bukkitSheep.getNearbyEntities(RADIUS, RADIUS, RADIUS)) {
                 if (entity instanceof Player) {
                     final Player nearby = (Player)entity;
-                    final TeamManager team = TeamManager.getPlayerTeam(nearby);
+                    final TeamManager team = PlayerData.getPlayerData(nearby).getTeam();
                     if (team != playerTeam) {
                         continue;
                     }
@@ -35,12 +50,13 @@ public class HealerSheep implements Sheeps.SheepAction
             }
         }
         else if (ticks % 5L == 0L) {
-        	plugin.versionManager.getParticleFactory().playParticles(Particles.HEART, sheep.getLocation().add(0, 1.5, 0), 0.5f, 0.5f, 0.5f, 3, 0.1f);
+        	UltimateSheepWarsPlugin.getVersionManager().getParticleFactory().playParticles(Particles.HEART, bukkitSheep.getLocation().add(0, 1.5, 0), 0.5f, 0.5f, 0.5f, 3, 0.1f);
         }
         return false;
-    }
-    
-    @Override
-    public void onFinish(final Player player, final org.bukkit.entity.Sheep sheep, final boolean death, final UltimateSheepWarsPlugin plugin) {
-    }
+	}
+
+	@Override
+	public void onFinish(Player player, Sheep bukkitSheep, boolean death, Plugin plugin) {
+		// Do nothing
+	}
 }

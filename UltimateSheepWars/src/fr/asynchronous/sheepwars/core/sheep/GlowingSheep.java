@@ -1,5 +1,6 @@
 package fr.asynchronous.sheepwars.core.sheep;
 
+import org.bukkit.DyeColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -7,33 +8,46 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Sheep;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
+import fr.asynchronous.sheepwars.core.data.PlayerData;
 import fr.asynchronous.sheepwars.core.handler.Particles;
-import fr.asynchronous.sheepwars.core.handler.Sheeps;
 import fr.asynchronous.sheepwars.core.handler.Sounds;
+import fr.asynchronous.sheepwars.core.manager.SheepManager;
 import fr.asynchronous.sheepwars.core.manager.TeamManager;
+import fr.asynchronous.sheepwars.core.message.Message.MsgEnum;
 import fr.asynchronous.sheepwars.core.util.MathUtils;
 
-public class GlowingSheep implements Sheeps.SheepAction
+public class GlowingSheep extends SheepManager
 {
     private static final int RADIUS = 8;
     
-    @Override
-    public void onSpawn(final Player player, final org.bukkit.entity.Sheep sheep, final UltimateSheepWarsPlugin plugin) {
-    }
-    
+    public GlowingSheep() {
+		super(MsgEnum.GLOWING_SHEEP_NAME, DyeColor.SILVER, 10, false, true);
+	}
+	
+	@Override
+	public boolean onGive(Player player) {
+		return true;
+	}
+	
+	@Override
+	public void onSpawn(Player player, Sheep bukkitSheep, Plugin plugin) {
+		// Do nothing
+	}
 
 	@Override
-    public boolean onTicking(final Player player, final long ticks, final org.bukkit.entity.Sheep sheep, final UltimateSheepWarsPlugin plugin) {
-		if (ticks % 20L == 0L && !sheep.isDead()) {
-            Location location = sheep.getLocation();
-            World world = sheep.getWorld();
-            TeamManager playerTeam = TeamManager.getPlayerTeam(player);
+	public boolean onTicking(Player player, long ticks, Sheep bukkitSheep, Plugin plugin) {
+		if (ticks % 20L == 0L && !bukkitSheep.isDead()) {
+            Location location = bukkitSheep.getLocation();
+            World world = bukkitSheep.getWorld();
+            TeamManager playerTeam = PlayerData.getPlayerData(player).getTeam();
             Sounds.playSoundAll(location, Sounds.BLOCK_BREWING_STAND_BREW, 1.0f, 0.0f);
-            /*new BukkitRunnable(){
+            /**new BukkitRunnable(){
             	Location loc = sheep.getLocation().clone();
                 double t = Math.PI/4;
                 public void run(){
@@ -51,7 +65,7 @@ public class GlowingSheep implements Sheeps.SheepAction
                     	this.cancel();
                     }
                 }
-        	}.runTaskTimer(plugin, 0, 1);*/
+        	}.runTaskTimer(plugin, 0, 1);**/
             for (int x = -RADIUS; x < RADIUS; ++x) {
                 for (int y = -RADIUS; y < RADIUS; ++y) {
                     for (int z = -RADIUS; z < RADIUS; ++z) {
@@ -59,12 +73,12 @@ public class GlowingSheep implements Sheeps.SheepAction
                         final Block top = block.getRelative(BlockFace.UP);
                         if (block.getType() != Material.AIR && top.getType() == Material.AIR && MathUtils.randomBoolean()) {
                             final Location topLocation = top.getLocation();
-                            plugin.versionManager.getParticleFactory().playParticles(Particles.SPELL, topLocation, 0f, 0f, 0f, 1, 0.1f);
+                            UltimateSheepWarsPlugin.getVersionManager().getParticleFactory().playParticles(Particles.SPELL, topLocation, 0f, 0f, 0f, 1, 0.1f);
                         }
                     }
                 }
             }
-            /*for (int x = -RADIUS; x < RADIUS; ++x) {
+            /**for (int x = -RADIUS; x < RADIUS; ++x) {
                 for (int y = -RADIUS; y < RADIUS; ++y) {
                     for (int z = -RADIUS; z < RADIUS; ++z) {
                         final Block block = world.getBlockAt(location.getBlockX() + x, location.getBlockY() + y, location.getBlockZ() + z);
@@ -76,11 +90,11 @@ public class GlowingSheep implements Sheeps.SheepAction
                         }
                     }
                 }
-            }*/
-            for (final Entity entity : sheep.getNearbyEntities(RADIUS, RADIUS, RADIUS)) {
-                if (entity instanceof Player && TeamManager.getPlayerTeam((Player)entity) != TeamManager.SPEC) {
+            }**/
+            for (final Entity entity : bukkitSheep.getNearbyEntities(RADIUS, RADIUS, RADIUS)) {
+                if (entity instanceof Player && PlayerData.getPlayerData((Player)entity).getTeam() != TeamManager.SPEC) {
                     Player victim = (Player)entity;
-                    TeamManager team = TeamManager.getPlayerTeam(victim);
+                    TeamManager team = PlayerData.getPlayerData(victim).getTeam();
                     if (team != playerTeam) {
                     	victim.addPotionEffect(new PotionEffect(PotionEffectType.getByName("GLOWING"), 100, 1));
                     }
@@ -91,9 +105,10 @@ public class GlowingSheep implements Sheeps.SheepAction
             }
         }
         return false;
-    }
-    
-    @Override
-    public void onFinish(final Player player, final org.bukkit.entity.Sheep sheep, final boolean death, final UltimateSheepWarsPlugin plugin) {
-    }
+	}
+
+	@Override
+	public void onFinish(Player player, Sheep bukkitSheep, boolean death, Plugin plugin) {
+		// DO nothing
+	}
 }
