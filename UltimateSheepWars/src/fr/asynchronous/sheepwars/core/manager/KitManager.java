@@ -6,36 +6,26 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
+import org.bukkit.plugin.Plugin;
 
 import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
+import fr.asynchronous.sheepwars.core.data.PlayerData;
 import fr.asynchronous.sheepwars.core.exception.ConfigFileNotSet;
 import fr.asynchronous.sheepwars.core.handler.Contributor;
-import fr.asynchronous.sheepwars.core.handler.PlayerData;
 import fr.asynchronous.sheepwars.core.manager.ConfigManager.Field;
 import fr.asynchronous.sheepwars.core.message.Message;
 import fr.asynchronous.sheepwars.core.message.Message.MsgEnum;
 import fr.asynchronous.sheepwars.core.util.ItemBuilder;
+import fr.asynchronous.sheepwars.exception.KitNotRegistredException;
 
 public abstract class KitManager implements Listener
 {
-	
-    /*MORE_HEALTH(1, "sheepwars.kit.morehealth", 24, MsgEnum.KIT_MORE_HEALTH_NAME, MsgEnum.KIT_MORE_HEALTH_DESCRIPTION, new ItemBuilder(Material.APPLE)), 
-    BETTER_BOW(2, "sheepwars.kit.betterbow", 32, MsgEnum.KIT_BETTER_BOW_NAME, MsgEnum.KIT_BETTER_BOW_DESCRIPTION, new ItemBuilder(Material.BOW)), 
-    BETTER_SWORD(3, "sheepwars.kit.bettersword", 29, MsgEnum.KIT_BETTER_SWORD_NAME, MsgEnum.KIT_BETTER_SWORD_DESCRIPTION, new ItemBuilder(Material.STONE_SWORD)), 
-    MORE_SHEEP(4, "sheepwars.kit.moresheep", 23, MsgEnum.KIT_MORE_SHEEP_NAME, MsgEnum.KIT_MORE_SHEEP_DESCRIPTION, new ItemBuilder(Material.WOOL)), 
-    BUILDER(5, "sheepwars.kit.builder", 30, MsgEnum.KIT_BUILDER_NAME, MsgEnum.KIT_BUILDER_DESCRIPTION, new ItemBuilder(Material.BRICK)), 
-    DESTROYER(6, "sheepwars.kit.destroyer", 33, MsgEnum.KIT_DESTROYER_NAME, MsgEnum.KIT_DESTROYER_DESCRIPTION, new ItemBuilder(Material.TNT)),
-    MOBILITY(7, "sheepwars.kit.mobility", 21, MsgEnum.KIT_MOBILITY_NAME, MsgEnum.KIT_MOBILITY_DESCRIPTION, new ItemBuilder(Material.LEATHER_BOOTS)),
-    ARMORED_SHEEP(8, "sheepwars.kit.armoredsheep", 20, MsgEnum.KIT_AMORED_SHEEP_NAME, MsgEnum.KIT_AMORED_SHEEP_DESCRIPTION, new ItemBuilder(Material.WOOL).setWoolColor(DyeColor.BLACK)),
-	
-	RANDOM(9, "sheepwars.kit.random", 31, MsgEnum.KIT_RANDOM_NAME, MsgEnum.KIT_RANDOM_DESCRIPTION, new ItemBuilder(Material.SKULL_ITEM).setSkullTexture("http://textures.minecraft.net/texture/cc7d1b18398acd6e7e692a833a2217aea6b5a770f42c43513e4358cacd1b9c")),
-	NULL(0, "sheepwars.kit.none", 22, MsgEnum.KIT_NULL_NAME, MsgEnum.KIT_NULL_DESCRIPTION, new ItemBuilder(Material.STAINED_GLASS_PANE).setDyeColor(DyeColor.RED));
-    */
-    
     private static ArrayList<KitManager> availableKits = new ArrayList<>();
     private static File configFile;
     private static FileConfiguration config;
@@ -46,6 +36,7 @@ public abstract class KitManager implements Listener
     private Message description;
     private String permission;
     private ItemBuilder icon;
+    private Plugin plugin;
     
     private Double price;
     private int wins;
@@ -55,7 +46,7 @@ public abstract class KitManager implements Listener
     }
     
     public KitManager(final int id, final MsgEnum name, final MsgEnum description, final String permission, final double price, final int requiredWins, final ItemBuilder icon) {
-    	this(id, name.toString().replaceAll("KIT_", "").replaceAll("_NAME", ""), Message.getMessage(name), Message.getMessage(description), permission, price, requiredWins, iconO);
+    	this(id, name.toString().replaceAll("KIT_", "").replaceAll("_NAME", ""), Message.getMessage(name), Message.getMessage(description), permission, price, requiredWins, icon);
     }
     
     public KitManager(final int id, final String configPath, final Message name, final Message description, final String permission, final double price, final int requiredWins, final ItemBuilder icon) {
@@ -83,6 +74,10 @@ public abstract class KitManager implements Listener
     
     public String getPermission() {
         return this.permission;
+    }
+    
+    public Plugin getPlugin() {
+        return this.plugin;
     }
     
     public boolean isKit(int i) {
@@ -144,11 +139,21 @@ public abstract class KitManager implements Listener
     	return null;
     }
     
+    public static KitManager getInstanceKit(KitManager kit) {
+    	for (KitManager k : availableKits) {
+    		if (k.getId() == kit.getId()) {
+    			return k;
+    		}
+    	}
+    	new KitNotRegistredException("Class " + kit.getClass().getName() + " has to be registred as a kit first.").printStackTrace();
+		return null;
+    }
+    
     public static List<KitManager> getAvailableKits() {
     	return availableKits;
     }
 
-	public static boolean registerKit(KitManager kit) throws ConfigFileNotSet, IOException {
+	public static boolean registerKit(KitManager kit, Plugin plugin) throws ConfigFileNotSet, IOException {
 		if (!availableKits.contains(kit)) {
 			if (configFile == null || config == null)
 				throw new ConfigFileNotSet("You have to set the config file used to store kit's data before registering a new kit.");
@@ -166,6 +171,8 @@ public abstract class KitManager implements Listener
 				kit.price = price;
 				kit.wins = requiredWins;
 			}
+			kit.plugin = plugin;
+			Bukkit.getPluginManager().registerEvents(kit, plugin);
 			availableKits.add(kit);
 			return true;
 		}
@@ -174,6 +181,7 @@ public abstract class KitManager implements Listener
 	
 	public static boolean unregisterKit(KitManager kit) {
 		if (availableKits.contains(kit)) {
+			HandlerList.unregisterAll(kit);
 			availableKits.remove(kit);
 			return true;
 		}
@@ -188,12 +196,5 @@ public abstract class KitManager implements Listener
     	}
     	configFile = file;
     	config = YamlConfiguration.loadConfiguration(file);
-    }
-    
-    public enum Kit {
-    	ARMORED_SHEEP(),
-    	BETTER_BOW(),
-    	BETTER_SWORD(),
-    	
     }
 }

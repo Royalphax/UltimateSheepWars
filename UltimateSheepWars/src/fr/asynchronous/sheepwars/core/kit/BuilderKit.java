@@ -1,31 +1,24 @@
 package fr.asynchronous.sheepwars.core.kit;
 
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import fr.asynchronous.sheepwars.core.handler.Sounds;
-import fr.asynchronous.sheepwars.core.util.Utils;
+import fr.asynchronous.sheepwars.core.manager.KitManager;
+import fr.asynchronous.sheepwars.core.message.Message.MsgEnum;
+import fr.asynchronous.sheepwars.core.util.ItemBuilder;
 
-public class BuilderKit {
+public class BuilderKit extends KitManager {
 
-}
-
-/*ON INTERACT !! Block block = event.getClickedBlock();
-if (event.getAction() == Action.RIGHT_CLICK_BLOCK && block.getType() == Material.ANVIL && Kit.getPlayerKit(player) == Kit.BUILDER) {
-	event.setCancelled(true);
-	if (!Utils.inventoryContains(player, Material.ANVIL)) {
-		block.setType(Material.AIR);
-		Sounds.playSound(player, null, Sounds.ITEM_PICKUP, 1f, 1f);
-		player.getInventory().addItem(new ItemStack(Material.ANVIL, 1));
-		player.updateInventory();
+	public BuilderKit() {
+		super(3, MsgEnum.KIT_BUILDER_NAME, MsgEnum.KIT_BUILDER_DESCRIPTION, "sheepwars.kit.builder", 10, 10, new ItemBuilder(Material.BRICK));
 	}
-} 
-ON PICKUP
-if (Kit.getPlayerKit(event.getPlayer()) == Kit.BUILDER) {
-				event.getItem().remove();
-				Utils.playSound(event.getPlayer(), event.getPlayer().getLocation(), Sounds.ITEM_PICKUP, 1f, 1f);
-				event.getPlayer().getInventory().addItem(new ItemStack(Material.ANVIL, 1));
-			}
 
-
--- AJOUTER AU KIT BUILDER */ 
+	@Override
+	public boolean onEquip(Player player) {
+		player.getInventory().setItem(2, new ItemStack(Material.BRICK, 5));
+		player.getInventory().setItem(3, new ItemStack(Material.SAND, 5, (short) 1));
+		player.getInventory().setItem(4, new ItemStack(Material.ANVIL, 5));
+		return true;
+	}
+}

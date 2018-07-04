@@ -10,8 +10,8 @@ import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
+import fr.asynchronous.sheepwars.core.data.PlayerData;
 import fr.asynchronous.sheepwars.core.handler.Particles;
-import fr.asynchronous.sheepwars.core.handler.PlayerData;
 import fr.asynchronous.sheepwars.core.manager.KitManager;
 import fr.asynchronous.sheepwars.core.message.Message.MsgEnum;
 import fr.asynchronous.sheepwars.core.util.ItemBuilder;
@@ -19,14 +19,16 @@ import fr.asynchronous.sheepwars.core.util.RandomUtils;
 
 public class BetterBowKit extends KitManager {
 
+	public static final int PERCENT_TO_KNOCKBACK = 20;
+	public static final int PERCENT_TO_CRITICAL = 10;
+	
 	public BetterBowKit() {
 		super(1, MsgEnum.KIT_BETTER_BOW_NAME, MsgEnum.KIT_BETTER_BOW_DESCRIPTION, "sheepwars.kit.betterbow", 10, 10, new ItemBuilder(Material.BOW));
 	}
 
 	@Override
 	public boolean onEquip(Player player) {
-		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 	
 	@EventHandler
@@ -35,13 +37,13 @@ public class BetterBowKit extends KitManager {
 			final Arrow arrow = (Arrow) event.getEntity();
 			final Player player = (Player) arrow.getShooter();
 			final PlayerData data = PlayerData.getPlayerData(player);
-			if (data.getKit().isKit(1)) {
+			if (data.getKit().getId() == this.getId()) {
 				boolean boostedArrow = false;
-				if (RandomUtils.getRandomByPercent(20)) {
+				if (RandomUtils.getRandomByPercent(PERCENT_TO_KNOCKBACK)) {
 					arrow.setKnockbackStrength(2);
 					boostedArrow = true;
 				}
-				if (RandomUtils.getRandomByPercent(10)) {
+				if (RandomUtils.getRandomByPercent(PERCENT_TO_CRITICAL)) {
 					arrow.setCritical(true);
 					boostedArrow = true;
 				}
@@ -65,7 +67,7 @@ public class BetterBowKit extends KitManager {
     				UltimateSheepWarsPlugin.getVersionManager().getParticleFactory().playParticles(Particles.FLAME, lastLocation, 0.1f, 0.1f, 0.1f, 3, 0.05f);
     			}
     		}
-    	}.runTaskTimer(this.plugin, 0, 0);
+    	}.runTaskTimer(getPlugin(), 0, 0);
     }
 
 }
