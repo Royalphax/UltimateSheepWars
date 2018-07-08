@@ -1,4 +1,4 @@
-package fr.asynchronous.sheepwars.exception;
+package fr.asynchronous.sheepwars.core.exception;
 
 public class KitNotRegistredException extends Exception {
 
