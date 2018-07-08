@@ -5,16 +5,21 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
+import org.bukkit.DyeColor;
 import org.bukkit.FireworkEffect;
 import org.bukkit.FireworkEffect.Type;
+import org.bukkit.Material;
+import org.bukkit.SkullType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
 import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
+import fr.asynchronous.sheepwars.core.data.DataManager;
 import fr.asynchronous.sheepwars.core.data.PlayerData;
 import fr.asynchronous.sheepwars.core.data.PlayerData.DataType;
 import fr.asynchronous.sheepwars.core.gui.base.GuiScreen;
@@ -43,16 +48,22 @@ public class KitsInventory extends GuiScreen {
 	@Override
 	public void drawScreen() {
 		this.playerData = PlayerData.getPlayerData(this.player);
-		decorate(playerData);
+		decorateBorders();
 		drawKitsScreen();
+	}
+	
+	public void clearScreen() {
+		for (int i : InventoryOrganizer.EdgeMode.NO_EDGE.getSlots())
+			setItem(new ItemStack(Material.AIR), i);
 	}
 
 	public void drawKitsScreen() {
+		clearScreen();
 		LinkedList<ItemStack> items = new LinkedList<>();
 		for (KitManager kit : KitManager.getAvailableKits()) {
 			ItemBuilder itemBuilder = kit.getIcon().setName(kit.getName(this.player)).setLore(kit.getDescription(this.player).split("\n"));
 			if (kit != new RandomKit() && kit != new NoneKit()) {
-				List<KitResult> results = kit.useKit(this.player, this.plugin);
+				List<KitResult> results = kit.canUseKit(this.player, this.plugin);
 				for (KitResult result : results) {
 					itemBuilder.addLoreLine("");
 					switch (result) {
@@ -75,36 +86,45 @@ public class KitsInventory extends GuiScreen {
 					}
 				}
 			}
-			if (playerData.getKit() == kit)
+			if (playerData.getKit() == kit && !kit.isKit(new RandomKit().getId()) && !kit.isKit(new NoneKit().getId())) {
+				Bukkit.broadcastMessage("Il glow ! " + kit.toString());
 				itemBuilder.addIllegallyGlow();
+			}
 			items.add(itemBuilder.toItemStack());
 		}
-		new InventoryOrganizer(this.inventory).organize(items);
+		new InventoryOrganizer(this.inventory).organize(items, this.plugin);
 
-		final ItemStack itemStats = Utils.getItemStats(null, this.player);
-		ItemStack item = new ItemBuilder(itemStats).addLoreLine("", this.playerData.getLanguage().getMessage(MsgEnum.SWITCH_TO_RANKING_LORE)).toItemStack();
-		setItem(item, 49);
+		ItemStack item;
+		if (DataManager.isConnected()) {
+			final ItemStack itemStats = Utils.getItemStats(null, this.player);
+			item = new ItemBuilder(itemStats).addLoreLine("", this.playerData.getLanguage().getMessage(MsgEnum.SWITCH_TO_RANKING_LORE)).toItemStack();
+		} else {
+			item = new ItemBuilder(Material.SKULL_ITEM, 1, (byte) SkullType.PLAYER.ordinal()).setSkullOwner(player.getName()).setName(this.playerData.getLanguage().getMessage(MsgEnum.DATABASE_NOT_CONNECTED)).toItemStack();
+		}
+		
+		setItem(item, (items.size() >= 23 ? 4 : 49));
 	}
 
 	public void drawRankingScreen() {
+		clearScreen();
 		LinkedList<ItemStack> items = new LinkedList<>();
 		for (DataType dataType : DataType.values())
 			items.add(Utils.getItemStats(dataType, this.player));
-		new InventoryOrganizer(this.inventory).organize(items);
+		new InventoryOrganizer(this.inventory).organize(items, this.plugin);
 
 		final ItemStack itemStats = Utils.getItemStats(null, this.player);
 		ItemStack item = new ItemBuilder(itemStats).addLoreLine("", this.playerData.getLanguage().getMessage(MsgEnum.SWITCH_TO_KITS_SELECTION_LORE)).toItemStack();
-		setItem(item, 49);
+		setItem(item, (items.size() >= 23 ? 4 : 49));
 	}
 
 	@Override
 	public void onOpen() {
-		Sounds.playSound(this.player, this.player.getLocation(), Sounds.CHEST_OPEN, 1.0f, 0.0f);
+		Sounds.playSound(this.player, this.player.getLocation(), Sounds.CHEST_OPEN, 1.0f, 0.5f);
 	}
 
 	@Override
 	public void onClose() {
-		// Do nothing
+		Sounds.playSound(this.player, this.player.getLocation(), Sounds.CHEST_CLOSE, 1.0f, 0.8f);
 	}
 
 	@Override
@@ -113,7 +133,8 @@ public class KitsInventory extends GuiScreen {
 		final PlayerData playerData = PlayerData.getPlayerData(clicker);
 
 		if (item != null && item.getItemMeta() != null && item.getItemMeta().hasDisplayName()) {
-			if (item.getItemMeta().getDisplayName().startsWith(ChatColor.GOLD + "Stats : ")) {
+				
+			if (item.getItemMeta().getDisplayName().startsWith(ChatColor.GOLD + "Stats : ") && DataManager.isConnected()) {
 				if (this.kitScreen) {
 					drawRankingScreen();
 					this.kitScreen = false;
@@ -121,7 +142,7 @@ public class KitsInventory extends GuiScreen {
 					drawKitsScreen();
 					this.kitScreen = true;
 				}
-			} else {
+			} else if (!item.getItemMeta().getDisplayName().contains("✖")) {
 				KitManager kit = new NoneKit();
 				for (KitManager k : KitManager.getAvailableKits()) {
 					if (k.getName(clicker).equals(item.getItemMeta().getDisplayName())) {
@@ -129,7 +150,7 @@ public class KitsInventory extends GuiScreen {
 						break;
 					}
 				}
-				if (kit != new RandomKit() && kit != new NoneKit()) {
+				if (!kit.isKit(new RandomKit().getId()) && !kit.isKit(new NoneKit().getId())) {
 					boolean shopclick = false;
 					if (event.getClick() == ClickType.RIGHT && ConfigManager.getBoolean(Field.ENABLE_INGAME_SHOP))
 						shopclick = true;
@@ -146,26 +167,28 @@ public class KitsInventory extends GuiScreen {
 								Sounds.playSound(clicker, clicker.getLocation(), Sounds.VILLAGER_NO, 1f, 1f);
 							}
 						} else {
-							setKit(kit);
+							this.playerData.setKit(kit);
 						}
 					} else {
-						if (kit.useKit(clicker, this.plugin).contains(KitResult.SUCCESS)) {
-							setKit(kit);
+						if (kit.canUseKit(clicker, this.plugin).contains(KitResult.SUCCESS)) {
+							this.playerData.setKit(kit);
 						} else {
 							clicker.sendMessage(ConfigManager.getString(Field.PREFIX) + ChatColor.GRAY + Message.getMessage(clicker, MsgEnum.KIT_NOT_UNLOCKED_MESSAGE));
 						}
 					}
 				} else {
-					setKit(kit);
+					this.playerData.setKit(kit);
 				}
 				clicker.closeInventory();
 			}
 		}
 		event.setCancelled(true);
 	}
-
-	private void setKit(KitManager kit) {
-		this.playerData.setKit(kit);
-		Sounds.playSound(this.player, Sounds.STEP_WOOD, 1f, 0f);
+	
+	public void decorateBorders() {
+		ItemStack itemStack = new ItemBuilder(Material.STAINED_GLASS_PANE, 1, (byte) (this.playerData.hasTeam() ? this.playerData.getTeam().getDyeColor().ordinal() : DyeColor.WHITE.ordinal())).setName(ChatColor.DARK_GRAY + "✖").toItemStack();
+		List<Integer> decorationSlots = Arrays.asList(36, 27, 18, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 17, 26, 35, 44, 45, 53);
+		for (int i : decorationSlots)
+        	setItem(itemStack, i);
 	}
 }

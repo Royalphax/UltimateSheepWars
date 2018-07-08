@@ -82,13 +82,6 @@ public abstract class GuiScreen implements Listener {
 			setItem(item, i);
 	}
 	
-	public void decorate(PlayerData data) {
-		ItemStack itemStack = new ItemBuilder(Material.STAINED_GLASS_PANE).setDyeColor((data.hasTeam() ? data.getTeam().getDyeColor() : DyeColor.WHITE)).setName(ChatColor.DARK_GRAY + "✖").toItemStack();
-		List<Integer> decorationSlots = Arrays.asList(36, 27, 18, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 17, 26, 35, 44);
-		for (int i : decorationSlots)
-        	setItem(itemStack, i);
-	}
-
 	public void clearInventory() {
 		this.inventory.clear();
 	}
