@@ -129,7 +129,7 @@ public abstract class SheepManager {
 		return this.health;
 	}
 
-	public boolean isDrop() {
+	public boolean isDropAllowed() {
 		return this.drop;
 	}
 

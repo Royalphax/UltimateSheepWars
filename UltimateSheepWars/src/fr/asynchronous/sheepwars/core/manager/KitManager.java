@@ -17,12 +17,12 @@ import org.bukkit.plugin.Plugin;
 import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.data.PlayerData;
 import fr.asynchronous.sheepwars.core.exception.ConfigFileNotSet;
+import fr.asynchronous.sheepwars.core.exception.KitNotRegistredException;
 import fr.asynchronous.sheepwars.core.handler.Contributor;
 import fr.asynchronous.sheepwars.core.manager.ConfigManager.Field;
 import fr.asynchronous.sheepwars.core.message.Message;
 import fr.asynchronous.sheepwars.core.message.Message.MsgEnum;
 import fr.asynchronous.sheepwars.core.util.ItemBuilder;
-import fr.asynchronous.sheepwars.exception.KitNotRegistredException;
 
 public abstract class KitManager implements Listener
 {
@@ -84,12 +84,11 @@ public abstract class KitManager implements Listener
     	return(this.id == i);
     }
     
-    public List<KitResult> useKit(Player player, UltimateSheepWarsPlugin plugin) {
+    public List<KitResult> canUseKit(Player player, UltimateSheepWarsPlugin plugin) {
     	List<KitResult> output = new ArrayList<>();
     	PlayerData data = PlayerData.getPlayerData(player);
     	if ((ConfigManager.getBoolean(Field.ENABLE_KIT_REQUIRED_WINS) && data.getWins() >= this.wins) || (ConfigManager.getBoolean(Field.ENABLE_KIT_PERMISSIONS) && player.hasPermission(this.permission)) || ConfigManager.getBoolean(Field.ENABLE_ALL_KITS) || (Contributor.isImportant(player)))
     	{	
-    		data.setKit(this);
     		output.add(KitResult.SUCCESS);
     	} else {
     		if (ConfigManager.getBoolean(Field.ENABLE_KIT_REQUIRED_WINS)) {

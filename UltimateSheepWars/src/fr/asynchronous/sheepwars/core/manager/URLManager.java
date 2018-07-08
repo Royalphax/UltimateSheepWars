@@ -71,17 +71,13 @@ public class URLManager {
 		return new String(baos.toByteArray(), encoding);
 	}
 
-	public static Boolean checkVersion(String version, Boolean localhost, Link link) {
+	public static Boolean checkVersion(String version, Boolean localhost, Link link) throws MalformedURLException, IOException {
 		Boolean isUpToDate = true;
 		String content;
-		try {
-			content = new URLManager(link.getURL() + "/version.txt", localhost).read();
-			if (!content.trim().equals(version.trim())) {
-				latestVersion = content.trim();
-				isUpToDate = false;
-			}
-		} catch (IOException e) {
-			// Do nothing
+		content = new URLManager(link.getURL() + "/version.txt", localhost).read();
+		if (!content.trim().equals(version.trim())) {
+			latestVersion = content.trim();
+			isUpToDate = false;
 		}
 		return isUpToDate;
 	}

@@ -16,7 +16,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BannerMeta;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.material.Dye;
 import org.bukkit.material.MaterialData;
 import org.bukkit.material.Wool;
 import org.bukkit.scoreboard.Scoreboard;
@@ -33,10 +32,10 @@ import fr.asynchronous.sheepwars.core.util.ReflectionUtils;
 import fr.asynchronous.sheepwars.core.util.ReflectionUtils.PackageType;
 
 public enum TeamManager {
-	BLUE("blue", Message.getMessage(MsgEnum.BLUE_NAME), ConfigManager.getMaterial(Field.TEAM_BLUE_MATERIAL), ConfigManager.getLocations(Field.BLUE_SPAWNS), DyeColor.BLUE, ChatColor.BLUE, 85, 85, 255),
-	RED("red", Message.getMessage(MsgEnum.RED_NAME), ConfigManager.getMaterial(Field.TEAM_RED_MATERIAL), ConfigManager.getLocations(Field.RED_SPAWNS), DyeColor.RED, ChatColor.RED, 255, 50, 50),
-	SPEC("spec", Message.getMessage(MsgEnum.SPEC_NAME), Material.STONE, ConfigManager.getLocations(Field.SPEC_SPAWNS), DyeColor.SILVER, ChatColor.GRAY, 0, 0, 0),
-	NULL("null", new Message("null"), Material.AIR, new ArrayList<>(), DyeColor.WHITE, ChatColor.WHITE, 255, 255, 255);
+	BLUE("blue", Message.getMessage(MsgEnum.BLUE_NAME), ConfigManager.getMaterial(Field.TEAM_BLUE_MATERIAL), Field.BLUE_SPAWNS, DyeColor.BLUE, ChatColor.BLUE, 85, 85, 255),
+	RED("red", Message.getMessage(MsgEnum.RED_NAME), ConfigManager.getMaterial(Field.TEAM_RED_MATERIAL), Field.RED_SPAWNS, DyeColor.RED, ChatColor.RED, 255, 50, 50),
+	SPEC("spec", Message.getMessage(MsgEnum.SPEC_NAME), Material.STONE, Field.SPEC_SPAWNS, DyeColor.SILVER, ChatColor.GRAY, 0, 0, 0),
+	NULL("null", new Message("null"), Material.AIR, null, DyeColor.WHITE, ChatColor.WHITE, 255, 255, 255);
 
 	public static int redSlot;
 	public static int blueSlot;
@@ -52,7 +51,7 @@ public enum TeamManager {
 	private DyeColor dyecolor;
 	private final ChatColor color;
 	private final Color leatherColor;
-	private List<Location> spawns;
+	private Field configField;
 	private List<Player> players;
 	private Boolean blocked;
 	private int lastSpawn;
@@ -85,18 +84,17 @@ public enum TeamManager {
 		return null;
 	}
 
-	private TeamManager(final String name, final Message displayName, final Material material, final List<Location> spawns, final DyeColor dyecolor, final ChatColor color, int r, int g, int b) {
+	private TeamManager(final String name, final Message displayName, final Material material, final Field field, final DyeColor dyecolor, final ChatColor color, int r, int g, int b) {
 		this.name = name;
 		this.displayName = displayName;
 		this.dyecolor = dyecolor;
 		this.blocked = false;
 		if (material != null)
 			this.material = material;
-		this.spawns = spawns;
+		this.configField = field;
 		this.color = color;
 		this.leatherColor = Color.fromRGB(r, g, b);
 		this.lastSpawn = 0;
-		this.spawns = new ArrayList<>();
 		this.players = new ArrayList<>();
 	}
 
@@ -141,13 +139,13 @@ public enum TeamManager {
 	}
 
 	public Location getNextSpawn() {
-		if (this.spawns.isEmpty()) {
+		if (getSpawns().isEmpty()) {
 			return null;
 		}
-		if (this.spawns.size() == this.lastSpawn) {
+		if (getSpawns().size() == this.lastSpawn) {
 			this.lastSpawn = 0;
 		}
-		return this.spawns.get(this.lastSpawn++);
+		return getSpawns().get(this.lastSpawn++);
 	}
 
 	public void inGameRules() {
@@ -195,7 +193,7 @@ public enum TeamManager {
 			MaterialData data = new Wool(this.dyecolor);
 			i.setData(data);
 		} else if (material == Material.INK_SACK) {
-			MaterialData data = new Dye(this.dyecolor);
+			MaterialData data = UltimateSheepWarsPlugin.getVersionManager().getNMSUtils().getDye(this.dyecolor);
 			i.setData(data);
 		}
 		ItemMeta iMeta = i.getItemMeta();
@@ -223,8 +221,14 @@ public enum TeamManager {
 	public DyeColor getDyeColor() {
 		return this.dyecolor;
 	}
-
+	
 	public List<Location> getSpawns() {
-		return this.spawns;
+		if (this.configField == null)
+			return new ArrayList<>();
+		return ConfigManager.getLocations(this.configField);
+	}
+
+	public void addSpawn(Location location) {
+		ConfigManager.addLocation(this.configField, location);
 	}
 }
