@@ -26,138 +26,133 @@ import net.minecraft.server.v1_9_R1.EntityInsentient;
 import net.minecraft.server.v1_9_R1.EntitySheep;
 import net.minecraft.server.v1_9_R1.EntityTypes;
 
-public enum CustomEntityType
-{
-    @SuppressWarnings({ "unchecked", "rawtypes" })
-	SHEEP("Sheep", 91, EntityType.SHEEP, (Class)EntitySheep.class, (Class)CustomSheep.class),
-    @SuppressWarnings({ "unchecked", "rawtypes" })
-	METEOR("Fireball", 12, EntityType.FIREBALL, (Class)EntityFireball.class, (Class)EntityMeteor.class);
-    
-    private String name;
-    private int id;
-    private EntityType entityType;
-    private Class<? extends EntityInsentient> nmsClass;
-    private Class<? extends EntityInsentient> customClass;
+public enum CustomEntityType {
+	@SuppressWarnings({"unchecked", "rawtypes"})
+	SHEEP("Sheep", 91, EntityType.SHEEP, (Class) EntitySheep.class, (Class) CustomSheep.class),
+	@SuppressWarnings({"unchecked", "rawtypes"})
+	METEOR("Fireball", 12, EntityType.FIREBALL, (Class) EntityFireball.class, (Class) EntityMeteor.class);
 
-    private CustomEntityType(String name, int id, EntityType entityType, Class<? extends EntityInsentient> nmsClass,
-                             Class<? extends EntityInsentient> customClass) {
-        this.name = name;
-        this.id = id;
-        this.entityType = entityType;
-        this.nmsClass = nmsClass;
-        this.customClass = customClass;
-    }
+	private String name;
+	private int id;
+	private EntityType entityType;
+	private Class<? extends EntityInsentient> nmsClass;
+	private Class<? extends EntityInsentient> customClass;
 
-    public String getName() {
-        return name;
-    }
+	private CustomEntityType(String name, int id, EntityType entityType, Class<? extends EntityInsentient> nmsClass, Class<? extends EntityInsentient> customClass) {
+		this.name = name;
+		this.id = id;
+		this.entityType = entityType;
+		this.nmsClass = nmsClass;
+		this.customClass = customClass;
+	}
 
-    public int getID() {
-        return id;
-    }
+	public String getName() {
+		return name;
+	}
 
-    public EntityType getEntityType() {
-        return entityType;
-    }
+	public int getID() {
+		return id;
+	}
 
-    public Class<? extends EntityInsentient> getNMSClass() {
-        return nmsClass;
-    }
+	public EntityType getEntityType() {
+		return entityType;
+	}
 
-    public Class<? extends EntityInsentient> getCustomClass() {
-        return customClass;
-    }
+	public Class<? extends EntityInsentient> getNMSClass() {
+		return nmsClass;
+	}
 
-    public static class GlobalMethods implements ICustomEntityType
-    {
+	public Class<? extends EntityInsentient> getCustomClass() {
+		return customClass;
+	}
 
-    	public void registerEntities() {
-            for (CustomEntityType entity : values()) {
-                a(entity.getCustomClass(), entity.getName(), entity.getID());
-            }
-            BiomeBase[] biomes;
-            try {
-            	biomes = new BiomeBase[] { Biomes.a, Biomes.c, Biomes.d, Biomes.e, Biomes.f, Biomes.g, Biomes.h, Biomes.i, Biomes.m, Biomes.n, Biomes.o, Biomes.p, Biomes.q, Biomes.r, Biomes.s, Biomes.t, Biomes.u, Biomes.w, Biomes.x, Biomes.y, Biomes.z, Biomes.A, Biomes.B, Biomes.C, Biomes.D, Biomes.E, Biomes.F, Biomes.G, Biomes.H, Biomes.I, Biomes.J, Biomes.K, Biomes.L, Biomes.M, Biomes.N, Biomes.O};
-                //biomes = (BiomeBase[]) getPrivateStatic(BiomeBase.class, "biomes");
-            } catch (Exception e) {
-                return;
-            }
-            for (BiomeBase biomeBase : biomes) {
-                if (biomeBase == null) {
-                    break;
-                }
-                if (biomeBase.equals(BiomeBase.getBiome(8))) { //8 = NETHER
-                    continue;
-                }
-                for (String field : new String[]{"u", "v", "w", "x"})
-                    try {
-                        Field list = BiomeBase.class.getDeclaredField(field);
-                        list.setAccessible(true);
-                        @SuppressWarnings("unchecked")
-                        List<BiomeMeta> mobList = (List<BiomeMeta>) list.get(biomeBase);
-                        for (BiomeMeta meta : mobList)
-                            for (CustomEntityType entity : values())
-                                if (entity.getNMSClass().equals(meta.b))
-                                    meta.b = entity.getCustomClass();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-            }
-        }
+	public static class GlobalMethods implements ICustomEntityType {
 
-        @SuppressWarnings("rawtypes")
-    	public void unregisterEntities() {
-            for (CustomEntityType entity : values()) {
-                try {
-                    ((Map) getPrivateStatic(EntityTypes.class, "c")).remove(entity.getCustomClass());
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+		public void registerEntities() {
+			for (CustomEntityType entity : values()) {
+				a(entity.getCustomClass(), entity.getName(), entity.getID());
+			}
+			BiomeBase[] biomes;
+			try {
+				biomes = new BiomeBase[]{Biomes.a, Biomes.c, Biomes.d, Biomes.e, Biomes.f, Biomes.g, Biomes.h, Biomes.i, Biomes.m, Biomes.n, Biomes.o, Biomes.p, Biomes.q, Biomes.r, Biomes.s, Biomes.t, Biomes.u, Biomes.w, Biomes.x, Biomes.y, Biomes.z, Biomes.A, Biomes.B, Biomes.C, Biomes.D, Biomes.E, Biomes.F, Biomes.G, Biomes.H, Biomes.I, Biomes.J, Biomes.K, Biomes.L, Biomes.M, Biomes.N, Biomes.O};
+			} catch (Exception e) {
+				return;
+			}
+			for (BiomeBase biomeBase : biomes) {
+				if (biomeBase == null) {
+					break;
+				}
+				if (biomeBase.equals(BiomeBase.getBiome(8))) {
+					continue;
+				}
+				for (String field : new String[]{"u", "v", "w", "x"})
+					try {
+						Field list = BiomeBase.class.getDeclaredField(field);
+						list.setAccessible(true);
+						@SuppressWarnings("unchecked")
+						List<BiomeMeta> mobList = (List<BiomeMeta>) list.get(biomeBase);
+						for (BiomeMeta meta : mobList)
+							for (CustomEntityType entity : values())
+								if (entity.getNMSClass().equals(meta.b))
+									meta.b = entity.getCustomClass();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+			}
+		}
 
-                try {
-                    ((Map) getPrivateStatic(EntityTypes.class, "e")).remove(entity.getCustomClass());
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
+		@SuppressWarnings("rawtypes")
+		public void unregisterEntities() {
+			for (CustomEntityType entity : values()) {
+				try {
+					((Map) getPrivateStatic(EntityTypes.class, "c")).remove(entity.getCustomClass());
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 
-            for (CustomEntityType entity : values())
-                try {
-                    a(entity.getNMSClass(), entity.getName(), entity.getID());
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+				try {
+					((Map) getPrivateStatic(EntityTypes.class, "e")).remove(entity.getCustomClass());
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
 
-            BiomeBase[] biomes;
-            try {
-            	biomes = new BiomeBase[] { Biomes.a, Biomes.c, Biomes.d, Biomes.e, Biomes.f, Biomes.g, Biomes.h, Biomes.i, Biomes.m, Biomes.n, Biomes.o, Biomes.p, Biomes.q, Biomes.r, Biomes.s, Biomes.t, Biomes.u, Biomes.w, Biomes.x, Biomes.y, Biomes.z, Biomes.A, Biomes.B, Biomes.C, Biomes.D, Biomes.E, Biomes.F, Biomes.G, Biomes.H, Biomes.I, Biomes.J, Biomes.K, Biomes.L, Biomes.M, Biomes.N, Biomes.O};
-                //biomes = (BiomeBase[]) getPrivateStatic(BiomeBase.class, "biomes");
-            } catch (Exception exc) {
-                return;
-            }
-            for (BiomeBase biomeBase : biomes) {
-                if (biomeBase == null)
-                    break;
-                if (biomeBase == BiomeBase.getBiome(8)) { //8 = Hell
-                    continue;
-                }
+			for (CustomEntityType entity : values())
+				try {
+					a(entity.getNMSClass(), entity.getName(), entity.getID());
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 
-                for (String field : new String[]{"u", "v", "w", "x"})
-                    try {
-                        Field list = BiomeBase.class.getDeclaredField(field);
-                        list.setAccessible(true);
-                        @SuppressWarnings("unchecked")
-                        List<BiomeMeta> mobList = (List<BiomeMeta>) list.get(biomeBase);
+			BiomeBase[] biomes;
+			try {
+				biomes = new BiomeBase[]{Biomes.a, Biomes.c, Biomes.d, Biomes.e, Biomes.f, Biomes.g, Biomes.h, Biomes.i, Biomes.m, Biomes.n, Biomes.o, Biomes.p, Biomes.q, Biomes.r, Biomes.s, Biomes.t, Biomes.u, Biomes.w, Biomes.x, Biomes.y, Biomes.z, Biomes.A, Biomes.B, Biomes.C, Biomes.D, Biomes.E, Biomes.F, Biomes.G, Biomes.H, Biomes.I, Biomes.J, Biomes.K, Biomes.L, Biomes.M, Biomes.N, Biomes.O};
+			} catch (Exception exc) {
+				return;
+			}
+			for (BiomeBase biomeBase : biomes) {
+				if (biomeBase == null)
+					break;
+				if (biomeBase == BiomeBase.getBiome(8)) {
+					continue;
+				}
 
-                        for (BiomeMeta meta : mobList)
-                            for (CustomEntityType entity : values())
-                                if (entity.getCustomClass().equals(meta.b))
-                                    meta.b = entity.getNMSClass();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-            }
-        }
+				for (String field : new String[]{"u", "v", "w", "x"})
+					try {
+						Field list = BiomeBase.class.getDeclaredField(field);
+						list.setAccessible(true);
+						@SuppressWarnings("unchecked")
+						List<BiomeMeta> mobList = (List<BiomeMeta>) list.get(biomeBase);
+
+						for (BiomeMeta meta : mobList)
+							for (CustomEntityType entity : values())
+								if (entity.getCustomClass().equals(meta.b))
+									meta.b = entity.getNMSClass();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+			}
+		}
 
 		@Override
 		public void spawnInstantExplodingFirework(Location location, FireworkEffect effect, ArrayList<Player> players) {
@@ -166,28 +161,28 @@ public enum CustomEntityType
 
 		@Override
 		public Fireball spawnFireball(Location location, Player sender) {
-			final EntityMeteor meteor = new EntityMeteor((net.minecraft.server.v1_9_R1.World)((CraftWorld)location.getWorld()).getHandle(), sender);
-	        meteor.setPosition(location.getX() + (double)MathUtils.random(-20, 20), location.getY() + 40.0, location.getZ() + (double)MathUtils.random(-20, 20));
-	        ((CraftWorld)location.getWorld()).getHandle().addEntity((net.minecraft.server.v1_9_R1.Entity)meteor);
-	        return (Fireball)meteor.getBukkitEntity();
+			final EntityMeteor meteor = new EntityMeteor((net.minecraft.server.v1_9_R1.World) ((CraftWorld) location.getWorld()).getHandle(), sender);
+			meteor.setPosition(location.getX() + (double) MathUtils.random(-20, 20), location.getY() + 40.0, location.getZ() + (double) MathUtils.random(-20, 20));
+			((CraftWorld) location.getWorld()).getHandle().addEntity((net.minecraft.server.v1_9_R1.Entity) meteor);
+			return (Fireball) meteor.getBukkitEntity();
 		}
-    	
-    }
 
-    private static Object getPrivateStatic(@SuppressWarnings("rawtypes") Class clazz, String f) throws Exception {
-    	return ReflectionUtils.getField(clazz, true, f).get(null);
-    }
+	}
 
-    @SuppressWarnings("unchecked")
-    private static void a(Class<?> paramClass, String paramString, int paramInt) {
-        try {
-            ((Map<String, Class<?>>) getPrivateStatic(EntityTypes.class, "c")).put(paramString, paramClass);
-            ((Map<Class<?>, String>) getPrivateStatic(EntityTypes.class, "d")).put(paramClass, paramString);
-            ((Map<Integer, Class<?>>) getPrivateStatic(EntityTypes.class, "e")).put(paramInt, paramClass);
-            ((Map<Class<?>, Integer>) getPrivateStatic(EntityTypes.class, "f")).put(paramClass, paramInt);
-            ((Map<String, Integer>) getPrivateStatic(EntityTypes.class, "g")).put(paramString, paramInt);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+	private static Object getPrivateStatic(@SuppressWarnings("rawtypes") Class clazz, String f) throws Exception {
+		return ReflectionUtils.getField(clazz, true, f).get(null);
+	}
+
+	@SuppressWarnings("unchecked")
+	private static void a(Class<?> paramClass, String paramString, int paramInt) {
+		try {
+			((Map<String, Class<?>>) getPrivateStatic(EntityTypes.class, "c")).put(paramString, paramClass);
+			((Map<Class<?>, String>) getPrivateStatic(EntityTypes.class, "d")).put(paramClass, paramString);
+			((Map<Integer, Class<?>>) getPrivateStatic(EntityTypes.class, "e")).put(paramInt, paramClass);
+			((Map<Class<?>, Integer>) getPrivateStatic(EntityTypes.class, "f")).put(paramClass, paramInt);
+			((Map<String, Integer>) getPrivateStatic(EntityTypes.class, "g")).put(paramString, paramInt);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 }
