@@ -15,12 +15,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
+import fr.asynchronous.sheepwars.core.data.DataManager;
+import fr.asynchronous.sheepwars.core.data.PlayerData;
 import fr.asynchronous.sheepwars.core.handler.GameState;
-import fr.asynchronous.sheepwars.core.handler.PlayerData;
 import fr.asynchronous.sheepwars.core.kit.NoneKit;
 import fr.asynchronous.sheepwars.core.manager.ConfigManager;
 import fr.asynchronous.sheepwars.core.manager.ConfigManager.Field;
-import fr.asynchronous.sheepwars.core.manager.DataManager;
 import fr.asynchronous.sheepwars.core.manager.ExceptionManager;
 import fr.asynchronous.sheepwars.core.manager.RewardsManager.Events;
 import fr.asynchronous.sheepwars.core.manager.SheepManager;
