@@ -7,7 +7,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
-import fr.asynchronous.sheepwars.core.gui.GuiContributor;
+import fr.asynchronous.sheepwars.core.gui.ContributorsInventory;
 import fr.asynchronous.sheepwars.core.gui.manager.GuiManager;
 import fr.asynchronous.sheepwars.core.handler.Contributor;
 
@@ -26,7 +26,7 @@ public class ContributorCommand implements CommandExecutor {
         }
         final Player player = (Player)sender;
         if (Contributor.isContributor(player))
-    		GuiManager.openGui(this.plugin, new GuiContributor(this.plugin, player));
+    		GuiManager.openGui(this.plugin, player, "Contributor's GUI", new ContributorsInventory());
 		return false;
 	}
 }

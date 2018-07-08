@@ -1,5 +1,6 @@
 package fr.asynchronous.sheepwars.core.command;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -10,8 +11,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
-import fr.asynchronous.sheepwars.core.gui.GuiValidateOwner;
-import fr.asynchronous.sheepwars.core.gui.manager.GuiManager;
+import fr.asynchronous.sheepwars.core.data.PlayerData;
 import fr.asynchronous.sheepwars.core.handler.GameState;
 import fr.asynchronous.sheepwars.core.handler.Hologram;
 import fr.asynchronous.sheepwars.core.handler.Particles;
@@ -44,7 +44,7 @@ public class MainCommand implements CommandExecutor {
             if (sub.equalsIgnoreCase("help")) {
             	player.sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + ChatColor.STRIKETHROUGH + "=============" + ChatColor.RESET + " " + ChatColor.AQUA + ChatColor.BOLD + "UltimateSheepWars " + ChatColor.GREEN + "" + ChatColor.BOLD + ChatColor.STRIKETHROUGH + "=============");
             	player.sendMessage("");
-            	if (Utils.isPluginConfigured())
+            	if (!Utils.isPluginConfigured())
             	{
             		final String ok = ChatColor.DARK_GRAY + "| " + ChatColor.GREEN + "✔" + ChatColor.DARK_GRAY + " |" + ChatColor.GRAY;
                 	final String no = ChatColor.DARK_GRAY + "| " + ChatColor.DARK_RED + "✖" + ChatColor.DARK_GRAY + " |" + ChatColor.GRAY;
@@ -61,7 +61,7 @@ public class MainCommand implements CommandExecutor {
             		player.sendMessage("");
                 	player.sendMessage("/sw start " + ChatColor.DARK_GRAY + "- " + ChatColor.GRAY + "Reduce countdown");
             		player.sendMessage("/sw give " + ChatColor.DARK_GRAY + "- " + ChatColor.GRAY + "Give you all sheeps");
-            		player.sendMessage("/sw changeowner " + ChatColor.DARK_GRAY + "- " + ChatColor.GRAY + "Change plugin's owner");
+            		//player.sendMessage("/sw changeowner " + ChatColor.DARK_GRAY + "- " + ChatColor.GRAY + "Change plugin's owner");
             		player.sendMessage("");
             		player.sendMessage("/stats <player> " + ChatColor.DARK_GRAY + "- " + ChatColor.GRAY + "Check player's stats");
             		player.sendMessage("/lang " + ChatColor.DARK_GRAY + "- " + ChatColor.GRAY + "Change your language");
@@ -113,22 +113,28 @@ public class MainCommand implements CommandExecutor {
                 }
                 else {
                 	ConfigManager.addLocation(Field.BOOSTERS, location);
-                    player.sendMessage(ChatColor.GREEN + "You have added a magic wool at (" + location.getBlockX() + "," + location.getY() + "," + location.getZ() + ")");
+                    player.sendMessage(ChatColor.GREEN + "You have added a magic wool at (" + location.getBlockX() + ", " + location.getY() + ", " + location.getZ() + ")");
                     UltimateSheepWarsPlugin.getVersionManager().getParticleFactory().playParticles(player, Particles.REDSTONE, location, 1.0f, 1.0f, 1.0f, 20, 1.0f);
                     Hologram.runHologramTask(Message.getDecoration() + ChatColor.GREEN + " Magic wool N°" + ConfigManager.getLocations(Field.BOOSTERS).size() + " " + Message.getDecoration(), player.getLocation(), 5, this.plugin);
                 }
             }
             else if (sub.equalsIgnoreCase("start")) {
-            	if (!this.plugin.getPreGameTask().hasStarted())
+            	if (!this.plugin.isSetPreGameTask() || !this.plugin.getPreGameTask().hasStarted())
             		new BeginCountdown(this.plugin);
             	this.plugin.getPreGameTask().shortenCountdown();
             }
             else if (sub.equalsIgnoreCase("test")) {
-            	// DO NOTHING
+            	/**SheepManager sheep = RandomUtils.getRandom(SheepManager.getAvailableSheeps());
+            	sheep.throwSheep(player, this.plugin);**/
+            	Bukkit.broadcastMessage("Active workers: " + Bukkit.getScheduler().getActiveWorkers().size());
+            	Bukkit.broadcastMessage("Pending tasks: " + Bukkit.getScheduler().getPendingTasks().size());
+            	Bukkit.broadcastMessage("Particle players: " + PlayerData.getParticlePlayers().size());
+            	Bukkit.broadcastMessage("Players data: " + PlayerData.getData().size());
+            	player.sendMessage("Tested.");
             }
-            else if (sub.equalsIgnoreCase("changeowner")) {
+            /**else if (sub.equalsIgnoreCase("changeowner")) {
             	GuiManager.openGui(this.plugin, new GuiValidateOwner(this.plugin, player));
-            }
+            }**/
             else if (sub.equalsIgnoreCase("give")) {
             	if (GameState.isStep(GameState.INGAME))
             	{

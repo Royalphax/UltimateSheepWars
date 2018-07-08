@@ -11,8 +11,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.handler.Sounds;
-import fr.asynchronous.sheepwars.core.manager.ConfigManager;
-import fr.asynchronous.sheepwars.core.manager.ConfigManager.Field;
 import fr.asynchronous.sheepwars.core.message.Message;
 import fr.asynchronous.sheepwars.core.message.Message.MsgEnum;
 import fr.asynchronous.sheepwars.core.util.Utils;
@@ -31,14 +29,14 @@ public class HubCommand implements CommandExecutor {
 			return true;
 		}
 		final Player player = (Player) sender;
-		player.addPotionEffect(new PotionEffect(PotionEffectType.CONFUSION, 100, 5));
+		player.addPotionEffect(new PotionEffect(PotionEffectType.CONFUSION, 100, 5, false, false));
 		Sounds.playSound(player, player.getLocation(), Sounds.PORTAL_TRAVEL, 1f, 1f);
-		player.sendMessage(ConfigManager.getString(Field.PREFIX) + Message.getMessage(player, MsgEnum.HUB_TELEPORTATION));
+		Message.sendMessage(player, MsgEnum.HUB_TELEPORTATION);
 		Utils.returnToHub(this.plugin, player);
 		new BukkitRunnable() {
 			public void run() {
 				if (player.isOnline())
-					player.sendMessage(ConfigManager.getString(Field.PREFIX) + ChatColor.RED + Message.getMessage(player, MsgEnum.CONNECTION_FAILED));
+					Message.sendMessage(player, MsgEnum.CONNECTION_FAILED);
 			}
 		}.runTaskLater(this.plugin, 100);
 		return false;
