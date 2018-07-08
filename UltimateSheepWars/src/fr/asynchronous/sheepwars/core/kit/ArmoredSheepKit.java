@@ -17,7 +17,7 @@ import fr.asynchronous.sheepwars.core.util.ItemBuilder;
 public class ArmoredSheepKit extends KitManager {
 
 	public ArmoredSheepKit() {
-		super(0, MsgEnum.KIT_ARMORED_SHEEP_NAME, MsgEnum.KIT_BETTER_BOW_DESCRIPTION, "sheepwars.kit.betterbow", 10, 10, new ItemBuilder(Material.BOW));
+		super(0, MsgEnum.KIT_ARMORED_SHEEP_NAME, MsgEnum.KIT_BETTER_BOW_DESCRIPTION, "sheepwars.kit.armoredsheep", 10, 10, new ItemBuilder(Material.CHAINMAIL_CHESTPLATE));
 	}
 
 	@Override
