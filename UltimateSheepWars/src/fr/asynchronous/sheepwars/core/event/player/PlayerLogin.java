@@ -7,9 +7,9 @@ import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
+import fr.asynchronous.sheepwars.core.data.PlayerData;
 import fr.asynchronous.sheepwars.core.event.UltimateSheepWarsEventListener;
 import fr.asynchronous.sheepwars.core.handler.GameState;
-import fr.asynchronous.sheepwars.core.handler.PlayerData;
 import fr.asynchronous.sheepwars.core.manager.ConfigManager;
 import fr.asynchronous.sheepwars.core.manager.ConfigManager.Field;
 import fr.asynchronous.sheepwars.core.message.Language;
@@ -45,9 +45,9 @@ public class PlayerLogin extends UltimateSheepWarsEventListener {
 			{
 				String locale = event.getPlayer().spigot().getLocale();
 				if (ConfigManager.getBoolean(Field.AUTO_GENERATE_LANGUAGES))
-					data.setLanguage(Language.createLanguageIfNotExist(locale, "", "", true));
+					data.setLanguage(Language.getLanguage(locale));
 				player.sendMessage(ChatColor.GRAY + data.getLanguage().getIntro());
 			}
-		}.runTaskLater(this.plugin, 20*5);
+		}.runTaskLater(this.plugin, (20 * 5));
 	}
 }

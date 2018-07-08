@@ -10,12 +10,10 @@ import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.material.Wool;
 
 import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
+import fr.asynchronous.sheepwars.core.data.PlayerData;
 import fr.asynchronous.sheepwars.core.event.UltimateSheepWarsEventListener;
-import fr.asynchronous.sheepwars.core.handler.PlayerData;
 import fr.asynchronous.sheepwars.core.handler.Sounds;
 import fr.asynchronous.sheepwars.core.manager.BoosterManager;
-import fr.asynchronous.sheepwars.core.manager.ConfigManager;
-import fr.asynchronous.sheepwars.core.manager.ConfigManager.Field;
 import fr.asynchronous.sheepwars.core.message.Message.MsgEnum;
 
 public class ProjectileHit extends UltimateSheepWarsEventListener

@@ -16,7 +16,7 @@ public class EntityTarget extends UltimateSheepWarsEventListener {
 	@EventHandler
 	public void onEntityTarget(EntityTargetEvent event) {
 		if ((event.getEntity() instanceof Sheep) && (event.getTarget() instanceof Player)) {
-			event.setCancelled(UltimateSheepWarsPlugin.getVersionManager().getEventHelper().onEntityTargerEvent(event.getEntity(), event.getTarget()));
+			event.setCancelled(UltimateSheepWarsPlugin.getVersionManager().getEventHelper().onEntityTargetEvent(event.getEntity(), event.getTarget()));
 		}
 	}
 }

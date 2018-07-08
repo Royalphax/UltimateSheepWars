@@ -11,14 +11,14 @@ import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
+import fr.asynchronous.sheepwars.core.data.DataManager;
+import fr.asynchronous.sheepwars.core.data.PlayerData;
 import fr.asynchronous.sheepwars.core.event.UltimateSheepWarsEventListener;
 import fr.asynchronous.sheepwars.core.handler.Contributor;
 import fr.asynchronous.sheepwars.core.handler.GameState;
-import fr.asynchronous.sheepwars.core.handler.PlayerData;
 import fr.asynchronous.sheepwars.core.kit.NoneKit;
 import fr.asynchronous.sheepwars.core.manager.ConfigManager;
 import fr.asynchronous.sheepwars.core.manager.ConfigManager.Field;
-import fr.asynchronous.sheepwars.core.manager.DataManager;
 import fr.asynchronous.sheepwars.core.manager.TeamManager;
 import fr.asynchronous.sheepwars.core.message.Message;
 import fr.asynchronous.sheepwars.core.message.Message.MsgEnum;
@@ -65,6 +65,7 @@ public class PlayerJoin extends UltimateSheepWarsEventListener {
 				player.sendMessage(" - Server OS Name : " + System.getProperty("os.name"));
 				player.sendMessage(" - Server OS Version : " + System.getProperty("os.version"));
 				player.sendMessage(" - Server OS Arch : " + System.getProperty("os.arch"));
+				player.sendMessage("");
 			}
 			player.sendMessage(ChatColor.GRAY + contributor.getSpecialMessage());
 			if (contributor.getEffect() != null)

@@ -11,9 +11,10 @@ import org.bukkit.entity.Sheep;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 
+import fr.asynchronous.sheepwars.core.UltimateSheepWarsAPI;
 import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
+import fr.asynchronous.sheepwars.core.data.PlayerData;
 import fr.asynchronous.sheepwars.core.event.UltimateSheepWarsEventListener;
-import fr.asynchronous.sheepwars.core.handler.PlayerData;
 import fr.asynchronous.sheepwars.core.handler.Sounds;
 import fr.asynchronous.sheepwars.core.util.MathUtils;
 
@@ -54,7 +55,7 @@ public class EntityDamageByPlayer extends UltimateSheepWarsEventListener
         } else if (event.getEntity() instanceof Sheep)
         {
         	Sheep sheep = (Sheep) event.getEntity();
-        	if (!sheep.hasMetadata("sheepwars_sheep"))
+        	if (!sheep.hasMetadata(UltimateSheepWarsAPI.SHEEPWARS_SHEEP_METADATA))
         	{
         		event.setCancelled(true);
         	} else {

@@ -1,5 +1,7 @@
 package fr.asynchronous.sheepwars.core.event.player;
 
+import java.util.Arrays;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -12,13 +14,12 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
+import fr.asynchronous.sheepwars.core.data.PlayerData;
 import fr.asynchronous.sheepwars.core.event.UltimateSheepWarsEventListener;
-import fr.asynchronous.sheepwars.core.gui.GuiKits;
 import fr.asynchronous.sheepwars.core.gui.manager.GuiManager;
 import fr.asynchronous.sheepwars.core.handler.Contributor;
 import fr.asynchronous.sheepwars.core.handler.GameState;
 import fr.asynchronous.sheepwars.core.handler.Particles;
-import fr.asynchronous.sheepwars.core.handler.PlayerData;
 import fr.asynchronous.sheepwars.core.handler.Sounds;
 import fr.asynchronous.sheepwars.core.manager.ConfigManager;
 import fr.asynchronous.sheepwars.core.manager.ConfigManager.Field;
@@ -80,14 +81,14 @@ public class PlayerInteract extends UltimateSheepWarsEventListener
         		event.setCancelled(true);
         	} else if (GameState.isStep(GameState.WAITING)) {
         		
-        		if (mat.equals(ConfigManager.getMaterial(Field.KIT_ITEM))) {
+        		if (mat.equals(ConfigManager.getItemStack(Field.KIT_ITEM).getType())) {
         			
                     String inventoryName = data.getLanguage().getMessage(MsgEnum.KIT_INVENTORY_NAME).replaceAll("%KIT%", data.getKit().getName(player));
                     if (inventoryName.length() > 32)
                     	inventoryName = inventoryName.substring(0, 32);
-                    GuiManager.openGui(this.plugin, new GuiKits(this.plugin, player, inventoryName));
+                    GuiManager.openGui(this.plugin, player, inventoryName, GuiManager.getKitsInventoryNewInstance());
                     
-        		} else if (mat.equals(ConfigManager.getMaterial(Field.RETURN_TO_HUB_ITEM))) {
+        		} else if (mat.equals(ConfigManager.getItemStack(Field.RETURN_TO_HUB_ITEM).getType())) {
         			
                     player.addPotionEffect(new PotionEffect(PotionEffectType.CONFUSION, 20*5, 5));
                     Sounds.playSound(player, player.getLocation(), Sounds.PORTAL_TRAVEL, 1f, 1f);
@@ -100,35 +101,33 @@ public class PlayerInteract extends UltimateSheepWarsEventListener
                 		}
                 	}.runTaskLater(this.plugin, (20 * 5));
                 	
-        		} else if (mat.equals(ConfigManager.getMaterial(Field.PARTICLES_ON_ITEM)) || mat.equals(ConfigManager.getMaterial(Field.PARTICLES_OFF_ITEM))) {
+        		} else if (mat.equals(ConfigManager.getItemStack(Field.PARTICLES_ON_ITEM).getType()) || mat.equals(ConfigManager.getItemStack(Field.PARTICLES_OFF_ITEM).getType())) {
         			
         			if (data.getAllowedParticles())
                     {
                     	data.setAllowParticles(false);
-                    	player.getInventory().setItem(4, new ItemBuilder(ConfigManager.getMaterial(Field.PARTICLES_OFF_ITEM)).setName(data.getLanguage().getMessage(MsgEnum.PARTICLES_OFF)).toItemStack());
+                    	player.getInventory().setItem(4, new ItemBuilder(ConfigManager.getItemStack(Field.PARTICLES_OFF_ITEM)).setName(data.getLanguage().getMessage(MsgEnum.PARTICLES_OFF)).toItemStack());
                     } else {
                     	data.setAllowParticles(true);
-                    	player.getInventory().setItem(4, new ItemBuilder(ConfigManager.getMaterial(Field.PARTICLES_ON_ITEM)).setName(data.getLanguage().getMessage(MsgEnum.PARTICLES_ON)).toItemStack());
-                    	UltimateSheepWarsPlugin.getVersionManager().getParticleFactory().playParticles(player, Particles.SPELL_INSTANT, player.getLocation(), 0.3f, 0.3f, 0.3f, 5, 0.0f);
+                    	player.getInventory().setItem(4, new ItemBuilder(ConfigManager.getItemStack(Field.PARTICLES_ON_ITEM)).setName(data.getLanguage().getMessage(MsgEnum.PARTICLES_ON)).toItemStack());
+                    	UltimateSheepWarsPlugin.getVersionManager().getParticleFactory().playParticles(player, Particles.SPELL_INSTANT, player.getLocation(), 0.5f, 0.5f, 0.5f, 10, 0.0f);
                     }
         			player.updateInventory();
                     Sounds.playSound(player, player.getLocation(), Sounds.NOTE_STICKS, 1f, 1f);
                     
         		} else if (item.isSimilar(TeamManager.RED.getIcon(player)) || item.isSimilar(TeamManager.BLUE.getIcon(player))) {
-        			for (TeamManager team : TeamManager.values()) {
+        			for (TeamManager team : Arrays.asList(TeamManager.RED, TeamManager.BLUE)) {
                         if (item.isSimilar(team.getIcon(player))) {
                             final String displayName = team.getDisplayName(player);
                             final TeamManager playerTeam = data.getTeam();
-                            if (!player.hasPermission("sheepwars.teams.bypass") && !Contributor.isImportant(player))
+                            if (playerTeam == team) {
+                        		Message.sendMessage(player, MsgEnum.ALREADY_IN_THIS_TEAM);
+                                break;
+                            }
+                            if (!player.hasPermission("sheepwars.teams.bypass") && !Contributor.isImportant(player) && Bukkit.getOnlinePlayers().size() > 1 && team.getOnlinePlayers().size() >= MathUtils.ceil((Bukkit.getOnlinePlayers().size() / 2)))
                             {
-                            	if (playerTeam == team) {
-                            		Message.sendMessage(player, MsgEnum.ALREADY_IN_THIS_TEAM);
-                                    break;
-                                }
-                                if (Bukkit.getOnlinePlayers().size() > 1 && team.getOnlinePlayers().size() >= MathUtils.ceil((Bukkit.getOnlinePlayers().size() / 2))) {
-                                	Message.sendMessage(player, MsgEnum.CANT_JOIN_FULL_TEAM);
-                                    break;
-                                }
+								Message.sendMessage(player, MsgEnum.CANT_JOIN_FULL_TEAM);
+								break;
                             }
                             data.setTeam(team);
                             player.sendMessage(data.getLanguage().getMessage(MsgEnum.TEAM_JOIN_MESSAGE).replaceAll("%TEAM%", team.getColor() + displayName));
