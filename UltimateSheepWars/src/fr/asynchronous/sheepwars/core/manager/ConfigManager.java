@@ -72,10 +72,10 @@ public class ConfigManager {
 		
 		LOBBY("lobby", FieldType.LOCATION, new Location(Bukkit.getWorlds().get(0), 0, 0, 0), SETTINGS_FILE),
 		OWNER("owner", FieldType.STRING, "null", SETTINGS_FILE),
-		BOOSTERS("boosters", FieldType.LOCATION_LIST, null, SETTINGS_FILE),
-		RED_SPAWNS("teams.red.spawns", FieldType.LOCATION_LIST, null, SETTINGS_FILE),
-		BLUE_SPAWNS("teams.blue.spawns", FieldType.LOCATION_LIST, null, SETTINGS_FILE),
-		SPEC_SPAWNS("teams.spec.spawns", FieldType.LOCATION_LIST, null, SETTINGS_FILE),
+		BOOSTERS("boosters", FieldType.LOCATION_LIST, new ArrayList<Location>(), SETTINGS_FILE),
+		RED_SPAWNS("teams.red.spawns", FieldType.LOCATION_LIST, new ArrayList<Location>(), SETTINGS_FILE),
+		BLUE_SPAWNS("teams.blue.spawns", FieldType.LOCATION_LIST, new ArrayList<Location>(), SETTINGS_FILE),
+		SPEC_SPAWNS("teams.spec.spawns", FieldType.LOCATION_LIST, new ArrayList<Location>(), SETTINGS_FILE),
 		
 		PREFIX("prefix", FieldType.STRING, "&8[&9SheepWars&8]");
 
@@ -138,9 +138,9 @@ public class ConfigManager {
 							String is = config.getString(field.getPath(), (String) field.getDefault());
 							String[] split = is.split(":");
 							if (split.length > 1) {
-								field.setValue(new ItemBuilder(Material.matchMaterial(split[0])).setData(Byte.parseByte(split[1])));
+								field.setValue(new ItemBuilder(Material.matchMaterial(split[0])).setData(Byte.parseByte(split[1])).toItemStack());
 							} else {
-								field.setValue(new ItemBuilder(Material.matchMaterial(split[0])));
+								field.setValue(new ItemBuilder(Material.matchMaterial(split[0])).toItemStack());
 							}
 							break;
 						case MATERIAL :
@@ -201,9 +201,16 @@ public class ConfigManager {
 		field.setValue(arg0);
 	}
 	
+	public static void setItemStack(Field field, ItemStack arg0) {
+		checkForException(field, FieldType.ITEMSTACK);
+		field.setValue(arg0);
+	}
+	
 	public static void addLocation(Field field, Location arg0) {
 		checkForException(field, FieldType.LOCATION_LIST);
-		field.setValue(getLocations(field).add(arg0));
+		List<Location> locations = getLocations(field);
+		locations.add(arg0);
+		field.setValue(locations);
 	}
 	
 	public static void clearLocations(Field field) {
