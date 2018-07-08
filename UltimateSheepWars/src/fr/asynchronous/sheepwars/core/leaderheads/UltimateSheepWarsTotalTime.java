@@ -3,7 +3,7 @@ import java.util.Arrays;
 
 import org.bukkit.entity.Player;
 
-import fr.asynchronous.sheepwars.core.handler.PlayerData;
+import fr.asynchronous.sheepwars.core.data.PlayerData;
 import me.robin.leaderheads.datacollectors.OnlineDataCollector;
 import me.robin.leaderheads.objects.BoardType;
 

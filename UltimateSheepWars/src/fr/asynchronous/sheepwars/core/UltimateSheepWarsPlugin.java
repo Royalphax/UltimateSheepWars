@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.net.UnknownHostException;
 import java.util.List;
 import java.util.logging.Level;
 
@@ -19,12 +20,21 @@ import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import fr.asynchronous.sheepwars.core.booster.ArrowBackBooster;
+import fr.asynchronous.sheepwars.core.booster.ArrowFireBooster;
+import fr.asynchronous.sheepwars.core.booster.BlockingSheepBooster;
+import fr.asynchronous.sheepwars.core.booster.MoreSheepBooster;
+import fr.asynchronous.sheepwars.core.booster.NauseaBooster;
+import fr.asynchronous.sheepwars.core.booster.PoisonBooster;
+import fr.asynchronous.sheepwars.core.booster.RegenerationBooster;
+import fr.asynchronous.sheepwars.core.booster.ResistanceBooster;
 import fr.asynchronous.sheepwars.core.command.ContributorCommand;
 import fr.asynchronous.sheepwars.core.command.HubCommand;
 import fr.asynchronous.sheepwars.core.command.LangCommand;
 import fr.asynchronous.sheepwars.core.command.MainCommand;
 import fr.asynchronous.sheepwars.core.command.StatsCommand;
 import fr.asynchronous.sheepwars.core.data.AccountManager;
+import fr.asynchronous.sheepwars.core.data.DataManager;
 import fr.asynchronous.sheepwars.core.data.DataRegister;
 import fr.asynchronous.sheepwars.core.event.UltimateSheepWarsEventListener;
 import fr.asynchronous.sheepwars.core.event.block.BlockBreak;
@@ -39,8 +49,6 @@ import fr.asynchronous.sheepwars.core.event.entity.EntityDeath;
 import fr.asynchronous.sheepwars.core.event.entity.EntityExplode;
 import fr.asynchronous.sheepwars.core.event.entity.EntityTarget;
 import fr.asynchronous.sheepwars.core.event.entity.FoodLevelChange;
-import fr.asynchronous.sheepwars.core.event.inventory.InventoryClick;
-import fr.asynchronous.sheepwars.core.event.inventory.InventoryOpenEvent;
 import fr.asynchronous.sheepwars.core.event.player.AsyncPlayerChat;
 import fr.asynchronous.sheepwars.core.event.player.PlayerArmorStandManipulate;
 import fr.asynchronous.sheepwars.core.event.player.PlayerCommandPreprocess;
@@ -62,12 +70,22 @@ import fr.asynchronous.sheepwars.core.event.projectile.ProjectileHit;
 import fr.asynchronous.sheepwars.core.event.projectile.ProjectileLaunch;
 import fr.asynchronous.sheepwars.core.event.server.ServerCommand;
 import fr.asynchronous.sheepwars.core.event.server.ServerListPing;
+import fr.asynchronous.sheepwars.core.gui.KitsInventory;
 import fr.asynchronous.sheepwars.core.handler.GameState;
 import fr.asynchronous.sheepwars.core.handler.MinecraftVersion;
+import fr.asynchronous.sheepwars.core.kit.ArmoredSheepKit;
+import fr.asynchronous.sheepwars.core.kit.BetterBowKit;
+import fr.asynchronous.sheepwars.core.kit.BetterSwordKit;
+import fr.asynchronous.sheepwars.core.kit.BuilderKit;
+import fr.asynchronous.sheepwars.core.kit.DestroyerKit;
+import fr.asynchronous.sheepwars.core.kit.MobilityKit;
+import fr.asynchronous.sheepwars.core.kit.MoreHealthKit;
+import fr.asynchronous.sheepwars.core.kit.MoreSheepKit;
+import fr.asynchronous.sheepwars.core.kit.NoneKit;
+import fr.asynchronous.sheepwars.core.kit.RandomKit;
 import fr.asynchronous.sheepwars.core.manager.BoosterManager;
 import fr.asynchronous.sheepwars.core.manager.ConfigManager;
 import fr.asynchronous.sheepwars.core.manager.ConfigManager.Field;
-import fr.asynchronous.sheepwars.core.manager.DataManager;
 import fr.asynchronous.sheepwars.core.manager.ExceptionManager;
 import fr.asynchronous.sheepwars.core.manager.KitManager;
 import fr.asynchronous.sheepwars.core.manager.RewardsManager;
@@ -77,6 +95,20 @@ import fr.asynchronous.sheepwars.core.manager.URLManager;
 import fr.asynchronous.sheepwars.core.manager.VersionManager;
 import fr.asynchronous.sheepwars.core.message.Language;
 import fr.asynchronous.sheepwars.core.message.Message;
+import fr.asynchronous.sheepwars.core.sheep.BoardingSheep;
+import fr.asynchronous.sheepwars.core.sheep.DarkSheep;
+import fr.asynchronous.sheepwars.core.sheep.DistorsionSheep;
+import fr.asynchronous.sheepwars.core.sheep.EarthQuakeSheep;
+import fr.asynchronous.sheepwars.core.sheep.ExplosiveSheep;
+import fr.asynchronous.sheepwars.core.sheep.FragmentationSheep;
+import fr.asynchronous.sheepwars.core.sheep.FrozenSheep;
+import fr.asynchronous.sheepwars.core.sheep.GlowingSheep;
+import fr.asynchronous.sheepwars.core.sheep.HealerSheep;
+import fr.asynchronous.sheepwars.core.sheep.IncendiarySheep;
+import fr.asynchronous.sheepwars.core.sheep.IntergalacticSheep;
+import fr.asynchronous.sheepwars.core.sheep.LightningSheep;
+import fr.asynchronous.sheepwars.core.sheep.SeekerSheep;
+import fr.asynchronous.sheepwars.core.sheep.SwapSheep;
 import fr.asynchronous.sheepwars.core.task.BeginCountdown;
 import fr.asynchronous.sheepwars.core.task.GameTask;
 import fr.asynchronous.sheepwars.core.task.ScoreboardTask;
@@ -130,7 +162,7 @@ public class UltimateSheepWarsPlugin extends JavaPlugin {
         this.vaultInstalled = false;
         
         /** Ne pas oublier de changer la valeur **/
-        this.localhost = true;
+        this.localhost = false;
 	}
 	
 	public void disablePlugin(Level level, String reason)
@@ -151,6 +183,7 @@ public class UltimateSheepWarsPlugin extends JavaPlugin {
 	
 	@Override
 	public void onLoad() {
+		/** On fait toutes les verifs pour etre sur que tout va bien se passer **/
 		if (!isSpigotServer()) {
 			disablePlugin(Level.WARNING, "This server isn't running with Spigot build. The plugin can't be load.");
 			return;
@@ -225,13 +258,11 @@ public class UltimateSheepWarsPlugin extends JavaPlugin {
         		EntityDamageByPlayer.class, EntityDeath.class, EntityExplode.class, 
         		EntityTarget.class, FoodLevelChange.class, EntityDamage.class,
         		
-        		InventoryClick.class, 
-        		
         		AsyncPlayerChat.class, PlayerArmorStandManipulate.class, 
         		PlayerCommandPreprocess.class, PlayerDamage.class, PlayerDamageByEntity.class,
-        		PlayerDeath.class, PlayerDropItem.class, PlayerInteract.class, PlayerJoin.class, 
+        		PlayerDeath.class, PlayerDropItem.class, PlayerInteract.class, PlayerInteractAtEntity.class, PlayerJoin.class, 
         		PlayerKick.class, PlayerLogin.class, PlayerMove.class, PlayerPickupItem.class,
-        		PlayerQuit.class, PlayerRespawn.class, PlayerInteractAtEntity.class, InventoryOpenEvent.class, 
+        		PlayerQuit.class, PlayerRespawn.class, 
         		
         		ProjectileHit.class, ProjectileLaunch.class, 
         		
@@ -239,11 +270,12 @@ public class UltimateSheepWarsPlugin extends JavaPlugin {
         if (versionManager.getVersion().newerThan(MinecraftVersion.v1_9_R1))
         	this.register(PlayerSwapItem.class);
         
-		/** Load most common things **/
+        /** Load most common things **/
 		this.load();
-		
-		/** Init stats & mySQL things at the end (cause it can take time ... ) **/
+        
+		/** Init stats **/
 		DataManager.initDatabaseConnections(this);
+			
 		new BukkitRunnable()
 		{
 			public void run()
@@ -260,7 +292,7 @@ public class UltimateSheepWarsPlugin extends JavaPlugin {
 					} else {
 						getLogger().info("Plugin is up-to-date.");
 					}
-				} catch (FileNotFoundException ex) {
+				} catch (FileNotFoundException | UnknownHostException ex) {
 					new ExceptionManager(ex).register(false);
 					disablePlugin(Level.SEVERE, "You don't have a valid internet connection, please connect to the internet for the plugin to work.");
 				} catch (IOException ex) {
@@ -291,12 +323,15 @@ public class UltimateSheepWarsPlugin extends JavaPlugin {
 	
 	public void load()
 	{
+		getLogger().info("Preparing the game ...");
         /** Pas besoin malotru ! this.saveDefaultConfig(); **/
-        this.initClasses();
         
-        /** Init Game **/ 
-		GameState.setCurrentStep(GameState.WAITING);
-        
+		/** On init les class **/
+		this.initClasses();
+		
+		/** On empeche tout joueur de se connecter **/
+		GameState.setCurrentStep(GameState.RESTARTING);
+		
         /** Setup Vault **/
 		vaultInstalled = Bukkit.getPluginManager().isPluginEnabled("Vault");
 		if (vaultInstalled)
@@ -380,6 +415,9 @@ public class UltimateSheepWarsPlugin extends JavaPlugin {
         /** Initialize other classes **/
         TeamManager.RED.updateScoreboardTeamCount();
         TeamManager.BLUE.updateScoreboardTeamCount();
+        
+        /** Init Game **/ 
+		GameState.setCurrentStep(GameState.WAITING);
 	}
 	
 	@Override
@@ -416,6 +454,7 @@ public class UltimateSheepWarsPlugin extends JavaPlugin {
 		ConfigManager.initConfig(this);
 		Message.initMessages();
 		Language.loadStartupConfiguration(this);
+		UltimateSheepWarsAPI.setKitsInventory(KitsInventory.class);
 		
 		try {
 			File boosterFile = new File(this.getDataFolder(), "boosters.yml");
@@ -438,6 +477,19 @@ public class UltimateSheepWarsPlugin extends JavaPlugin {
 		}
 		
 		this.rewardManager = new RewardsManager(this);
+		
+		UltimateSheepWarsAPI.registerKits(this, new ArmoredSheepKit(), new BetterBowKit(), new BetterSwordKit(), new BuilderKit(), new DestroyerKit(),
+				new MobilityKit(), new MoreHealthKit(), new MoreSheepKit(), new NoneKit(), new RandomKit());
+		
+		UltimateSheepWarsAPI.registerSheeps(new BoardingSheep(), new DarkSheep(), new DistorsionSheep(), new EarthQuakeSheep(), new ExplosiveSheep(), 
+				new FragmentationSheep(), new FrozenSheep(), new HealerSheep(), new IncendiarySheep(), new IntergalacticSheep(), new LightningSheep(), 
+				new SeekerSheep(), new SwapSheep());
+
+		if (versionManager.getVersion().newerThan(MinecraftVersion.v1_9_R1))
+			UltimateSheepWarsAPI.registerSheep(new GlowingSheep());
+		
+		UltimateSheepWarsAPI.registerBoosters(new ArrowBackBooster(), new ArrowFireBooster(), new BlockingSheepBooster(), new MoreSheepBooster(),
+				new NauseaBooster(), new PoisonBooster(), new RegenerationBooster(), new ResistanceBooster());
 	}
 	
 	private void setupProviders()
@@ -500,6 +552,10 @@ public class UltimateSheepWarsPlugin extends JavaPlugin {
 	
 	public static VersionManager getVersionManager() {
 		return versionManager;
+	}
+	
+	public boolean isSetPreGameTask() {
+		return this.preGameTask != null;
 	}
 	
 	public BeginCountdown getPreGameTask() {
