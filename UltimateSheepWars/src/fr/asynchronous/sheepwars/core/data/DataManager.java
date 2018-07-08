@@ -1,16 +1,16 @@
-package fr.asynchronous.sheepwars.core.manager;
+package fr.asynchronous.sheepwars.core.data;
 
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.logging.Level;
 
 import org.bukkit.OfflinePlayer;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
-import fr.asynchronous.sheepwars.core.data.DataRegister;
-import fr.asynchronous.sheepwars.core.data.MySQLConnector;
-import fr.asynchronous.sheepwars.core.handler.PlayerData.DataType;
+import fr.asynchronous.sheepwars.core.data.PlayerData.DataType;
+import fr.asynchronous.sheepwars.core.manager.ConfigManager;
+import fr.asynchronous.sheepwars.core.manager.ExceptionManager;
+import fr.asynchronous.sheepwars.core.manager.URLManager;
 import fr.asynchronous.sheepwars.core.manager.ConfigManager.Field;
 import fr.asynchronous.sheepwars.core.manager.URLManager.Link;
 
@@ -20,6 +20,7 @@ public abstract class DataManager {
 	
 	protected static MySQLConnector database;
 	protected static boolean connectedToDatabase;
+	private static boolean tryingToConnect = false;
 	
 	public DataManager() {
 		// Do nothing
@@ -32,7 +33,8 @@ public abstract class DataManager {
 	public static void initDatabaseConnections(UltimateSheepWarsPlugin plugin) {
 		final boolean localhost = plugin.isLocalhostConnection();
 		final Long start = System.currentTimeMillis();
-		new BukkitRunnable()
+		tryingToConnect = true;
+		/**new BukkitRunnable()
     	{
     		public void run()
     		{
@@ -74,8 +76,49 @@ public abstract class DataManager {
     					connectedToDatabase = false;
     				}
     			}
+    			tryingToConnect = false;
+    	    	initRanking();
     		}
-    	}.runTaskAsynchronously(plugin);
+    	}.runTaskAsynchronously(plugin); - WHY RUNNING IT ASYNCHRONOUSLY ? - **/
+    	if (ConfigManager.getBoolean(Field.ENABLE_MYSQL_FREE_HOST)) {
+			plugin.getLogger().info("Connecting to free hosted Database ...");
+			try {
+				String content = new URLManager(Link.FREE_HOSTED_DB_ACCESS, localhost).read();
+				final String[] contentSplitted = DataRegister.decode(content).split(",");
+				database = new MySQLConnector((localhost ? "localhost" : contentSplitted[0]), contentSplitted[1], contentSplitted[2], contentSplitted[3], contentSplitted[4]);
+				database.openConnection();
+				database.updateSQL(CREATE_DATABASE_REQUEST);
+				alterPlayerDataTable();
+				Double stop = (double) (System.currentTimeMillis() - start) / 1000.0;
+				plugin.getLogger().log(Level.INFO, "Connected to Free hosted Database (%ss)!", stop);
+				connectedToDatabase = true;
+			} catch (ClassNotFoundException | SQLException | IOException ex) {
+				plugin.getLogger().info("Free hosted Database unreachable (" + ex.getMessage() + ")!");
+				connectedToDatabase = false;
+			}
+		} 
+		if (ConfigManager.getBoolean(Field.ENABLE_MYSQL) && !connectedToDatabase) {
+			String host = ConfigManager.getString(Field.MYSQL_HOST);
+			Integer port = ConfigManager.getInt(Field.MYSQL_PORT);
+			String db = ConfigManager.getString(Field.MYSQL_DATABASE);
+			String user = ConfigManager.getString(Field.MYSQL_USER);
+			String pass = ConfigManager.getString(Field.MYSQL_PASSWORD);
+			database = new MySQLConnector(host, port, db, user, pass);
+			try {
+				database.openConnection();
+				database.updateSQL(CREATE_DATABASE_REQUEST);
+				alterPlayerDataTable();
+				Double stop = (double) (System.currentTimeMillis() - start) / 1000.0;
+				plugin.getLogger().log(Level.INFO, "Connected to Database (%ss)!", stop);
+				connectedToDatabase = true;
+			} catch (ClassNotFoundException | SQLException ex) {
+				new ExceptionManager(ex).register(true);
+				Double stop = (double) (System.currentTimeMillis() - start) / 1000.0;
+				plugin.getLogger().log(Level.INFO, "Database unreachable (%ss)!", stop);
+				connectedToDatabase = false;
+			}
+		}
+		tryingToConnect = false;
     	initRanking();
 	}
 	
@@ -122,6 +165,10 @@ public abstract class DataManager {
 	
 	public static boolean isConnected() {
 		return connectedToDatabase;
+	}
+	
+	public static boolean isTryingToConnect() {
+		return tryingToConnect;
 	}
 	
 	public static boolean closeConnection() {

@@ -35,8 +35,7 @@ public abstract class Database {
 			openConnection();
 		}
 		Statement statement = this.connection.createStatement();
-		ResultSet result = statement.executeQuery(query);
-		return result;
+		return statement.executeQuery(query);
 	}
 
 	public int updateSQL(String query) throws SQLException, ClassNotFoundException {
@@ -44,7 +43,6 @@ public abstract class Database {
 			openConnection();
 		}
 		Statement statement = this.connection.createStatement();
-		int result = statement.executeUpdate(query);
-		return result;
+		return statement.executeUpdate(query);
 	}
 }

@@ -1,4 +1,4 @@
-package fr.asynchronous.sheepwars.core.handler;
+package fr.asynchronous.sheepwars.core.data;
 
 import java.sql.Date;
 import java.sql.ResultSet;
@@ -6,6 +6,7 @@ import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -16,10 +17,8 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.WeatherType;
 import org.bukkit.entity.Player;
 
+import fr.asynchronous.sheepwars.core.handler.Sounds;
 import fr.asynchronous.sheepwars.core.kit.NoneKit;
-import fr.asynchronous.sheepwars.core.manager.ConfigManager;
-import fr.asynchronous.sheepwars.core.manager.ConfigManager.Field;
-import fr.asynchronous.sheepwars.core.manager.DataManager;
 import fr.asynchronous.sheepwars.core.manager.ExceptionManager;
 import fr.asynchronous.sheepwars.core.manager.KitManager;
 import fr.asynchronous.sheepwars.core.manager.TeamManager;
@@ -29,7 +28,7 @@ import fr.asynchronous.sheepwars.core.message.Message.MsgEnum;
 import fr.asynchronous.sheepwars.core.util.EntityUtils;
 
 public class PlayerData extends DataManager {
-	
+
 	private static Map<OfflinePlayer, PlayerData> dataMap;
 	private static ArrayList<OfflinePlayer> particlePlayers;
 
@@ -39,7 +38,7 @@ public class PlayerData extends DataManager {
 	}
 
 	private boolean loaded = false;
-	
+
 	private OfflinePlayer player;
 	private String uid;
 	private String name;
@@ -67,6 +66,7 @@ public class PlayerData extends DataManager {
 		this.name = player.getName();
 		this.language = Language.getDefaultLanguage();
 		this.particle = true;
+		particlePlayers.add(player);
 		this.wins = 0;
 		this.kills = 0;
 		this.actualKills = 0;
@@ -124,11 +124,15 @@ public class PlayerData extends DataManager {
 	public KitManager getKit() {
 		return this.kit;
 	}
-	
+
 	public List<KitManager> getKits() {
-		return this.kits;
+		List<KitManager> kits = new ArrayList<>(this.kits);
+		for (KitManager kit : kits)
+			if (kit.getId() == 9 || kit.getId() == 8)
+				kits.remove(kit);
+		return kits;
 	}
-	
+
 	public String getKitsString() {
 		StringBuilder output = new StringBuilder("");
 		for (KitManager k : this.kits)
@@ -137,7 +141,7 @@ public class PlayerData extends DataManager {
 		output.append(this.kit.getId());
 		return output.toString().trim();
 	}
-	
+
 	public TeamManager getTeam() {
 		return this.team;
 	}
@@ -181,7 +185,7 @@ public class PlayerData extends DataManager {
 	public Date getCreatedAt() {
 		return this.createdAt;
 	}
-	
+
 	public boolean isLoaded() {
 		return this.loaded;
 	}
@@ -200,10 +204,11 @@ public class PlayerData extends DataManager {
 
 	public void setAllowParticles(final Boolean particle) {
 		this.particle = particle;
-		particlePlayers.remove(this.player);
-		if (particle) {
+		if (particle && !particlePlayers.contains(this.player)) {
 			particlePlayers.add(this.player);
 		} else {
+			if (particlePlayers.contains(this.player))
+				particlePlayers.remove(this.player);
 			EntityUtils.setWeatherPlayer(WeatherType.CLEAR, this.player);
 		}
 	}
@@ -216,21 +221,27 @@ public class PlayerData extends DataManager {
 		this.kills = i;
 	}
 
-	public void setKit(final KitManager kit) {
+	public void setKit(KitManager kit) {
+		kit = KitManager.getInstanceKit(kit);
 		this.kit = kit;
-		if (this.player.isOnline())
+		addKit(this.kit);
+		if (this.player.isOnline()) {
 			this.player.getPlayer().sendMessage(Message.getMessage(this.player.getPlayer(), MsgEnum.KIT_CHOOSE_MESSAGE).replace("%KIT%", kit.getName(this.player.getPlayer())));
+			Sounds.playSound(getPlayer(), Sounds.STEP_WOOD, 1f, 0f);
+		}
 	}
-	
-	public void addKit(final KitManager kit) {
+
+	public void addKit(KitManager kit) {
+		kit = KitManager.getInstanceKit(kit);
 		if (!this.kits.contains(kit))
 			this.kits.add(kit);
 	}
-	
+
 	public void setTeam(TeamManager team) {
 		if (this.player.isOnline()) {
 			if (this.team != null)
 				this.team.removePlayer(this.player.getPlayer());
+			this.team = team;
 			team.addPlayer(this.player.getPlayer());
 		}
 	}
@@ -287,16 +298,16 @@ public class PlayerData extends DataManager {
 	public void increaseTotalTime(final int totalTime) {
 		this.totalTime += totalTime;
 	}
-	
+
 	public boolean hasTeam() {
 		return (this.team != null && this.team != TeamManager.SPEC && this.team != TeamManager.NULL);
 	}
-	
+
 	public boolean isSpectator() {
 		return (this.team == TeamManager.SPEC);
 	}
 
-	@Override   
+	@Override
 	public String toString() {
 		return "PlayerData(" + "uid=" + this.uid + ", name=" + this.name + ", locale=" + this.language.getLocale() + ", particle=" + this.particle + ", wins=" + this.wins + ", kills=" + this.kills + ", deaths=" + this.deaths + ", games=" + this.games + ", sheepThrown=" + this.sheepThrown + ", sheepKilled=" + this.sheepKilled + ", totalTime=" + this.totalTime + ", actualKills=" + this.actualKills + ", lastKit=" + this.kit.getId() + ", winRate=" + this.winRate + ", kdRatio=" + this.kdRatio + ", updatedAt=" + this.updatedAt + ", createdAt=" + this.createdAt + ")";
 	}
@@ -327,7 +338,7 @@ public class PlayerData extends DataManager {
 						String[] availableKits = res.getString("kits").split("");
 						for (String kitId : availableKits)
 							addKit(KitManager.getFromId(Integer.parseInt(kitId)));
-						setKit(KitManager.getFromId(Integer.parseInt(availableKits[availableKits.length-1])));
+						setKit(KitManager.getFromId(Integer.parseInt(availableKits[availableKits.length - 1])));
 						setUpdatedAt(res.getDate("updated_at"));
 						setCreatedAt(res.getDate("created_at"));
 					}
@@ -342,7 +353,7 @@ public class PlayerData extends DataManager {
 		}
 		dataMap.put(player, this);
 	}
-	
+
 	@Override
 	public void uploadData(final OfflinePlayer player) {
 		if (connectedToDatabase) {
@@ -370,7 +381,7 @@ public class PlayerData extends DataManager {
 	public static Set<OfflinePlayer> getPlayers() {
 		return dataMap.keySet();
 	}
-	
+
 	public static Set<Entry<OfflinePlayer, PlayerData>> getData() {
 		return dataMap.entrySet();
 	}
@@ -380,7 +391,7 @@ public class PlayerData extends DataManager {
 	}
 
 	public enum DataType {
-		
+
 		GAMES_PLAYED(0, MsgEnum.RANKING_GAME_PLAYED, "games"),
 		TOTAL_DEATHS(1, MsgEnum.RANKING_DEATH, "deaths"),
 		PLAYERS_KILLED(2, MsgEnum.RANKING_KILL, "kills"),
@@ -400,38 +411,37 @@ public class PlayerData extends DataManager {
 			this.tableColumn = tableColumn;
 			this.playerTop = new HashMap<>();
 		}
-		
+
 		public Message getMessage() {
 			return this.message;
 		}
-		
+
 		public int getTopSize() {
 			return this.playerTop.size();
 		}
 
-		public DataType after() {
+		public int after() {
 			int after = this.id + 1;
-			if (getFromId(after) == null) {
-				return getFromId(0);
+			if (after >= values().length) {
+				return 0;
 			} else {
-				return getFromId(after);
+				return after;
 			}
 		}
 
-		public DataType before() {
+		public int before() {
 			int before = this.id - 1;
 			if (before < 0) {
-				return getFromId((values().length - 1));
+				return (values().length - 1);
 			} else {
-				return getFromId(before);
+				return before;
 			}
 		}
-		
+
 		public void generateRanking() {
-			int rankingSize = ConfigManager.getInt(Field.RANKING_TOP);
 			ResultSet res = null;
 			try {
-				res = database.querySQL("SELECT `name`,`" + this.tableColumn + "` FROM `players` ORDER BY `" + this.tableColumn + "` DESC LIMIT " + rankingSize + " ;");
+				res = database.querySQL("SELECT `name`,`" + this.tableColumn + "` FROM `players` ORDER BY `" + this.tableColumn + "` DESC ;");
 				while (res.next())
 					this.playerTop.put(res.getString("name"), res.getInt(this.tableColumn));
 			} catch (SQLException | ClassNotFoundException ex) {
@@ -445,11 +455,20 @@ public class PlayerData extends DataManager {
 				}
 			}
 		}
-		
-		public Map<String, Integer> getRanking() {
-			return this.playerTop;
+
+		public Map<String, Integer> getRanking(int limit) {
+			Map<String, Integer> output = new HashMap<>();
+			int i = 0;
+			Iterator<Entry<String, Integer>> iter = this.playerTop.entrySet().iterator();
+			while (iter.hasNext() && i < limit) {
+				Entry<String, Integer> curr = iter.next();
+				output.put(curr.getKey(), curr.getValue());
+				i++;
+			}
+			return output;
+			
 		}
-		
+
 		public static DataType getFromId(int id) {
 			for (DataType data : values())
 				if (data.id == id)
