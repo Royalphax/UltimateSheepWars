@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.DyeColor;
@@ -86,12 +85,14 @@ public class KitsInventory extends GuiScreen {
 					}
 				}
 			}
-			if (playerData.getKit() == kit && !kit.isKit(new RandomKit().getId()) && !kit.isKit(new NoneKit().getId())) {
-				Bukkit.broadcastMessage("Il glow ! " + kit.toString());
+			if (this.playerData.getKit().getId() == kit.getId()) {
 				itemBuilder.addIllegallyGlow();
+			} else {
+				itemBuilder.removeIllegallyGlow();
 			}
 			items.add(itemBuilder.toItemStack());
 		}
+		
 		new InventoryOrganizer(this.inventory).organize(items, this.plugin);
 
 		ItemStack item;
@@ -142,7 +143,7 @@ public class KitsInventory extends GuiScreen {
 					drawKitsScreen();
 					this.kitScreen = true;
 				}
-			} else if (!item.getItemMeta().getDisplayName().contains("✖")) {
+			} else if (!item.getItemMeta().getDisplayName().contains("✖") && (event.getSlot() != 49 || event.getSlot() != 4) && this.kitScreen) {
 				KitManager kit = new NoneKit();
 				for (KitManager k : KitManager.getAvailableKits()) {
 					if (k.getName(clicker).equals(item.getItemMeta().getDisplayName())) {

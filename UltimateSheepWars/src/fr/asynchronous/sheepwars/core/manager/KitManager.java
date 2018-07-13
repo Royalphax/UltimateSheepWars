@@ -81,7 +81,7 @@ public abstract class KitManager implements Listener
     }
     
     public boolean isKit(int i) {
-    	return(this.id == i);
+    	return (this.id == i);
     }
     
     public List<KitResult> canUseKit(Player player, UltimateSheepWarsPlugin plugin) {
