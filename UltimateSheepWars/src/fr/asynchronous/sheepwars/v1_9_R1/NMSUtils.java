@@ -68,7 +68,7 @@ public class NMSUtils implements INMSUtils {
 	}
 
 	@Override
-	public ItemStack setIllegallyGlowing(ItemStack item) {
+	public ItemStack setIllegallyGlowing(ItemStack item, boolean activate) {
 		net.minecraft.server.v1_9_R1.ItemStack nmsStack = CraftItemStack.asNMSCopy(item);
 		NBTTagCompound tag = null;
 		if (!nmsStack.hasTag()) {
@@ -77,8 +77,12 @@ public class NMSUtils implements INMSUtils {
 		}
 		if (tag == null)
 			tag = nmsStack.getTag();
-		NBTTagList ench = new NBTTagList();
-		tag.set("ench", ench);
+		if (activate) {
+			NBTTagList ench = new NBTTagList();
+			tag.set("ench", ench);
+		} else {
+			tag.remove("ench");
+		}
 		nmsStack.setTag(tag);
 
 		return CraftItemStack.asCraftMirror(nmsStack);

@@ -18,7 +18,7 @@ public interface INMSUtils {
 	
 	public Block getBoosterBlock(final Arrow arrow, final UltimateSheepWarsPlugin plugin);
 	
-	public ItemStack setIllegallyGlowing(final ItemStack item);
+	public ItemStack setIllegallyGlowing(final ItemStack item, boolean activate);
 	
 	public void setUnbreakable(final ItemMeta meta, final boolean bool);
 	
