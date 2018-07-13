@@ -554,12 +554,14 @@ public class UltimateSheepWarsPlugin extends JavaPlugin {
 		return versionManager;
 	}
 	
-	public boolean isSetPreGameTask() {
-		return this.preGameTask != null;
-	}
-	
 	public BeginCountdown getPreGameTask() {
 		return this.preGameTask;
+	}
+	
+	public boolean hasPreGameTaskStarted() {
+		if (this.preGameTask == null)
+			return false;
+		return this.preGameTask.hasStarted();
 	}
 	
 	public GameTask getGameTask() {

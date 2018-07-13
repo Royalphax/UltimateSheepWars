@@ -13,6 +13,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.SkullType;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -22,9 +23,9 @@ import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 
 import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
+import fr.asynchronous.sheepwars.core.data.PlayerData;
 import fr.asynchronous.sheepwars.core.handler.Contributor;
 import fr.asynchronous.sheepwars.core.handler.DisplayStyle;
-import fr.asynchronous.sheepwars.core.handler.PlayerData;
 import fr.asynchronous.sheepwars.core.manager.ConfigManager;
 import fr.asynchronous.sheepwars.core.manager.ConfigManager.Field;
 import fr.asynchronous.sheepwars.core.manager.TeamManager;
@@ -84,9 +85,9 @@ public class Utils {
 			ArrayList<String> stats = new ArrayList<>(getPlayerStats(data, data.getLanguage(), DisplayStyle.INVENTORY));
 			String title = stats.get(0);
 			stats.remove(0);
-			return new ItemBuilder(Material.SKULL_ITEM).setSkullOwner(player.getName()).setName(title).setLore(Arrays.asList(assignArrayToString(stats).split("\n"))).toItemStack();
+			return new ItemBuilder(Material.SKULL_ITEM, 1, (byte) SkullType.PLAYER.ordinal()).setSkullOwner(player.getName()).setName(title).setLore(Arrays.asList(assignArrayToString(stats).split("\n"))).toItemStack();
 		} else {
-			Map<String, Integer> ranking = type.getRanking();
+			Map<String, Integer> ranking = type.getRanking(ConfigManager.getInt(Field.RANKING_TOP));
 			ArrayList<String> lore = new ArrayList<>();
 			lore.add("");
 			int i = 1;
@@ -94,7 +95,7 @@ public class Utils {
 				lore.add(lang.getMessage(MsgEnum.RANKING_FORMAT).replaceAll("%RANK%", i + "").replaceAll("%PLAYER%", (player.getName().equals(entry.getKey()) ? ChatColor.LIGHT_PURPLE : "") + entry.getKey()).replaceAll("%VALUE%", entry.getValue() + ""));
 				i++;
 			}
-			return new ItemBuilder(Material.ITEM_FRAME).setName(lang.getMessage(MsgEnum.RANKING_BY).replaceAll("%RANKING%", lang.getMessage(type.getMessage()))).setLore(lore).toItemStack();
+			return new ItemBuilder(Material.PAPER).setName(lang.getMessage(MsgEnum.RANKING_BY).replaceAll("%RANKING%", lang.getMessage(type.getMessage()))).setLore(lore).toItemStack();
 		}
 	}
 
