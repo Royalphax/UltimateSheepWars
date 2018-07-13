@@ -17,7 +17,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.util.Vector;
 
 import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
-import fr.asynchronous.sheepwars.core.handler.PlayerData;
+import fr.asynchronous.sheepwars.core.data.PlayerData;
 import fr.asynchronous.sheepwars.core.handler.Sounds;
 
 public class EntityUtils {
@@ -48,7 +48,7 @@ public class EntityUtils {
 	public static void killPlayer(String reason, Player player) {
 		player.getWorld().strikeLightning(player.getLocation().add(0, 5, 0));
 		player.damage(player.getHealth());
-		Sounds.playSound(player, player.getLocation(), Sounds.GHAST_SCREAM, 1f, 1f);
+		Sounds.playSoundAll(player.getLocation(), Sounds.GHAST_SCREAM, 10f, 1f);
 		for (Player p : Bukkit.getOnlinePlayers()) {
 			p.sendMessage(ChatColor.RED + player.getName() + " was killed (" + reason + ")");
 		}
@@ -57,6 +57,7 @@ public class EntityUtils {
 	public static void kickPlayer(String reason, Player player) {
 		player.getWorld().strikeLightning(player.getLocation().add(0, 5, 0));
 		player.kickPlayer(ChatColor.RED + "You were kicked. " + reason);
+		Sounds.playSoundAll(player.getLocation(), Sounds.ENDERDRAGON_GROWL, 10f, 1f);
 		for (Player p : Bukkit.getOnlinePlayers()) {
 			p.sendMessage(ChatColor.RED + player.getName() + " was kicked (" + reason + ")");
 		}

@@ -81,6 +81,8 @@ public class ItemBuilder {
 
 	public ItemBuilder setSkullOwner(String owner) {
 		try {
+			if (is.getDurability() != SkullType.PLAYER.ordinal())
+				is = new ItemStack(Material.SKULL_ITEM, is.getAmount(), (short) SkullType.PLAYER.ordinal());
 			SkullMeta im = (SkullMeta) is.getItemMeta();
 			im.setOwner(owner);
 			is.setItemMeta(im);
@@ -112,7 +114,13 @@ public class ItemBuilder {
     }
 
 	public ItemBuilder addIllegallyGlow() {
-		ItemStack newItem = UltimateSheepWarsPlugin.getVersionManager().getNMSUtils().setIllegallyGlowing(is);
+		ItemStack newItem = UltimateSheepWarsPlugin.getVersionManager().getNMSUtils().setIllegallyGlowing(is, true);
+		is = newItem;
+		return this;
+	}
+	
+	public ItemBuilder removeIllegallyGlow() {
+		ItemStack newItem = UltimateSheepWarsPlugin.getVersionManager().getNMSUtils().setIllegallyGlowing(is, false);
 		is = newItem;
 		return this;
 	}
@@ -195,14 +203,24 @@ public class ItemBuilder {
 		is.setItemMeta(im);
 		return this;
 	}
+	
+	public ItemBuilder setColor(DyeColor color) {
+		Material material = this.is.getType();
+		if (material.equals(Material.INK_SACK)) {
+			this.is = new ItemStack(material, this.is.getAmount(), color.getDyeData());
+		} else if (Arrays.asList(Material.WOOL, Material.STAINED_GLASS_PANE, Material.STAINED_GLASS).contains(material)) {
+			this.is = new ItemStack(material, this.is.getAmount(), color.getWoolData());
+		}
+		return this;
+	}
 
-	public ItemBuilder setDyeColor(DyeColor color) {
+	/**public ItemBuilder setDyeColor(DyeColor color) {
 		MaterialData blockData = is.getData();
 		if (!(blockData instanceof Dye))
 		    return this;
 		Dye dyeData = (Dye) blockData;
 		dyeData.setColor(color);
-		is = dyeData.toItemStack(is.getAmount());
+		is.setData(dyeData);
 		return this;
 	}
 
@@ -212,9 +230,9 @@ public class ItemBuilder {
 			return this;
 		Wool woolData = (Wool) blockData;
 		woolData.setColor(color);
-		is = woolData.toItemStack(is.getAmount());
+		is.setData(woolData);
 		return this;
-	}
+	}**/
 	
 	public ItemBuilder setBannerColor(DyeColor color) {
 		if (is.getType() != Material.BANNER)
