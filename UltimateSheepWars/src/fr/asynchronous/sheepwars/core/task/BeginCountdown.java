@@ -1,5 +1,7 @@
 package fr.asynchronous.sheepwars.core.task;
 
+import java.util.Arrays;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
@@ -37,6 +39,7 @@ public class BeginCountdown extends BukkitRunnable {
 
 	public BeginCountdown(final UltimateSheepWarsPlugin plugin) {
 		this.plugin = plugin;
+		this.timeUntilStart = ConfigManager.getInt(Field.COUNTDOWN);
 		plugin.setPreGameTask(this);
 		this.runTaskTimer(plugin, 0L, 20L);
 		start();
@@ -53,7 +56,7 @@ public class BeginCountdown extends BukkitRunnable {
 				started = false;
 			} else {
 				GameState.setCurrentStep(GameState.INGAME);
-				for (TeamManager team : TeamManager.values())
+				for (TeamManager team : Arrays.asList(TeamManager.RED, TeamManager.BLUE))
 					team.inGameRules();
 				for (Language lang : Language.getLanguages()) {
 					lang.getScoreboardWrapper().setLine(8, ChatColor.RED + "", true);
@@ -75,13 +78,12 @@ public class BeginCountdown extends BukkitRunnable {
 				Boolean shakeUp = (TeamManager.BLUE.getOnlinePlayers().isEmpty() || TeamManager.RED.getOnlinePlayers().isEmpty());
 				for (Player player : Bukkit.getOnlinePlayers()) {
 					PlayerData data = PlayerData.getPlayerData(player);
-					TeamManager team = data.getTeam();
-					if (team == TeamManager.SPEC || shakeUp) {
-						team.removePlayer(player);
-						team = TeamManager.getRandomTeam();
+					if (!data.hasTeam() || shakeUp) {
+						TeamManager team = TeamManager.getRandomTeam();
 						team.addPlayer(player);
 					}
 					EntityUtils.resetPlayer(player, GameMode.SURVIVAL);
+					final TeamManager team = data.getTeam();
 					final Color color = team.getLeatherColor();
 					final KitManager kit = data.getKit();
 					boolean equipBasics = kit.onEquip(player);
@@ -95,34 +97,6 @@ public class BeginCountdown extends BukkitRunnable {
 						player.getInventory().addItem(new ItemBuilder(Material.WOOD_SWORD).setUnbreakable().toItemStack());
 						player.getInventory().setItem(9, new ItemStack(Material.ARROW));
 					}
-					/**
-					player.getInventory().addItem(new ItemBuilder(Material.BOW).addEnchant(Enchantment.ARROW_INFINITE, 1).setUnbreakable().toItemStack());
-					player.getInventory().addItem(new ItemBuilder((kit == Kit.BETTER_SWORD) ? Material.STONE_SWORD : Material.WOOD_SWORD).setUnbreakable().toItemStack());
-					if (kit == Kit.BUILDER) {
-						player.getInventory().addItem(new ItemStack[]{new ItemStack(Material.SAND, 5, (short) 1)});
-						player.getInventory().addItem(new ItemStack[]{new ItemStack(Material.BRICK, 5, (short) 1)});
-						player.getInventory().addItem(new ItemStack[]{new ItemStack(Material.ANVIL, 1)});
-					} else if (kit == Kit.DESTROYER) {
-						player.getInventory().addItem(new ItemStack[]{new ItemStack(Material.TNT, 3)});
-					}
-					player.getInventory().setHelmet(new ItemBuilder(Material.LEATHER_HELMET).setLeatherArmorColor(color).addEnchant(Enchantment.PROTECTION_PROJECTILE, 2).setUnbreakable().toItemStack());
-					player.getInventory().setChestplate(new ItemBuilder(Material.LEATHER_CHESTPLATE).setLeatherArmorColor(color).addEnchant(Enchantment.PROTECTION_PROJECTILE, 2).setUnbreakable().toItemStack());
-					player.getInventory().setItem(8, new ItemBuilder(Material.LEATHER_CHESTPLATE).setLeatherArmorColor(color).setName(team.getColor() + "" + ChatColor.BOLD + team.getDisplayName(player)).setUnbreakable().toItemStack());
-					player.getInventory().setLeggings(new ItemBuilder(Material.LEATHER_LEGGINGS).setLeatherArmorColor(color).addEnchant(Enchantment.PROTECTION_PROJECTILE, 2).setUnbreakable().toItemStack());
-					if (kit != Kit.MOBILITY) {
-						player.getInventory().setBoots(new ItemBuilder(Material.LEATHER_BOOTS).setLeatherArmorColor(color).addEnchant(Enchantment.PROTECTION_PROJECTILE, 2).setUnbreakable().toItemStack());
-					} else {
-						player.getInventory().setBoots(new ItemBuilder(Material.LEATHER_BOOTS).setLeatherArmorColor(color).addEnchant(Enchantment.PROTECTION_PROJECTILE, 2).addEnchant(Enchantment.PROTECTION_FALL, 1).setUnbreakable().toItemStack());
-						player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 1));
-						player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, Integer.MAX_VALUE, 1));
-					}
-					player.getInventory().setItem(9, new ItemStack(Material.ARROW));
-					if (kit == Kit.MORE_HEALTH) {
-						player.setMaxHealth(24.0);
-						player.setHealthScaled(false);
-						player.setHealth(23.0);
-					}
-					**/
 					for (Language lang : Language.getLanguages())
 						lang.getScoreboardWrapper().getScoreboard().getObjective("health").getScore(player.getName()).setScore((kit == new MoreHealthKit() ? 24 : 20));
 					data.increaseGames(1);

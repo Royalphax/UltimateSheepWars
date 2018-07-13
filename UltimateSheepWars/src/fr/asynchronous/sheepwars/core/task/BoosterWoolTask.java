@@ -56,8 +56,10 @@ public class BoosterWoolTask extends BukkitRunnable {
 				Sounds.playSoundAll(null, Sounds.LEVEL_UP, 1f, 1f);
 			}
 			if (magicBlock.getType() == Material.WOOL) {
-				Wool wool = (Wool) magicBlock;
+				Wool wool = (Wool) magicBlock.getState().getData();
 				wool.setColor(RandomUtils.getRandom(this.colors));
+				magicBlock.getState().setData(wool);
+				magicBlock.getState().update();
 				UltimateSheepWarsPlugin.getVersionManager().getParticleFactory().playParticles(Particles.REDSTONE, this.magicBlockLocation, 1.0f, 1.0f, 1.0f, 20, 1.0f);
 			} else {
 				this.time = 0;
