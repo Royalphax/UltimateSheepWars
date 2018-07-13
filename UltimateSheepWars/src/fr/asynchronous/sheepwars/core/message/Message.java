@@ -9,8 +9,8 @@ import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
+import fr.asynchronous.sheepwars.core.data.PlayerData;
 import fr.asynchronous.sheepwars.core.exception.StringIdAlreadyUsed;
-import fr.asynchronous.sheepwars.core.handler.PlayerData;
 import fr.asynchronous.sheepwars.core.version.ATitleUtils.Type;
 
 public class Message {
@@ -75,29 +75,20 @@ public class Message {
 	
 	public static void broadcast(MsgEnum message) {
 		for (Player online : Bukkit.getOnlinePlayers())
-			sendMessage(online, "", message, "", null, "");
+			sendMessage(online, "", message, "");
 	}
 
 	public static void broadcast(String prefix, MsgEnum message, String suffix) {
 		for (Player online : Bukkit.getOnlinePlayers())
-			sendMessage(online, prefix, message, suffix, null, "");
+			sendMessage(online, prefix, message, suffix);
 	}
 
-	public static void broadcast(String prefix, MsgEnum message1, String between, MsgEnum message2, String suffix) {
-		for (Player online : Bukkit.getOnlinePlayers())
-			sendMessage(online, prefix, message1, between, message2, suffix);
-	}
-	
 	public static void sendMessage(Player player, MsgEnum message) {
 		sendMessage(player, "", message, "");
 	}
 
 	public static void sendMessage(Player player, String prefix, MsgEnum message, String suffix) {
-		sendMessage(player, prefix, message, suffix, null, "");
-	}
-
-	public static void sendMessage(Player player, String prefix, MsgEnum message1, String between, MsgEnum message2, String suffix) {
-		player.sendMessage(prefix + getMessage(player, message1) + between + getMessage(player, message2) + suffix);
+		player.sendMessage(prefix + getMessage(player, message) + suffix);
 	}
 
 	public static void broadcastTitle(MsgEnum title, MsgEnum subtitle) {
@@ -133,7 +124,7 @@ public class Message {
 	public static String getMessage(Player player, MsgEnum msgEnum) {
 		PlayerData data = PlayerData.getPlayerData(player);
 		Message msg = getMessage(msgEnum);
-		return (msg != null ? data.getLanguage().getMessage(msg) : "NullPointerException");
+		return (msg != null ? data.getLanguage().getMessage(msg) : "ERROR - PLEASE CONTACT THE DEVELOPER");
 	}
 	
 	public static Message getMessage(MsgEnum msgEnum) {
@@ -165,13 +156,13 @@ public class Message {
 		
 		JOIN_TITLE("&6UltimateSheepWars&8: &e%ONLINE_PLAYERS%&7/&e%MAX_PLAYERS%"),
 		JOIN_SUBTITLE("&aChoose your team and kit"),
-		BOARDING_TITLE("&5â˜ &f Away boarders &5â˜ "),
+		BOARDING_TITLE("&5☠ &fAway boarders &5☠"),
 		BOARDING_SUBTITLE("&6One boarding sheep every minute !"),
 		BOOSTERS_MESSAGE("&5&k||&a Bonus Wool &5&k||&6 Hit magical blocks !"),
 		FINISH_EQUALITY(getDecoration() + ChatColor.AQUA + ChatColor.BOLD + " Equality " + getDecoration()),
-		GAME_END_EQUALITY_DESCRIPTION("&aTime is up"),
-		PLAYER_JOIN_MESSAGE("%PLAYER% &ahas joined the game !"),
-		TEAM_JOIN_MESSAGE("You join the %TEAM% team"),
+		GAME_END_EQUALITY_DESCRIPTION("&aTime is up!"),
+		PLAYER_JOIN_MESSAGE("&e%PLAYER% &ahas joined the game !"),
+		TEAM_JOIN_MESSAGE("&7You join the %TEAM% team"),
 		STATS_WIN_RATE("Average Win Rate"),
 		STATS_KD_RATIO("Kills/Deaths Ratio"),
 		STATS_KILL("Enemies Killed"),
@@ -193,6 +184,9 @@ public class Message {
 		RANKING_DEATH("&eDeaths"),
 		RANKING_VICTORY("&eVictories"),
 		RANKING_GAME_PLAYED("&eGame Played"),
+		CLOSE_INVENTORY_ITEM("&cClose"),
+		SWITCH_TO_RANKING_LORE("&b&lClick to display rankings"),
+		SWITCH_TO_KITS_SELECTION_LORE("&b&lClick to display kits"),
 		STARTING_GAME("&6&lGame start in &e&l%TIME%"),
 		HOURS("hours"),
 		HOUR("hour"),
@@ -232,18 +226,18 @@ public class Message {
 		KIT_MOBILITY_NAME("&eMobility"),
 		KIT_BUILDER_NAME("&eBuilder"),
 		KIT_DESTROYER_NAME("&eDestroyer"),
-		KIT_AMORED_SHEEP_NAME("&eArmored sheep"),
+		KIT_ARMORED_SHEEP_NAME("&eArmored sheep"),
 		KIT_MORE_SHEEP_NAME("&eMore sheeps"),
 		KIT_RANDOM_NAME("&eRandom"),
 		KIT_NULL_NAME("&eNone"),
 		KIT_MORE_SHEEP_DESCRIPTION("&7Gives chances to have\n&7extra sheeps\n&7\n&b+15% &7to receive one more sheep"),
 		KIT_BETTER_BOW_DESCRIPTION("&7Improves your bow\n&7and give it critical & punch\n&7\n&b20%&7 chance to punch\n&7&b10% &7chance to critical"),
-		KIT_MORE_HEALTH_DESCRIPTION("&7Increases health by &b2 &câ�¤"),
+		KIT_MORE_HEALTH_DESCRIPTION("&7Increases health by &b2 &chearts"),
 		KIT_BETTER_SWORD_DESCRIPTION("&7Improves your sword\n&7\n&b5% &7chance to critical"),
 		KIT_MOBILITY_DESCRIPTION("&7Improves your mobility\n&7\n&7Swiftness I\n&7Feather falling I"),
 		KIT_BUILDER_DESCRIPTION("&7Gives you an anvil, sand and bricks\n&7\n&bx1 &7anvil\n&bx5 &7bricks\n&bx5 &7sand blocks"),
 		KIT_DESTROYER_DESCRIPTION("&7Gives you TNT and improve your bow\n&7Right click to launch TNT !\n&7\n&bx3 &7TNT block\n&7&b5% &7chance to put your arrows in fire"),
-		KIT_AMORED_SHEEP_DESCRIPTION("&7Increases resistance and\n&7health points of sheeps\n&7\n&b+150% &7health"),
+		KIT_ARMORED_SHEEP_DESCRIPTION("&7Increases resistance and\n&7health points of sheeps\n&7\n&b+150% &7health"),
 		KIT_RANDOM_DESCRIPTION("&7This is random."),
 		KIT_NULL_DESCRIPTION("&7Select no kit."),
 		KIT_INVENTORY_NAME("Kit: %KIT%"),

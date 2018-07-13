@@ -14,9 +14,9 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 
 import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
+import fr.asynchronous.sheepwars.core.data.PlayerData;
 import fr.asynchronous.sheepwars.core.handler.GameState;
 import fr.asynchronous.sheepwars.core.handler.MinecraftVersion;
-import fr.asynchronous.sheepwars.core.handler.PlayerData;
 import fr.asynchronous.sheepwars.core.manager.ConfigManager;
 import fr.asynchronous.sheepwars.core.manager.ConfigManager.Field;
 import fr.asynchronous.sheepwars.core.manager.ExceptionManager;
@@ -162,7 +162,9 @@ public class Language {
 		for (Language lang : languages)
 			if (lang.getLocale().equals(first + "_X"))
 				return lang;
-		return getDefaultLanguage();
+		if (!ConfigManager.getBoolean(Field.AUTO_GENERATE_LANGUAGES)) 
+			return getDefaultLanguage();
+		return createLanguageIfNotExist(locale, "", "", true);
 	}
 	
 	public static Language verify(String s) {
