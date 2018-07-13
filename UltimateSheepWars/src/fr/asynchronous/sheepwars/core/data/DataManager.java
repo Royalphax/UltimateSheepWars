@@ -90,7 +90,7 @@ public abstract class DataManager {
 				database.updateSQL(CREATE_DATABASE_REQUEST);
 				alterPlayerDataTable();
 				Double stop = (double) (System.currentTimeMillis() - start) / 1000.0;
-				plugin.getLogger().log(Level.INFO, "Connected to Free hosted Database (%ss)!", stop);
+				plugin.getLogger().log(Level.INFO, "Connected to Free hosted Database (" + stop + "s)!");
 				connectedToDatabase = true;
 			} catch (ClassNotFoundException | SQLException | IOException ex) {
 				plugin.getLogger().info("Free hosted Database unreachable (" + ex.getMessage() + ")!");
@@ -109,12 +109,12 @@ public abstract class DataManager {
 				database.updateSQL(CREATE_DATABASE_REQUEST);
 				alterPlayerDataTable();
 				Double stop = (double) (System.currentTimeMillis() - start) / 1000.0;
-				plugin.getLogger().log(Level.INFO, "Connected to Database (%ss)!", stop);
+				plugin.getLogger().log(Level.INFO, "Connected to Database (" + stop + "s)!");
 				connectedToDatabase = true;
 			} catch (ClassNotFoundException | SQLException ex) {
 				new ExceptionManager(ex).register(true);
 				Double stop = (double) (System.currentTimeMillis() - start) / 1000.0;
-				plugin.getLogger().log(Level.INFO, "Database unreachable (%ss)!", stop);
+				plugin.getLogger().log(Level.INFO, "Database unreachable (" + stop + "s)!");
 				connectedToDatabase = false;
 			}
 		}
