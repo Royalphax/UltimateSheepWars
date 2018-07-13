@@ -119,7 +119,7 @@ public class MainCommand implements CommandExecutor {
                 }
             }
             else if (sub.equalsIgnoreCase("start")) {
-            	if (!this.plugin.isSetPreGameTask() || !this.plugin.getPreGameTask().hasStarted())
+            	if (!this.plugin.hasPreGameTaskStarted())
             		new BeginCountdown(this.plugin);
             	this.plugin.getPreGameTask().shortenCountdown();
             }
