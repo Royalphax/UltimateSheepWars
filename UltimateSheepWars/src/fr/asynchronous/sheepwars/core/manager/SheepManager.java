@@ -114,7 +114,7 @@ public abstract class SheepManager {
 	}
 
 	public ItemStack getIcon(Player player) {
-		return new ItemBuilder(Material.WOOL).setWoolColor(this.color).setName(getName(player)).toItemStack();
+		return new ItemBuilder(Material.WOOL).setColor(this.color).setName(getName(player)).toItemStack();
 	}
 
 	public int getDuration() {
