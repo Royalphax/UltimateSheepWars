@@ -21,6 +21,7 @@ import fr.asynchronous.sheepwars.core.gui.base.GuiScreen;
 import fr.asynchronous.sheepwars.core.handler.Contributor;
 import fr.asynchronous.sheepwars.core.handler.Sounds;
 import fr.asynchronous.sheepwars.core.manager.TeamManager;
+import fr.asynchronous.sheepwars.core.task.BeginCountdown;
 import fr.asynchronous.sheepwars.core.util.EntityUtils;
 import fr.asynchronous.sheepwars.core.util.ItemBuilder;
 import fr.asynchronous.sheepwars.core.version.AAnvilGUI;
@@ -44,8 +45,8 @@ public class ContributorsInventory extends GuiScreen {
 			lores.add(ChatColor.YELLOW + "> " + ChatColor.GREEN + "Right click " + ChatColor.GRAY + "Kick him");
 			lores.add("");
 		}
-		setItem(new ItemBuilder(Material.WOOL).setWoolColor(DyeColor.RED).setName(ChatColor.RED + "" + ChatColor.BOLD + "Red Team").toItemStack(), 0);
-		setItem(new ItemBuilder(Material.WOOL).setWoolColor(DyeColor.BLUE).setName(ChatColor.BLUE + "" + ChatColor.BOLD + "Blue Team").toItemStack(), 18);
+		setItem(new ItemBuilder(Material.WOOL).setColor(DyeColor.RED).setName(ChatColor.RED + "" + ChatColor.BOLD + "Red Team").toItemStack(), 0);
+		setItem(new ItemBuilder(Material.WOOL).setColor(DyeColor.BLUE).setName(ChatColor.BLUE + "" + ChatColor.BOLD + "Blue Team").toItemStack(), 18);
 		if (this.contributor.getLevel() > 3) {
 			setItem(new ItemBuilder(Material.DIAMOND_CHESTPLATE).setName(ChatColor.AQUA + "" + ChatColor.BOLD + "GOD MODE").toItemStack(), 48);
 			setItem(new ItemBuilder(Material.FEATHER).setName(ChatColor.AQUA + "" + ChatColor.BOLD + "FLY").toItemStack(), 47);
@@ -75,10 +76,10 @@ public class ContributorsInventory extends GuiScreen {
 				break;
 		}
 		for (int i = 36; i < 45; i++)
-			setItem(new ItemBuilder(Material.STAINED_GLASS_PANE).setDyeColor(DyeColor.GRAY).toItemStack(), i);
-		setItem(new ItemBuilder(Material.INK_SACK).setDyeColor((this.contributor.isEffectActive() ? DyeColor.LIME : DyeColor.GRAY)).setName(ChatColor.YELLOW + "Contributor Particles: " + (this.contributor.isEffectActive() ? ChatColor.GREEN : ChatColor.RED) + ChatColor.BOLD + (this.contributor.isEffectActive() ? "ON" : "OFF")).setLore(ChatColor.GRAY + "Click to toggle it!").toItemStack(), 49);
-		if (this.plugin.getPreGameTask().hasStarted() && !this.plugin.getPreGameTask().wasForced())
-			setItem(new ItemBuilder(Material.WATCH).setName(ChatColor.GREEN + "Shorten countdown").addIllegallyGlow().toItemStack(), 46);
+			setItem(new ItemBuilder(Material.STAINED_GLASS_PANE).setColor(DyeColor.GRAY).toItemStack(), i);
+		setItem(new ItemBuilder(Material.INK_SACK).setColor((this.contributor.isEffectActive() ? DyeColor.LIME : DyeColor.GRAY)).setName(ChatColor.YELLOW + "Contributor Particles: " + (this.contributor.isEffectActive() ? ChatColor.GREEN : ChatColor.RED) + ChatColor.BOLD + (this.contributor.isEffectActive() ? "ON" : "OFF")).setLore(ChatColor.GRAY + "Click to toggle it!").toItemStack(), 49);
+		if (!this.plugin.hasPreGameTaskStarted() || !this.plugin.getPreGameTask().wasForced())
+			setItem(new ItemBuilder(Material.WATCH).setName(ChatColor.GREEN + "Shorten countdown").toItemStack(), 46);
 		setItem(new ItemBuilder(Material.BARRIER).setName(ChatColor.RED + "Close").toItemStack(), 53);
 	}
 
@@ -109,6 +110,7 @@ public class ContributorsInventory extends GuiScreen {
 					online.hidePlayer(clicker);
 				clicker.setAllowFlight(true);
 				clicker.setFlying(true);
+				clicker.setVelocity(new Vector(0, 3.0, 0));
 				if (clicker.getLocation().getY() <= 0)
 					clicker.setVelocity(new Vector(0, 10.0, 0));
 				clicker.closeInventory();
@@ -145,7 +147,9 @@ public class ContributorsInventory extends GuiScreen {
 				broadcastGui.open();
 			} else if (item.getItemMeta().getDisplayName().contains("Shorten countdown")) {
 				Sounds.playSoundAll(clicker.getLocation(), Sounds.NOTE_SNARE_DRUM, 1f, 1f);
-				this.plugin.getPreGameTask().shortenCountdown();
+				if (!this.plugin.hasPreGameTaskStarted())
+            		new BeginCountdown(this.plugin);
+            	this.plugin.getPreGameTask().shortenCountdown();
 				clicker.closeInventory();
 			} else if (Bukkit.getPlayer(ChatColor.stripColor(item.getItemMeta().getDisplayName())) != null) {
 				final Player subject = Bukkit.getPlayer(ChatColor.stripColor(item.getItemMeta().getDisplayName()));
