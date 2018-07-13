@@ -27,7 +27,7 @@ public class ProjectileHit extends UltimateSheepWarsEventListener
         if (event.getEntity() instanceof Arrow && event.getEntity().getShooter() instanceof Player) {
             final Arrow arrow = (Arrow)event.getEntity();
             final Player player = (Player)arrow.getShooter();
-            final Block block = UltimateSheepWarsPlugin.getVersionManager().getNMSUtils().getBoosterBlock(arrow, plugin);
+            final Block block = UltimateSheepWarsPlugin.getVersionManager().getNMSUtils().getBoosterBlock(arrow, this.plugin);
             if (block != null && block.getType() == Material.WOOL)
             {
             	final PlayerData data = PlayerData.getPlayerData(player);

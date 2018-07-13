@@ -111,7 +111,7 @@ public class PlayerJoin extends UltimateSheepWarsEventListener {
 			}
 			
 			/** S'il y a assez de joueurs, on lance le countdown **/
-			if ((Bukkit.getOnlinePlayers().size() >= ConfigManager.getInt(Field.MIN_PLAYERS)) && (!this.plugin.getPreGameTask().hasStarted()) && (!ConfigManager.getLocations(Field.BOOSTERS).isEmpty())) {
+			if ((Bukkit.getOnlinePlayers().size() >= ConfigManager.getInt(Field.MIN_PLAYERS)) && (!this.plugin.hasPreGameTaskStarted()) && (!ConfigManager.getLocations(Field.BOOSTERS).isEmpty())) {
 				new BeginCountdown(this.plugin);
 			}
 			

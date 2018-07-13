@@ -51,7 +51,6 @@ public class PlayerDeath extends UltimateSheepWarsEventListener
         final TeamManager playerTeam = playerData.getTeam();
         if (!GameState.isStep(GameState.WAITING) && !playerData.isSpectator()) {
             final Player killer = player.getKiller();
-            final PlayerData killerData = PlayerData.getPlayerData(killer);
             if (killer != null) {
             	Sounds.playSound(killer, player.getLocation(), Sounds.VILLAGER_HIT, 1f, 1f);
             	killer.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 5, 1));
@@ -66,7 +65,7 @@ public class PlayerDeath extends UltimateSheepWarsEventListener
             	{
             		online.sendMessage(data.getLanguage().getMessage(MsgEnum.DIED_MESSAGE).replaceAll("%VICTIM%", playerTeam.getColor() + player.getName()));
             	} else {
-            		online.sendMessage(data.getLanguage().getMessage(MsgEnum.SLAYED_MESSAGE).replaceAll("%VICTIM%", playerTeam.getColor() + player.getName()).replaceAll("%KILLER%", killerData.getTeam().getColor() + killer.getName()));
+            		online.sendMessage(data.getLanguage().getMessage(MsgEnum.SLAYED_MESSAGE).replaceAll("%VICTIM%", playerTeam.getColor() + player.getName()).replaceAll("%KILLER%", PlayerData.getPlayerData(killer).getTeam().getColor() + killer.getName()));
             	}
             }
             Sounds.playSoundAll(player.getLocation(), Sounds.VILLAGER_DEATH, 1.0f, 2.0f);
@@ -80,7 +79,7 @@ public class PlayerDeath extends UltimateSheepWarsEventListener
             final Random rdm = new Random();
             for (int i = 0; i < 5; i++)
             {
-            	final ItemBuilder itemBuilder = RandomUtils.getRandom(new ItemBuilder(Material.INK_SACK).setDyeColor(DyeColor.RED), new ItemBuilder(Material.BONE));
+            	final ItemBuilder itemBuilder = RandomUtils.getRandom(new ItemBuilder(Material.INK_SACK).setColor(DyeColor.RED), new ItemBuilder(Material.BONE));
             	final ItemStack deathStack = itemBuilder.toItemStack();
             	final Item item = w.dropItem(loc, deathStack);
             	item.setVelocity(RandomUtils.getRandomVector());
