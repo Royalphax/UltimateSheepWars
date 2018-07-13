@@ -18,10 +18,10 @@ commands:
     description: Return to hub
   contributor:
     aliases: [contrib, c]
-    description: Only for contributors :)
+    description: Only for contributors
 permissions:
   sheepwars.admin:
-    description: Become an admin of sheepwars
+    description: Become an administrator of sheepwars
     default: op
   sheepwars.teams.bypass:
     description: Bypass team conditions 
