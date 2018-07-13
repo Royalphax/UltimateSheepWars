@@ -5,8 +5,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -25,7 +29,6 @@ import fr.asynchronous.sheepwars.core.manager.TeamManager;
 import fr.asynchronous.sheepwars.core.message.Language;
 import fr.asynchronous.sheepwars.core.message.Message;
 import fr.asynchronous.sheepwars.core.message.Message.MsgEnum;
-import fr.asynchronous.sheepwars.core.util.EntityUtils;
 
 public class PlayerData extends DataManager {
 
@@ -66,7 +69,6 @@ public class PlayerData extends DataManager {
 		this.name = player.getName();
 		this.language = Language.getDefaultLanguage();
 		this.particle = true;
-		particlePlayers.add(player);
 		this.wins = 0;
 		this.kills = 0;
 		this.actualKills = 0;
@@ -127,7 +129,7 @@ public class PlayerData extends DataManager {
 
 	public List<KitManager> getKits() {
 		List<KitManager> kits = new ArrayList<>(this.kits);
-		for (KitManager kit : kits)
+		for (KitManager kit : this.kits)
 			if (kit.getId() == 9 || kit.getId() == 8)
 				kits.remove(kit);
 		return kits;
@@ -204,12 +206,16 @@ public class PlayerData extends DataManager {
 
 	public void setAllowParticles(final Boolean particle) {
 		this.particle = particle;
-		if (particle && !particlePlayers.contains(this.player)) {
-			particlePlayers.add(this.player);
+		if (particle) {
+			if (!particlePlayers.contains(this.player))
+				particlePlayers.add(this.player);
+			if (this.player.isOnline())
+				this.getPlayer().resetPlayerWeather();
 		} else {
 			if (particlePlayers.contains(this.player))
 				particlePlayers.remove(this.player);
-			EntityUtils.setWeatherPlayer(WeatherType.CLEAR, this.player);
+			if (this.player.isOnline())
+				this.getPlayer().setPlayerWeather(WeatherType.CLEAR);
 		}
 	}
 
@@ -304,7 +310,7 @@ public class PlayerData extends DataManager {
 	}
 
 	public boolean isSpectator() {
-		return (this.team == TeamManager.SPEC);
+		return (this.team != null && this.team == TeamManager.SPEC);
 	}
 
 	@Override
@@ -351,6 +357,7 @@ public class PlayerData extends DataManager {
 		} else {
 			this.loaded = true;
 		}
+		particlePlayers.add(player);
 		dataMap.put(player, this);
 	}
 
@@ -456,7 +463,7 @@ public class PlayerData extends DataManager {
 			}
 		}
 
-		public Map<String, Integer> getRanking(int limit) {
+		public Map<String, Integer> getRanking(int limit) { 
 			Map<String, Integer> output = new HashMap<>();
 			int i = 0;
 			Iterator<Entry<String, Integer>> iter = this.playerTop.entrySet().iterator();
@@ -465,7 +472,7 @@ public class PlayerData extends DataManager {
 				output.put(curr.getKey(), curr.getValue());
 				i++;
 			}
-			return output;
+			return sortByValue(output);
 			
 		}
 
@@ -474,6 +481,24 @@ public class PlayerData extends DataManager {
 				if (data.id == id)
 					return data;
 			return null;
+		}
+		
+		private static Map<String, Integer> sortByValue(Map<String, Integer> unsortMap) {
+
+			List<Map.Entry<String, Integer>> list = new LinkedList<Map.Entry<String, Integer>>(unsortMap.entrySet());
+
+			Collections.sort(list, new Comparator<Map.Entry<String, Integer>>() {
+				public int compare(Map.Entry<String, Integer> o1, Map.Entry<String, Integer> o2) {
+					return -(o1.getValue()).compareTo(o2.getValue());
+				}
+			});
+
+			Map<String, Integer> sortedMap = new LinkedHashMap<String, Integer>();
+			for (Map.Entry<String, Integer> entry : list) {
+				sortedMap.put(entry.getKey(), entry.getValue());
+			}
+
+			return sortedMap;
 		}
 	}
 }
