@@ -12,7 +12,7 @@ import fr.asynchronous.sheepwars.core.util.RandomUtils;
 public class RandomKit extends KitManager {
 
 	public RandomKit() {
-		super(9, MsgEnum.KIT_RANDOM_NAME, MsgEnum.KIT_RANDOM_DESCRIPTION, "", 0, 0, new ItemBuilder(Material.SKULL_ITEM).setSkullTexture("http://textures.minecraft.net/texture/cc7d1b18398acd6e7e692a833a2217aea6b5a770f42c43513e4358cacd1b9c"));
+		super(9, MsgEnum.KIT_RANDOM_NAME, MsgEnum.KIT_RANDOM_DESCRIPTION, "", 0, 0, new ItemBuilder(Material.SKULL_ITEM).setSkullTexture("http://textures.minecraft.net/texture/797955462e4e576664499ac4a1c572f6143f19ad2d6194776198f8d136fdb2"));
 	}
 
 	@Override

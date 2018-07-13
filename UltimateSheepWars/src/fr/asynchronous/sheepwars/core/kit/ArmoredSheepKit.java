@@ -30,7 +30,7 @@ public class ArmoredSheepKit extends KitManager {
 	public void onSheepLaunch(final SheepLaunchEvent event) {
 		final PlayerData data = PlayerData.getPlayerData(event.getLauncher());
 		if (data.getKit().getId() == this.getId()) {
-			UltimateSheepWarsPlugin.getVersionManager().getNMSUtils().setHealth(event.getEntity(), ConfigManager.getDouble(Field.SHEEP_HEALTH) + 6.0);
+			UltimateSheepWarsPlugin.getVersionManager().getNMSUtils().setHealth(event.getEntity(), ConfigManager.getInteger(Field.SHEEP_HEALTH) + 6.0);
 			event.getEntity().setMetadata("armored_sheep", new FixedMetadataValue(getPlugin(), true));
 		}
 	}

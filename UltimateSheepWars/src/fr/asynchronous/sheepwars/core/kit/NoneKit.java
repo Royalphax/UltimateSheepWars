@@ -11,7 +11,7 @@ import fr.asynchronous.sheepwars.core.util.ItemBuilder;
 public class NoneKit extends KitManager {
 
 	public NoneKit() {
-		super(8, MsgEnum.KIT_NULL_NAME, MsgEnum.KIT_NULL_DESCRIPTION, "", 0, 0, new ItemBuilder(Material.STAINED_GLASS_PANE).setDyeColor(DyeColor.RED));
+		super(8, MsgEnum.KIT_NULL_NAME, MsgEnum.KIT_NULL_DESCRIPTION, "", 0, 0, new ItemBuilder(Material.STAINED_GLASS_PANE, 1, (byte) DyeColor.RED.ordinal()));
 	}
 
 	@Override
