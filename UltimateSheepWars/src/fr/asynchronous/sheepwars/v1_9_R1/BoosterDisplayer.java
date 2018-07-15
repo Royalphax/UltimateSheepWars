@@ -29,7 +29,7 @@ public class BoosterDisplayer implements IBoosterDisplayer {
 
 	@Override
 	public void tickDisplay(BoosterManager booster, int duration) {
-		float progress = (duration / (booster.getDuration() * 20));
+		double progress = (double)duration / (double)(booster.getDuration() * 20);
 		this.barMap.get(booster).tick(progress);
 	}
 
@@ -63,7 +63,7 @@ public class BoosterDisplayer implements IBoosterDisplayer {
 			}
 		}
 
-		public void tick(float progress) {
+		public void tick(double progress) {
 			for (Entry<Language, BossBar> entry : this.bossBars.entrySet())
 				entry.getValue().setProgress(progress);
 		}

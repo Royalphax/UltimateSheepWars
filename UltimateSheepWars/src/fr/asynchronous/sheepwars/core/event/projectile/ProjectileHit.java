@@ -32,6 +32,7 @@ public class ProjectileHit extends UltimateSheepWarsEventListener
             final Player player = (Player)arrow.getShooter();
             //final Block block = UltimateSheepWarsPlugin.getVersionManager().getNMSUtils().getBoosterBlock(arrow, this.plugin);
             Block sourceBlock = arrow.getLocation().getBlock();
+            arrow.remove();
             ArrayList<Block> arrayList = BlockUtils.getSurrounding(sourceBlock, true);
             arrayList.add(sourceBlock);
             Block block = null;
@@ -54,13 +55,6 @@ public class ProjectileHit extends UltimateSheepWarsEventListener
                     	online.sendMessage(onlineData.getLanguage().getMessage(MsgEnum.BOOSTER_ACTION).replaceAll("%PLAYER%", data.getTeam().getColor() + player.getName()).replaceAll("%BOOSTER%", onlineData.getLanguage().getMessage(booster.getName())));
                     }
                 }
-             } else {
-            	 if (block == null) {
-            		 Bukkit.broadcastMessage("IL EST NULL PUTAIN");
-            	 } else {
-            		 block.setType(Material.BEDROCK);
-            	 }
-            	 
              }
         } 
     }
