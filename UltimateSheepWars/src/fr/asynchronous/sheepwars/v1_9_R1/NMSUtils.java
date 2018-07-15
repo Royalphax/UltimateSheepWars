@@ -1,7 +1,9 @@
 package fr.asynchronous.sheepwars.v1_9_R1;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
@@ -21,6 +23,7 @@ import org.bukkit.material.MaterialData;
 import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.manager.ExceptionManager;
 import fr.asynchronous.sheepwars.core.message.Language;
+import fr.asynchronous.sheepwars.core.util.BlockUtils;
 import fr.asynchronous.sheepwars.core.version.INMSUtils;
 import fr.asynchronous.sheepwars.v1_9_R1.util.SpecialMessage;
 import net.minecraft.server.v1_9_R1.ChatClickable.EnumClickAction;
@@ -56,11 +59,15 @@ public class NMSUtils implements INMSUtils {
 			final int x = fieldX.getInt(entityArrow);
 			final int y = fieldY.getInt(entityArrow);
 			final int z = fieldZ.getInt(entityArrow);
-			final Block block = arrow.getWorld().getBlockAt(x, y, z);
+			final Block sourceBlock = arrow.getWorld().getBlockAt(x, y, z);
 			entityArrow.die();
-			if (block.getType() == Material.WOOL && plugin.getGameTask().isBooster(block.getLocation())) {
-				return block;
-			}
+			ArrayList<Block> arrayList = BlockUtils.getSurrounding(sourceBlock, true);
+			sourceBlock.setType(Material.BEDROCK);
+			Bukkit.broadcastMessage("ON CHERCHE UN BLOCK DANS LE NMS " + x + " et " + y + " et " + z);
+            arrayList.add(sourceBlock);
+            for (Block block : arrayList)
+            	if (block.getType() == Material.WOOL && plugin.getGameTask().isBooster(block.getLocation()))
+            		return block;
 		} catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
 			new ExceptionManager(e).register(true);
 		}

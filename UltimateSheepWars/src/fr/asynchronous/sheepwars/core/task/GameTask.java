@@ -52,6 +52,7 @@ public class GameTask extends BukkitRunnable {
 		this.remainingDurationInSecs = (this.gameTime * 60);
 		this.boosterCountdown = this.boosterInterval;
 		this.giveSheepCountdown = 0;
+		new BoosterWoolTask(this).runTaskTimer(this.plugin, 0, 20);
 		this.runTaskTimer(plugin, 0, 20);
 	}
 
@@ -92,10 +93,7 @@ public class GameTask extends BukkitRunnable {
 				lang.refreshSheepCountdown(giveSheepCountdown);
 				lang.refreshBoosterCountdown(boosterCountdown);
 			}
-			if (remainingDurationInSecs == (this.gameTime * 60 - this.boosterInterval)) {
-				new BoosterWoolTask(this).runTaskTimer(this.plugin, 0, 20);
-				
-			} else if (remainingDurationInSecs == (this.boardingTime * 60)) {
+			if (remainingDurationInSecs == (this.boardingTime * 60)) {
 				Message.broadcastTitle(MsgEnum.BOARDING_TITLE, MsgEnum.BOARDING_SUBTITLE);
 				new GiveSheepTask(new BoardingSheep()).runTaskTimer(this.plugin, 0, (20*60));
 				

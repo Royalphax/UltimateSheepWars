@@ -18,9 +18,7 @@ import org.bukkit.inventory.meta.BannerMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.inventory.meta.SkullMeta;
-import org.bukkit.material.Dye;
 import org.bukkit.material.MaterialData;
-import org.bukkit.material.Wool;
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;

@@ -40,19 +40,20 @@ public class BoosterWoolTask extends BukkitRunnable {
 		this.boosterInterval = ConfigManager.getInt(Field.BOOSTER_INTERVAL);
 		this.boosterLifeTime = ConfigManager.getInt(Field.BOOSTER_LIFE_TIME);
 		this.maxWait = this.boosterInterval + this.boosterLifeTime;
-		this.time = this.boosterInterval;
+		this.time = this.boosterInterval - 1;
 		for (BoosterManager boost : BoosterManager.getAvailableBoosters())
 			this.colors.add(boost.getDisplayColor().getColor());
 	}
 
 	public void run() {
 		this.currentTask.setBoosterCountdown(this.time);
-		if (this.time <= 0) {
-			if (this.firstTime) {
-				this.firstTime = false;
-				Message.broadcast(MsgEnum.BOOSTERS_MESSAGE);
-			}
-			if (this.time == this.boosterLifeTime) {
+		if (this.time <= 0 || this.time > this.boosterInterval) {
+			if (this.time == 0) {
+				this.time = this.maxWait;
+				if (this.firstTime) {
+					this.firstTime = false;
+					Message.broadcast(MsgEnum.BOOSTERS_MESSAGE);
+				}
 				this.magicBlockLocation = ConfigManager.getRdmLocationFromList(Field.BOOSTERS);
 				this.magicBlock = this.magicBlockLocation.getBlock();
 				this.lastSavedMaterial = this.magicBlock.getType();
@@ -60,18 +61,12 @@ public class BoosterWoolTask extends BukkitRunnable {
 				Sounds.playSoundAll(null, Sounds.LEVEL_UP, 1f, 1f);
 			}
 			if (magicBlock.getType() == Material.WOOL) {
-				Wool wool = (Wool) magicBlock.getState().getData();
-				wool.setColor(RandomUtils.getRandom(this.colors));
-				magicBlock.getState().setData(wool);
-				magicBlock.getState().update();
+				this.magicBlock.setData(RandomUtils.getRandom(this.colors).getWoolData());
 				UltimateSheepWarsPlugin.getVersionManager().getParticleFactory().playParticles(Particles.REDSTONE, this.magicBlockLocation, 1.0f, 1.0f, 1.0f, 20, 1.0f);
-			} else {
-				this.time = 0;
 			}
 		}
-		if (this.time <= 0 || !GameState.isStep(GameState.INGAME)) {
+		if (this.time == this.boosterInterval || !GameState.isStep(GameState.INGAME)) {
 			magicBlock.setType(this.lastSavedMaterial);
-			this.time = this.maxWait;
 			if (!GameState.isStep(GameState.INGAME))
 				this.cancel();
 		}
