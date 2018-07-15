@@ -132,20 +132,13 @@ public enum TeamManager {
 		return this.blocked;
 	}
 
-	public void broadcastMessage(final String msg) {
-		for (final Player player : this.getOnlinePlayers()) {
-			player.sendMessage(msg);
-		}
-	}
-
 	public Location getNextSpawn() {
-		if (getSpawns().isEmpty()) {
+		List<Location> spawns = getSpawns();
+		if (spawns.isEmpty())
 			return null;
-		}
-		if (getSpawns().size() == this.lastSpawn) {
+		if (spawns.size() == this.lastSpawn)
 			this.lastSpawn = 0;
-		}
-		return getSpawns().get(this.lastSpawn++);
+		return spawns.get(this.lastSpawn++);
 	}
 
 	public void inGameRules() {

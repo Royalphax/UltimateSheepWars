@@ -80,7 +80,7 @@ public class BeginCountdown extends BukkitRunnable {
 					PlayerData data = PlayerData.getPlayerData(player);
 					if (!data.hasTeam() || shakeUp) {
 						TeamManager team = TeamManager.getRandomTeam();
-						team.addPlayer(player);
+						data.setTeam(team);
 					}
 					EntityUtils.resetPlayer(player, GameMode.SURVIVAL);
 					final TeamManager team = data.getTeam();

@@ -34,52 +34,6 @@ public abstract class DataManager {
 		final boolean localhost = plugin.isLocalhostConnection();
 		final Long start = System.currentTimeMillis();
 		tryingToConnect = true;
-		/**new BukkitRunnable()
-    	{
-    		public void run()
-    		{
-    			if (ConfigManager.getBoolean(Field.ENABLE_MYSQL_FREE_HOST)) {
-    				plugin.getLogger().info("Connecting to free hosted Database ...");
-    				try {
-    					String content = new URLManager(Link.FREE_HOSTED_DB_ACCESS, localhost).read();
-    					final String[] contentSplitted = DataRegister.decode(content).split(",");
-    					database = new MySQLConnector((localhost ? "localhost" : contentSplitted[0]), contentSplitted[1], contentSplitted[2], contentSplitted[3], contentSplitted[4]);
-    					database.openConnection();
-    					database.updateSQL(CREATE_DATABASE_REQUEST);
-    					alterPlayerDataTable();
-    					Double stop = (double) (System.currentTimeMillis() - start) / 1000.0;
-    					plugin.getLogger().log(Level.INFO, "Connected to Free hosted Database (%ss)!", stop);
-    					connectedToDatabase = true;
-    				} catch (ClassNotFoundException | SQLException | IOException ex) {
-    					plugin.getLogger().info("Free hosted Database unreachable (" + ex.getMessage() + ")!");
-    					connectedToDatabase = false;
-    				}
-    			} 
-    			if (ConfigManager.getBoolean(Field.ENABLE_MYSQL) && !connectedToDatabase) {
-    				String host = ConfigManager.getString(Field.MYSQL_HOST);
-    				Integer port = ConfigManager.getInt(Field.MYSQL_PORT);
-    				String db = ConfigManager.getString(Field.MYSQL_DATABASE);
-    				String user = ConfigManager.getString(Field.MYSQL_USER);
-    				String pass = ConfigManager.getString(Field.MYSQL_PASSWORD);
-    				database = new MySQLConnector(host, port, db, user, pass);
-    				try {
-    					database.openConnection();
-    					database.updateSQL(CREATE_DATABASE_REQUEST);
-    					alterPlayerDataTable();
-    					Double stop = (double) (System.currentTimeMillis() - start) / 1000.0;
-    					plugin.getLogger().log(Level.INFO, "Connected to Database (%ss)!", stop);
-    					connectedToDatabase = true;
-    				} catch (ClassNotFoundException | SQLException ex) {
-    					new ExceptionManager(ex).register(true);
-    					Double stop = (double) (System.currentTimeMillis() - start) / 1000.0;
-    					plugin.getLogger().log(Level.INFO, "Database unreachable (%ss)!", stop);
-    					connectedToDatabase = false;
-    				}
-    			}
-    			tryingToConnect = false;
-    	    	initRanking();
-    		}
-    	}.runTaskAsynchronously(plugin); - WHY RUNNING IT ASYNCHRONOUSLY ? - **/
     	if (ConfigManager.getBoolean(Field.ENABLE_MYSQL_FREE_HOST)) {
 			plugin.getLogger().info("Connecting to free hosted Database ...");
 			try {
@@ -124,6 +78,11 @@ public abstract class DataManager {
 	
 	private static void alterPlayerDataTable() {
 		try {
+			database.updateSQL("CREATE TABLE IF NOT EXISTS players_backup SELECT * FROM players;");
+		} catch (ClassNotFoundException | SQLException exception) {
+			// Do nothing
+		}
+		try {
 			database.updateSQL("ALTER TABLE `players` DROP `lang`;");
 		} catch (ClassNotFoundException | SQLException exception) {
 			// Do nothing
@@ -145,12 +104,11 @@ public abstract class DataManager {
 		}
 		try {
 			database.updateSQL("ALTER TABLE `players` ADD `last_kit` INT(1) NOT NULL DEFAULT '0' AFTER `particles`;");
-			database.updateSQL("ALTER TABLE `players` CHANGE `last_kit` `kits` TEXT NOT NULL;");
 		} catch (ClassNotFoundException | SQLException exception) {
 			// Do nothing
 		}
 		try {
-			database.updateSQL("ALTER TABLE `players` ADD `kits` TEXT NOT NULL DEFAULT '0' AFTER `particles`;");
+			database.updateSQL("ALTER TABLE `players` CHANGE `last_kit` `kits` TEXT NOT NULL;");
 		} catch (ClassNotFoundException | SQLException exception) {
 			// Do nothing
 		}

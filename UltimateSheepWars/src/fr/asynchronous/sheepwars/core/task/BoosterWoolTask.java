@@ -32,6 +32,7 @@ public class BoosterWoolTask extends BukkitRunnable {
 	private Block magicBlock;
 	private Location magicBlockLocation;
 	private Material lastSavedMaterial;
+	private Boolean firstTime = true;
 	private List<DyeColor> colors = new ArrayList<>();
 	
 	public BoosterWoolTask(GameTask currentTask) {
@@ -39,15 +40,18 @@ public class BoosterWoolTask extends BukkitRunnable {
 		this.boosterInterval = ConfigManager.getInt(Field.BOOSTER_INTERVAL);
 		this.boosterLifeTime = ConfigManager.getInt(Field.BOOSTER_LIFE_TIME);
 		this.maxWait = this.boosterInterval + this.boosterLifeTime;
-		this.time = this.maxWait - this.boosterInterval;
+		this.time = this.boosterInterval;
 		for (BoosterManager boost : BoosterManager.getAvailableBoosters())
 			this.colors.add(boost.getDisplayColor().getColor());
-		Message.broadcast(MsgEnum.BOOSTERS_MESSAGE);
 	}
 
 	public void run() {
 		this.currentTask.setBoosterCountdown(this.time);
-		if (this.time <= this.boosterLifeTime) {
+		if (this.time <= 0) {
+			if (this.firstTime) {
+				this.firstTime = false;
+				Message.broadcast(MsgEnum.BOOSTERS_MESSAGE);
+			}
 			if (this.time == this.boosterLifeTime) {
 				this.magicBlockLocation = ConfigManager.getRdmLocationFromList(Field.BOOSTERS);
 				this.magicBlock = this.magicBlockLocation.getBlock();

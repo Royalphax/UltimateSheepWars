@@ -11,8 +11,6 @@ import org.bukkit.entity.Sheep;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.Vector;
 
 import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.data.PlayerData;
@@ -90,26 +88,6 @@ public class FrozenSheep extends SheepManager
 
 	@Override
 	public void onFinish(Player player, Sheep bukkitSheep, boolean death, Plugin plugin) {
-		if (!death) {
-            final Location location = bukkitSheep.getLocation();
-            UltimateSheepWarsPlugin.getVersionManager().getWorldUtils().createExplosion(player, bukkitSheep.getLocation(), 3.5f);
-            for (int i = 0; i < MathUtils.random(3, 6); ++i) {
-            	final org.bukkit.entity.Sheep baby = UltimateSheepWarsPlugin.getVersionManager().getSheepFactory().spawnSheepStatic(location, player, plugin);
-                baby.setColor(DyeColor.values()[MathUtils.random.nextInt(DyeColor.values().length)]);
-                baby.setVelocity(new Vector(MathUtils.random(1.2f), 1.5f, MathUtils.random(1.2f)));
-                baby.setBaby();
-                new BukkitRunnable() {
-                	int t = 0;
-                    public void run() {
-                    	t++;
-                    	if (baby.isOnGround() || t > 20*5) {
-                    		this.cancel();
-                    		baby.remove();
-                    		UltimateSheepWarsPlugin.getVersionManager().getWorldUtils().createExplosion(player, bukkitSheep.getLocation(), 1.5f);
-                    	}
-                    }
-                }.runTaskTimer(plugin, 0, 0);
-            }
-        }
+		// Do nothing
 	}
 }

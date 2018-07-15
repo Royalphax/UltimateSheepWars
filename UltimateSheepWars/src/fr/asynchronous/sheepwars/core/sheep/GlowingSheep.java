@@ -109,6 +109,6 @@ public class GlowingSheep extends SheepManager
 
 	@Override
 	public void onFinish(Player player, Sheep bukkitSheep, boolean death, Plugin plugin) {
-		// DO nothing
+		// Do nothing
 	}
 }
