@@ -75,7 +75,7 @@ public class BeginCountdown extends BukkitRunnable {
 					}
 					board.registerNewObjective("kills", "playerKillCount").setDisplaySlot(DisplaySlot.PLAYER_LIST);
 				}
-				Boolean shakeUp = (TeamManager.BLUE.getOnlinePlayers().isEmpty() || TeamManager.RED.getOnlinePlayers().isEmpty());
+				final boolean shakeUp = TeamManager.BLUE.getOnlinePlayers().isEmpty() || TeamManager.RED.getOnlinePlayers().isEmpty();
 				for (Player player : Bukkit.getOnlinePlayers()) {
 					PlayerData data = PlayerData.getPlayerData(player);
 					if (!data.hasTeam() || shakeUp) {

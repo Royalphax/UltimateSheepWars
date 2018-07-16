@@ -63,15 +63,15 @@ public class PlayerInteract extends UltimateSheepWarsEventListener
         				if (amount <= 0) {
         					newItem = new ItemStack(Material.AIR);
         				} else {
-        					newItem.setAmount(item.getAmount() - 1);
+        					newItem.setAmount(amount);
         				}
-        				player.setItemOnCursor(newItem);
+        				setItemInHand(newItem, player);
         				boolean launch = sheep.throwSheep(player, this.plugin);
         				if (launch) {
         					data.increaseSheepThrown(1);
         				} else {
-        					newItem.setAmount(item.getAmount());
-        					player.setItemOnCursor(newItem);
+        					newItem.setAmount(amount + 1);
+        					setItemInHand(newItem, player);
         				}
         				player.updateInventory();
         			}
@@ -140,4 +140,8 @@ public class PlayerInteract extends UltimateSheepWarsEventListener
         	}
         }
     }
+	
+	public void setItemInHand(final ItemStack item, final Player player) {
+		UltimateSheepWarsPlugin.getVersionManager().getNMSUtils().setItemInHand(item, player);
+	}
 }

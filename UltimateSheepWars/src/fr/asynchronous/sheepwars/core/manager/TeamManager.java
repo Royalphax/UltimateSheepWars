@@ -103,7 +103,7 @@ public enum TeamManager {
 		player.setPlayerListName(this.color + ((player.getName().length() > 14) ? player.getName().substring(0, 14) : player.getName()));
 		for (Language lang : Language.getLanguages())
 			lang.getTeam(this.name).addEntry(player.getName());
-		if (this != TeamManager.SPEC) 
+		if (this != TeamManager.SPEC && this != TeamManager.NULL)
 			updateScoreboardTeamCount();
 	}
 
@@ -111,7 +111,7 @@ public enum TeamManager {
 		this.players.remove(player);
 		for (Language lang : Language.getLanguages())
 			lang.getTeam(this.name).removeEntry(player.getName());
-		if (this != TeamManager.SPEC)
+		if (this != TeamManager.SPEC && this != TeamManager.NULL)
 			updateScoreboardTeamCount();
 	}
 

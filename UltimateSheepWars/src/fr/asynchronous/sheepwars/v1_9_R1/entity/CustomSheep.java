@@ -36,9 +36,8 @@ public class CustomSheep extends EntitySheep {
 	private SheepManager sheep;
 	private Player player;
 	private net.minecraft.server.v1_9_R1.World world;
-	private boolean explosion = true;
-	private boolean ground;
-	private long defaultTicks;
+	private boolean ground = false;
+	private boolean isDead = false;
 	private long ticks;
 	private Plugin plugin;
 
@@ -56,13 +55,9 @@ public class CustomSheep extends EntitySheep {
 	@SuppressWarnings({"unchecked", "rawtypes"})
 	public CustomSheep(net.minecraft.server.v1_9_R1.World world, Player player, SheepManager sheep, Plugin plugin) {
 		this(world, player, plugin);
-		/**
-		 * getNavigation(); a(0.9F, 1.3F);
-		 **/
 
 		this.sheep = sheep;
-		this.ticks = (sheep.getDuration() == -1 ? Long.MAX_VALUE : sheep.getDuration() * 20);
-		this.defaultTicks = this.ticks;
+		this.ticks = sheep.getDuration() <= 0 ? Long.MAX_VALUE : sheep.getDuration() * 20;
 
 		setColor(EnumColor.valueOf(sheep.getColor().toString()));
 		sheep.onSpawn(player, getBukkitSheep(), plugin);
@@ -103,10 +98,6 @@ public class CustomSheep extends EntitySheep {
 		 */
 		super.move(d0, d1, d2);
 	}
-
-	/**
-	 * UTILE ? public void g(double d0, double d1, double d2) { }
-	 **/
 
 	@Override
 	public void g(float sideMot, float forMot) {
@@ -170,8 +161,41 @@ public class CustomSheep extends EntitySheep {
 		}
 		super.g(sideMot, forMot);
 	}
-
+	
 	@Override
+	public void n() {
+		try {
+			if (this.sheep != null) {
+				/** On gère les particules **/
+				if ((this.onGround || this.inWater || this.sheep.isFriendly()) && !this.ground)
+					this.ground = true;
+				if (!this.ground) {
+					UltimateSheepWarsPlugin.getVersionManager().getParticleFactory().playParticles(Particles.FIREWORKS_SPARK, getBukkitEntity().getLocation().add(0, 0.5, 0), 0.0F, 0.0F, 0.0F, 1, 0.0F);
+				}
+				else if (!this.isDead && (this.ticks <= 0 || !isAlive() || this.sheep.onTicking(this.player, this.ticks, getBukkitSheep(), this.plugin))) {
+					this.isDead = true;
+					boolean death = true;
+					if (!this.passengers.isEmpty())
+						for (Entity ent : this.passengers)
+							ent.getBukkitEntity().eject();
+					if (isAlive()) {
+						die();
+						death = false;
+					}
+					this.sheep.onFinish(this.player, getBukkitSheep(), death, this.plugin);
+					this.dropDeathLoot();
+					return;
+				}
+				this.ticks--;
+			}
+		} catch (Exception ex) {
+			return;
+		} finally {
+			super.n();
+		}
+	}
+
+	/**@Override
 	public void n() {
 		try {
 			if (this.sheep != null) {
@@ -204,7 +228,7 @@ public class CustomSheep extends EntitySheep {
 		} finally {
 			super.n();
 		}
-	}
+	}**/
 
 	public void dropDeathLoot() {
 		if (this.sheep.isDropAllowed()) {

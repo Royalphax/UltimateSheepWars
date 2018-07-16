@@ -16,10 +16,10 @@ import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.util.Vector;
 
 import fr.asynchronous.sheepwars.core.calendar.CalendarEvent;
 import fr.asynchronous.sheepwars.core.handler.Sounds;
+import fr.asynchronous.sheepwars.core.util.RandomUtils;
 
 public class EasterEggEvent extends CalendarEvent {
 
@@ -93,7 +93,7 @@ public class EasterEggEvent extends CalendarEvent {
 
 		Rabbit rab = (Rabbit) event.getEntity().getWorld().spawnEntity(top.getLocation(), EntityType.RABBIT);
 		rab.setBaby();
-		rab.setVelocity(new Vector(0, 0.2, 0));
+		rab.setVelocity(RandomUtils.getRandomVector().normalize().multiply(0.5));
 	}
 
 	public static int[] getEasterSundayDate(int year) {

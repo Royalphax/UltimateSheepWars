@@ -2,6 +2,7 @@ package fr.asynchronous.sheepwars.core.handler;
 
 public enum DisplayStyle {
 	
+	HOVER("HOVER"),
 	INVENTORY("INVENTORY"),
 	CHAT("CHAT");
 	

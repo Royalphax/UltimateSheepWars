@@ -75,8 +75,6 @@ public class GameTask extends BukkitRunnable {
 					}
 					this.stopGame(null);
 					return;
-				} else {
-					Bukkit.broadcastMessage(ChatColor.RED + "The game was stopped !");
 				}
 			}
 			/** Si c'est pas la fin du jeu, on fait les trucs habituels **/

@@ -1,17 +1,9 @@
 package fr.asynchronous.sheepwars.v1_9_R1;
 
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.DyeColor;
-import org.bukkit.Material;
-import org.bukkit.block.Block;
-import org.bukkit.craftbukkit.v1_9_R1.entity.CraftArrow;
 import org.bukkit.craftbukkit.v1_9_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_9_R1.inventory.CraftItemStack;
-import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -20,17 +12,13 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.material.Dye;
 import org.bukkit.material.MaterialData;
 
-import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
-import fr.asynchronous.sheepwars.core.manager.ExceptionManager;
 import fr.asynchronous.sheepwars.core.message.Language;
-import fr.asynchronous.sheepwars.core.util.BlockUtils;
 import fr.asynchronous.sheepwars.core.version.INMSUtils;
 import fr.asynchronous.sheepwars.v1_9_R1.util.SpecialMessage;
 import net.minecraft.server.v1_9_R1.ChatClickable.EnumClickAction;
 import net.minecraft.server.v1_9_R1.ChatHoverable;
 import net.minecraft.server.v1_9_R1.ChatMessage;
 import net.minecraft.server.v1_9_R1.ChatModifier;
-import net.minecraft.server.v1_9_R1.EntityArrow;
 import net.minecraft.server.v1_9_R1.EntityHuman;
 import net.minecraft.server.v1_9_R1.EntityPlayer;
 import net.minecraft.server.v1_9_R1.NBTTagCompound;
@@ -47,31 +35,8 @@ public class NMSUtils implements INMSUtils {
 	}
 
 	@Override
-	public Block getBoosterBlock(Arrow arrow, UltimateSheepWarsPlugin plugin) {
-		try {
-			final EntityArrow entityArrow = ((CraftArrow) arrow).getHandle();
-			final Field fieldX = EntityArrow.class.getDeclaredField("h");
-			final Field fieldY = EntityArrow.class.getDeclaredField("as");
-			final Field fieldZ = EntityArrow.class.getDeclaredField("at");
-			fieldX.setAccessible(true);
-			fieldY.setAccessible(true);
-			fieldZ.setAccessible(true);
-			final int x = fieldX.getInt(entityArrow);
-			final int y = fieldY.getInt(entityArrow);
-			final int z = fieldZ.getInt(entityArrow);
-			final Block sourceBlock = arrow.getWorld().getBlockAt(x, y, z);
-			entityArrow.die();
-			ArrayList<Block> arrayList = BlockUtils.getSurrounding(sourceBlock, true);
-			sourceBlock.setType(Material.BEDROCK);
-			Bukkit.broadcastMessage("ON CHERCHE UN BLOCK DANS LE NMS " + x + " et " + y + " et " + z);
-            arrayList.add(sourceBlock);
-            for (Block block : arrayList)
-            	if (block.getType() == Material.WOOL && plugin.getGameTask().isBooster(block.getLocation()))
-            		return block;
-		} catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
-			new ExceptionManager(e).register(true);
-		}
-		return null;
+	public void setItemInHand(final ItemStack item, final Player player) {
+		player.getInventory().setItemInMainHand(item);
 	}
 
 	@Override

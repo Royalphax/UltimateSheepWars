@@ -48,7 +48,7 @@ public class AsyncPlayerChat extends UltimateSheepWarsEventListener {
 				if (onlineData.getTeam() == TeamManager.SPEC) {
 					String hover = playerTeam.getColor() + onlineData.getLanguage().getMessage(MsgEnum.RECORDS).replaceAll("%PLAYER%", playerTeam.getColor() + "" + ChatColor.BOLD + player.getName()) + "\n\n" + ChatColor.GRAY + onlineData.getLanguage().getMessage(MsgEnum.DATABASE_NOT_CONNECTED);
 					if (DataManager.isConnected())
-						hover = Utils.assignArrayToString(Utils.getPlayerStats(data, onlineData.getLanguage(), DisplayStyle.CHAT));
+						hover = Utils.assignArrayToString(Utils.getPlayerStats(data, onlineData.getLanguage(), DisplayStyle.HOVER));
 					UltimateSheepWarsPlugin.getVersionManager().getEventHelper().onAsyncPlayerChat(prefix, suffix, online, event, hover, true);
 				}
 			}

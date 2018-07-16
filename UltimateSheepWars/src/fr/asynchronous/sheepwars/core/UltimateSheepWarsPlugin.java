@@ -28,6 +28,10 @@ import fr.asynchronous.sheepwars.core.booster.NauseaBooster;
 import fr.asynchronous.sheepwars.core.booster.PoisonBooster;
 import fr.asynchronous.sheepwars.core.booster.RegenerationBooster;
 import fr.asynchronous.sheepwars.core.booster.ResistanceBooster;
+import fr.asynchronous.sheepwars.core.calendar.event.AprilFoolEvent;
+import fr.asynchronous.sheepwars.core.calendar.event.ChristmassMonthEvent;
+import fr.asynchronous.sheepwars.core.calendar.event.EasterEggEvent;
+import fr.asynchronous.sheepwars.core.calendar.event.HappyNewYearEvent;
 import fr.asynchronous.sheepwars.core.command.ContributorCommand;
 import fr.asynchronous.sheepwars.core.command.HubCommand;
 import fr.asynchronous.sheepwars.core.command.LangCommand;
@@ -478,18 +482,20 @@ public class UltimateSheepWarsPlugin extends JavaPlugin {
 		
 		this.rewardManager = new RewardsManager(this);
 		
+		/** Register Kits **/
 		UltimateSheepWarsAPI.registerKits(this, new ArmoredSheepKit(), new BetterBowKit(), new BetterSwordKit(), new BuilderKit(), new DestroyerKit(),
 				new MobilityKit(), new MoreHealthKit(), new MoreSheepKit(), new NoneKit(), new RandomKit());
-		
+		/** Register Sheeps **/
 		UltimateSheepWarsAPI.registerSheeps(new BoardingSheep(), new DarkSheep(), new DistorsionSheep(), new EarthQuakeSheep(), new ExplosiveSheep(), 
 				new FragmentationSheep(), new FrozenSheep(), new HealerSheep(), new IncendiarySheep(), new IntergalacticSheep(), new LightningSheep(), 
 				new SeekerSheep(), new SwapSheep());
-
 		if (versionManager.getVersion().newerThan(MinecraftVersion.v1_9_R1))
 			UltimateSheepWarsAPI.registerSheep(new GlowingSheep());
-		
+		/** Register Boosters **/
 		UltimateSheepWarsAPI.registerBoosters(new ArrowBackBooster(), new ArrowFireBooster(), new BlockingSheepBooster(), new MoreSheepBooster(),
 				new NauseaBooster(), new PoisonBooster(), new RegenerationBooster(), new ResistanceBooster());
+		/** Register Calendar Events **/
+		//UltimateSheepWarsAPI.registerCalendarEvents(this, new AprilFoolEvent(), new ChristmassMonthEvent(), new EasterEggEvent(), new HappyNewYearEvent());
 	}
 	
 	private void setupProviders()

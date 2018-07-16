@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import org.bukkit.plugin.Plugin;
 
+import fr.asynchronous.sheepwars.core.calendar.CalendarEvent;
 import fr.asynchronous.sheepwars.core.exception.ConfigFileNotSet;
 import fr.asynchronous.sheepwars.core.gui.base.GuiScreen;
 import fr.asynchronous.sheepwars.core.gui.manager.GuiManager;
@@ -94,5 +95,14 @@ public class UltimateSheepWarsAPI {
 	public static void unregisterSheeps(SheepManager... classes) {
 		for (SheepManager clazz : classes) 
 			unregisterSheep(clazz);
+	}
+	
+	public static void registerCalendarEvent(Plugin owningPlugin, CalendarEvent calendarEvent) {
+		CalendarEvent.enableCalendarEvent(calendarEvent, owningPlugin);
+	}
+	
+	public static void registerCalendarEvents(Plugin owningPlugin, CalendarEvent... calendarEvents) {
+		for (CalendarEvent clazz : calendarEvents)
+			registerCalendarEvent(owningPlugin, clazz);
 	}
 }

@@ -1,12 +1,6 @@
 package fr.asynchronous.sheepwars.core.gui.base;
 
-import java.util.Arrays;
-import java.util.List;
-
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.DyeColor;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
@@ -17,9 +11,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
-import fr.asynchronous.sheepwars.core.data.PlayerData;
 import fr.asynchronous.sheepwars.core.gui.manager.GuiManager;
-import fr.asynchronous.sheepwars.core.util.ItemBuilder;
 
 public abstract class GuiScreen implements Listener {
 
@@ -33,7 +25,7 @@ public abstract class GuiScreen implements Listener {
 	public GuiScreen(int size, boolean update) {
 		this.size = size;
 		if (size > 6)
-			throw new IllegalArgumentException("Size of the inventory can't exceed 6 because bukkit accepts only 6 lines max.");
+			throw new IllegalArgumentException("Size of the inventory can't exceed 6 because minecraft accepts only 6 lines max.");
 		this.update = update;
 	}
 

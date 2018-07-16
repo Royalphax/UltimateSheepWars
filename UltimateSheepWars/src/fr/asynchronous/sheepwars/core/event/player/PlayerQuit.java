@@ -25,12 +25,14 @@ public class PlayerQuit extends UltimateSheepWarsEventListener
         final Player player = event.getPlayer();
         final PlayerData data = PlayerData.getPlayerData(player);
         
-        /** On gère les effets **/
-        if (data.getTeam() != TeamManager.SPEC && GameState.isStep(GameState.INGAME))
-        {
-        	player.getWorld().strikeLightning(player.getLocation().add(0,5,0));
-        	for (Player online : Bukkit.getOnlinePlayers())
-        		online.sendMessage(Message.getMessage(online, MsgEnum.DIED_MESSAGE).replace("%VICTIM%", player.getName()));
+        if (data.hasTeam()) {
+        	if (GameState.isStep(GameState.WAITING)) {
+        		data.setTeam(TeamManager.NULL);
+        	} else if (GameState.isStep(GameState.INGAME)) {
+        		player.getWorld().strikeLightning(player.getLocation().add(0,5,0));
+            	for (Player online : Bukkit.getOnlinePlayers())
+            		online.sendMessage(Message.getMessage(online, MsgEnum.DIED_MESSAGE).replace("%VICTIM%", player.getName()));
+        	}
         }
         
         /** On supprime le joueur **/

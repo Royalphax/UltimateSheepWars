@@ -68,7 +68,7 @@ public abstract class CalendarEvent implements Listener {
 			public void run() {
 				unregisterEvents(plugin);
 			}
-		}.runTaskLater(plugin, secBeforeEnd() * 20);
+		}.runTaskLaterAsynchronously(plugin, secBeforeEnd() * 20);
 	}
 
 	private void unregisterEvents(final Plugin plugin) {
@@ -82,7 +82,7 @@ public abstract class CalendarEvent implements Listener {
 			public void run() {
 				registerEvents(plugin);
 			}
-		}.runTaskLater(plugin, secBeforeStart() * 20);
+		}.runTaskLaterAsynchronously(plugin, secBeforeStart() * 20);
 	}
 
 	public static boolean enableCalendarEvent(CalendarEvent calendarEvent, Plugin owningPlugin) {

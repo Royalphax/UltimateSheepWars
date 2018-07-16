@@ -13,6 +13,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.SkullType;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -42,7 +43,7 @@ public class Utils {
 		ChatColor color = data.getTeam().getColor();
 		ArrayList<String> output = new ArrayList<>();
 		switch (style) {
-			case CHAT :
+			case HOVER :
 				output.add(data.getLanguage().getMessage(MsgEnum.RECORDS).replaceAll("%PLAYER%", color + "" + ChatColor.BOLD + data.getPlayer().getName()));
 				output.add("");
 				output.add(ChatColor.WHITE + lang.getMessage(MsgEnum.STATS_GAME_PLAYED) + ": " + ChatColor.GRAY + data.getGames());
@@ -52,18 +53,32 @@ public class Utils {
 				output.add(ChatColor.WHITE + lang.getMessage(MsgEnum.STATS_SHEEP_THROWN) + ": " + ChatColor.GRAY + data.getSheepThrown());
 				output.add(ChatColor.WHITE + lang.getMessage(MsgEnum.STATS_SHEEP_KILLED) + ": " + ChatColor.GRAY + data.getSheepKilled());
 				break;
+				
+			case CHAT :
+				final String barChat = ChatColor.GRAY + "--------------------------------";
+				output.add(barChat);
+				output.add(data.getLanguage().getMessage(MsgEnum.RECORDS).replaceAll("%PLAYER%", color + "" + ChatColor.BOLD + data.getPlayer().getName()));
+				output.add("");
+				output.add(ChatColor.WHITE + lang.getMessage(MsgEnum.STATS_GAME_PLAYED) + ": " + ChatColor.GRAY + data.getGames());
+				output.add(ChatColor.WHITE + lang.getMessage(MsgEnum.STATS_DEATH) + ": " + ChatColor.GRAY + data.getDeaths());
+				output.add(ChatColor.WHITE + lang.getMessage(MsgEnum.STATS_KILL) + ": " + ChatColor.GRAY + data.getKills());
+				output.add(ChatColor.WHITE + lang.getMessage(MsgEnum.STATS_VICTORY) + ": " + ChatColor.GRAY + data.getWins());
+				output.add(ChatColor.WHITE + lang.getMessage(MsgEnum.STATS_SHEEP_THROWN) + ": " + ChatColor.GRAY + data.getSheepThrown());
+				output.add(ChatColor.WHITE + lang.getMessage(MsgEnum.STATS_SHEEP_KILLED) + ": " + ChatColor.GRAY + data.getSheepKilled());
+				output.add(barChat);
+				break;
 
 			case INVENTORY :
-				final String bar = ChatColor.YELLOW + "-------------------------------------";
+				final String barInventory = ChatColor.YELLOW + "--------------------------------";
 				output.add(ChatColor.GOLD + "Stats : " + Contributor.getPrefix(data.getPlayer()) + data.getName());
-				output.add(bar);
+				output.add(barInventory);
 				output.add(ChatColor.AQUA + lang.getMessage(MsgEnum.STATS_GAME_PLAYED) + ": " + ChatColor.YELLOW + data.getGames());
 				output.add(ChatColor.AQUA + lang.getMessage(MsgEnum.STATS_DEATH) + ": " + ChatColor.YELLOW + data.getDeaths());
 				output.add(ChatColor.AQUA + lang.getMessage(MsgEnum.STATS_KILL) + ": " + ChatColor.YELLOW + data.getKills());
 				output.add(ChatColor.AQUA + lang.getMessage(MsgEnum.STATS_VICTORY) + ": " + ChatColor.YELLOW + data.getWins());
 				output.add(ChatColor.AQUA + lang.getMessage(MsgEnum.STATS_SHEEP_THROWN) + ": " + ChatColor.YELLOW + data.getSheepThrown());
 				output.add(ChatColor.AQUA + lang.getMessage(MsgEnum.STATS_SHEEP_KILLED) + ": " + ChatColor.YELLOW + data.getSheepKilled());
-				output.add(bar);
+				output.add(barInventory);
 				output.add(ChatColor.LIGHT_PURPLE + lang.getMessage(MsgEnum.STATS_WIN_RATE) + ": " + ChatColor.YELLOW + data.getWinRate() + ChatColor.GREEN + " %");
 				output.add(ChatColor.LIGHT_PURPLE + lang.getMessage(MsgEnum.STATS_KD_RATIO) + ": " + ChatColor.YELLOW + data.getKDRatio());
 				output.add(ChatColor.LIGHT_PURPLE + lang.getMessage(MsgEnum.STATS_TOTAL_TIME) + ": " + ChatColor.YELLOW + formatTime(lang, data.getTotalTime()));
@@ -72,7 +87,7 @@ public class Utils {
 		return output;
 	}
 	
-	public static List<String> getPlayerStats(Player playersData, Player playerToShow, DisplayStyle style) {
+	public static List<String> getPlayerStats(OfflinePlayer playersData, Player playerToShow, DisplayStyle style) {
 		final PlayerData data = PlayerData.getPlayerData(playersData);
 		final Language lang = PlayerData.getPlayerData(playerToShow).getLanguage();
 		return getPlayerStats(data, lang, style);
