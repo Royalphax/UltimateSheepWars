@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -53,6 +54,7 @@ import fr.asynchronous.sheepwars.core.event.entity.EntityDeath;
 import fr.asynchronous.sheepwars.core.event.entity.EntityExplode;
 import fr.asynchronous.sheepwars.core.event.entity.EntityTarget;
 import fr.asynchronous.sheepwars.core.event.entity.FoodLevelChange;
+import fr.asynchronous.sheepwars.core.event.inventory.InventoryClick;
 import fr.asynchronous.sheepwars.core.event.player.AsyncPlayerChat;
 import fr.asynchronous.sheepwars.core.event.player.PlayerArmorStandManipulate;
 import fr.asynchronous.sheepwars.core.event.player.PlayerCommandPreprocess;
@@ -69,7 +71,7 @@ import fr.asynchronous.sheepwars.core.event.player.PlayerMove;
 import fr.asynchronous.sheepwars.core.event.player.PlayerPickupItem;
 import fr.asynchronous.sheepwars.core.event.player.PlayerQuit;
 import fr.asynchronous.sheepwars.core.event.player.PlayerRespawn;
-import fr.asynchronous.sheepwars.core.event.player.PlayerSwapItem;
+import fr.asynchronous.sheepwars.core.event.player.PlayerSwapHandItems;
 import fr.asynchronous.sheepwars.core.event.projectile.ProjectileHit;
 import fr.asynchronous.sheepwars.core.event.projectile.ProjectileLaunch;
 import fr.asynchronous.sheepwars.core.event.server.ServerCommand;
@@ -262,6 +264,8 @@ public class UltimateSheepWarsPlugin extends JavaPlugin {
         		EntityDamageByPlayer.class, EntityDeath.class, EntityExplode.class, 
         		EntityTarget.class, FoodLevelChange.class, EntityDamage.class,
         		
+        		InventoryClick.class,
+        		
         		AsyncPlayerChat.class, PlayerArmorStandManipulate.class, 
         		PlayerCommandPreprocess.class, PlayerDamage.class, PlayerDamageByEntity.class,
         		PlayerDeath.class, PlayerDropItem.class, PlayerInteract.class, PlayerInteractAtEntity.class, PlayerJoin.class, 
@@ -272,7 +276,7 @@ public class UltimateSheepWarsPlugin extends JavaPlugin {
         		
         		ServerCommand.class, ServerListPing.class);
         if (versionManager.getVersion().newerThan(MinecraftVersion.v1_9_R1))
-        	this.register(PlayerSwapItem.class);
+        	this.register(PlayerSwapHandItems.class);
         
         /** Load most common things **/
 		this.load();
@@ -438,8 +442,9 @@ public class UltimateSheepWarsPlugin extends JavaPlugin {
 		/** Save the Lobby loc **/
     	this.settingsConfig.set("lobby", Utils.toString(ConfigManager.getLocation(Field.LOBBY)));
     	/** Save the Boosters loc **/
-    	for (int i = 0; i < ConfigManager.getLocations(Field.BOOSTERS).size(); ++i) {
-        	this.settingsConfig.set("boosters." + i, Utils.toString(ConfigManager.getLocations(Field.BOOSTERS).get(i)));
+    	List<Location> boosters = ConfigManager.getLocations(Field.BOOSTERS);
+    	for (int i = 0; i < boosters.size(); ++i) {
+        	this.settingsConfig.set("boosters." + i, Utils.toString(boosters.get(i)));
         }
     	/** Save the Teams spawns **/
         for (TeamManager team : TeamManager.values())

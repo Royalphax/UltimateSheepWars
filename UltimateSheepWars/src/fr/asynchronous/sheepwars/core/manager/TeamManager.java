@@ -224,4 +224,8 @@ public enum TeamManager {
 	public void addSpawn(Location location) {
 		ConfigManager.addLocation(this.configField, location);
 	}
+	
+	public static rebuildTeams() {
+		
+	}
 }

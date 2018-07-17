@@ -8,6 +8,7 @@ import java.util.Random;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.FireworkEffect;
+import org.bukkit.GameMode;
 import org.bukkit.FireworkEffect.Type;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
@@ -113,7 +114,6 @@ public class GameTask extends BukkitRunnable {
 	}
 
 	public void setSpectator(final Player player, final boolean lose) {
-		player.setAllowFlight(true);
 		final PlayerData data = PlayerData.getPlayerData(player);
 		if (!data.isSpectator()) {
 			if (lose) {
@@ -121,13 +121,8 @@ public class GameTask extends BukkitRunnable {
 				data.increaseDeaths(1);
 			}
 			data.setTeam(TeamManager.SPEC);
-			for (Player online : Bukkit.getOnlinePlayers())
-				if (player != online) {
-					player.showPlayer(online);
-					if (!PlayerData.getPlayerData(online).isSpectator())
-						online.hidePlayer(player);
-				}
 		}
+		player.setGameMode(GameMode.SPECTATOR);
 	}
 
 	public void removePlayer(final Player player) {

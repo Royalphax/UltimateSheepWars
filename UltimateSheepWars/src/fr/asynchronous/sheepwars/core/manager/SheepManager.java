@@ -158,6 +158,7 @@ public abstract class SheepManager {
 		Location location = playerLocation.toVector().add(playerLocation.getDirection().multiply(0.5)).toLocation(launcher.getWorld());
 
 		Sheep entity = spawnSheep(location, launcher, plugin);
+		entity.setAdult();
 
 		UltimateSheepWarsPlugin.getVersionManager().getNMSUtils().setHealth(entity, this.health);
 		entity.setMetadata(UltimateSheepWarsAPI.SHEEPWARS_SHEEP_METADATA, new FixedMetadataValue(plugin, true));

@@ -12,12 +12,14 @@ import org.bukkit.potion.PotionEffectType;
 
 import com.google.common.collect.Sets;
 
+import fr.asynchronous.sheepwars.core.UltimateSheepWarsAPI;
 import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.data.PlayerData;
 import fr.asynchronous.sheepwars.core.handler.Particles;
 import fr.asynchronous.sheepwars.core.handler.SheepAbility;
 import fr.asynchronous.sheepwars.core.manager.ExceptionManager;
 import fr.asynchronous.sheepwars.core.manager.SheepManager;
+import fr.asynchronous.sheepwars.core.util.BlockUtils;
 import net.minecraft.server.v1_9_R1.Entity;
 import net.minecraft.server.v1_9_R1.EntityHuman;
 import net.minecraft.server.v1_9_R1.EntityLiving;
@@ -91,11 +93,10 @@ public class CustomSheep extends EntitySheep {
 
 	@Override
 	public void move(double d0, double d1, double d2) {
-		//boolean b = this.getBukkitEntity().hasMetadata(UltimateSheepWarsAPI.SHEEPWARS_SHEEP_METADATA);
-		//Bukkit.broadcastMessage(String.valueOf(b).toUpperCase() + " -> CUSTOMSHEEP.JAVA MOVE(): " + d0 + " / " + d1 + " / " + d2);
-		/**
-		 * Voir ce que cela renvoie. Si chaque double est en fait ce qui va être ajouté à la position, tester si le bloque de cette position est solide ou pas. S'il l'est pas, on active le noclip !
-		 */
+		if (this.getBukkitEntity().hasMetadata(UltimateSheepWarsAPI.SHEEPWARS_SHEEP_METADATA) && this.getBukkitEntity().getVelocity().getY() >= 0) {
+			Location newLocation = this.getBukkitEntity().getLocation().clone().add(d0, d1, d2);
+			this.noclip = BlockUtils.isThroughable(newLocation.getBlock());
+		}
 		super.move(d0, d1, d2);
 	}
 
@@ -183,7 +184,8 @@ public class CustomSheep extends EntitySheep {
 						death = false;
 					}
 					this.sheep.onFinish(this.player, getBukkitSheep(), death, this.plugin);
-					this.dropDeathLoot();
+					if (death)
+						this.dropDeathLoot();
 					return;
 				}
 				this.ticks--;
@@ -194,41 +196,6 @@ public class CustomSheep extends EntitySheep {
 			super.n();
 		}
 	}
-
-	/**@Override
-	public void n() {
-		try {
-			if (this.sheep != null) {
-				Location location = getBukkitEntity().getLocation();
-				if (!this.ground) {
-					this.ground = (this.sheep.isFriendly() || this.onGround || this.inWater);
-				} else {
-					if ((this.sheep.isFriendly() || (this.ticks <= this.defaultTicks - 20L)) && ((this.ticks == 0L) || (this.sheep.onTicking(this.player, this.ticks, getBukkitSheep(), this.plugin)) || (!isAlive()))) {
-						boolean death = true;
-						if (!this.passengers.isEmpty())
-							for (Entity ent : this.passengers)
-								ent.getBukkitEntity().eject();
-						if (isAlive()) {
-							die();
-							death = false;
-						}
-						this.sheep.onFinish(this.player, getBukkitSheep(), death, this.plugin);
-						this.dropDeathLoot();
-						return;
-					}
-					--this.ticks;
-				}
-				if (!this.onGround && this.ticksLived < 100 && !this.sheep.isFriendly()) {
-					UltimateSheepWarsPlugin.getVersionManager().getParticleFactory().playParticles(Particles.FIREWORKS_SPARK, location.add(0, 0.5, 0), 0.0F, 0.0F, 0.0F, 1, 0.0F);
-				}
-				this.explosion = !this.explosion;
-			}
-		} catch (Exception ex) {
-			return;
-		} finally {
-			super.n();
-		}
-	}**/
 
 	public void dropDeathLoot() {
 		if (this.sheep.isDropAllowed()) {

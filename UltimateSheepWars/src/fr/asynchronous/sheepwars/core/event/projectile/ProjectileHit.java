@@ -30,7 +30,7 @@ public class ProjectileHit extends UltimateSheepWarsEventListener {
 			final Arrow arrow = (Arrow) event.getEntity();
 			final Player player = (Player) arrow.getShooter();
 			Block sourceBlock = arrow.getLocation().getBlock();
-			ArrayList<Block> arrayList = BlockUtils.getSurrounding(sourceBlock, false);
+			ArrayList<Block> arrayList = BlockUtils.getSurrounding(sourceBlock, true, true);
 			Block block = null;
 			for (Block blc : arrayList)
 				if (blc.getType() == Material.WOOL && this.plugin.getGameTask().isBooster(blc.getLocation())) {

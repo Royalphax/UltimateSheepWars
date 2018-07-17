@@ -9,15 +9,15 @@ import fr.asynchronous.sheepwars.core.event.UltimateSheepWarsEventListener;
 import fr.asynchronous.sheepwars.core.handler.GameState;
 import fr.asynchronous.sheepwars.core.handler.Sounds;
 
-public class PlayerSwapItem extends UltimateSheepWarsEventListener {
-	public PlayerSwapItem(final UltimateSheepWarsPlugin plugin) {
+public class PlayerSwapHandItems extends UltimateSheepWarsEventListener {
+	public PlayerSwapHandItems(final UltimateSheepWarsPlugin plugin) {
 		super(plugin);
 	}
 
 	@EventHandler
 	public void onPlayerSwapHandItems(final PlayerSwapHandItemsEvent e) {
 		
-		if (GameState.isStep(GameState.INGAME) || e.getOffHandItem().getType() == Material.WOOL || e.getOffHandItem().getType() == Material.LEATHER_CHESTPLATE) {
+		if (GameState.isStep(GameState.WAITING) || e.getOffHandItem().getType() == Material.WOOL || e.getOffHandItem().getType().toString().contains("LEATHER")) {
 			
 			Sounds.playSound(e.getPlayer(), Sounds.VILLAGER_NO, 1f, 1f);
 			e.setCancelled(true);

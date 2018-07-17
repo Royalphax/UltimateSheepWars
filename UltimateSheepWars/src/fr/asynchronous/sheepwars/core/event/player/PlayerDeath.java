@@ -14,8 +14,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
@@ -49,14 +47,16 @@ public class PlayerDeath extends UltimateSheepWarsEventListener
         final Player player = event.getEntity();
         final PlayerData playerData = PlayerData.getPlayerData(player);
         final TeamManager playerTeam = playerData.getTeam();
+        final int countdown = ConfigManager.getInt(Field.KILLER_VIEW_STAY_TIME);
         if (!GameState.isStep(GameState.WAITING) && !playerData.isSpectator()) {
             final Player killer = player.getKiller();
+            String subtitle = "";
             if (killer != null) {
             	Sounds.playSound(killer, player.getLocation(), Sounds.VILLAGER_HIT, 1f, 1f);
-            	killer.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 5, 1));
                 final PlayerData data = PlayerData.getPlayerData(killer);
                 data.increaseKills(1);
                 this.plugin.getRewardsManager().rewardPlayer(Events.ON_KILL, killer);
+                subtitle = playerData.getLanguage().getMessage(MsgEnum.KILLED_MESSAGE).replaceAll("%PLAYER%", killer.getName());
             }
             for (Player online : Bukkit.getOnlinePlayers())
             {
@@ -70,9 +70,8 @@ public class PlayerDeath extends UltimateSheepWarsEventListener
             }
             Sounds.playSoundAll(player.getLocation(), Sounds.VILLAGER_DEATH, 1.0f, 2.0f);
             this.plugin.getRewardsManager().rewardPlayer(Events.ON_DEATH, player);
-            Message.sendMessage(player, MsgEnum.GHOST_MESSAGE_1);
-            Message.sendMessage(player, MsgEnum.GHOST_MESSAGE_2);
-            UltimateSheepWarsPlugin.getVersionManager().getTitleUtils().titlePacket(player, 0, 60, 20, playerData.getLanguage().getMessage(MsgEnum.ELIMINATED), "");
+            Message.sendMessage(player, MsgEnum.GHOST_DESCRIPTION);
+            UltimateSheepWarsPlugin.getVersionManager().getTitleUtils().titlePacket(player, 0, 60, 20, playerData.getLanguage().getMessage(MsgEnum.ELIMINATED), subtitle);
             this.plugin.getGameTask().setSpectator(event.getEntity(), true);
             Location loc = player.getLocation().add(0,1,0);
             World w = loc.getWorld();
@@ -82,7 +81,7 @@ public class PlayerDeath extends UltimateSheepWarsEventListener
             	final ItemBuilder itemBuilder = RandomUtils.getRandom(new ItemBuilder(Material.INK_SACK).setColor(DyeColor.RED), new ItemBuilder(Material.BONE));
             	final ItemStack deathStack = itemBuilder.toItemStack();
             	final Item item = w.dropItem(loc, deathStack);
-            	item.setVelocity(RandomUtils.getRandomVector());
+            	item.setVelocity(RandomUtils.getRandomVector().multiply(0.5));
             	item.setPickupDelay(Integer.MAX_VALUE);
             	new BukkitRunnable()
             	{
@@ -92,9 +91,19 @@ public class PlayerDeath extends UltimateSheepWarsEventListener
             		}
             	}.runTaskLater(this.plugin, (20 + (rdm.nextInt(90))));
             }
+            if (countdown > 0) {
+            	player.setSpectatorTarget(killer);
+            	new BukkitRunnable()
+            	{
+            		public void run()
+            		{
+            			player.setSpectatorTarget(null);
+            		}
+            	}.runTaskLater(this.plugin, countdown * 20);
+            }
         }
         EntityUtils.resetPlayer(player, GameMode.SPECTATOR);
-        if (player.getLocation().getY() <= 5)
+        if (player.getLocation().getY() <= 5 && countdown <= 0)
         {
         	Location spawn = TeamManager.SPEC.getNextSpawn();
             player.teleport((spawn == null) ? ConfigManager.getLocation(Field.LOBBY) : spawn);

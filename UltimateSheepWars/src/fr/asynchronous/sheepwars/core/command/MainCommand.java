@@ -1,9 +1,12 @@
 package fr.asynchronous.sheepwars.core.command;
 
+import java.util.List;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -23,10 +26,13 @@ import fr.asynchronous.sheepwars.core.manager.TeamManager;
 import fr.asynchronous.sheepwars.core.message.Message;
 import fr.asynchronous.sheepwars.core.message.Message.MsgEnum;
 import fr.asynchronous.sheepwars.core.task.BeginCountdown;
+import fr.asynchronous.sheepwars.core.util.BlockUtils;
 import fr.asynchronous.sheepwars.core.util.Utils;
 
 public class MainCommand implements CommandExecutor {
 
+	public static final String PREFIX = ChatColor.AQUA + "" + ChatColor.BOLD + "ULTIMATE SHEEP WARS " + ChatColor.DARK_GRAY + "| " + ChatColor.RESET; 
+	
 	public UltimateSheepWarsPlugin plugin;
 
 	public MainCommand(UltimateSheepWarsPlugin plugin) {
@@ -42,7 +48,7 @@ public class MainCommand implements CommandExecutor {
         if (args.length != 0) {
             final String sub = args[0];
             if (sub.equalsIgnoreCase("help")) {
-            	player.sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + ChatColor.STRIKETHROUGH + "=============" + ChatColor.RESET + " " + ChatColor.AQUA + ChatColor.BOLD + "UltimateSheepWars " + ChatColor.GREEN + "" + ChatColor.BOLD + ChatColor.STRIKETHROUGH + "=============");
+            	player.sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + ChatColor.STRIKETHROUGH + "===========" + ChatColor.RESET + " " + ChatColor.AQUA + ChatColor.BOLD + "ULTIMATE SHEEP WARS " + ChatColor.GREEN + "" + ChatColor.BOLD + ChatColor.STRIKETHROUGH + "===========");
             	player.sendMessage("");
             	if (!Utils.isPluginConfigured())
             	{
@@ -72,30 +78,30 @@ public class MainCommand implements CommandExecutor {
             }
             else if (sub.equalsIgnoreCase("setlobby")) {
             	ConfigManager.setLocation(Field.LOBBY, player.getLocation().add(0,2,0));
-                player.sendMessage(ChatColor.GREEN + "Lobby set.");
+                player.sendMessage(PREFIX + ChatColor.GREEN + "Lobby set.");
                 UltimateSheepWarsPlugin.getVersionManager().getParticleFactory().playParticles(player, Particles.VILLAGER_HAPPY, player.getLocation().add(0,1,0), 0f, 0f, 0f, 1, 0.1f);
                 Hologram.runHologramTask(ChatColor.GREEN + "Lobby set!", player.getLocation().add(0,2,0), 5, this.plugin);
             }
             else if (sub.equalsIgnoreCase("clearspawns") && args.length == 2) {
                 if (!args[1].equalsIgnoreCase("red") && !args[1].equalsIgnoreCase("blue") && !args[1].equalsIgnoreCase("spec")) {
-                    player.sendMessage(ConfigManager.getString(Field.PREFIX) + ChatColor.RED + "Team " + ChatColor.DARK_RED + args[1] + ChatColor.RED + " doesn't exist (only blue/red/spec).");
+                    player.sendMessage(PREFIX + ChatColor.RED + "Team " + ChatColor.DARK_RED + args[1] + ChatColor.RED + " doesn't exist (only blue/red/spec).");
                 }
                 else {
                     final TeamManager team = TeamManager.getTeam(args[1]);
                     for (Location loc : team.getSpawns())
                     	UltimateSheepWarsPlugin.getVersionManager().getParticleFactory().playParticles(player, Particles.SMOKE_LARGE, loc, 0f, 0f, 0f, 1, 0.1f);
                     team.getSpawns().clear();
-                    player.sendMessage(ConfigManager.getString(Field.PREFIX) + ChatColor.GREEN + "Team " + team.getColor() + team.getDisplayName(player) + ChatColor.GREEN + " spawns where cleared!");
+                    player.sendMessage(PREFIX + ChatColor.GREEN + "Team " + team.getColor() + team.getDisplayName(player) + ChatColor.GREEN + " spawns where cleared!");
                 }
             }
             else if (sub.equalsIgnoreCase("addspawn") && args.length == 2) {
                 if (!args[1].equalsIgnoreCase("red") && !args[1].equalsIgnoreCase("blue") && !args[1].equalsIgnoreCase("spec")) {
-                    player.sendMessage(ConfigManager.getString(Field.PREFIX) + ChatColor.RED + "Team " + ChatColor.DARK_RED + args[1] + ChatColor.RED + " doesn't exist. (blue/red/spec)");
+                    player.sendMessage(PREFIX + ChatColor.RED + "Team " + ChatColor.DARK_RED + args[1] + ChatColor.RED + " doesn't exist. (blue/red/spec)");
                 }
                 else {
                     final TeamManager team = TeamManager.getTeam(args[1]);
                     team.getSpawns().add(player.getLocation());
-                    player.sendMessage(ConfigManager.getString(Field.PREFIX) + ChatColor.GREEN + "You have added a spawn for " + team.getColor() + team.getDisplayName(player) + ChatColor.GREEN + " team.");
+                    player.sendMessage(PREFIX + ChatColor.GREEN + "You have added a spawn for " + team.getColor() + team.getDisplayName(player) + ChatColor.GREEN + " team.");
                     UltimateSheepWarsPlugin.getVersionManager().getParticleFactory().playParticles(player, Particles.VILLAGER_HAPPY, player.getLocation().add(0,1,0), 0f, 0f, 0f, 1, 0.1f);
                     Hologram.runHologramTask(team.getColor() + "New team spawn added: N°" + team.getSpawns().size(), player.getLocation(), 5, this.plugin);
                 }
@@ -104,16 +110,16 @@ public class MainCommand implements CommandExecutor {
                 for (Location loc : ConfigManager.getLocations(Field.BOOSTERS))
                 	UltimateSheepWarsPlugin.getVersionManager().getParticleFactory().playParticles(player, Particles.SMOKE_LARGE, loc, 0f, 0f, 0f, 1, 0.1f);
                 ConfigManager.clearLocations(Field.BOOSTERS);
-                player.sendMessage(ConfigManager.getString(Field.PREFIX) + ChatColor.GREEN + "Booster locations where cleared!");
+                player.sendMessage(PREFIX + ChatColor.GREEN + "Booster locations where cleared!");
             }
             else if (sub.equalsIgnoreCase("addbooster")) {
                 final Location location = player.getLocation().subtract(0.0, 1.0, 0.0).getBlock().getLocation();
                 if (location.getBlock().getType() != Material.AIR) {
-                    player.sendMessage(ConfigManager.getString(Field.PREFIX) + ChatColor.RED + "You must have an air block under your feet.");
+                    player.sendMessage(PREFIX + ChatColor.RED + "You must have an air block under your feet.");
                 }
                 else {
                 	ConfigManager.addLocation(Field.BOOSTERS, location);
-                    player.sendMessage(ChatColor.GREEN + "You have added a magic wool at (" + location.getBlockX() + ", " + location.getY() + ", " + location.getZ() + ")");
+                    player.sendMessage(PREFIX + ChatColor.GREEN + "You have added a magic wool at (" + location.getBlockX() + ", " + location.getY() + ", " + location.getZ() + ")");
                     UltimateSheepWarsPlugin.getVersionManager().getParticleFactory().playParticles(player, Particles.REDSTONE, location, 1.0f, 1.0f, 1.0f, 20, 1.0f);
                     Hologram.runHologramTask(Message.getDecoration() + ChatColor.GREEN + " Magic wool N°" + ConfigManager.getLocations(Field.BOOSTERS).size() + " " + Message.getDecoration(), player.getLocation(), 5, this.plugin);
                 }
@@ -124,17 +130,22 @@ public class MainCommand implements CommandExecutor {
             	this.plugin.getPreGameTask().shortenCountdown();
             }
             else if (sub.equalsIgnoreCase("test")) {
-            	/**SheepManager sheep = RandomUtils.getRandom(SheepManager.getAvailableSheeps());
-            	sheep.throwSheep(player, this.plugin);**/
             	Bukkit.broadcastMessage("Active workers: " + Bukkit.getScheduler().getActiveWorkers().size());
             	Bukkit.broadcastMessage("Pending tasks: " + Bukkit.getScheduler().getPendingTasks().size());
             	Bukkit.broadcastMessage("Particle players: " + PlayerData.getParticlePlayers().size());
             	Bukkit.broadcastMessage("Players data: " + PlayerData.getData().size());
+            	
+            	Location loc = player.getLocation().clone().add(0,5,0);
+            	
+            	List<Block> blocks = BlockUtils.getSurrounding(loc.getBlock(), false, true);
+            	for (Block block : blocks)
+            		block.setType(Material.GLASS);
+            	
+            	loc.getBlock().setType(Material.REDSTONE_BLOCK);
+            	
             	player.sendMessage("Tested.");
+            	
             }
-            /**else if (sub.equalsIgnoreCase("changeowner")) {
-            	GuiManager.openGui(this.plugin, new GuiValidateOwner(this.plugin, player));
-            }**/
             else if (sub.equalsIgnoreCase("give")) {
             	if (GameState.isStep(GameState.INGAME))
             	{
@@ -155,8 +166,9 @@ public class MainCommand implements CommandExecutor {
             }
             return true;
         }
-        player.sendMessage(ChatColor.GREEN + "Plugin UltimateSheepWars v" + this.plugin.getDescription().getVersion() + " by Roytreo28 (@Asynchronous).");
-        player.sendMessage(ChatColor.GREEN + "If you encounter any problem come and discuss it : " + ChatColor.AQUA + ChatColor.UNDERLINE + "https://discord.gg/nZthcPh");
+        player.sendMessage(ChatColor.GRAY + "∙ Plugin " + ChatColor.GREEN + "UltimateSheepWars v" + this.plugin.getDescription().getVersion() + ChatColor.GRAY + " by " + ChatColor.GREEN + "The Asynchronous" + ChatColor.GRAY + ".");
+        player.sendMessage(ChatColor.GRAY + "∙ Many thanks to @Roytreo28 (" + ChatColor.RED + "Developer" + ChatColor.GRAY + "), @KingRider26 (" + ChatColor.RED + "Co-Developer" + ChatColor.GRAY + "), @6985jjorda (English Translation), @felibouille (German Translation), @jeussa (Instant Explosion Firework Effect)");
+        player.sendMessage(ChatColor.GRAY + "∙ If you encounter any issue, come and talk to us: " + ChatColor.AQUA + "https://discord.gg/nZthcPh");
 		return false;
 	}
 }

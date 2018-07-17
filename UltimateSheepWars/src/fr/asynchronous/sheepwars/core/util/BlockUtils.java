@@ -2,6 +2,7 @@ package fr.asynchronous.sheepwars.core.util;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -262,45 +263,41 @@ public class BlockUtils {
 		}
 		return (item.getTypeId() > 0) && (item.getTypeId() < 256);
 	}
-	
+
 	public static final Block getTargetBlock(Player player, int range) {
-        BlockIterator iter = new BlockIterator(player, range);
-        Block lastBlock = iter.next();
-        while (iter.hasNext()) {
-            lastBlock = iter.next();
-            if (lastBlock.getType() == Material.AIR) {
-                continue;
-            }
-            break;
-        }
-        return lastBlock;
-    }
-	
+		BlockIterator iter = new BlockIterator(player, range);
+		Block lastBlock = iter.next();
+		while (iter.hasNext()) {
+			lastBlock = iter.next();
+			if (lastBlock.getType() == Material.AIR) {
+				continue;
+			}
+			break;
+		}
+		return lastBlock;
+	}
+
 	public static final int getViewField(Player player, int range) {
-        BlockIterator iter = new BlockIterator(player, range);
-        Block lastBlock = iter.next();
-        Integer output = 0;
-        while (iter.hasNext()) {
-            lastBlock = iter.next();
-            if (isThroughing(lastBlock)) {
-                output++;
-            	continue;
-            }
-            break;
-        }
-        return (output > range ? range : output);
-    }
-	
-	public static final boolean isThroughing(Block block)
-	{
+		BlockIterator iter = new BlockIterator(player, range);
+		Block lastBlock = iter.next();
+		Integer output = 0;
+		while (iter.hasNext()) {
+			lastBlock = iter.next();
+			if (isThroughable(lastBlock)) {
+				output++;
+				continue;
+			}
+			break;
+		}
+		return (output > range ? range : output);
+	}
+
+	public static final boolean isThroughable(Block block) {
 		Material type = block.getType();
-		if (type.isOccluding() || type == Material.GLASS) return false;
-		if (type.name().endsWith("FENCE")
-				|| type == Material.COBBLE_WALL || type == Material.STAINED_GLASS_PANE
-				|| type == Material.THIN_GLASS) {
-			if (block.getRelative(BlockFace.EAST).getType() != Material.AIR && block.getRelative(BlockFace.WEST).getType() != Material.AIR
-					|| block.getRelative(BlockFace.NORTH).getType() != Material.AIR && block.getRelative(BlockFace.SOUTH).getType() != Material.AIR)
-			{
+		if (type.isOccluding() || type == Material.GLASS)
+			return false;
+		if (type.name().endsWith("FENCE") || type == Material.COBBLE_WALL || type == Material.STAINED_GLASS_PANE || type == Material.THIN_GLASS) {
+			if (block.getRelative(BlockFace.EAST).getType() != Material.AIR && block.getRelative(BlockFace.WEST).getType() != Material.AIR || block.getRelative(BlockFace.NORTH).getType() != Material.AIR && block.getRelative(BlockFace.SOUTH).getType() != Material.AIR) {
 				return false;
 			} else {
 				return true;
@@ -311,76 +308,91 @@ public class BlockUtils {
 		}
 		return false;
 	}
-	
+
 	public static final ArrayList<Block> getTargetBlocks(Player player, int range) {
 		ArrayList<Block> output = new ArrayList<>();
-        BlockIterator iter = new BlockIterator(player, range);
-        Block lastBlock = iter.next();
-        while (iter.hasNext()) {
-            lastBlock = iter.next();
-            if (lastBlock.getType() == Material.AIR) {
-            	output.add(lastBlock);
-                continue;
-            }
-            break;
-        }
-        return output;
-    }
+		BlockIterator iter = new BlockIterator(player, range);
+		Block lastBlock = iter.next();
+		while (iter.hasNext()) {
+			lastBlock = iter.next();
+			if (lastBlock.getType() == Material.AIR) {
+				output.add(lastBlock);
+				continue;
+			}
+			break;
+		}
+		return output;
+	}
 
 	public static Block getHighest(World world, int x, int z) {
 		return getHighest(world, x, z, null);
 	}
 
-	public static Block getHighest(World world, int x, int z,
-			HashSet<Material> ignore) {
+	public static Block getHighest(World world, int x, int z, HashSet<Material> ignore) {
 		Block block = world.getHighestBlockAt(x, z);
 
-		while ((airFoliage(block)) || (block.getType() == Material.LEAVES)
-				|| ((ignore != null) && (ignore.contains(block.getType())))) {
+		while ((airFoliage(block)) || (block.getType() == Material.LEAVES) || ((ignore != null) && (ignore.contains(block.getType())))) {
 			block = block.getRelative(BlockFace.DOWN);
 		}
 
 		return block.getRelative(BlockFace.UP);
 	}
-	
-	public static boolean isOnAir(Location location, int x)
-	{
+
+	public static boolean isOnAir(Location location, int x) {
 		int y = location.getBlockY();
-		for (int i = y; i >= (y-x);)
-		{
+		for (int i = y; i >= (y - x);) {
 			Location loc = location.clone();
 			loc.setY(i);
-			if (fullSolid(loc.getBlock()));
-				return false;
+			if (fullSolid(loc.getBlock()))
+				;
+			return false;
 		}
 		return true;
 	}
 
-	public static ArrayList<Block> getSurrounding(Block block, boolean diagonals) {
+	public static ArrayList<Block> getSurrounding(Block block, boolean self, boolean edges) {
 		ArrayList<Block> blocks = new ArrayList<Block>();
-
-		if (diagonals) {
-			for (int x = -1; x <= 1; x++)
-				for (int y = -1; y <= 1; y++)
-					for (int z = -1; z <= 1; z++) {
-						Block blck = block.getRelative(x, y, z);
-						if (!blocks.contains(blck))
-							blocks.add(block.getRelative(x, y, z));
-					}
-		} else {
-			blocks.add(block.getRelative(BlockFace.UP));
-			blocks.add(block.getRelative(BlockFace.DOWN));
-			blocks.add(block.getRelative(BlockFace.NORTH));
-			blocks.add(block.getRelative(BlockFace.SOUTH));
-			blocks.add(block.getRelative(BlockFace.EAST));
-			blocks.add(block.getRelative(BlockFace.WEST));
+		List<BlockFace> faces = new ArrayList<>();
+		faces.add(BlockFace.UP);
+		faces.add(BlockFace.DOWN);
+		faces.add(BlockFace.NORTH);
+		faces.add(BlockFace.EAST);
+		faces.add(BlockFace.WEST);
+		faces.add(BlockFace.SOUTH);
+		if (self)
+			blocks.add(block);
+		if (edges) {
+			faces.add(BlockFace.NORTH_EAST);
+			faces.add(BlockFace.NORTH_WEST);
+			faces.add(BlockFace.SOUTH_EAST);
+			faces.add(BlockFace.SOUTH_WEST);
+			final Block up = block.getRelative(BlockFace.UP);
+			blocks.add(up.getRelative(BlockFace.NORTH));
+			blocks.add(up.getRelative(BlockFace.SOUTH));
+			blocks.add(up.getRelative(BlockFace.WEST));
+			blocks.add(up.getRelative(BlockFace.EAST));
+			blocks.add(up.getRelative(BlockFace.NORTH_EAST));
+			blocks.add(up.getRelative(BlockFace.NORTH_WEST));
+			blocks.add(up.getRelative(BlockFace.SOUTH_EAST));
+			blocks.add(up.getRelative(BlockFace.SOUTH_WEST));
+			final Block down = block.getRelative(BlockFace.DOWN);
+			blocks.add(down.getRelative(BlockFace.NORTH));
+			blocks.add(down.getRelative(BlockFace.SOUTH));
+			blocks.add(down.getRelative(BlockFace.WEST));
+			blocks.add(down.getRelative(BlockFace.EAST));
+			blocks.add(down.getRelative(BlockFace.NORTH_EAST));
+			blocks.add(down.getRelative(BlockFace.NORTH_WEST));
+			blocks.add(down.getRelative(BlockFace.SOUTH_EAST));
+			blocks.add(down.getRelative(BlockFace.SOUTH_WEST));
 		}
+		for (BlockFace face : faces)
+			blocks.add(block.getRelative(face));
 
 		return blocks;
 	}
 
 	public static boolean isVisible(Block block) {
-		for (Block other : getSurrounding(block, false)) {
+		for (Block other : getSurrounding(block, false, false)) {
 			if (!other.getType().isOccluding()) {
 				return true;
 			}

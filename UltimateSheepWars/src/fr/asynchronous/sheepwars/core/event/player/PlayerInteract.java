@@ -110,7 +110,7 @@ public class PlayerInteract extends UltimateSheepWarsEventListener
                     } else {
                     	data.setAllowParticles(true);
                     	player.getInventory().setItem(4, new ItemBuilder(ConfigManager.getItemStack(Field.PARTICLES_ON_ITEM)).setName(data.getLanguage().getMessage(MsgEnum.PARTICLES_ON)).toItemStack());
-                    	UltimateSheepWarsPlugin.getVersionManager().getParticleFactory().playParticles(player, Particles.SPELL_INSTANT, player.getLocation(), 0.5f, 0.5f, 0.5f, 10, 0.0f);
+                    	UltimateSheepWarsPlugin.getVersionManager().getParticleFactory().playParticles(player, Particles.SPELL_INSTANT, player.getLocation().add(0, 1, 0), 1f, 0.5f, 1f, 10, 0.0f);
                     }
         			player.updateInventory();
                     Sounds.playSound(player, player.getLocation(), Sounds.NOTE_STICKS, 1f, 1f);

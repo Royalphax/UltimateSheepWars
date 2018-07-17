@@ -93,7 +93,7 @@ public class EasterEggEvent extends CalendarEvent {
 
 		Rabbit rab = (Rabbit) event.getEntity().getWorld().spawnEntity(top.getLocation(), EntityType.RABBIT);
 		rab.setBaby();
-		rab.setVelocity(RandomUtils.getRandomVector().normalize().multiply(0.5));
+		rab.setVelocity(RandomUtils.getRandomVector().multiply(0.5));
 	}
 
 	public static int[] getEasterSundayDate(int year) {
