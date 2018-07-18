@@ -74,6 +74,7 @@ public class EntityUtils {
 	}
 
 	public static void resetPlayer(final Player player, final GameMode gameMode) {
+		player.setGameMode(gameMode);
 		player.setFireTicks(0);
 		UltimateSheepWarsPlugin.getVersionManager().getNMSUtils().setHealth(player, 20.0D);
 		player.setHealthScaled(true);
@@ -85,7 +86,6 @@ public class EntityUtils {
 		player.setLevel(0);
 		player.getInventory().clear();
 		player.getInventory().setArmorContents((ItemStack[]) null);
-		player.setGameMode(gameMode);
 		player.closeInventory();
 		for (final PotionEffect effect : player.getActivePotionEffects()) {
 			player.removePotionEffect(effect.getType());

@@ -1,12 +1,9 @@
 package fr.asynchronous.sheepwars.core.command;
 
-import java.util.List;
-
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -26,7 +23,6 @@ import fr.asynchronous.sheepwars.core.manager.TeamManager;
 import fr.asynchronous.sheepwars.core.message.Message;
 import fr.asynchronous.sheepwars.core.message.Message.MsgEnum;
 import fr.asynchronous.sheepwars.core.task.BeginCountdown;
-import fr.asynchronous.sheepwars.core.util.BlockUtils;
 import fr.asynchronous.sheepwars.core.util.Utils;
 
 public class MainCommand implements CommandExecutor {
@@ -48,7 +44,7 @@ public class MainCommand implements CommandExecutor {
         if (args.length != 0) {
             final String sub = args[0];
             if (sub.equalsIgnoreCase("help")) {
-            	player.sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + ChatColor.STRIKETHROUGH + "===========" + ChatColor.RESET + " " + ChatColor.AQUA + ChatColor.BOLD + "ULTIMATE SHEEP WARS " + ChatColor.GREEN + "" + ChatColor.BOLD + ChatColor.STRIKETHROUGH + "===========");
+            	player.sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + ChatColor.STRIKETHROUGH + "===========" + ChatColor.RESET + " " + ChatColor.AQUA + ChatColor.BOLD + "ULTIMATE SHEEP WARS " + ChatColor.GREEN + "" + ChatColor.BOLD + ChatColor.STRIKETHROUGH + "============");
             	player.sendMessage("");
             	if (!Utils.isPluginConfigured())
             	{
@@ -134,14 +130,6 @@ public class MainCommand implements CommandExecutor {
             	Bukkit.broadcastMessage("Pending tasks: " + Bukkit.getScheduler().getPendingTasks().size());
             	Bukkit.broadcastMessage("Particle players: " + PlayerData.getParticlePlayers().size());
             	Bukkit.broadcastMessage("Players data: " + PlayerData.getData().size());
-            	
-            	Location loc = player.getLocation().clone().add(0,5,0);
-            	
-            	List<Block> blocks = BlockUtils.getSurrounding(loc.getBlock(), false, true);
-            	for (Block block : blocks)
-            		block.setType(Material.GLASS);
-            	
-            	loc.getBlock().setType(Material.REDSTONE_BLOCK);
             	
             	player.sendMessage("Tested.");
             	

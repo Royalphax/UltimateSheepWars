@@ -141,7 +141,7 @@ public class Language {
 					method.setAccessible(true);
 					method.invoke(bukkitTeam, objOption, objOptionStatus);
 				} catch (Exception ex) {
-					new ExceptionManager(ex).register(true);
+					new ExceptionManager(ex).register(false);
 				}
 			}
 		}

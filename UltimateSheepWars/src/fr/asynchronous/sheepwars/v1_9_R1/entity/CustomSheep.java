@@ -12,14 +12,12 @@ import org.bukkit.potion.PotionEffectType;
 
 import com.google.common.collect.Sets;
 
-import fr.asynchronous.sheepwars.core.UltimateSheepWarsAPI;
 import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.data.PlayerData;
 import fr.asynchronous.sheepwars.core.handler.Particles;
 import fr.asynchronous.sheepwars.core.handler.SheepAbility;
 import fr.asynchronous.sheepwars.core.manager.ExceptionManager;
 import fr.asynchronous.sheepwars.core.manager.SheepManager;
-import fr.asynchronous.sheepwars.core.util.BlockUtils;
 import net.minecraft.server.v1_9_R1.Entity;
 import net.minecraft.server.v1_9_R1.EntityHuman;
 import net.minecraft.server.v1_9_R1.EntityLiving;
@@ -91,14 +89,12 @@ public class CustomSheep extends EntitySheep {
 		}
 	}
 
-	@Override
+	/**@Override
 	public void move(double d0, double d1, double d2) {
-		if (this.getBukkitEntity().hasMetadata(UltimateSheepWarsAPI.SHEEPWARS_SHEEP_METADATA) && this.getBukkitEntity().getVelocity().getY() >= 0) {
-			Location newLocation = this.getBukkitEntity().getLocation().clone().add(d0, d1, d2);
-			this.noclip = BlockUtils.isThroughable(newLocation.getBlock());
-		}
+		Location newLocation = this.getBukkitEntity().getLocation().clone().add(d0, d1, d2);
+		this.noclip = newLocation.getBlock().getType() == Material.AIR;
 		super.move(d0, d1, d2);
-	}
+	}**/
 
 	@Override
 	public void g(float sideMot, float forMot) {
@@ -162,7 +158,7 @@ public class CustomSheep extends EntitySheep {
 		}
 		super.g(sideMot, forMot);
 	}
-	
+
 	@Override
 	public void n() {
 		try {
@@ -172,8 +168,7 @@ public class CustomSheep extends EntitySheep {
 					this.ground = true;
 				if (!this.ground) {
 					UltimateSheepWarsPlugin.getVersionManager().getParticleFactory().playParticles(Particles.FIREWORKS_SPARK, getBukkitEntity().getLocation().add(0, 0.5, 0), 0.0F, 0.0F, 0.0F, 1, 0.0F);
-				}
-				else if (!this.isDead && (this.ticks <= 0 || !isAlive() || this.sheep.onTicking(this.player, this.ticks, getBukkitSheep(), this.plugin))) {
+				} else if (!this.isDead && (this.ticks <= 0 || !isAlive() || this.sheep.onTicking(this.player, this.ticks, getBukkitSheep(), this.plugin))) {
 					this.isDead = true;
 					boolean death = true;
 					if (!this.passengers.isEmpty())

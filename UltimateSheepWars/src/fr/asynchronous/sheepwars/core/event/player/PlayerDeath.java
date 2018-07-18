@@ -40,11 +40,11 @@ public class PlayerDeath extends UltimateSheepWarsEventListener
     @EventHandler
     public void onPlayerDeath(final PlayerDeathEvent event) {
     	event.setDeathMessage((String)null);
-        ArrayList<ItemStack> copy = new ArrayList<>(event.getDrops());
-    	for (ItemStack i : copy)
-        	if (i.getType() != Material.WOOL)
-        		event.getDrops().remove(i);
         final Player player = event.getEntity();
+    	for (ItemStack i : event.getDrops())
+        	if (i.getType() == Material.WOOL)
+        		player.getWorld().dropItem(player.getLocation(), i);
+    	event.getDrops().clear();
         final PlayerData playerData = PlayerData.getPlayerData(player);
         final TeamManager playerTeam = playerData.getTeam();
         final int countdown = ConfigManager.getInt(Field.KILLER_VIEW_STAY_TIME);
@@ -92,17 +92,21 @@ public class PlayerDeath extends UltimateSheepWarsEventListener
             	}.runTaskLater(this.plugin, (20 + (rdm.nextInt(90))));
             }
             if (countdown > 0) {
-            	player.setSpectatorTarget(killer);
             	new BukkitRunnable()
             	{
+            		int i = countdown * 20;
             		public void run()
             		{
-            			player.setSpectatorTarget(null);
+            			player.setSpectatorTarget(killer);
+            			if (i <= 0) {
+            				cancel();
+            				player.setSpectatorTarget(null);
+            			}
+            			i--;
             		}
-            	}.runTaskLater(this.plugin, countdown * 20);
+            	}.runTaskTimer(this.plugin, 0, 0);
             }
         }
-        EntityUtils.resetPlayer(player, GameMode.SPECTATOR);
         if (player.getLocation().getY() <= 5 && countdown <= 0)
         {
         	Location spawn = TeamManager.SPEC.getNextSpawn();

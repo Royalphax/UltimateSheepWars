@@ -30,6 +30,7 @@ import fr.asynchronous.sheepwars.core.message.Language;
 import fr.asynchronous.sheepwars.core.message.Message;
 import fr.asynchronous.sheepwars.core.message.Message.MsgEnum;
 import fr.asynchronous.sheepwars.core.sheep.BoardingSheep;
+import fr.asynchronous.sheepwars.core.util.EntityUtils;
 import fr.asynchronous.sheepwars.core.util.RandomUtils;
 
 public class GameTask extends BukkitRunnable {
@@ -122,7 +123,7 @@ public class GameTask extends BukkitRunnable {
 			}
 			data.setTeam(TeamManager.SPEC);
 		}
-		player.setGameMode(GameMode.SPECTATOR);
+		EntityUtils.resetPlayer(player, GameMode.SPECTATOR);
 	}
 
 	public void removePlayer(final Player player) {
@@ -130,7 +131,6 @@ public class GameTask extends BukkitRunnable {
 		final TeamManager team = data.getTeam();
 		if (!data.isSpectator()) {
 			data.setTeam(TeamManager.NULL);
-			data.setKit(new NoneKit());
 			if (GameState.isStep(GameState.WAITING)) {
 				PlayerData.getPlayers().remove(player);
 			} else if (GameState.isStep(GameState.INGAME) && team.getOnlinePlayers().isEmpty()) {

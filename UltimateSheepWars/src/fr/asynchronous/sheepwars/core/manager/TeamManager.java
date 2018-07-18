@@ -225,7 +225,7 @@ public enum TeamManager {
 		ConfigManager.addLocation(this.configField, location);
 	}
 	
-	public static rebuildTeams() {
+	public static void rebuildTeams() {
 		
 	}
 }
