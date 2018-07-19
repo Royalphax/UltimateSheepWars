@@ -126,13 +126,12 @@ public class MainCommand implements CommandExecutor {
             	this.plugin.getPreGameTask().shortenCountdown();
             }
             else if (sub.equalsIgnoreCase("test")) {
-            	Bukkit.broadcastMessage("Active workers: " + Bukkit.getScheduler().getActiveWorkers().size());
-            	Bukkit.broadcastMessage("Pending tasks: " + Bukkit.getScheduler().getPendingTasks().size());
-            	Bukkit.broadcastMessage("Particle players: " + PlayerData.getParticlePlayers().size());
-            	Bukkit.broadcastMessage("Players data: " + PlayerData.getData().size());
+            	player.sendMessage("Active workers: " + Bukkit.getScheduler().getActiveWorkers().size());
+            	player.sendMessage("Pending tasks: " + Bukkit.getScheduler().getPendingTasks().size());
+            	player.sendMessage("Particle players: " + PlayerData.getParticlePlayers().size());
+            	player.sendMessage("Players data: " + PlayerData.getData().size());
             	
             	player.sendMessage("Tested.");
-            	
             }
             else if (sub.equalsIgnoreCase("give")) {
             	if (GameState.isStep(GameState.INGAME))
