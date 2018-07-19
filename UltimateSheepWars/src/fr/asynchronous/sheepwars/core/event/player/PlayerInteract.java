@@ -124,7 +124,7 @@ public class PlayerInteract extends UltimateSheepWarsEventListener
                         		Message.sendMessage(player, MsgEnum.ALREADY_IN_THIS_TEAM);
                                 break;
                             }
-                            if (!player.hasPermission("sheepwars.teams.bypass") && !Contributor.isImportant(player) && Bukkit.getOnlinePlayers().size() > 1 && team.getOnlinePlayers().size() >= MathUtils.ceil((Bukkit.getOnlinePlayers().size() / 2)))
+                            if (!player.hasPermission(TeamManager.BYPASS_TEAMS_PERMISSION) && !Contributor.isImportant(player) && Bukkit.getOnlinePlayers().size() > 1 && team.getOnlinePlayers().size() >= MathUtils.ceil((Bukkit.getOnlinePlayers().size() / 2)))
                             {
 								Message.sendMessage(player, MsgEnum.CANT_JOIN_FULL_TEAM);
 								break;
