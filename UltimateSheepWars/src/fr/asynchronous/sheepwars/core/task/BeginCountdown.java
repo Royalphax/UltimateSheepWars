@@ -75,13 +75,9 @@ public class BeginCountdown extends BukkitRunnable {
 					}
 					board.registerNewObjective("kills", "playerKillCount").setDisplaySlot(DisplaySlot.PLAYER_LIST);
 				}
-				final boolean shakeUp = TeamManager.BLUE.getOnlinePlayers().isEmpty() || TeamManager.RED.getOnlinePlayers().isEmpty();
+				TeamManager.checkTeams();
 				for (Player player : Bukkit.getOnlinePlayers()) {
 					PlayerData data = PlayerData.getPlayerData(player);
-					if (!data.hasTeam() || shakeUp) {
-						TeamManager team = TeamManager.getRandomTeam();
-						data.setTeam(team);
-					}
 					EntityUtils.resetPlayer(player, GameMode.SURVIVAL);
 					final TeamManager team = data.getTeam();
 					final Color color = team.getLeatherColor();

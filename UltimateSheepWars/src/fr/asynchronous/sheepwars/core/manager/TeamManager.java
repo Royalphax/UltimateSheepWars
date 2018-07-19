@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.DyeColor;
@@ -21,6 +22,7 @@ import org.bukkit.material.Wool;
 import org.bukkit.scoreboard.Scoreboard;
 
 import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
+import fr.asynchronous.sheepwars.core.data.PlayerData;
 import fr.asynchronous.sheepwars.core.handler.MinecraftVersion;
 import fr.asynchronous.sheepwars.core.manager.ConfigManager.Field;
 import fr.asynchronous.sheepwars.core.message.Language;
@@ -37,6 +39,7 @@ public enum TeamManager {
 	SPEC("spec", Message.getMessage(MsgEnum.SPEC_NAME), Material.STONE, Field.SPEC_SPAWNS, DyeColor.SILVER, ChatColor.GRAY, 0, 0, 0),
 	NULL("null", new Message("null"), Material.AIR, null, DyeColor.WHITE, ChatColor.WHITE, 255, 255, 255);
 
+	public static final String BYPASS_TEAMS_PERMISSION = "sheepwars.teams.bypass";
 	public static int redSlot;
 	public static int blueSlot;
 
@@ -214,7 +217,7 @@ public enum TeamManager {
 	public DyeColor getDyeColor() {
 		return this.dyecolor;
 	}
-	
+
 	public List<Location> getSpawns() {
 		if (this.configField == null)
 			return new ArrayList<>();
@@ -224,8 +227,164 @@ public enum TeamManager {
 	public void addSpawn(Location location) {
 		ConfigManager.addLocation(this.configField, location);
 	}
-	
-	public static void rebuildTeams() {
+
+	public static boolean checkTeams() {
+		if (TeamManager.BLUE.getOnlinePlayers().isEmpty() || TeamManager.RED.getOnlinePlayers().isEmpty()) {
+			rebuildTeams();
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	private static void rebuildTeams() {
+		/** On initialise **/
+		int redTeamCount = 0;
+		int blueTeamCount = 0;
+		List<Player> noTeamPlayers = new ArrayList<>();
+		for (Player player : Bukkit.getOnlinePlayers()) {
+			PlayerData data = PlayerData.getPlayerData(player);
+			if (data.hasTeam()) {
+				if (data.getTeam() == RED) {
+					redTeamCount++;
+				} else if (data.getTeam() == BLUE) {
+					blueTeamCount++;
+				}
+			} else {
+				noTeamPlayers.add(player);
+			}
+		}
+		int noTeamCount = noTeamPlayers.size();
+
+		/** DEBUT DE L'ALGORITHME **/
 		
+		if (redTeamCount == 0 && blueTeamCount == 0) {
+			for (Player player : Bukkit.getOnlinePlayers()) {
+				PlayerData data = PlayerData.getPlayerData(player);
+				data.setTeam(getRandomTeam());
+			}
+		} else if (blueTeamCount == 0) {
+			if ((noTeamCount + 1) >= redTeamCount && (noTeamCount - 1) <= redTeamCount) {
+				for (Player player : Bukkit.getOnlinePlayers()) {
+					PlayerData data = PlayerData.getPlayerData(player);
+					if (!data.hasTeam())
+						data.setTeam(TeamManager.BLUE);
+				}
+			} else if (noTeamCount < redTeamCount) {
+				/** On trie les joueurs de l'équipe pour obtenir une jolie liste triée en fonction de si ils ont la perm ou pas **/
+				List<Player> nonPrioPlayers = new ArrayList<>();
+				List<Player> prioPlayers = new ArrayList<>();
+				for (Player redPlayer : TeamManager.RED.getOnlinePlayers()) {
+					if (redPlayer.hasPermission(BYPASS_TEAMS_PERMISSION)) {
+						prioPlayers.add(redPlayer);
+					} else {
+						nonPrioPlayers.add(redPlayer);
+					}
+				}
+				List<Player> redPlayers = new ArrayList<>();
+				for (Player player : nonPrioPlayers)
+					redPlayers.add(player);
+				for (Player player : prioPlayers)
+					redPlayers.add(player);
+				/** Maintenant, on ajoute le nbre de joueurs necessaires dans l'equipe bleu en plus de ceux qui ont pas de team **/
+				for (Player player : noTeamPlayers)
+					PlayerData.getPlayerData(player).setTeam(TeamManager.BLUE);
+				for (Player player : redPlayers) {
+					if (TeamManager.BLUE.getOnlinePlayers().size() < TeamManager.RED.getOnlinePlayers().size()) {
+						PlayerData.getPlayerData(player).setTeam(TeamManager.BLUE);
+					} else {
+						break;
+					}
+				}
+			} else if (noTeamCount > redTeamCount) {
+				/** On trie les joueurs de l'équipe pour obtenir une jolie liste triée en fonction de si ils ont la perm ou pas **/
+				List<Player> nonPrioPlayers = new ArrayList<>();
+				List<Player> prioPlayers = new ArrayList<>();
+				for (Player noTeamPlayer : noTeamPlayers) {
+					if (noTeamPlayer.hasPermission(BYPASS_TEAMS_PERMISSION)) {
+						prioPlayers.add(noTeamPlayer);
+					} else {
+						nonPrioPlayers.add(noTeamPlayer);
+					}
+				}
+				/** Maintenant on regarde lesquels on va foutre dans l'equipe rouge pour equilibrer **/
+				List<Player> bluePlayers = new ArrayList<>();
+				for (Player player : nonPrioPlayers)
+					bluePlayers.add(player);
+				for (Player player : prioPlayers)
+					bluePlayers.add(player);
+				/** Maintenant, on ajoute le nbre de joueurs necessaires dans l'equipe rouge en plus de ceux qui ont pas de team **/
+				for (Player player : noTeamPlayers)
+					PlayerData.getPlayerData(player).setTeam(TeamManager.BLUE);
+				for (Player player : bluePlayers) {
+					if (TeamManager.BLUE.getOnlinePlayers().size() > TeamManager.RED.getOnlinePlayers().size()) {
+						PlayerData.getPlayerData(player).setTeam(TeamManager.RED);
+					} else {
+						break;
+					}
+				}
+			}
+		} else if (redTeamCount == 0) {
+			if ((noTeamCount + 1) >= blueTeamCount && (noTeamCount - 1) <= blueTeamCount) {
+				for (Player player : Bukkit.getOnlinePlayers()) {
+					PlayerData data = PlayerData.getPlayerData(player);
+					if (!data.hasTeam())
+						data.setTeam(TeamManager.RED);
+				}
+			} else if (noTeamCount < blueTeamCount) {
+				/** On trie les joueurs de l'équipe pour obtenir une jolie liste triée en fonction de si ils ont la perm ou pas **/
+				List<Player> nonPrioPlayers = new ArrayList<>();
+				List<Player> prioPlayers = new ArrayList<>();
+				for (Player bluePlayer : TeamManager.BLUE.getOnlinePlayers()) {
+					if (bluePlayer.hasPermission(BYPASS_TEAMS_PERMISSION)) {
+						prioPlayers.add(bluePlayer);
+					} else {
+						nonPrioPlayers.add(bluePlayer);
+					}
+				}
+				List<Player> bluePlayers = new ArrayList<>();
+				for (Player player : nonPrioPlayers)
+					bluePlayers.add(player);
+				for (Player player : prioPlayers)
+					bluePlayers.add(player);
+				/** Maintenant, on ajoute le nbre de joueurs necessaires dans l'equipe rouge en plus de ceux qui ont pas de team **/
+				for (Player player : noTeamPlayers)
+					PlayerData.getPlayerData(player).setTeam(TeamManager.RED);
+				for (Player player : bluePlayers) {
+					if (TeamManager.BLUE.getOnlinePlayers().size() > TeamManager.RED.getOnlinePlayers().size()) {
+						PlayerData.getPlayerData(player).setTeam(TeamManager.RED);
+					} else {
+						break;
+					}
+				}
+			} else if (noTeamCount > blueTeamCount) {
+				/** On trie les joueurs de l'équipe pour obtenir une jolie liste triée en fonction de si ils ont la perm ou pas **/
+				List<Player> nonPrioPlayers = new ArrayList<>();
+				List<Player> prioPlayers = new ArrayList<>();
+				for (Player noTeamPlayer : noTeamPlayers) {
+					if (noTeamPlayer.hasPermission(BYPASS_TEAMS_PERMISSION)) {
+						prioPlayers.add(noTeamPlayer);
+					} else {
+						nonPrioPlayers.add(noTeamPlayer);
+					}
+				}
+				/** Maintenant on regarde lesquels on va foutre dans l'equipe rouge pour equilibrer **/
+				List<Player> redPlayers = new ArrayList<>();
+				for (Player player : nonPrioPlayers)
+					redPlayers.add(player);
+				for (Player player : prioPlayers)
+					redPlayers.add(player);
+				/** Maintenant, on ajoute tout les joueurs sans team dans la rouge et on vient equilibrer en en envoyant dans la bleu **/
+				for (Player player : noTeamPlayers)
+					PlayerData.getPlayerData(player).setTeam(TeamManager.RED);
+				for (Player player : redPlayers) {
+					if (TeamManager.BLUE.getOnlinePlayers().size() < TeamManager.RED.getOnlinePlayers().size()) {
+						PlayerData.getPlayerData(player).setTeam(TeamManager.BLUE);
+					} else {
+						break;
+					}
+				}
+			}
+		}
 	}
 }
