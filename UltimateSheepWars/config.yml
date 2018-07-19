@@ -15,7 +15,7 @@ countdown-before-starting: 60
 #
 #Amount of players which are required
 #to start the countdown (minimum of 2)
-min-players-to-start: 6
+min-players-to-start: 2
 #
 #Specify the number of seconds you want the killed player to stay in the killer's vision. 
 #Set 0 if you want to disable this option.
