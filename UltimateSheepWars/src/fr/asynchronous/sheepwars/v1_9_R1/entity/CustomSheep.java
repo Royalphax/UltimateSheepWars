@@ -3,15 +3,18 @@ package fr.asynchronous.sheepwars.v1_9_R1.entity;
 import java.lang.reflect.Field;
 
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_9_R1.CraftWorld;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.util.Vector;
 
 import com.google.common.collect.Sets;
 
+import fr.asynchronous.sheepwars.core.UltimateSheepWarsAPI;
 import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.data.PlayerData;
 import fr.asynchronous.sheepwars.core.handler.Particles;
@@ -89,12 +92,27 @@ public class CustomSheep extends EntitySheep {
 		}
 	}
 
-	/**@Override
+	@Override
 	public void move(double d0, double d1, double d2) {
-		Location newLocation = this.getBukkitEntity().getLocation().clone().add(d0, d1, d2);
-		this.noclip = newLocation.getBlock().getType() == Material.AIR;
+		if (this.getBukkitEntity().hasMetadata(UltimateSheepWarsAPI.SHEEPWARS_SHEEP_METADATA) && !this.ground) {
+			Location from = new Location(this.getBukkitEntity().getWorld(), this.locX, this.locY, this.locZ);
+			Location to = from.clone().add(this.motX, this.motY, this.motZ);
+			
+			Vector dir = to.subtract(from).toVector();
+			Vector copy = dir.clone();
+			boolean noclip = true;
+			for (double i = 0; i <= 1; i += 0.2) {
+			    copy.multiply(i);
+			    Location loc = from.clone().add(copy);
+			    UltimateSheepWarsPlugin.getVersionManager().getParticleFactory().playParticles(Particles.FIREWORKS_SPARK, from, 0.0F, 0.0F, 0.0F, 1, 0.0F);
+			    if (loc.getBlock().getType() != Material.AIR)
+			    	noclip = false;
+			    copy = dir.clone();
+			}
+			this.noclip = noclip;
+		}
 		super.move(d0, d1, d2);
-	}**/
+	}
 
 	@Override
 	public void g(float sideMot, float forMot) {
@@ -163,12 +181,9 @@ public class CustomSheep extends EntitySheep {
 	public void n() {
 		try {
 			if (this.sheep != null) {
-				/** On gère les particules **/
 				if ((this.onGround || this.inWater || this.sheep.isFriendly()) && !this.ground)
 					this.ground = true;
-				if (!this.ground) {
-					UltimateSheepWarsPlugin.getVersionManager().getParticleFactory().playParticles(Particles.FIREWORKS_SPARK, getBukkitEntity().getLocation().add(0, 0.5, 0), 0.0F, 0.0F, 0.0F, 1, 0.0F);
-				} else if (!this.isDead && (this.ticks <= 0 || !isAlive() || this.sheep.onTicking(this.player, this.ticks, getBukkitSheep(), this.plugin))) {
+				if (this.ground && !this.isDead && (this.ticks <= 0 || !isAlive() || this.sheep.onTicking(this.player, this.ticks, getBukkitSheep(), this.plugin))) {
 					this.isDead = true;
 					boolean death = true;
 					if (!this.passengers.isEmpty())
