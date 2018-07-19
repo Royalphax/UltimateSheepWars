@@ -18,8 +18,12 @@ public class RandomKit extends KitManager {
 	@Override
 	public boolean onEquip(Player player) {
 		final PlayerData data = PlayerData.getPlayerData(player);
-		KitManager kit = RandomUtils.getRandom(data.getKits());
-		data.setKit(kit);
-		return kit.onEquip(player);
+		if (data.getKits().isEmpty()) {
+			data.setKit(new NoneKit());
+		} else {
+			KitManager kit = RandomUtils.getRandom(data.getKits());
+			data.setKit(kit);
+		}
+		return data.getKit().onEquip(player);
 	}
 }
