@@ -17,6 +17,7 @@ import fr.asynchronous.sheepwars.core.event.UltimateSheepWarsEventListener;
 import fr.asynchronous.sheepwars.core.handler.Sounds;
 import fr.asynchronous.sheepwars.core.manager.BoosterManager;
 import fr.asynchronous.sheepwars.core.message.Message.MsgEnum;
+import fr.asynchronous.sheepwars.core.task.BoosterWoolTask;
 import fr.asynchronous.sheepwars.core.util.BlockUtils;
 
 public class ProjectileHit extends UltimateSheepWarsEventListener {
@@ -33,7 +34,7 @@ public class ProjectileHit extends UltimateSheepWarsEventListener {
 			ArrayList<Block> arrayList = BlockUtils.getSurrounding(sourceBlock, true, true);
 			Block block = null;
 			for (Block blc : arrayList)
-				if (blc.getType() == Material.WOOL && this.plugin.getGameTask().isBooster(blc.getLocation())) {
+				if (blc.getType() == Material.WOOL && blc.hasMetadata(BoosterWoolTask.BOOSTER_METADATA)) {
 					block = blc;
 					break;
 				}
@@ -50,6 +51,11 @@ public class ProjectileHit extends UltimateSheepWarsEventListener {
 					}
 				}
 			}
+			// DEBUG
+			sourceBlock.setType(Material.REDSTONE_BLOCK);
+			for (Block b : BlockUtils.getSurrounding(sourceBlock, false, true))
+				b.setType(Material.GLASS);
+			// DEBUG
 			arrow.remove();
 		}
 	}

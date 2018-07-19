@@ -1,7 +1,6 @@
 package fr.asynchronous.sheepwars.core.task;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Map.Entry;
 import java.util.Random;
 
@@ -175,13 +174,5 @@ public class GameTask extends BukkitRunnable {
 			if (DataManager.isConnected())
 				data.uploadData(offPlayer);
 		}
-	}
-	
-	public boolean isBooster(Location loc) {
-		List<Location> boostersLoc = ConfigManager.getLocations(Field.BOOSTERS);
-		List<Location> boostersBlock = new ArrayList<>();
-		for (Location location : boostersLoc)
-			boostersBlock.add(location.getBlock().getLocation());
-		return (boostersBlock.contains(loc.getBlock().getLocation()));
 	}
 }

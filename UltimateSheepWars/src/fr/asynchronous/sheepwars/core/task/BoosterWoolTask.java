@@ -7,6 +7,7 @@ import org.bukkit.DyeColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
@@ -22,6 +23,8 @@ import fr.asynchronous.sheepwars.core.util.RandomUtils;
 
 public class BoosterWoolTask extends BukkitRunnable {
 
+	public static final String BOOSTER_METADATA = "sheepwars_booster_block";
+	
 	public final GameTask currentTask;
 	
 	public final int boosterInterval;
@@ -42,6 +45,8 @@ public class BoosterWoolTask extends BukkitRunnable {
 		this.time = this.boosterInterval - 1;
 		for (BoosterManager boost : BoosterManager.getAvailableBoosters())
 			this.colors.add(boost.getDisplayColor().getColor());
+		for (Location boosters : ConfigManager.getLocations(Field.BOOSTERS))
+			boosters.getBlock().setMetadata(BOOSTER_METADATA, new FixedMetadataValue(this.currentTask.plugin, true));
 	}
 
 	public void run() {
