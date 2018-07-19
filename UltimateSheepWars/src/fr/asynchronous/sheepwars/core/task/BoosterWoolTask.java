@@ -7,7 +7,6 @@ import org.bukkit.DyeColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.material.Wool;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
@@ -66,7 +65,8 @@ public class BoosterWoolTask extends BukkitRunnable {
 			}
 		}
 		if (this.time == this.boosterInterval || !GameState.isStep(GameState.INGAME)) {
-			magicBlock.setType(this.lastSavedMaterial);
+			if (magicBlock != null && this.lastSavedMaterial != null)
+				magicBlock.setType(this.lastSavedMaterial);
 			if (!GameState.isStep(GameState.INGAME))
 				this.cancel();
 		}
