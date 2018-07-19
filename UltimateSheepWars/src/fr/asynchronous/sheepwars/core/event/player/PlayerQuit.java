@@ -31,7 +31,7 @@ public class PlayerQuit extends UltimateSheepWarsEventListener
         	} else if (GameState.isStep(GameState.INGAME)) {
         		player.getWorld().strikeLightning(player.getLocation().add(0,5,0));
             	for (Player online : Bukkit.getOnlinePlayers())
-            		online.sendMessage(Message.getMessage(online, MsgEnum.DIED_MESSAGE).replace("%VICTIM%", player.getName()));
+            		online.sendMessage(Message.getMessage(online, MsgEnum.DIED_MESSAGE).replace("%VICTIM%", data.getTeam().getColor() + player.getName()));
         	}
         }
         
