@@ -298,7 +298,7 @@ public class UltimateSheepWarsPlugin extends JavaPlugin {
 					}
 				} catch (FileNotFoundException | UnknownHostException ex) {
 					new ExceptionManager(ex).register(false);
-					disablePlugin(Level.SEVERE, "You don't have a valid internet connection, please connect to the internet for the plugin to work.");
+					getLogger().info("You don't have a valid internet connection, you will not be notified of the new updates and what is their content.");
 				} catch (IOException ex) {
 					// Do nothing
 				}

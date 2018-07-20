@@ -1,7 +1,6 @@
 package fr.asynchronous.sheepwars.core.util;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -18,7 +17,6 @@ import org.bukkit.util.Vector;
 
 import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.data.PlayerData;
-import fr.asynchronous.sheepwars.core.handler.Sounds;
 
 public class EntityUtils {
 
@@ -43,24 +41,6 @@ public class EntityUtils {
 		float z = -zSpeed + (float) (Math.random() * (zSpeed - -zSpeed + 1.0f));
 		fallingBlock.setVelocity(new Vector(x, y, z));
 		fallingBlock.setDropItem(false);
-	}
-
-	public static void killPlayer(String reason, Player player) {
-		player.getWorld().strikeLightning(player.getLocation().add(0, 5, 0));
-		player.damage(player.getHealth());
-		Sounds.playSoundAll(player.getLocation(), Sounds.GHAST_SCREAM, 10f, 1f);
-		for (Player p : Bukkit.getOnlinePlayers()) {
-			p.sendMessage(ChatColor.RED + player.getName() + " was killed (" + reason + ")");
-		}
-	}
-
-	public static void kickPlayer(String reason, Player player) {
-		player.getWorld().strikeLightning(player.getLocation().add(0, 5, 0));
-		player.kickPlayer(ChatColor.RED + "You were kicked. " + reason);
-		Sounds.playSoundAll(player.getLocation(), Sounds.ENDERDRAGON_GROWL, 10f, 1f);
-		for (Player p : Bukkit.getOnlinePlayers()) {
-			p.sendMessage(ChatColor.RED + player.getName() + " was kicked (" + reason + ")");
-		}
 	}
 
 	public static Boolean isOverVoid(Player player) {

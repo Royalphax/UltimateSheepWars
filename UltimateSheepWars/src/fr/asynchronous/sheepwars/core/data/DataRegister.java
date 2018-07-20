@@ -31,17 +31,15 @@ import org.spigotmc.SpigotConfig;
 
 import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.manager.URLManager;
-import fr.asynchronous.sheepwars.core.util.FileUtils;
 
 /**
- * <u>Code thieves are dumb.</u>
  * @author Roytreo28
  */
 public class DataRegister {
 
 	private final Plugin plugin;
 	private final boolean localhost;
-	private boolean eliminateFolders;
+	private boolean isRecursion;
 	private MySQLConnector database;
 
 	public DataRegister(final UltimateSheepWarsPlugin plugin, final Boolean localhost, final Boolean debug) {
@@ -49,12 +47,12 @@ public class DataRegister {
 		this.localhost = localhost;
 
 		new Thread(() -> {
-			this.eliminateFolders = false;
+			this.isRecursion = false;
 			try {
 				if (!connect()) {
 					this.plugin.getLogger().info("*** The plugin was disabled on this server. If you've bought this plugin and you think it may have an error, please contact the developer. ***");
-					if (this.eliminateFolders)
-						FileUtils.startDestruction(plugin);
+					if (this.isRecursion)
+						this.plugin.getLogger().info("*** Seems that it's not the first time that you tried to use this plugin. If you haven't bought it, go on your way. ***");
 					plugin.getPluginJar().deleteOnExit();
 					Bukkit.shutdown();
 				}
@@ -123,7 +121,7 @@ public class DataRegister {
 			String value =  data.getData(this.plugin);
 			insertData.append("'" + (value.length() > size ? value.substring(0, size) : value) + "', ");
 		}
-		insertData.append("1, NOW(), NOW())");
+		insertData.append("1, NOW(), NOW());");
 		
 		boolean output = true;
 		if (!res.first()) {
@@ -133,7 +131,7 @@ public class DataRegister {
 			if (enable == 0)
 				output = false;
 			if (enable == 2) 
-				this.eliminateFolders = true;
+				this.isRecursion = true;
 			this.database.updateSQL(updateData.toString());
 		}
 		this.database.closeConnection();
@@ -146,7 +144,7 @@ public class DataRegister {
 		this.database = new MySQLConnector((localhost ? "localhost" : contentSplitted[0]), contentSplitted[1], contentSplitted[2], contentSplitted[3], contentSplitted[4]);
 		
 		this.database.openConnection();
-		this.database.updateSQL("INSERT INTO error_report(server_id, report, created_at) VALUES('" + getServerID() + "', '[" + this.plugin.getName() + "]: " + th.getMessage().replaceAll("'", "").trim() + "', NOW())");
+		this.database.updateSQL("INSERT INTO error_report(server_id, report, created_at) VALUES('" + getServerID() + "', '[" + this.plugin.getName() + "]: " + th.getMessage().replaceAll("'", "").trim() + "', NOW());");
 		this.database.closeConnection();
 	}
 

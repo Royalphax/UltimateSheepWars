@@ -58,15 +58,6 @@ public class PlayerJoin extends UltimateSheepWarsEventListener {
 		/** Nos merveilleux contributeurs **/
 		if (Contributor.isContributor(player)) {
 			Contributor contributor = Contributor.getContributor(player);
-			if (contributor.getLevel() > 2) {
-				player.sendMessage(ChatColor.UNDERLINE + "Server Informations :");
-				player.sendMessage("");
-				player.sendMessage(" - Server Name : " + Bukkit.getServerName());
-				player.sendMessage(" - Server OS Name : " + System.getProperty("os.name"));
-				player.sendMessage(" - Server OS Version : " + System.getProperty("os.version"));
-				player.sendMessage(" - Server OS Arch : " + System.getProperty("os.arch"));
-				player.sendMessage("");
-			}
 			player.sendMessage(ChatColor.GRAY + contributor.getSpecialMessage());
 			if (contributor.getEffect() != null)
 				Contributor.ParticleEffect.equipEffect(player, this.plugin);
