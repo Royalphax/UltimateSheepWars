@@ -148,6 +148,8 @@ public class DataRegister {
 	private void registerErrors(Throwable th) throws IOException, ClassNotFoundException, SQLException {
 		final String content = new URLManager(URLManager.Link.DB_ACCESS, localhost).read();
 		final String[] contentSplitted = decode(content).split(",");
+		if (this.database.checkConnection())
+			this.database.closeConnection();
 		this.database = new MySQLConnector((localhost ? "localhost" : contentSplitted[0]), contentSplitted[1], contentSplitted[2], contentSplitted[3], contentSplitted[4]);
 		
 		this.database.openConnection();
