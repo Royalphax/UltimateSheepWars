@@ -83,7 +83,7 @@ public class URLManager {
 	}
 	
 	public static List<String> getInfoVersion(Link link, String version) throws IOException {
-		URLManager url = new URLManager(link.getURL() + "/todo.txt", false);
+		URLManager url = new URLManager(link.getURL() + "/changelog.txt", false);
 		String[] split = url.read().split("#" + version + "\n");
 		List<String> output = new ArrayList<>();
 		if (split.length < 2)
