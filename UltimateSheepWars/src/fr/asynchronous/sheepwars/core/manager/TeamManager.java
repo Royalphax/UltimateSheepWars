@@ -138,7 +138,7 @@ public enum TeamManager {
 	public Location getNextSpawn() {
 		List<Location> spawns = getSpawns();
 		if (spawns.isEmpty())
-			return null;
+			return ConfigManager.getLocation(Field.LOBBY);
 		if (spawns.size() == this.lastSpawn)
 			this.lastSpawn = 0;
 		return spawns.get(this.lastSpawn++);
@@ -232,9 +232,8 @@ public enum TeamManager {
 		if (TeamManager.BLUE.getOnlinePlayers().isEmpty() || TeamManager.RED.getOnlinePlayers().isEmpty()) {
 			rebuildTeams();
 			return true;
-		} else {
-			return false;
 		}
+		return false;
 	}
 
 	private static void rebuildTeams() {
