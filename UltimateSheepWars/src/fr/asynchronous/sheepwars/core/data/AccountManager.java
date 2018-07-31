@@ -29,9 +29,8 @@ public class AccountManager {
 		String owner = ConfigManager.getString(Field.OWNER);
 		if (owner.equals("null")) {
 			owner = getAccountName(userid);
-			if (owner.equals("null")) {
+			if (owner.equals("null"))
 				this.askForOwnerName = true;
-			}
 		}
 		this.owner = owner;
 	}
@@ -41,7 +40,6 @@ public class AccountManager {
 	}
 	
 	public void openGUI(final Player player) {
-		final GameMode gm = player.getGameMode();
 		player.setGameMode(GameMode.SPECTATOR);
 		UltimateSheepWarsPlugin.getVersionManager().newAnvilGUI(player, this.plugin, new AAnvilGUI.AnvilClickEventHandler() {
             @Override
@@ -50,9 +48,9 @@ public class AccountManager {
                     event.setWillClose(true);
                     event.setWillDestroy(true);
                     String output = event.getName();
-                    player.setGameMode(gm);
                     if (setOwner(output.trim())) {
-						player.sendMessage(ChatColor.GREEN + "This plugin was linked to " + ChatColor.AQUA + output + ChatColor.GREEN + "'s spigot account. " + ChatColor.GREEN + "You are able to update this name at any moment with /sw changeowner. " + (!Utils.isPluginConfigured() ? ChatColor.GREEN + "Now, begin/continue to setup the game with /sw help." : "The server is ready to play !"));
+						player.sendMessage(ChatColor.GREEN + "This plugin was linked to " + ChatColor.AQUA + output + ChatColor.GREEN + "'s spigot account. " + (!Utils.isPluginConfigured() ? ChatColor.GREEN + "Now, begin/continue to setup the game with /sw help." : "The server is ready to play !"));
+						player.setGameMode(GameMode.CREATIVE);
                     } else {
                     	player.sendMessage(ChatColor.RED + "Try again.");
                     }
