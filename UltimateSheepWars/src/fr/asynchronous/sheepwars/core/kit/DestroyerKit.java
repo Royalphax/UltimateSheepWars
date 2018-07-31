@@ -26,7 +26,7 @@ import fr.asynchronous.sheepwars.core.util.RandomUtils;
 
 public class DestroyerKit extends KitManager {
 
-	public static final Integer TNT_COUNT = 3;
+	public static final Integer TNT_COUNT = 1;
 	
 	public DestroyerKit() {
 		super(4, MsgEnum.KIT_DESTROYER_NAME, MsgEnum.KIT_DESTROYER_DESCRIPTION, "sheepwars.kit.destroyer", 10, 10, new ItemBuilder(Material.TNT));
@@ -64,7 +64,7 @@ public class DestroyerKit extends KitManager {
 			} else {
 				newItem.setAmount(item.getAmount() - 1);
 			}
-			player.setItemOnCursor(newItem);
+			UltimateSheepWarsPlugin.getVersionManager().getNMSUtils().setItemInHand(newItem, player);
 			final org.bukkit.entity.TNTPrimed tnt = player.getWorld().spawn(player.getLocation().add(0,2.0,0), TNTPrimed.class);
 			final Double velocity = ConfigManager.getDouble(Field.SHEEP_VELOCITY);
 			

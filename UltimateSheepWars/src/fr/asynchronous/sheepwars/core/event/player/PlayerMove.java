@@ -36,13 +36,13 @@ public class PlayerMove extends UltimateSheepWarsEventListener
         final Location to = event.getTo();
         
         /** On verifie que monsieur a deja rentre ses identifiants **/
-        if (this.plugin.getAccountManager().askForOwnerName())
+        if (UltimateSheepWarsPlugin.getAccount().askForOwnerName())
         {
         	/**if (!player.isFlying() && player.getLocation().subtract(0,1,0).getBlock().getType() == Material.AIR) {
         		player.setAllowFlight(true);
         		player.setFlying(true);
         	}**/
-        	this.plugin.getAccountManager().openGUI(player);
+        	UltimateSheepWarsPlugin.getAccount().openGUI(player);
         	
         }
         

@@ -10,6 +10,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.material.Wool;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.data.PlayerData;
@@ -30,33 +31,32 @@ public class ProjectileHit extends UltimateSheepWarsEventListener {
 		if (event.getEntity() instanceof Arrow && event.getEntity().getShooter() instanceof Player) {
 			final Arrow arrow = (Arrow) event.getEntity();
 			final Player player = (Player) arrow.getShooter();
-			Block sourceBlock = arrow.getLocation().getBlock();
-			ArrayList<Block> arrayList = BlockUtils.getSurrounding(sourceBlock, true, true);
-			Block block = null;
-			for (Block blc : arrayList)
-				if (blc.getType() == Material.WOOL && blc.hasMetadata(BoosterWoolTask.BOOSTER_METADATA)) {
-					block = blc;
-					break;
-				}
-			if (block != null && block.getType() == Material.WOOL) {
-				final PlayerData data = PlayerData.getPlayerData(player);
-				final Wool wool = (Wool) block.getState().getData();
-				if (data.hasTeam()) {
-					block.setType(Material.AIR);
-					Sounds.playSoundAll(block.getLocation(), Sounds.CHICKEN_EGG_POP, 5f, 2f);
-					final BoosterManager booster = BoosterManager.activateBooster(player, wool.getColor(), this.plugin);
-					for (Player online : Bukkit.getOnlinePlayers()) {
-						PlayerData onlineData = PlayerData.getPlayerData(online);
-						online.sendMessage(onlineData.getLanguage().getMessage(MsgEnum.BOOSTER_ACTION).replaceAll("%PLAYER%", data.getTeam().getColor() + player.getName()).replaceAll("%BOOSTER%", onlineData.getLanguage().getMessage(booster.getName())));
+			new BukkitRunnable() {
+				public void run() {
+					final Block sourceBlock = arrow.getLocation().getBlock();
+					ArrayList<Block> arrayList = BlockUtils.getSurrounding(sourceBlock, true, true);
+					Block block = null;
+					for (Block blc : arrayList)
+						if (blc.getType() == Material.WOOL && blc.hasMetadata(BoosterWoolTask.BOOSTER_METADATA)) {
+							block = blc;
+							break;
+						}
+					if (block != null && block.getType() == Material.WOOL) {
+						final PlayerData data = PlayerData.getPlayerData(player);
+						final Wool wool = (Wool) block.getState().getData();
+						if (data.hasTeam()) {
+							block.setType(Material.AIR);
+							Sounds.playSoundAll(block.getLocation(), Sounds.CHICKEN_EGG_POP, 5f, 2f);
+							final BoosterManager booster = BoosterManager.activateBooster(player, wool.getColor(), plugin);
+							for (Player online : Bukkit.getOnlinePlayers()) {
+								PlayerData onlineData = PlayerData.getPlayerData(online);
+								online.sendMessage(onlineData.getLanguage().getMessage(MsgEnum.BOOSTER_ACTION).replaceAll("%PLAYER%", data.getTeam().getColor() + player.getName()).replaceAll("%BOOSTER%", onlineData.getLanguage().getMessage(booster.getName())));
+							}
+						}
 					}
+					arrow.remove();
 				}
-			}
-			// DEBUG
-			sourceBlock.setType(Material.REDSTONE_BLOCK);
-			for (Block b : BlockUtils.getSurrounding(sourceBlock, false, true))
-				b.setType(Material.GLASS);
-			// DEBUG
-			arrow.remove();
+			}.runTaskLater(this.plugin, 5);
 		}
 	}
 }

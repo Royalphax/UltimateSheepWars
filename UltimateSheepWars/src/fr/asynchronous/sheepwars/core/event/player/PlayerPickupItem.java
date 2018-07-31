@@ -36,7 +36,8 @@ public class PlayerPickupItem extends UltimateSheepWarsEventListener {
 				SheepManager sheep = RandomUtils.getRandom(correspondingSheeps);
 				event.getItem().remove();
 				Sounds.playSound(event.getPlayer(), event.getPlayer().getLocation(), Sounds.ITEM_PICKUP, 1f, 1f);
-				SheepManager.giveSheep(event.getPlayer(), sheep);
+				for (int i = 0; i < event.getItem().getItemStack().getAmount(); i++)
+					SheepManager.giveSheep(event.getPlayer(), sheep);
 			}
 		}
 	}

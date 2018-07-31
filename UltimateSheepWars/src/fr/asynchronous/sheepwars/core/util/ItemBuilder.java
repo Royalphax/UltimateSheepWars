@@ -181,6 +181,12 @@ public class ItemBuilder {
 			addLoreLine(lines[i]);
 		return this;
 	}
+	
+	public ItemBuilder addLoreLine(List<String> lines) {
+		for (String str : lines)
+			addLoreLine(str);
+		return this;
+	}
 
 	public ItemBuilder addLoreLine(String line) {
 		ItemMeta im = is.getItemMeta();

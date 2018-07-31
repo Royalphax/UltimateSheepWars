@@ -1,18 +1,19 @@
 package fr.asynchronous.sheepwars.core.gui;
 
-import org.bukkit.Bukkit;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.bukkit.ChatColor;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
+import org.bukkit.SkullType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
-import fr.asynchronous.sheepwars.core.data.PlayerData;
 import fr.asynchronous.sheepwars.core.gui.base.GuiScreen;
 import fr.asynchronous.sheepwars.core.handler.Contributor;
 import fr.asynchronous.sheepwars.core.handler.Sounds;
-import fr.asynchronous.sheepwars.core.manager.TeamManager;
 import fr.asynchronous.sheepwars.core.task.BeginCountdown;
 import fr.asynchronous.sheepwars.core.util.ItemBuilder;
 
@@ -21,41 +22,29 @@ public class ContributorsInventory extends GuiScreen {
 	public Contributor contributor;
 
 	public ContributorsInventory() {
-		super(6, false);
+		super(1, false);
 	}
 
 	@Override
 	public void drawScreen() {
 		this.contributor = Contributor.getContributor(this.player);
-
-		setItem(new ItemBuilder(Material.WOOL).setColor(DyeColor.RED).setName(ChatColor.RED + "" + ChatColor.BOLD + "Red Team").toItemStack(), 0);
-		setItem(new ItemBuilder(Material.WOOL).setColor(DyeColor.BLUE).setName(ChatColor.BLUE + "" + ChatColor.BOLD + "Blue Team").toItemStack(), 18);
-		int redSlot = 1;
-		int blueSlot = 19;
-		for (Player online : Bukkit.getOnlinePlayers()) {
-			TeamManager team = PlayerData.getPlayerData(online).getTeam();
-			ItemStack item = new ItemBuilder(Material.SKULL_ITEM).setSkullOwner(online.getName()).setName(ChatColor.AQUA + online.getName()).toItemStack();
-			switch (team) {
-				case BLUE :
-					setItem(item, blueSlot);
-					blueSlot++;
-					break;
-				case RED :
-					setItem(item, redSlot);
-					redSlot++;
-					break;
-				default :
-					break;
+		final String[] messageSplitted = this.contributor.getSpecialMessage().split(" ");
+		final int limit = 30;
+		List<String> messageLore = new ArrayList<>();
+		String nextLore = "";
+		for (String str : messageSplitted) {
+			if (nextLore.length() + str.length() <= limit) {
+				nextLore += " " + str;
+			} else {
+				messageLore.add(ChatColor.WHITE + nextLore);
+				nextLore = str;
 			}
-			if (redSlot > 17 || blueSlot > 35)
-				break;
 		}
-		for (int i = 36; i < 45; i++)
-			setItem(new ItemBuilder(Material.STAINED_GLASS_PANE).setColor(DyeColor.GRAY).toItemStack(), i);
-		setItem(new ItemBuilder(Material.INK_SACK).setColor((this.contributor.isEffectActive() ? DyeColor.LIME : DyeColor.GRAY)).setName(ChatColor.YELLOW + "Contributor Particles: " + (this.contributor.isEffectActive() ? ChatColor.GREEN : ChatColor.RED) + ChatColor.BOLD + (this.contributor.isEffectActive() ? "ON" : "OFF")).setLore(ChatColor.GRAY + "Click to toggle it!").toItemStack(), 49);
-		if (!this.plugin.hasPreGameTaskStarted() || !this.plugin.getPreGameTask().wasForced())
-			setItem(new ItemBuilder(Material.WATCH).setName(ChatColor.GREEN + "Shorten countdown").toItemStack(), 46);
-		setItem(new ItemBuilder(Material.BARRIER).setName(ChatColor.RED + "Close").toItemStack(), 53);
+		messageLore.add(ChatColor.WHITE + nextLore);
+
+		setItem(new ItemBuilder(Material.INK_SACK).setColor((this.contributor.isEffectActive() ? DyeColor.LIME : DyeColor.GRAY)).setName(ChatColor.YELLOW + "Contributor Particles: " + (this.contributor.isEffectActive() ? ChatColor.GREEN : ChatColor.RED) + ChatColor.BOLD + (this.contributor.getEffect().toString().replaceAll("_", " "))).setLore(ChatColor.GRAY + "Click to toggle it!").toItemStack(), 0);
+		setItem(new ItemBuilder(Material.BARRIER).setName(ChatColor.RED + "Close").toItemStack(), 8);
+		setItem(new ItemBuilder(Material.SKULL_ITEM, 1, (byte) SkullType.PLAYER.ordinal()).setSkullOwner(this.player.getName()).setName(ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + "CONTRIBUTOR " + ChatColor.YELLOW + this.player.getName()).addLoreLine("", ChatColor.GRAY + "Developer's message:").addLoreLine(messageLore).toItemStack(), 4);
 	}
 
 	@Override
@@ -83,8 +72,8 @@ public class ContributorsInventory extends GuiScreen {
 			} else if (item.getItemMeta().getDisplayName().contains("Shorten countdown")) {
 				Sounds.playSoundAll(clicker.getLocation(), Sounds.NOTE_SNARE_DRUM, 1f, 1f);
 				if (!this.plugin.hasPreGameTaskStarted())
-            		new BeginCountdown(this.plugin);
-            	this.plugin.getPreGameTask().shortenCountdown();
+					new BeginCountdown(this.plugin);
+				this.plugin.getPreGameTask().shortenCountdown();
 				clicker.closeInventory();
 			}
 		}

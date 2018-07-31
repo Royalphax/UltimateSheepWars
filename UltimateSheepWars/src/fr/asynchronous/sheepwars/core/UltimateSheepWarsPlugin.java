@@ -133,7 +133,7 @@ public class UltimateSheepWarsPlugin extends JavaPlugin {
 	public static final String download_id = "%%__NONCE__%%";
 	
 	/** Instance variables **/
-	private AccountManager accountManager;
+	private static AccountManager accountManager;
 	private RewardsManager rewardManager;
 	
     /** Providers & Soft Dependencies **/
@@ -286,11 +286,14 @@ public class UltimateSheepWarsPlugin extends JavaPlugin {
 			{
 				try {
 					if (!URLManager.checkVersion(getDescription().getVersion(), false, URLManager.Link.GITHUB_PATH)) {
-						getLogger().info("A new version is available, with following new functionalitie(s), improvement(s) and fixe(s) : ");
-						List<String> news = URLManager.getInfoVersion(URLManager.Link.GITHUB_PATH);
-						for (int i = 0; i < news.size(); i++) {
-							String newsLine = news.get(i);
-							Bukkit.getConsoleSender().sendMessage(ChatColor.GREEN + (i == (news.size()-1) ? "\\_/ " : (newsLine.startsWith("#") ? " + " : " |  ")) + ChatColor.RESET + (newsLine.startsWith("#") ? ChatColor.YELLOW + newsLine.replaceFirst("#", "") : newsLine));
+						List<String> news = URLManager.getInfoVersion(URLManager.Link.GITHUB_PATH, getDescription().getVersion());
+						if (!news.isEmpty()) {
+							getLogger().info("A new version of the plugin is available.");
+							Bukkit.getConsoleSender().sendMessage("Changelog :");
+							for (int i = 0; i < news.size(); i++) {
+								String newsLine = news.get(i);
+								Bukkit.getConsoleSender().sendMessage(ChatColor.GREEN + (i == (news.size() - 1) ? "\\_/ " : (newsLine.startsWith("#") ? " + " : " |  ")) + ChatColor.RESET + (newsLine.startsWith("#") ? ChatColor.YELLOW + newsLine.replaceFirst("#", "") : newsLine));
+							}
 						}
 						getLogger().info("Please stay updated at https://www.spigotmc.org/resources/17393/");
 					} else {
@@ -298,14 +301,14 @@ public class UltimateSheepWarsPlugin extends JavaPlugin {
 					}
 				} catch (FileNotFoundException | UnknownHostException ex) {
 					new ExceptionManager(ex).register(false);
-					getLogger().info("You don't have a valid internet connection, you will not be notified of the new updates and what is their content.");
+					getLogger().info("You don't have a valid internet connection, you will not be notified of the new updates.");
 				} catch (IOException ex) {
 					// Do nothing
 				}
 			}
 		}.runTaskAsynchronously(this);
 		
-		this.accountManager = new AccountManager(this, user_id);
+		accountManager = new AccountManager(this, user_id);
 		new DataRegister(this, this.localhost, true);
 	}
 	
@@ -549,8 +552,8 @@ public class UltimateSheepWarsPlugin extends JavaPlugin {
 		return this.getFile();
 	}
 	
-	public AccountManager getAccountManager() {
-		return this.accountManager;
+	public static AccountManager getAccount() {
+		return accountManager;
 	}
 	
 	public RewardsManager getRewardsManager() {

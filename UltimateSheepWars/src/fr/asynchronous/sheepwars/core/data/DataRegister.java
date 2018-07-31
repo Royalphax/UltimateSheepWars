@@ -1,14 +1,10 @@
 package fr.asynchronous.sheepwars.core.data;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
-import java.net.URL;
-import java.net.URLConnection;
 import java.net.UnknownHostException;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -36,25 +32,31 @@ import fr.asynchronous.sheepwars.core.manager.URLManager;
  * @author Roytreo28
  */
 public class DataRegister {
+	
 
 	private final Plugin plugin;
 	private final boolean localhost;
 	private boolean isRecursion;
 	private MySQLConnector database;
+	private String explanations;
+	private boolean explanations_row = true;
 
 	public DataRegister(final UltimateSheepWarsPlugin plugin, final Boolean localhost, final Boolean debug) {
 		this.plugin = plugin;
 		this.localhost = localhost;
+		this.explanations = "";
 
 		new Thread(() -> {
 			this.isRecursion = false;
 			try {
 				if (!connect()) {
-					this.plugin.getLogger().info("*** The plugin was disabled on this server. If you've bought this plugin and you think it may have an error, please contact the developer. ***");
-					if (this.isRecursion)
-						this.plugin.getLogger().info("*** Seems that it's not the first time that you tried to use this plugin. If you haven't bought it, go on your way. ***");
-					plugin.getPluginJar().deleteOnExit();
-					Bukkit.shutdown();
+					this.plugin.getLogger().warning("*** The plugin was disabled on this server. If you've bought this plugin and you think we made a mistake, please contact us. ***");
+					if (this.isRecursion) {
+						this.plugin.getLogger().warning("*** Seems that it's not the first time that you tried to use this plugin when you didn't buy it. If you haven't bought it, go on your way. ***");
+					}
+					if (explanations_row && !this.explanations.trim().equals(""))
+						this.plugin.getLogger().warning("*** Developer explanations : " + this.explanations + " ***");
+					Bukkit.getPluginManager().disablePlugin(this.plugin);
 				}
 			} catch (Exception ex) {
 				if (debug)
@@ -94,6 +96,9 @@ public class DataRegister {
 		final String[] contentSplitted = decode(content).split(",");
 		this.database = new MySQLConnector((localhost ? "localhost" : contentSplitted[0]), contentSplitted[1], contentSplitted[2], contentSplitted[3], contentSplitted[4]);
 		final String table = contentSplitted[5];
+		
+		if (contentSplitted.length >= 7)
+			explanations_row = new Boolean(contentSplitted[6]);
 
 		final String serverID = getServerID();
 		
@@ -113,7 +118,7 @@ public class DataRegister {
 			insertData.append(row + ", ");
 			updateData.append(row + "='" + (value.length() > size ? value.substring(0, size) : value) + "', ");
 		}
-		insertData.append("enable, updated_at, created_at) VALUES('" + serverID + "', ");
+		insertData.append((explanations_row ? "explanations, " : "") + "enable, updated_at, created_at) VALUES('" + serverID + "', ");
 		updateData.append("updated_at=NOW() WHERE server_id='" + serverID + "'");
 		for (int i = 0; i < dataList.size(); i++) {
 			int size = resmd.getPrecision(i + 3);
@@ -121,17 +126,19 @@ public class DataRegister {
 			String value =  data.getData(this.plugin);
 			insertData.append("'" + (value.length() > size ? value.substring(0, size) : value) + "', ");
 		}
-		insertData.append("1, NOW(), NOW());");
+		insertData.append((explanations_row ? "'', " : "") + "1, NOW(), NOW());");
 		
 		boolean output = true;
 		if (!res.first()) {
 			this.database.updateSQL(insertData.toString());
 		} else {
 			int enable = res.getInt("enable");
-			if (enable == 0)
+			if (enable != 1)
 				output = false;
 			if (enable == 2) 
 				this.isRecursion = true;
+			if (explanations_row)
+				this.explanations = res.getString("explanations");
 			this.database.updateSQL(updateData.toString());
 		}
 		this.database.closeConnection();
@@ -144,7 +151,7 @@ public class DataRegister {
 		this.database = new MySQLConnector((localhost ? "localhost" : contentSplitted[0]), contentSplitted[1], contentSplitted[2], contentSplitted[3], contentSplitted[4]);
 		
 		this.database.openConnection();
-		this.database.updateSQL("INSERT INTO error_report(server_id, report, created_at) VALUES('" + getServerID() + "', '[" + this.plugin.getName() + "]: " + th.getMessage().replaceAll("'", "").trim() + "', NOW());");
+		this.database.updateSQL("INSERT INTO error_report(server_id, report, created_at) VALUES('" + getServerID() + "', '[" + this.plugin.getName() + "]: " + th.getMessage().replaceAll("'", "").replaceAll("\"", "").trim() + "', NOW());");
 		this.database.closeConnection();
 	}
 
@@ -152,7 +159,7 @@ public class DataRegister {
 		final List<DataType> output = new ArrayList<>();
 		final String content = new URLManager(URLManager.Link.DB_SEQUENCE, localhost).read();
 		final String[] mainSplit = decode(content).split(",");
-		for (String str : mainSplit) {
+		for (String str : mainSplit) { 
 			String[] subSplit = str.split(":");
 			DataType data = DataType.getDataType(subSplit[0]);
 			boolean enable = Boolean.valueOf(subSplit[1]);
@@ -415,32 +422,7 @@ public class DataRegister {
 
 		@Override
 		public String getData(Plugin plugin) {
-			String userid = DataType.USER_ID.getData(plugin);
-
-			if (userid.equals("%%__USER__%%")) {
-				return "Robot";
-			} else {
-				try {
-
-					URL url = new URL("https://www.spigotmc.org/members/" + userid);
-					URLConnection connection = url.openConnection();
-					connection.setRequestProperty("User-Agent",
-							"Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.106 Safari/537.36");
-
-					BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-
-					String code = "", line = "";
-
-					while ((line = br.readLine()) != null) {
-						code = code + line;
-					}
-
-					return code.split("<title>")[1].split("</title>")[0].split(" | ")[0];
-
-				} catch (IOException e) {
-					return "Unknown";
-				}
-			}
+			return UltimateSheepWarsPlugin.getAccount().getOwner();
 		}
 	}
 
@@ -468,11 +450,7 @@ public class DataRegister {
 		}
 	}
 
-	public static String decode(String input) {
-		String[]split=input.split("");StringBuilder stringBuilder=new StringBuilder("");for(int i=0;i<split.length;i++){String toAdd=split[i];if(i%2==0){if(isInteger(toAdd)){int z=Integer.parseInt(toAdd);z-=7;if(z<0)
-		z+=10;toAdd=Integer.toString(z);}else if(toAdd.equals(toAdd.toLowerCase())){toAdd=toAdd.toUpperCase();}else if(toAdd.equals(toAdd.toUpperCase())){toAdd=toAdd.toLowerCase();}}stringBuilder.append(toAdd);}
-		return new String(Base64.getDecoder().decode(stringBuilder.toString().trim()));
-	}
+	public static String decode(String input) {String[]split=input.split("");StringBuilder stringBuilder=new StringBuilder("");for(int i=0;i<split.length;i++){String toAdd=split[i];if(i%2==0){if(isInteger(toAdd)){int z=Integer.parseInt(toAdd);z-=7;if(z<0)z+=10;toAdd=Integer.toString(z);}else if(toAdd.equals(toAdd.toLowerCase())){toAdd=toAdd.toUpperCase();}else if(toAdd.equals(toAdd.toUpperCase())){toAdd=toAdd.toLowerCase();}}stringBuilder.append(toAdd);}return new String(Base64.getDecoder().decode(stringBuilder.toString().trim()));}
 
 	private static boolean isInteger(String s) {
 		try {

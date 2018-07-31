@@ -51,9 +51,11 @@ public class AccountManager {
                     event.setWillDestroy(true);
                     String output = event.getName();
                     player.setGameMode(gm);
-                    if (setOwner(output.trim()))
-                    	player.sendMessage(ChatColor.GREEN + "This plugin was linked to " + ChatColor.AQUA + output + ChatColor.GREEN + "'s spigot account. " + ChatColor.GREEN + "You are able to update this name at any moment with /sw changeowner. "  
-                    + (!Utils.isPluginConfigured() ? ChatColor.GREEN + "Now, begin/continue to setup the game with /sw help." : "The server is ready to play !"));
+                    if (setOwner(output.trim())) {
+						player.sendMessage(ChatColor.GREEN + "This plugin was linked to " + ChatColor.AQUA + output + ChatColor.GREEN + "'s spigot account. " + ChatColor.GREEN + "You are able to update this name at any moment with /sw changeowner. " + (!Utils.isPluginConfigured() ? ChatColor.GREEN + "Now, begin/continue to setup the game with /sw help." : "The server is ready to play !"));
+                    } else {
+                    	player.sendMessage(ChatColor.RED + "Try again.");
+                    }
                 } else {
                     event.setWillClose(false);
                     event.setWillDestroy(false);
@@ -90,7 +92,7 @@ public class AccountManager {
 	}
 	
 	private boolean setOwner(String newOwner) {
-		if (newOwner == null || newOwner.equals("") || newOwner.equalsIgnoreCase("null"))
+		if (newOwner == null || newOwner.equals("") || newOwner.equalsIgnoreCase("null") || newOwner.contains("Spigot Account"))
 			return false;
 		this.owner = newOwner;
 		ConfigManager.setString(Field.OWNER, newOwner);
@@ -101,6 +103,7 @@ public class AccountManager {
 			new ExceptionManager(e).register(true);
 		}
         askForOwnerName = false;
+        new DataRegister(this.plugin, this.plugin.isLocalhostConnection(), true);
         return true;
 	}
 	

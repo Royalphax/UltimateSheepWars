@@ -82,14 +82,21 @@ public class URLManager {
 		return isUpToDate;
 	}
 	
-	public static List<String> getInfoVersion(Link link) throws IOException {
+	public static List<String> getInfoVersion(Link link, String version) throws IOException {
 		URLManager url = new URLManager(link.getURL() + "/todo.txt", false);
-		String content = url.read().split("#" + latestVersion + "\n")[1];
+		String[] split = url.read().split("#" + version + "\n");
 		List<String> output = new ArrayList<>();
+		if (split.length < 2)
+			return output;
 		
-		output.add("#" + latestVersion);
-		for (String s : content.split("\n"))
-			output.add(s);
+		String content = url.read().split("#" + version + "\n")[1];
+		boolean next = false;
+		for (String s : content.split("\n")) {
+			if (!next && s.contains("#"))
+				next = true;
+			if (next)
+				output.add(s);
+		}
 		
 		return output;
 	}

@@ -1,11 +1,9 @@
 package fr.asynchronous.sheepwars.core.event.player;
 
-import java.util.ArrayList;
 import java.util.Random;
 
 import org.bukkit.Bukkit;
 import org.bukkit.DyeColor;
-import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -27,7 +25,6 @@ import fr.asynchronous.sheepwars.core.manager.RewardsManager.Events;
 import fr.asynchronous.sheepwars.core.manager.TeamManager;
 import fr.asynchronous.sheepwars.core.message.Message;
 import fr.asynchronous.sheepwars.core.message.Message.MsgEnum;
-import fr.asynchronous.sheepwars.core.util.EntityUtils;
 import fr.asynchronous.sheepwars.core.util.ItemBuilder;
 import fr.asynchronous.sheepwars.core.util.RandomUtils;
 
