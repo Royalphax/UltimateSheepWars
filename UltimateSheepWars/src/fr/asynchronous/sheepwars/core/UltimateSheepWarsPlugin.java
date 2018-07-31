@@ -129,8 +129,8 @@ public class UltimateSheepWarsPlugin extends JavaPlugin {
 	public static final File DATAFOLDER = new File("plugins/UltimateSheepWars/");
 	
 	/** Spigot premium placeholders **/
-	public static final String user_id = "%%__USER__%%";
-	public static final String download_id = "%%__NONCE__%%";
+	public static String user_id = "%%__USER__%%";
+	public static String download_id = "%%__NONCE__%%";
 	
 	/** Instance variables **/
 	private static AccountManager accountManager;
