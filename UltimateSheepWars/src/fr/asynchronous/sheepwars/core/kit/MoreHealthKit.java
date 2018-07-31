@@ -9,7 +9,7 @@ import fr.asynchronous.sheepwars.core.util.ItemBuilder;
 
 public class MoreHealthKit extends KitManager {
 
-	public static final Integer HEARTS_MORE = 2;
+	public static final Double HEARTS_MORE = 2.0;
 	
 	public MoreHealthKit() {
 		super(6, MsgEnum.KIT_MORE_HEALTH_NAME, MsgEnum.KIT_MORE_HEALTH_DESCRIPTION, "sheepwars.kit.morehealth", 15.0, 5, new ItemBuilder(Material.APPLE));
@@ -17,8 +17,9 @@ public class MoreHealthKit extends KitManager {
 
 	@Override
 	public boolean onEquip(Player player) {
-		player.setMaxHealth(20.0 + (HEARTS_MORE * 2));
-		player.setHealth(20.0 + (HEARTS_MORE * 2));
+		player.setMaxHealth(20.0 + (HEARTS_MORE * 2.0));
+		player.setHealthScaled(false);
+		player.setHealth(20.0 + (HEARTS_MORE * 2.0));
 		return true;
 	}
 }
