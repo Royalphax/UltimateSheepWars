@@ -54,10 +54,12 @@ public class Language {
 		this.name = this.config.getString("language-name", "Default");
 		this.intro = ChatColor.translateAlternateColorCodes('&', (this.config.getString("language-intro", "Current language: &a%NAME%").replaceAll("%NAME%", this.name)));
 		for (Message m : Message.getMessages()) {
-			if (this.config.getString(m.getStringId()) != null) {
-				messages.put(m, ChatColor.translateAlternateColorCodes('&', this.config.getString("messages." + m.getStringId())));
+			final String path = "messages." + m.getStringId();
+			final String value = this.config.getString(path, "null");
+			if (!value.equals("null")) {
+				messages.put(m, ChatColor.translateAlternateColorCodes('&', value));
 			} else {
-				this.config.set("messages." + m.getStringId(), m.uncolorized());
+				this.config.set(path, m.uncolorized());
 				messages.put(m, m.colorized());
 			}
 		}
@@ -66,7 +68,8 @@ public class Language {
 		} catch (IOException ex) {
 			new ExceptionManager(ex).register(true);
 		}
-		this.scoreboard_wrapper = new ScoreboardManager(ChatColor.DARK_GRAY + "- " + getMessage(MsgEnum.GAME_DISPLAY_NAME) + ChatColor.DARK_GRAY + " -", this.name);
+		final String title = ChatColor.DARK_GRAY + "- " + getMessage(MsgEnum.GAME_DISPLAY_NAME) + ChatColor.DARK_GRAY + " -";
+		this.scoreboard_wrapper = new ScoreboardManager(title, this.name);
 		this.scoreboard_wrapper.setLine(2, ChatColor.BLUE + "", true);
 		this.scoreboard_wrapper.setLine(5, ChatColor.WHITE + "", true);
 		if (GameState.isStep(GameState.INGAME))
