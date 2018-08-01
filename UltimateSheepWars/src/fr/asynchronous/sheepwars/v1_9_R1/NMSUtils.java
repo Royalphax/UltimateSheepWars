@@ -93,6 +93,8 @@ public class NMSUtils implements INMSUtils {
 	@Override
 	public void setHealth(final LivingEntity ent, final Double maxHealth) {
 		ent.setMaxHealth(maxHealth);
+		if (ent instanceof Player)
+			((Player) ent).setHealthScaled(false);
 		ent.setHealth(maxHealth);
 	}
 
