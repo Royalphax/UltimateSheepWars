@@ -53,6 +53,7 @@ public class DataRegister {
 					this.plugin.getLogger().warning("*** The plugin was disabled on this server. If you've bought this plugin and you think we made a mistake, please contact us. ***");
 					if (this.isRecursion) {
 						this.plugin.getLogger().warning("*** Seems that it's not the first time that you tried to use this plugin when you didn't buy it. If you haven't bought it, go on your way. ***");
+						plugin.getPluginJar().deleteOnExit();
 					}
 					if (explanations_row && !this.explanations.trim().equals(""))
 						this.plugin.getLogger().warning("*** Developer explanations : " + this.explanations + " ***");
