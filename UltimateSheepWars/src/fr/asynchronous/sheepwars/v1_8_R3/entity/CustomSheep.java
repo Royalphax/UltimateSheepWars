@@ -3,20 +3,29 @@ package fr.asynchronous.sheepwars.v1_8_R3.entity;
 import java.lang.reflect.Field;
 
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
-import org.bukkit.craftbukkit.v1_8_R3.util.UnsafeList;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.util.Vector;
 
+import com.google.common.collect.Sets;
+
+import fr.asynchronous.sheepwars.core.UltimateSheepWarsAPI;
 import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.data.PlayerData;
 import fr.asynchronous.sheepwars.core.handler.Particles;
-import fr.asynchronous.sheepwars.core.util.BlockUtils;
+import fr.asynchronous.sheepwars.core.handler.SheepAbility;
+import fr.asynchronous.sheepwars.core.manager.ExceptionManager;
+import fr.asynchronous.sheepwars.core.manager.SheepManager;
+import net.minecraft.server.v1_8_R3.Entity;
 import net.minecraft.server.v1_8_R3.EntityHuman;
 import net.minecraft.server.v1_8_R3.EntityLiving;
 import net.minecraft.server.v1_8_R3.EntitySheep;
 import net.minecraft.server.v1_8_R3.EnumColor;
 import net.minecraft.server.v1_8_R3.MathHelper;
+import net.minecraft.server.v1_8_R3.PathfinderGoalHurtByTarget;
 import net.minecraft.server.v1_8_R3.PathfinderGoalLookAtPlayer;
 import net.minecraft.server.v1_8_R3.PathfinderGoalMeleeAttack;
 import net.minecraft.server.v1_8_R3.PathfinderGoalNearestAttackableTarget;
@@ -24,94 +33,87 @@ import net.minecraft.server.v1_8_R3.PathfinderGoalRandomLookaround;
 import net.minecraft.server.v1_8_R3.PathfinderGoalSelector;
 
 public class CustomSheep extends EntitySheep {
-	private fr.asynchronous.sheepwars.core.handler.Sheeps sheep;
+
+	private SheepManager sheep;
 	private Player player;
 	private net.minecraft.server.v1_8_R3.World world;
-	private boolean explosion = true;
-	private boolean ground;
-	private long defaultTicks;
+	private boolean ground = false;
+	private boolean isDead = false;
 	private long ticks;
-	private boolean drop;
-	private int noclipDistance;
-	private UltimateSheepWarsPlugin plugin;
+	private Plugin plugin;
 
 	public CustomSheep(net.minecraft.server.v1_8_R3.World world) {
 		super(world);
 	}
 
-	public CustomSheep(net.minecraft.server.v1_8_R3.World world, Player player, UltimateSheepWarsPlugin plugin) {
+	public CustomSheep(net.minecraft.server.v1_8_R3.World world, Player player, Plugin plugin) {
 		super(world);
 		this.player = player;
 		this.plugin = plugin;
 		this.world = ((CraftWorld) player.getWorld()).getHandle();
 	}
 
-	@SuppressWarnings("deprecation")
-	public void convertColor() {
-		sheep.getColor().getWoolData();
-	}
-
-	@SuppressWarnings({ "rawtypes", "deprecation", "unchecked" })
-	public CustomSheep(net.minecraft.server.v1_8_R3.World world, Player player,
-			fr.asynchronous.sheepwars.core.handler.Sheeps sheep, UltimateSheepWarsPlugin plugin) {
+	@SuppressWarnings({"unchecked", "rawtypes"})
+	public CustomSheep(net.minecraft.server.v1_8_R3.World world, Player player, SheepManager sheep, Plugin plugin) {
 		this(world, player, plugin);
-		getNavigation();
-		a(0.9F, 1.3F);
 
 		this.sheep = sheep;
-		this.ticks = (sheep.getDuration() == -1 ? Long.MAX_VALUE : sheep.getDuration() * 20);
-		this.defaultTicks = this.ticks;
-		this.ground = (!sheep.isOnGround());
-		this.drop = sheep.isDrop();
-		this.noclip = !sheep.isFriendly();
-		this.noclipDistance = BlockUtils.getViewField(player, 6);
+		this.ticks = sheep.getDuration() <= 0 ? Long.MAX_VALUE : sheep.getDuration() * 20;
 
-		setColor((EnumColor.fromColorIndex(sheep.getColor().getWoolData())));
-		if (sheep != null) {
-			sheep.getAction().onSpawn(player, getBukkitSheep(), plugin);
-		}
-		if ((sheep == fr.asynchronous.sheepwars.core.handler.Sheeps.INTERGALACTIC)
-				|| (sheep == fr.asynchronous.sheepwars.core.handler.Sheeps.LIGHTNING)) {
+		setColor(EnumColor.valueOf(sheep.getColor().toString()));
+		sheep.onSpawn(player, getBukkitSheep(), plugin);
+
+		if (sheep.getAbilities().contains(SheepAbility.FIRE_PROOF))
 			this.fireProof = true;
-		} else if (sheep == fr.asynchronous.sheepwars.core.handler.Sheeps.SEEKER) {
+		if (sheep.getAbilities().contains(SheepAbility.SEEK_PLAYERS)) {
 			try {
 				Field bField = PathfinderGoalSelector.class.getDeclaredField("b");
 				bField.setAccessible(true);
 				Field cField = PathfinderGoalSelector.class.getDeclaredField("c");
 				cField.setAccessible(true);
-				bField.set(this.goalSelector, new UnsafeList());
-				bField.set(this.targetSelector, new UnsafeList());
-				cField.set(this.goalSelector, new UnsafeList());
-				cField.set(this.targetSelector, new UnsafeList());
+				bField.set(this.goalSelector, Sets.newLinkedHashSet());
+				bField.set(this.targetSelector, Sets.newLinkedHashSet());
+				cField.set(this.goalSelector, Sets.newLinkedHashSet());
+				cField.set(this.targetSelector, Sets.newLinkedHashSet());
 			} catch (Exception e) {
-				e.printStackTrace();
+				new ExceptionManager(e).register(true);
 			}
 			this.getNavigation();
-			this.goalSelector.a(2, new PathfinderGoalMeleeAttack(this, EntityHuman.class, 1.5D, false));
+			this.goalSelector.a(2, new PathfinderGoalMeleeAttack(this, 1.0D, false));
 			this.goalSelector.a(8, new PathfinderGoalLookAtPlayer(this, EntityHuman.class, 8.0F));
 			this.goalSelector.a(8, new PathfinderGoalRandomLookaround(this));
-			// this.targetSelector.a(1, new PathfinderGoalHurtByTarget(this,
-			// true));
+			this.targetSelector.a(1, new PathfinderGoalHurtByTarget(this, true));
 			this.targetSelector.a(2, new PathfinderGoalNearestAttackableTarget(this, EntityHuman.class, true));
-			// getAttributeInstance(GenericAttributes.MOVEMENT_SPEED).setValue(1.5D);
 		}
 	}
-	
+
 	@Override
 	public void move(double d0, double d1, double d2) {
-		if (this.noclip && this.player.getLocation().distance(getBukkitEntity().getLocation()) > noclipDistance) {
-			this.noclip = false;
+		if (this.getBukkitEntity().hasMetadata(UltimateSheepWarsAPI.SHEEPWARS_SHEEP_METADATA) && !this.ground) {
+			Location from = new Location(this.getBukkitEntity().getWorld(), this.locX, this.locY, this.locZ);
+			Location to = from.clone().add(this.motX, this.motY, this.motZ);
+			
+			Vector dir = to.subtract(from).toVector();
+			Vector copy = dir.clone();
+			boolean noclip = true;
+			for (double i = 0; i <= 1; i += 0.2) {
+			    copy.multiply(i);
+			    Location loc = from.clone().add(copy);
+			    UltimateSheepWarsPlugin.getVersionManager().getParticleFactory().playParticles(Particles.FIREWORKS_SPARK, from, 0.0F, 0.0F, 0.0F, 1, 0.0F);
+			    if (loc.getBlock().getType() != Material.AIR)
+			    	noclip = false;
+			    copy = dir.clone();
+			}
+			this.noclip = noclip;
 		}
 		super.move(d0, d1, d2);
 	}
 
-	public void g(double d0, double d1, double d2) {
-	}
-
+	@Override
 	public void g(float sideMot, float forMot) {
-		if (this.sheep != null && this.onGround && this.sheep == fr.asynchronous.sheepwars.core.handler.Sheeps.REMOTE) {
-			if (this.passenger == null || !(this.passenger instanceof EntityHuman)
-					|| this.sheep != fr.asynchronous.sheepwars.core.handler.Sheeps.REMOTE) {
+		if (this.sheep != null && this.sheep.getAbilities().contains(SheepAbility.RIDEABLE) && this.onGround && this.passenger != null) {
+			final Entity passenger = this.passenger;
+			if (passenger == null || !(passenger instanceof EntityHuman)) {
 				super.g(sideMot, forMot);
 				this.S = 1.0f;
 				this.aK = 0.02f;
@@ -173,51 +175,43 @@ public class CustomSheep extends EntitySheep {
 	public void bL() {
 		try {
 			if (this.sheep != null) {
-				Location location = getBukkitEntity().getLocation();
-				if (!this.ground) {
-					this.ground = (this.sheep.isFriendly() || this.onGround || this.inWater);
-				} else {
-					if (((this.sheep.isFriendly()) || (this.ticks <= this.defaultTicks - 20L))
-							&& ((this.ticks == 0L) || (this.sheep.getAction().onTicking(this.player, this.ticks,
-									getBukkitSheep(), this.plugin)) || (!isAlive()))) {
-						boolean death = true;
-						if (isAlive()) {
-							die();
-							death = false;
-						}
-						this.sheep.getAction().onFinish(this.player, getBukkitSheep(), death, this.plugin);
-						return;
+				if ((this.onGround || this.inWater || this.sheep.isFriendly()) && !this.ground)
+					this.ground = true;
+				if (this.ground && !this.isDead && (this.ticks <= 0 || !isAlive() || this.sheep.onTicking(this.player, this.ticks, getBukkitSheep(), this.plugin))) {
+					this.isDead = true;
+					boolean death = true;
+					if (this.passenger != null)
+						this.passenger.getBukkitEntity().eject();
+					if (isAlive()) {
+						die();
+						death = false;
 					}
-					--this.ticks;
+					this.sheep.onFinish(this.player, getBukkitSheep(), death, this.plugin);
+					if (death)
+						this.dropDeathLoot();
+					return;
 				}
-				if (!this.onGround && this.ticksLived < 100 && !sheep.isFriendly()) {
-					this.plugin.versionManager.getParticleFactory().playParticles(Particles.FIREWORKS_SPARK,
-							location.add(0, 0.5, 0), 0.0F, 0.0F, 0.0F, 1, 0.0F);
-				}
-				this.explosion = !this.explosion;
+				this.ticks--;
 			}
 		} catch (Exception ex) {
 			return;
 		} finally {
 			super.bL();
 		}
-		super.bL();
 	}
 
 	public void dropDeathLoot() {
-		if (this.drop) {
-			this.drop = false;
-			if (getBukkitEntity().getLastDamageCause().getCause() == DamageCause.ENTITY_ATTACK) {
+		if (this.sheep.isDropAllowed()) {
+			final Player killer = getBukkitSheep().getKiller();
+			final DamageCause damageCause = getBukkitEntity().getLastDamageCause().getCause();
+			if (damageCause == DamageCause.ENTITY_ATTACK) {
 				if (getBukkitSheep().getKiller() instanceof Player) {
-					PlayerData.getPlayerData(plugin, getBukkitSheep().getKiller()).increaseSheepKilled(1);
-					fr.asynchronous.sheepwars.core.handler.Sheeps.giveSheep(getBukkitSheep().getKiller(), this.sheep, this.plugin);
+					PlayerData.getPlayerData(killer).increaseSheepKilled(1);
+					SheepManager.giveSheep(killer, this.sheep);
 				}
-			} else if (getBukkitEntity().getLastDamageCause().getCause() == DamageCause.PROJECTILE) {
-				if (getBukkitSheep().getKiller() instanceof Player) {
-					PlayerData.getPlayerData(plugin, getBukkitSheep().getKiller()).increaseSheepKilled(1);
-					getBukkitSheep().getWorld().dropItem(getBukkitSheep().getLocation(),
-							this.sheep.getIcon(getBukkitSheep().getKiller()));
-				}
+			} else {
+				Location location = getBukkitEntity().getLocation();
+				location.getWorld().dropItemNaturally(location, this.sheep.getIcon(killer));
 			}
 		}
 	}
@@ -239,9 +233,7 @@ public class CustomSheep extends EntitySheep {
 	}
 
 	public void explode(float power, boolean breakBlocks, boolean fire) {
-		this.drop = false;
 		getBukkitEntity().remove();
-		this.plugin.versionManager.getWorldUtils().createExplosion(this.player, getBukkitSheep().getWorld(), this.locX,
-				this.locY, this.locZ, power, breakBlocks, fire);
+		UltimateSheepWarsPlugin.getVersionManager().getWorldUtils().createExplosion(this.player, getBukkitSheep().getWorld(), this.locX, this.locY, this.locZ, power, breakBlocks, fire);
 	}
 }
