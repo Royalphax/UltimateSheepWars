@@ -20,7 +20,6 @@ public class EntityMeteor extends EntityFireball
 {
     private final float speedModifier = 1.05f;
     private final float impactPower = 3.0f;
-    //private boolean explosion;
     
     public EntityMeteor(final World world) {
         super(world);
