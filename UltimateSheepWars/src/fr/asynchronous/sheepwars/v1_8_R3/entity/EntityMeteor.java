@@ -21,7 +21,6 @@ public class EntityMeteor extends EntityFireball
 {
     private final float speedModifier = 1.05f;
     private final float impactPower = 4.0f;
-    //private boolean explosion;
     
     public EntityMeteor(final World world) {
         super(world);
@@ -39,9 +38,6 @@ public class EntityMeteor extends EntityFireball
         }
         else {
         	super.t_();
-            /*if (this.explosion) {
-                location.getWorld().playEffect(location, Effect.SMOKE, 1);
-            }*/
             this.motX *= speedModifier;
             this.motY *= speedModifier;
             this.motZ *= speedModifier;
