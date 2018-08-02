@@ -399,13 +399,13 @@ public class PlayerData extends DataManager {
 
 	public enum DataType {
 
-		GAMES_PLAYED(0, MsgEnum.RANKING_GAME_PLAYED, "games"),
-		TOTAL_DEATHS(1, MsgEnum.RANKING_DEATH, "deaths"),
-		PLAYERS_KILLED(2, MsgEnum.RANKING_KILL, "kills"),
-		SHEEP_THROWN(3, MsgEnum.RANKING_SHEEP_THROWN, "sheep_thrown"),
-		SHEEP_KILLED(4, MsgEnum.RANKING_SHEEP_KILLED, "sheep_killed"),
-		TOTAL_TIME(5, MsgEnum.RANKING_TOTAL_TIME, "total_time"),
-		GAMES_WON(6, MsgEnum.RANKING_VICTORY, "wins");
+		GAMES_PLAYED(0, MsgEnum.STATS_GAME_PLAYED, "games"),
+		TOTAL_DEATHS(1, MsgEnum.STATS_DEATH, "deaths"),
+		PLAYERS_KILLED(2, MsgEnum.STATS_KILL, "kills"),
+		SHEEP_THROWN(3, MsgEnum.STATS_SHEEP_THROWN, "sheep_thrown"),
+		SHEEP_KILLED(4, MsgEnum.STATS_SHEEP_KILLED, "sheep_killed"),
+		TOTAL_TIME(5, MsgEnum.STATS_TOTAL_TIME, "total_time"),
+		GAMES_WON(6, MsgEnum.STATS_VICTORY, "wins");
 
 		private int id;
 		private Message message;
