@@ -21,7 +21,6 @@ public class EntityMeteor extends EntityFireball
 {
     private final float speedModifier = 1.05f;
     private final float impactPower = 3.0f;
-    //private boolean explosion;
     
     public EntityMeteor(final World world) {
         super(world);
@@ -41,7 +40,7 @@ public class EntityMeteor extends EntityFireball
             this.die();
         }
         else {
-        	super.am();
+        	super.A_();
             this.motX *= speedModifier;
             this.motY *= speedModifier;
             this.motZ *= speedModifier;
@@ -55,7 +54,7 @@ public class EntityMeteor extends EntityFireball
         this.die();
     }
     
-	public void playParticles(Particles particle, Location location, Float fx, Float fy, Float fz, int amount,
+    public void playParticles(Particles particle, Location location, Float fx, Float fy, Float fz, int amount,
 			Float particleData, int... list) {
 		ArrayList<OfflinePlayer> copy = new ArrayList<>(PlayerData.getParticlePlayers());
     	if (!copy.isEmpty())
