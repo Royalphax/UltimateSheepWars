@@ -197,7 +197,7 @@ public class UltimateSheepWarsPlugin extends JavaPlugin {
 			new ExceptionManager(e).register(false);
 			return;
 		}
-		if (!versionManager.getVersion().inRange(MinecraftVersion.v1_8_R4, MinecraftVersion.v1_11_R1))
+		if (!versionManager.getVersion().inRange(MinecraftVersion.v1_8_R4, MinecraftVersion.v1_12_R1))
 		{
 			disablePlugin(Level.WARNING, "UltimateSheepWars doesn't support your server version (" + versionManager.getVersion().toString() + ")");
 			return;
