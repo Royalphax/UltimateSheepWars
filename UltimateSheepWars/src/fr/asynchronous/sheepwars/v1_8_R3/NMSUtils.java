@@ -36,7 +36,7 @@ public class NMSUtils implements INMSUtils {
 
 	@Override
 	public void setItemInHand(final ItemStack item, final Player player) {
-		player.getInventory().setItemInMainHand(item);
+		player.getInventory().setItemInHand(item);
 	}
 
 	@Override
