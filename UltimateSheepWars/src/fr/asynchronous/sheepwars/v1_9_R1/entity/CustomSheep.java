@@ -8,8 +8,6 @@ import org.bukkit.craftbukkit.v1_9_R1.CraftWorld;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
 import com.google.common.collect.Sets;
@@ -86,9 +84,6 @@ public class CustomSheep extends EntitySheep {
 			this.goalSelector.a(8, new PathfinderGoalRandomLookaround(this));
 			this.targetSelector.a(1, new PathfinderGoalHurtByTarget(this, true));
 			this.targetSelector.a(2, new PathfinderGoalNearestAttackableTarget(this, EntityHuman.class, true));
-		} else {
-			PotionEffect effect = new PotionEffect(PotionEffectType.SLOW, Integer.MAX_VALUE, 1, false, false);
-			getBukkitSheep().addPotionEffect(effect);
 		}
 	}
 
