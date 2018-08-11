@@ -39,6 +39,7 @@ import fr.asynchronous.sheepwars.core.data.DataManager;
 import fr.asynchronous.sheepwars.core.data.DataRegister;
 import fr.asynchronous.sheepwars.core.event.UltimateSheepWarsEventListener;
 import fr.asynchronous.sheepwars.core.event.block.BlockBreak;
+import fr.asynchronous.sheepwars.core.event.block.BlockExplode;
 import fr.asynchronous.sheepwars.core.event.block.BlockPlace;
 import fr.asynchronous.sheepwars.core.event.block.BlockSpread;
 import fr.asynchronous.sheepwars.core.event.entity.CreatureSpawn;
@@ -254,7 +255,7 @@ public class UltimateSheepWarsPlugin extends JavaPlugin {
         this.getCommand("contributor").setExecutor(new ContributorCommand(this));
         
         /** Register Events **/
-        this.register(BlockBreak.class, BlockPlace.class, BlockSpread.class, 
+        this.register(BlockBreak.class, BlockPlace.class, BlockSpread.class, BlockExplode.class, 
         		
         		CreatureSpawn.class, EntityBlockForm.class, EntityChangeBlock.class, 
         		EntityDamageByPlayer.class, EntityDeath.class, EntityExplode.class, 
