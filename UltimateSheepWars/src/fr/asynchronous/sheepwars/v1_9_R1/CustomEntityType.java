@@ -12,6 +12,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Fireball;
 import org.bukkit.entity.Player;
 
+import fr.asynchronous.sheepwars.core.manager.ExceptionManager;
 import fr.asynchronous.sheepwars.core.util.MathUtils;
 import fr.asynchronous.sheepwars.core.util.ReflectionUtils;
 import fr.asynchronous.sheepwars.core.version.ICustomEntityType;
@@ -74,8 +75,9 @@ public enum CustomEntityType {
 			}
 			BiomeBase[] biomes;
 			try {
-				biomes = new BiomeBase[]{Biomes.a, Biomes.c, Biomes.d, Biomes.e, Biomes.f, Biomes.g, Biomes.h, Biomes.i, Biomes.m, Biomes.n, Biomes.o, Biomes.p, Biomes.q, Biomes.r, Biomes.s, Biomes.t, Biomes.u, Biomes.w, Biomes.x, Biomes.y, Biomes.z, Biomes.A, Biomes.B, Biomes.C, Biomes.D, Biomes.E, Biomes.F, Biomes.G, Biomes.H, Biomes.I, Biomes.J, Biomes.K, Biomes.L, Biomes.M, Biomes.N, Biomes.O};
-			} catch (Exception e) {
+				biomes = new BiomeBase[] { Biomes.a, Biomes.c, Biomes.d, Biomes.e, Biomes.f, Biomes.g, Biomes.h, Biomes.i, Biomes.j, Biomes.k, Biomes.l, Biomes.m, Biomes.n, Biomes.o, Biomes.p, Biomes.q, Biomes.r, Biomes.s, Biomes.t, Biomes.u, Biomes.v, Biomes.w, Biomes.x, Biomes.y, Biomes.z, Biomes.A, Biomes.B, Biomes.C, Biomes.D, Biomes.E, Biomes.F, Biomes.G, Biomes.H, Biomes.I, Biomes.J, Biomes.K, Biomes.L, Biomes.M, Biomes.N, Biomes.O, Biomes.P, Biomes.Q, Biomes.R, Biomes.S, Biomes.T, Biomes.U, Biomes.V, Biomes.W, Biomes.X, Biomes.Y, Biomes.Z, Biomes.aa, Biomes.ab, Biomes.ac, Biomes.ad, Biomes.ae, Biomes.af, Biomes.ag, Biomes.ah, Biomes.ai, Biomes.aj, Biomes.ak};
+	        } catch (Exception exc) {
+	        	new ExceptionManager(exc).register(true);
 				return;
 			}
 			for (BiomeBase biomeBase : biomes) {
@@ -96,7 +98,7 @@ public enum CustomEntityType {
 								if (entity.getNMSClass().equals(meta.b))
 									meta.b = entity.getCustomClass();
 					} catch (Exception e) {
-						e.printStackTrace();
+						new ExceptionManager(e).register(true);
 					}
 			}
 		}
@@ -107,13 +109,13 @@ public enum CustomEntityType {
 				try {
 					((Map) getPrivateStatic(EntityTypes.class, "c")).remove(entity.getCustomClass());
 				} catch (Exception e) {
-					e.printStackTrace();
+					new ExceptionManager(e).register(true);
 				}
 
 				try {
 					((Map) getPrivateStatic(EntityTypes.class, "e")).remove(entity.getCustomClass());
 				} catch (Exception e) {
-					e.printStackTrace();
+					new ExceptionManager(e).register(true);
 				}
 			}
 
@@ -121,13 +123,14 @@ public enum CustomEntityType {
 				try {
 					a(entity.getNMSClass(), entity.getName(), entity.getID());
 				} catch (Exception e) {
-					e.printStackTrace();
+					new ExceptionManager(e).register(true);
 				}
 
 			BiomeBase[] biomes;
 			try {
-				biomes = new BiomeBase[]{Biomes.a, Biomes.c, Biomes.d, Biomes.e, Biomes.f, Biomes.g, Biomes.h, Biomes.i, Biomes.m, Biomes.n, Biomes.o, Biomes.p, Biomes.q, Biomes.r, Biomes.s, Biomes.t, Biomes.u, Biomes.w, Biomes.x, Biomes.y, Biomes.z, Biomes.A, Biomes.B, Biomes.C, Biomes.D, Biomes.E, Biomes.F, Biomes.G, Biomes.H, Biomes.I, Biomes.J, Biomes.K, Biomes.L, Biomes.M, Biomes.N, Biomes.O};
-			} catch (Exception exc) {
+				biomes = new BiomeBase[] { Biomes.a, Biomes.c, Biomes.d, Biomes.e, Biomes.f, Biomes.g, Biomes.h, Biomes.i, Biomes.j, Biomes.k, Biomes.l, Biomes.m, Biomes.n, Biomes.o, Biomes.p, Biomes.q, Biomes.r, Biomes.s, Biomes.t, Biomes.u, Biomes.v, Biomes.w, Biomes.x, Biomes.y, Biomes.z, Biomes.A, Biomes.B, Biomes.C, Biomes.D, Biomes.E, Biomes.F, Biomes.G, Biomes.H, Biomes.I, Biomes.J, Biomes.K, Biomes.L, Biomes.M, Biomes.N, Biomes.O, Biomes.P, Biomes.Q, Biomes.R, Biomes.S, Biomes.T, Biomes.U, Biomes.V, Biomes.W, Biomes.X, Biomes.Y, Biomes.Z, Biomes.aa, Biomes.ab, Biomes.ac, Biomes.ad, Biomes.ae, Biomes.af, Biomes.ag, Biomes.ah, Biomes.ai, Biomes.aj, Biomes.ak};
+	        } catch (Exception exc) {
+	        	new ExceptionManager(exc).register(true);
 				return;
 			}
 			for (BiomeBase biomeBase : biomes) {
@@ -149,7 +152,7 @@ public enum CustomEntityType {
 								if (entity.getCustomClass().equals(meta.b))
 									meta.b = entity.getNMSClass();
 					} catch (Exception e) {
-						e.printStackTrace();
+						new ExceptionManager(e).register(true);
 					}
 			}
 		}
@@ -182,7 +185,7 @@ public enum CustomEntityType {
 			((Map<Class<?>, Integer>) getPrivateStatic(EntityTypes.class, "f")).put(paramClass, paramInt);
 			((Map<String, Integer>) getPrivateStatic(EntityTypes.class, "g")).put(paramString, paramInt);
 		} catch (Exception e) {
-			e.printStackTrace();
+			new ExceptionManager(e).register(true);
 		}
 	}
 }
