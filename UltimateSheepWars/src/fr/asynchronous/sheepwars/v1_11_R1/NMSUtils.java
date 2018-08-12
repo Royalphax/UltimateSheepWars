@@ -3,10 +3,11 @@ package fr.asynchronous.sheepwars.v1_11_R1;
 import org.bukkit.ChatColor;
 import org.bukkit.DyeColor;
 import org.bukkit.craftbukkit.v1_11_R1.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_11_R1.inventory.CraftItemStack;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.material.Dye;
@@ -21,8 +22,6 @@ import net.minecraft.server.v1_11_R1.ChatMessage;
 import net.minecraft.server.v1_11_R1.ChatModifier;
 import net.minecraft.server.v1_11_R1.EntityHuman;
 import net.minecraft.server.v1_11_R1.EntityPlayer;
-import net.minecraft.server.v1_11_R1.NBTTagCompound;
-import net.minecraft.server.v1_11_R1.NBTTagList;
 import net.minecraft.server.v1_11_R1.PacketPlayOutWorldBorder;
 import net.minecraft.server.v1_11_R1.WorldBorder;
 
@@ -41,23 +40,17 @@ public class NMSUtils implements INMSUtils {
 
 	@Override
 	public ItemStack setIllegallyGlowing(ItemStack item, boolean activate) {
-		net.minecraft.server.v1_11_R1.ItemStack nmsStack = CraftItemStack.asNMSCopy(item);
-		NBTTagCompound tag = null;
-		if (!nmsStack.hasTag()) {
-			tag = new NBTTagCompound();
-			nmsStack.setTag(tag);
-		}
-		if (tag == null)
-			tag = nmsStack.getTag();
+		ItemStack copy = item.clone();
+		ItemMeta meta = copy.getItemMeta();
 		if (activate) {
-			NBTTagList ench = new NBTTagList();
-			tag.set("ench", ench);
+			meta.addEnchant(Enchantment.LURE, 1, true);
+			meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
 		} else {
-			tag.remove("ench");
+			meta.removeEnchant(Enchantment.LURE);
+			meta.removeItemFlags(ItemFlag.HIDE_ENCHANTS);
 		}
-		nmsStack.setTag(tag);
-
-		return CraftItemStack.asCraftMirror(nmsStack);
+        copy.setItemMeta(meta);
+        return copy;
 	}
 
 	@Override
