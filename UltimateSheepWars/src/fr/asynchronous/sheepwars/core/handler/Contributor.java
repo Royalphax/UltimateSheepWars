@@ -10,6 +10,7 @@ import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.particle.EnchantEffect;
 import fr.asynchronous.sheepwars.core.particle.FlameCircleEffect;
 import fr.asynchronous.sheepwars.core.particle.FlameRingsEffect;
+import fr.asynchronous.sheepwars.core.particle.FlameSpiralEffect;
 import fr.asynchronous.sheepwars.core.particle.ShadowWalkEffect;
 import fr.asynchronous.sheepwars.core.particle.WitchSpiralEffect;
 import fr.asynchronous.sheepwars.core.task.ParticleTask;
@@ -19,7 +20,7 @@ public enum Contributor {
 	ROYTREO28("Roytreo28", "711e5a53-14a1-409b-bf48-7e8c1cc22440", ChatColor.RED + "Développeur " + ChatColor.YELLOW, 4, ParticleEffect.FLAME_RINGS, "Effet actif: " + ChatColor.GREEN + "Flame Rings"),
 	DROLEUR("Droleur", "da6610cb-3f5b-4638-aaf7-e6bb8fa1c22a", ChatColor.LIGHT_PURPLE + "Contributeur " + ChatColor.YELLOW, 3, ParticleEffect.ENCHANT, "Effet actif: " + ChatColor.GREEN + "Witch Spiral"),
 	KINGRIDER26("KingRider26", "fb053956-f24e-4ef5-aa2a-747575701858", ChatColor.LIGHT_PURPLE + "Contributeur " + ChatColor.YELLOW, 3, ParticleEffect.FLAME_RINGS, "Salut KingRider! Etant un des rares developpeurs que j'apprécie et que j'aide, je t'offre l'effet anneaux de feu en jeu."),
-	FINOWAY("Finoway", "aa42d5e0-a244-4da8-84df-95138f8e7371", "", 1, ParticleEffect.SHADOW_WALK, "Salut Finoway! Tu m'as bien aidé pour le plugin, je te remercie en t'offrant un effet de particule."),
+	FINOWAY("Finoway", "aa42d5e0-a244-4da8-84df-95138f8e7371", "", 1, ParticleEffect.FLAME_SPIRAL, "Salut Finoway! Tu m'as bien aidé pour le plugin, je te remercie en t'offrant un effet de particule."),
 	MILOWGAMING("milowgaming", "5c09ddc7-1186-4338-97eb-baf9c11da551", "", 1, ParticleEffect.ENCHANT, "Salut milowgaming, merci pour ton aide d'un soir. Je t'offre l'effet enchanteur !"),
 	THE_GUNTH("TheGunth", "aa8f4b05-808e-4bbf-a844-6ce7bc7afe2c", "", 1, ParticleEffect.ENCHANT, "Salut TheGunth, merci pour ton aide d'un soir. Je t'offre l'effet enchanteur !"),
 	JJORDA6985("6985jjorda", "f884fabc-3c99-4986-b0d7-9865d9f3c0e9", "", 1, ParticleEffect.SHADOW_WALK, "Hey Jjorda! thanks for all your help for this plugin. I give you the Shadow Walk effect, enjoy !"),
@@ -146,6 +147,7 @@ public enum Contributor {
 		
 		FLAME_RINGS((ParticleEffectType)new FlameRingsEffect(), 0),
 		FLAME_CIRCLE((ParticleEffectType)new FlameCircleEffect(), 0),
+		FLAME_SPIRAL((ParticleEffectType)new FlameSpiralEffect(), 0),
 		WITCH_SPIRAL((ParticleEffectType)new WitchSpiralEffect(), 0),
 		ENCHANT((ParticleEffectType)new EnchantEffect(), 5),
 		SHADOW_WALK((ParticleEffectType)new ShadowWalkEffect(), 8);
