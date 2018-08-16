@@ -23,7 +23,7 @@ public class PlayerLogin extends UltimateSheepWarsEventListener {
 	public void onPlayerLogin(final PlayerLoginEvent event) {
 		final Player player = event.getPlayer();
 		final PlayerData data = PlayerData.getPlayerData(player);
-		
+
 		/** On regarde si on le kick ou pas **/
 		if (GameState.isStep(GameState.WAITING)) {
 			if (event.getResult() == PlayerLoginEvent.Result.KICK_FULL && player.hasPermission("sheepwars.vip")) {
@@ -37,17 +37,16 @@ public class PlayerLogin extends UltimateSheepWarsEventListener {
 				event.setKickMessage(GameState.getMOTD());
 			}
 		}
-		
+
 		/** On actualise son langage **/
-		new BukkitRunnable()
-		{
-			public void run()
-			{
-				String locale = event.getPlayer().spigot().getLocale();
-				if (ConfigManager.getBoolean(Field.AUTO_GENERATE_LANGUAGES))
-					data.setLanguage(Language.getLanguage(locale));
-				player.sendMessage(ChatColor.GRAY + data.getLanguage().getIntro());
-			}
-		}.runTaskLater(this.plugin, (20 * 5));
+		if (this.plugin.isSpigotServer())
+			new BukkitRunnable() {
+				public void run() {
+					String locale = event.getPlayer().spigot().getLocale();
+					if (ConfigManager.getBoolean(Field.AUTO_GENERATE_LANGUAGES))
+						data.setLanguage(Language.getLanguage(locale));
+					player.sendMessage(ChatColor.GRAY + data.getLanguage().getIntro());
+				}
+			}.runTaskLater(this.plugin, (20 * 5));
 	}
 }
