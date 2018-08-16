@@ -175,7 +175,7 @@ public class UltimateSheepWarsPlugin extends JavaPlugin {
 		this.getPluginLoader().disablePlugin(this);
 	}
 	
-	public static Boolean isSpigotServer(){
+	public Boolean isSpigotServer(){
         try{
             Class.forName("org.bukkit.entity.Player$Spigot");
             return true;
@@ -187,20 +187,21 @@ public class UltimateSheepWarsPlugin extends JavaPlugin {
 	@Override
 	public void onLoad() {
 		/** On fait toutes les verifs pour etre sur que tout va bien se passer **/
-		if (!isSpigotServer()) {
+		/**if (!isSpigotServer()) {
 			disablePlugin(Level.WARNING, "This server isn't running with Spigot build. The plugin can't be load.");
+			return;
+		}* -> On va pas discriminer les craftbukkit ! */
+		final MinecraftVersion mcVersion = MinecraftVersion.getVersion();
+		if (!mcVersion.inRange(MinecraftVersion.v1_8_R4, MinecraftVersion.v1_12_R1))
+		{
+			disablePlugin(Level.WARNING, "UltimateSheepWars doesn't support your server version (" + versionManager.getVersion().toString() + ")");
 			return;
 		}
 		try {
-			versionManager = new VersionManager();
+			versionManager = new VersionManager(mcVersion);
 		} catch (ReflectiveOperationException e) {
-			disablePlugin(Level.WARNING, "ReflectiveOperationException occurs. Please contact the developer.");
 			new ExceptionManager(e).register(false);
-			return;
-		}
-		if (!versionManager.getVersion().inRange(MinecraftVersion.v1_8_R4, MinecraftVersion.v1_12_R1))
-		{
-			disablePlugin(Level.WARNING, "UltimateSheepWars doesn't support your server version (" + versionManager.getVersion().toString() + ")");
+			disablePlugin(Level.WARNING, "ReflectiveOperationException occurs. Please contact the developer.");
 			return;
 		}
 		try {
@@ -222,8 +223,9 @@ public class UltimateSheepWarsPlugin extends JavaPlugin {
             }
         }
         catch (Exception ex) {
+        	new ExceptionManager(ex).register(true);
         	disablePlugin(Level.SEVERE, "*** An error occured when reseting the map. Please contact the developer. ***");
-			new ExceptionManager(ex).register(true);
+        	return;
         }
 	}
 	

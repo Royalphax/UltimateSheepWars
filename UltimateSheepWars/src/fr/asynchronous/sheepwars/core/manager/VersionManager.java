@@ -30,8 +30,8 @@ public class VersionManager {
     private ISheepSpawner ISheepSpawner;
     private IWorldUtils IWorldUtils;
 
-    public VersionManager() throws ReflectiveOperationException {
-        this.version = MinecraftVersion.getVersion();
+    public VersionManager(MinecraftVersion version) throws ReflectiveOperationException {
+        this.version = version;
         load();
     }
 
