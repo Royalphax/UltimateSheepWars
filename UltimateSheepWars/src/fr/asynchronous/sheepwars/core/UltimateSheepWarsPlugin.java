@@ -152,6 +152,7 @@ public class UltimateSheepWarsPlugin extends JavaPlugin {
     /** USW **/
     private static VersionManager versionManager;
     private Boolean enablePlugin;
+    private String disableMessage;
     private BeginCountdown preGameTask;
 	private GameTask gameTask;
     private Boolean localhost;
@@ -162,10 +163,17 @@ public class UltimateSheepWarsPlugin extends JavaPlugin {
         this.economyProvider = null;
         this.chatProvider = null;
         this.enablePlugin = true;
+        this.disableMessage = "";
         this.vaultInstalled = false;
         
         /** Ne pas oublier de changer la valeur **/
         this.localhost = false;
+	}
+	
+	public void disablePluginLater(String reason)
+	{
+		this.enablePlugin = false;
+		this.disableMessage = reason;
 	}
 	
 	public void disablePlugin(Level level, String reason)
@@ -194,14 +202,14 @@ public class UltimateSheepWarsPlugin extends JavaPlugin {
 		final MinecraftVersion mcVersion = MinecraftVersion.getVersion();
 		if (!mcVersion.inRange(MinecraftVersion.v1_8_R4, MinecraftVersion.v1_12_R1))
 		{
-			disablePlugin(Level.WARNING, "UltimateSheepWars doesn't support your server version (" + versionManager.getVersion().toString() + ")");
+			disablePluginLater("UltimateSheepWars doesn't support your server version (" + versionManager.getVersion().toString() + ")");
 			return;
 		}
 		try {
 			versionManager = new VersionManager(mcVersion);
 		} catch (ReflectiveOperationException e) {
 			new ExceptionManager(e).register(false);
-			disablePlugin(Level.WARNING, "ReflectiveOperationException occurs. Please contact the developer.");
+			disablePluginLater("ReflectiveOperationException occurs. Please contact the developer.");
 			return;
 		}
 		try {
@@ -224,7 +232,7 @@ public class UltimateSheepWarsPlugin extends JavaPlugin {
         }
         catch (Exception ex) {
         	new ExceptionManager(ex).register(true);
-        	disablePlugin(Level.SEVERE, "*** An error occured when reseting the map. Please contact the developer. ***");
+        	disablePluginLater("*** An error occured when reseting the map. Please contact the developer. ***");
         	return;
         }
 	}
@@ -232,6 +240,11 @@ public class UltimateSheepWarsPlugin extends JavaPlugin {
 	@SuppressWarnings("unchecked")
 	@Override
 	public void onEnable() {
+		/** On verif que rien n'a nécéssité la désactivation du plugin **/
+		if (!this.enablePlugin) {
+			disablePlugin(Level.WARNING, this.disableMessage);
+		}
+		
 		/** On fait les verif qui necessite d'etre faites plus tard **/
 		if (!Bukkit.getWorlds().get(0).getName().equals("world"))
 		{
