@@ -3,7 +3,6 @@ package fr.asynchronous.sheepwars.v1_11_R1;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import org.bukkit.FireworkEffect;
 import org.bukkit.Location;
@@ -14,7 +13,6 @@ import org.bukkit.entity.Player;
 
 import fr.asynchronous.sheepwars.core.manager.ExceptionManager;
 import fr.asynchronous.sheepwars.core.util.MathUtils;
-import fr.asynchronous.sheepwars.core.util.ReflectionUtils;
 import fr.asynchronous.sheepwars.core.version.ICustomEntityType;
 import fr.asynchronous.sheepwars.v1_11_R1.entity.CustomSheep;
 import fr.asynchronous.sheepwars.v1_11_R1.entity.EntityMeteor;
@@ -22,13 +20,11 @@ import fr.asynchronous.sheepwars.v1_11_R1.entity.firework.FireworkSpawner;
 import net.minecraft.server.v1_11_R1.BiomeBase;
 import net.minecraft.server.v1_11_R1.BiomeBase.BiomeMeta;
 import net.minecraft.server.v1_11_R1.Biomes;
-import net.minecraft.server.v1_11_R1.Entity;
 import net.minecraft.server.v1_11_R1.EntityFireball;
 import net.minecraft.server.v1_11_R1.EntityInsentient;
 import net.minecraft.server.v1_11_R1.EntitySheep;
 import net.minecraft.server.v1_11_R1.EntityTypes;
 import net.minecraft.server.v1_11_R1.MinecraftKey;
-import net.minecraft.server.v1_11_R1.RegistryMaterials;
 
 public enum CustomEntityType {
 	@SuppressWarnings({"unchecked", "rawtypes"})
@@ -41,7 +37,6 @@ public enum CustomEntityType {
 	private EntityType entityType;
 	private Class<? extends EntityInsentient> nmsClass;
 	private Class<? extends EntityInsentient> customClass;
-	private MinecraftKey key;
 
 	private CustomEntityType(String name, int id, EntityType entityType, Class<? extends EntityInsentient> nmsClass, Class<? extends EntityInsentient> customClass) {
 		this.name = name;
@@ -49,7 +44,6 @@ public enum CustomEntityType {
 		this.entityType = entityType;
 		this.nmsClass = nmsClass;
 		this.customClass = customClass;
-		this.key = new MinecraftKey(this.name.toLowerCase());
 	}
 
 	public String getName() {
@@ -72,15 +66,11 @@ public enum CustomEntityType {
 		return customClass;
 	}
 	
-	public MinecraftKey getKey() {
-		return this.key;
-	}
-
 	public static class GlobalMethods implements ICustomEntityType {
 
 		public void registerEntities() {
 			for (CustomEntityType entity : values()) {
-				a(entity.getKey(), entity.getCustomClass(), entity.getName(), entity.getID());
+				initClass(entity, entity.getCustomClass());
 			}
 			BiomeBase[] biomes;
 			try {
@@ -112,25 +102,11 @@ public enum CustomEntityType {
 			}
 		}
 
-		@SuppressWarnings({"rawtypes", "unchecked"})
+		@SuppressWarnings({"unchecked"})
 		public void unregisterEntities() {
-			try {
-				RegistryMaterials<MinecraftKey, Class<? extends Entity>> obj = EntityTypes.b;
-				Class<? extends RegistryMaterials> clazz = obj.getClass();
-				Field field = getField(clazz, "b");
-				field.setAccessible(true);
-				for (CustomEntityType entity : values()) {
-					((Map<MinecraftKey, Class<? extends Entity>>) field.get(obj)).remove(entity.getKey());
-					EntityTypes.d.remove(entity.getKey());
-					((List<String>) getPrivateStatic(EntityTypes.class, "g")).remove(entity.getName().toLowerCase());
-				}
-			} catch (Exception e) {
-				new ExceptionManager(e).register(true);
-			}
-
 			for (CustomEntityType entity : values())
 				try {
-					a(entity.getKey(), entity.getNMSClass(), entity.getName(), entity.getID());
+					initClass(entity, entity.getNMSClass());
 				} catch (Exception e) {
 					new ExceptionManager(e).register(true);
 				}
@@ -179,37 +155,13 @@ public enum CustomEntityType {
 
 	}
 
-	private static Object getPrivateStatic(@SuppressWarnings("rawtypes") Class clazz, String f) throws Exception {
-		return ReflectionUtils.getField(clazz, true, f).get(null);
-	}
-
-	@SuppressWarnings("unchecked")
-	private static void a(MinecraftKey mckey, Class<?> paramClass, String paramString, int paramInt) {
+	private static void initClass(CustomEntityType entity, Class<? extends EntityInsentient> clazz) {
 		try {
-			/**
-			 * ((Map<String, Class<?>>) getPrivateStatic(EntityTypes.class, "c")).put(paramString, paramClass); ((Map<Class<?>, String>) getPrivateStatic(EntityTypes.class, "d")).put(paramClass, paramString); ((Map<Integer, Class<?>>) getPrivateStatic(EntityTypes.class, "e")).put(paramInt, paramClass); ((Map<Class<?>, Integer>) getPrivateStatic(EntityTypes.class, "f")).put(paramClass, paramInt); ((Map<String, Integer>) getPrivateStatic(EntityTypes.class, "g")).put(paramString, paramInt);
-			 **/
-			// Plusieurs pistes à explorer, la plus dure :
-			// MinecraftKey mckey = new MinecraftKey(paramInt, paramString);
-			EntityTypes.b.a(mckey, (Class<? extends Entity>) paramClass);
-			EntityTypes.d.add(mckey);
-			((List<String>) getPrivateStatic(EntityTypes.class, "g")).add(paramString.toLowerCase());
+			MinecraftKey localMinecraftKey = new MinecraftKey(entity.getName().toLowerCase());
+		    EntityTypes.b.a(entity.getID(), localMinecraftKey, clazz);
 
 		} catch (Exception e) {
 			new ExceptionManager(e).register(true);
-		}
-	}
-	
-	private static Field getField(Class<?> clazz, String fieldName) throws NoSuchFieldException {
-		try {
-			return clazz.getDeclaredField(fieldName);
-		} catch (NoSuchFieldException e) {
-			Class<?> superClass = clazz.getSuperclass();
-			if (superClass == null) {
-				throw e;
-			} else {
-				return getField(superClass, fieldName);
-			}
 		}
 	}
 }
