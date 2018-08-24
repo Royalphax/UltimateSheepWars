@@ -37,7 +37,7 @@ public class PlayerLogin extends UltimateSheepWarsEventListener {
 				event.setKickMessage(GameState.getMOTD());
 			}
 		}
-
+		
 		/** On actualise son langage **/
 		if (this.plugin.isSpigotServer())
 			new BukkitRunnable() {

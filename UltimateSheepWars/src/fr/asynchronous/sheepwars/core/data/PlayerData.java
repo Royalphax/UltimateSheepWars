@@ -343,7 +343,8 @@ public class PlayerData extends DataManager {
 						setTotalTime(res.getInt("total_time"));
 						String[] availableKits = res.getString("kits").split("");
 						for (String kitId : availableKits)
-							addKit(KitManager.getFromId(Integer.parseInt(kitId)));
+							if (KitManager.existKit(Integer.parseInt(kitId)))
+								addKit(KitManager.getFromId(Integer.parseInt(kitId)));
 						setKit(KitManager.getFromId(Integer.parseInt(availableKits[availableKits.length - 1])));
 						setUpdatedAt(res.getDate("updated_at"));
 						setCreatedAt(res.getDate("created_at"));
