@@ -110,7 +110,7 @@ public enum Contributor {
 		return (!isContributor(player) ? false : (getContributor(player).getLevel() > 2 ? true : false));
 	}
 	
-	public static Boolean isAdministrator(Player player)
+	public static Boolean isDeveloper(Player player)
 	{
 		return (!isContributor(player) ? false : (getContributor(player).getLevel() > 3 ? true : false));
 	}

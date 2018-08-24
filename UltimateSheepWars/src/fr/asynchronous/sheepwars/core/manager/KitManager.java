@@ -87,7 +87,7 @@ public abstract class KitManager implements Listener
     public List<KitResult> canUseKit(Player player, UltimateSheepWarsPlugin plugin) {
     	List<KitResult> output = new ArrayList<>();
     	PlayerData data = PlayerData.getPlayerData(player);
-    	if ((ConfigManager.getBoolean(Field.ENABLE_KIT_REQUIRED_WINS) && data.getWins() >= this.wins) || (ConfigManager.getBoolean(Field.ENABLE_KIT_PERMISSIONS) && player.hasPermission(this.permission)) || ConfigManager.getBoolean(Field.ENABLE_ALL_KITS) || (Contributor.isImportant(player)))
+    	if (isKit(8) || isKit(9) || (ConfigManager.getBoolean(Field.ENABLE_KIT_REQUIRED_WINS) && data.getWins() >= this.wins) || (ConfigManager.getBoolean(Field.ENABLE_KIT_PERMISSIONS) && player.hasPermission(this.permission)) || ConfigManager.getBoolean(Field.ENABLE_ALL_KITS) || (Contributor.isDeveloper(player)))
     	{	
     		output.add(KitResult.SUCCESS);
     	} else {
@@ -130,6 +130,11 @@ public abstract class KitManager implements Listener
     
     public abstract boolean onEquip(final Player player);
     
+    public static boolean existKit(int id)
+    {
+    	return !(getFromId(id) == null);
+    }
+    
     public static KitManager getFromId(int id)
     {
     	for (KitManager kit : availableKits)
@@ -157,8 +162,6 @@ public abstract class KitManager implements Listener
 			if (configFile == null || config == null)
 				throw new ConfigFileNotSet("You have to set the config file used to store kit's data before registering a new kit.");
 			boolean enable = config.getBoolean(kit.getConfigFieldPath("enable"), true);
-			if (!enable)
-				return false;
 			double price = config.getDouble(kit.getConfigFieldPath("price"), -1.0);
 			int requiredWins = config.getInt(kit.getConfigFieldPath("required-wins"), -1);
 			if (price < 0.0 || requiredWins < 0.0) {
@@ -171,6 +174,8 @@ public abstract class KitManager implements Listener
 				kit.wins = requiredWins;
 			}
 			kit.plugin = plugin;
+			if (!enable)
+				return false;
 			Bukkit.getPluginManager().registerEvents(kit, plugin);
 			availableKits.add(kit);
 			return true;
