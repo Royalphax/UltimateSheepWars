@@ -77,6 +77,18 @@ public abstract class SheepManager {
 		}
 	}
 
+	/**
+	 * Initialize a new sheep !
+	 * 
+	 * @param name Define the sheep's name. It will be automatically add to the language files.
+	 * @param color Color of the sheep.
+	 * @param duration Life time (in seconds) of the sheep, 0 will cause the sheep not to be automatically killed.
+	 * @param friendly Is this sheep friendly ? If yes, it will not be launched but just appear at the player position. 
+	 * @param health Sheep's health.
+	 * @param drop Will the sheep drop its wool if killed ?
+	 * @param random Specify the luck to get this sheep (1 = maximum luck, 0 = you will never get this sheep).
+	 * @param sheepAbilities (Optional) Sheep ability such as "FIRE_PROOF" or "SEEK_PLAYERS".
+	 */
 	public SheepManager(final String name, final DyeColor color, final int duration, final boolean friendly, final double health, final boolean drop, final float random, final SheepAbility... sheepAbilities) {
 		this(new Message(name), name, color, duration, friendly, health, drop, random, sheepAbilities);
 	}
@@ -145,12 +157,43 @@ public abstract class SheepManager {
 		return this.configPath + "." + field;
 	}
 
+	/**
+	 * Useful to cancel the give of a sheep under certain conditions.
+	 * 
+	 * @param player Player who will receive the sheep in his inventory
+	 * @return <b>true</b> if there's no problem giving that sheep to that player. <b>false</b> otherwise and the sheep won't be given.
+	 */
 	public abstract boolean onGive(final Player player);
 
+	/**
+	 * Useful to do something when the sheep gets launched.
+	 * <br/><u>For example :</u> the Intergalactic Sheep broadcast a message.
+	 * 
+	 * @param player 
+	 * @param bukkitSheep The sheep's bukkit entity.
+	 * @param plugin UltimateSheepWars plugin instance (useful to launch runnables).
+	 */
 	public abstract void onSpawn(final Player player, final org.bukkit.entity.Sheep bukkitSheep, final Plugin plugin);
-
+	
+	/**
+	 * Most important method called every tick.
+	 * 
+	 * @param player Player who has launched the sheep.
+	 * @param ticks Sheep's ticks (number incremented every twentieth of a second starting from 0 at the moment the sheep appeared).
+	 * @param bukkitSheep The sheep's bukkit entity.
+	 * @param plugin UltimateSheepWars plugin instance (useful to launch runnables).
+	 * @return <b>true</b> if you want to stop the sheep and directly go to the <i>onFinish([...]);</i> method, <b>false</b> if you want to continue ticking.
+	 */
 	public abstract boolean onTicking(final Player player, final long ticks, final org.bukkit.entity.Sheep bukkitSheep, final Plugin plugin);
 
+	/**
+	 * Called before the sheep disappear.
+	 * 
+	 * @param player Player who has launched the sheep.
+	 * @param bukkitSheep The sheep's bukkit entity.
+	 * @param death Was the sheep killed by a player and is already dead ?
+	 * @param plugin UltimateSheepWars plugin instance (useful to launch runnables).
+	 */
 	public abstract void onFinish(final Player player, final org.bukkit.entity.Sheep bukkitSheep, final boolean death, final Plugin plugin);
 
 	public boolean throwSheep(Player launcher, Plugin plugin) {
