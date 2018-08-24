@@ -200,9 +200,9 @@ public class UltimateSheepWarsPlugin extends JavaPlugin {
 			return;
 		}* -> On va pas discriminer les craftbukkit ! */
 		final MinecraftVersion mcVersion = MinecraftVersion.getVersion();
-		if (!mcVersion.inRange(MinecraftVersion.v1_8_R4, MinecraftVersion.v1_12_R1))
+		if (!mcVersion.inRange(MinecraftVersion.v1_8_R3, MinecraftVersion.v1_12_R1))
 		{
-			disablePluginLater("UltimateSheepWars doesn't support your server version (" + versionManager.getVersion().toString() + ")");
+			disablePluginLater("UltimateSheepWars doesn't support your server version (" + mcVersion.toString().replaceAll("_", ".") + ")");
 			return;
 		}
 		try {
@@ -243,6 +243,7 @@ public class UltimateSheepWarsPlugin extends JavaPlugin {
 		/** On verif que rien n'a nécéssité la désactivation du plugin **/
 		if (!this.enablePlugin) {
 			disablePlugin(Level.WARNING, this.disableMessage);
+			return;
 		}
 		
 		/** On fait les verif qui necessite d'etre faites plus tard **/
@@ -311,7 +312,7 @@ public class UltimateSheepWarsPlugin extends JavaPlugin {
 								Bukkit.getConsoleSender().sendMessage(ChatColor.GREEN + (i == (news.size() - 1) ? "\\_/ " : (newsLine.startsWith("#") ? " + " : " |  ")) + ChatColor.RESET + (newsLine.startsWith("#") ? ChatColor.YELLOW + newsLine.replaceFirst("#", "") : newsLine));
 							}
 						}
-						getLogger().info("Please stay updated at https://www.spigotmc.org/resources/17393/");
+						getLogger().info("You're not running the latest update. Please stay updated at https://www.spigotmc.org/resources/17393/");
 					} else {
 						getLogger().info("Plugin is up-to-date.");
 					}
@@ -325,7 +326,7 @@ public class UltimateSheepWarsPlugin extends JavaPlugin {
 		}.runTaskAsynchronously(this);
 		
 		accountManager = new AccountManager(this, user_id);
-		new DataRegister(this, this.localhost, true);
+		new DataRegister(this, this.localhost, false);
 	}
 	
 	private void register(@SuppressWarnings("unchecked") final Class<? extends UltimateSheepWarsEventListener>... classes) {
@@ -383,24 +384,26 @@ public class UltimateSheepWarsPlugin extends JavaPlugin {
         /** Check for config issues **/
         if (ConfigManager.getBoolean(Field.ENABLE_INGAME_SHOP))
         {
-        	ConfigManager.setBoolean(Field.ENABLE_KIT_PERMISSIONS, true);
+        	if (!ConfigManager.getBoolean(Field.ENABLE_KIT_PERMISSIONS))
+        		ConfigManager.setBoolean(Field.ENABLE_KIT_PERMISSIONS, true);
         	if (vaultInstalled)
         	{
         		if (!ecop) {
-        			getLogger().info("KIT: You have enable ingame-shop but there is no economy plugin. This is conflicting :(");
+        			getLogger().info("[CONFIG] You have enable ingame-shop but there is no economy plugin. This is conflicting :(");
         			ConfigManager.setBoolean(Field.ENABLE_KIT_PERMISSIONS, false);
-        		} else if (!permp) {
-        			getLogger().info("KIT: You have enable ingame-shop but there is no permission plugin. This is conflicting :(");
+        		}
+        		if (!permp) {
+        			getLogger().info("[CONFIG] You have enable ingame-shop but there is no permission plugin. This is conflicting :(");
         			ConfigManager.setBoolean(Field.ENABLE_KIT_PERMISSIONS, false);
         		}
         	} else {
-        		getLogger().info("KIT: You have enable ingame-shop but vault isn't installed. This is conflicting :(");
+        		getLogger().info("[CONFIG] You have enable ingame-shop but vault isn't installed. This is conflicting :(");
         		ConfigManager.setBoolean(Field.ENABLE_KIT_PERMISSIONS, false);
         	}
         }
         if (ConfigManager.getBoolean(Field.ENABLE_KIT_REQUIRED_WINS) && !DataManager.isConnected())
         {
-        	getLogger().info("KIT: You have enable required-wins but no database was detected. This is conflicting :(");
+        	getLogger().info("[CONFIG] You have enable required-wins but no database was detected. This is conflicting :(");
         	ConfigManager.setBoolean(Field.ENABLE_KIT_REQUIRED_WINS, false);
         }
 
@@ -548,6 +551,13 @@ public class UltimateSheepWarsPlugin extends JavaPlugin {
 	public void givePermission(Player player, String permission) {
 		try {
 			permissionProvider.playerAdd(player, permission);
+		} catch (NoClassDefFoundError | NullPointerException e) {
+		}
+	}
+	
+	public void removePermission(Player player, String permission) {
+		try {
+			permissionProvider.playerRemove(player, permission);
 		} catch (NoClassDefFoundError | NullPointerException e) {
 		}
 	}
