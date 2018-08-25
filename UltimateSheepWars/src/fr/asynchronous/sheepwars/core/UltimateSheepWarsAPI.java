@@ -17,6 +17,9 @@ import fr.asynchronous.sheepwars.core.manager.SheepManager;
  */
 public class UltimateSheepWarsAPI {
 
+	/**
+	 * ddd
+	 */
 	public static final String SHEEPWARS_SHEEP_METADATA = "sheepwars_sheep";
 	
 	private UltimateSheepWarsAPI() {
