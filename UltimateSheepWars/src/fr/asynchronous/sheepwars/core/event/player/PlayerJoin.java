@@ -84,7 +84,7 @@ public class PlayerJoin extends UltimateSheepWarsEventListener {
 						} else {
 							sendAction(player, data.getLanguage().getMessage(MsgEnum.DATABASE_NOT_CONNECTED));
 						}
-						sendTitle(player, data.getLanguage().getMessage(MsgEnum.JOIN_TITLE).replace("%ONLINE_PLAYERS%", Bukkit.getOnlinePlayers().size() + "").replace("%MAX_PLAYERS%", Bukkit.getMaxPlayers() + ""), data.getLanguage().getMessage(MsgEnum.JOIN_SUBTITLE));
+						sendTitle(player, data.getLanguage().getMessage(MsgEnum.JOIN_TITLE).replace("%ONLINE_PLAYERS%", Bukkit.getOnlinePlayers().size() + "").replace("%MAX_PLAYERS%", Bukkit.getMaxPlayers() + ""), data.getLanguage().getMessage(MsgEnum.GHOST_MESSAGE));
 						player.setScoreboard(data.getLanguage().getScoreboardWrapper().getScoreboard());
 					}
 				}
