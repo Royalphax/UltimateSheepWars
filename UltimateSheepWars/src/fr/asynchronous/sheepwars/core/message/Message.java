@@ -16,43 +16,43 @@ import fr.asynchronous.sheepwars.core.version.ATitleUtils.Type;
 public class Message {
 
 	private static List<Message> map = new ArrayList<>();
-	
+
 	private String strId;
 	private String msg;
 
 	public Message(MsgEnum msgEnum) {
 		this(msgEnum.toString().toLowerCase().replaceAll("_", "-"), msgEnum.getMessage());
 	}
-	
+
 	public Message(String messageId, String message) {
 		this.strId = messageId;
 		this.msg = message;
-		
+
 		if (getMessageByStringId(messageId) != null) {
 			new StringIdAlreadyUsed("You can't register a message with same string ID as another.").printStackTrace();
 		} else {
 			map.add(this);
 		}
 	}
-	
+
 	public Message(String message) {
 		this.strId = getRaw(message);
 		this.msg = message;
 	}
-	
+
 	public String getStringId() {
 		return this.strId;
 	}
-	
+
 	public String getMessage() {
 		return this.msg;
 	}
-	
+
 	public String getMessage(Player player) {
 		PlayerData data = PlayerData.getPlayerData(player);
 		return data.getLanguage().getMessage(this);
 	}
-	
+
 	public String colorized() {
 		return ChatColor.translateAlternateColorCodes('&', this.msg);
 	}
@@ -60,7 +60,7 @@ public class Message {
 	public String uncolorized() {
 		return this.msg.replaceAll("§", "&");
 	}
-	
+
 	private String getRaw(String input) {
 		String output = Normalizer.normalize(input, Normalizer.Form.NFD);
 		output = output.replaceAll("[^\\p{ASCII}]", "");
@@ -72,7 +72,7 @@ public class Message {
 		output = output.toLowerCase();
 		return output;
 	}
-	
+
 	public static void broadcast(MsgEnum message) {
 		for (Player online : Bukkit.getOnlinePlayers())
 			sendMessage(online, "", message, "");
@@ -120,18 +120,18 @@ public class Message {
 	public static String getMessage(Player player, String prefix, MsgEnum msg, String suffix) {
 		return prefix + getMessage(player, msg) + suffix;
 	}
-	
+
 	public static String getMessage(Player player, MsgEnum msgEnum) {
 		PlayerData data = PlayerData.getPlayerData(player);
 		Message msg = getMessage(msgEnum);
-		return (msg != null ? data.getLanguage().getMessage(msg) : "ERROR - PLEASE CONTACT THE DEVELOPER");
+		return (msg != null ? data.getLanguage().getMessage(msg) : "ERROR MESSAGE NOT LOAD - PLEASE CONTACT THE DEVELOPER");
 	}
-	
+
 	public static Message getMessage(MsgEnum msgEnum) {
 		String strId = msgEnum.toString().toLowerCase().replaceAll("_", "-");
 		return getMessageByStringId(strId);
 	}
-	
+
 	private static Message getMessageByStringId(String strId) {
 		for (Message msg : map)
 			if (msg.getStringId().equals(strId))
@@ -142,18 +142,18 @@ public class Message {
 	public static String getDecoration() {
 		return ChatColor.YELLOW + "" + ChatColor.MAGIC + "|" + ChatColor.AQUA + "" + ChatColor.MAGIC + "|" + ChatColor.GREEN + "" + ChatColor.MAGIC + "|" + ChatColor.RED + "" + ChatColor.MAGIC + "|" + ChatColor.LIGHT_PURPLE + "" + ChatColor.MAGIC + "|" + ChatColor.RESET;
 	}
-	
+
 	public static List<Message> getMessages() {
 		return map;
 	}
-	
+
 	public static void initMessages() {
 		for (MsgEnum msgEnum : MsgEnum.values())
 			new Message(msgEnum);
 	}
-	
+
 	public enum MsgEnum {
-		
+
 		JOIN_TITLE("&6UltimateSheepWars&8: &e%ONLINE_PLAYERS%&7/&e%MAX_PLAYERS%"),
 		JOIN_SUBTITLE("&aChoose your team and kit"),
 		BOARDING_TITLE("&5☠ &fAway boarders &5☠"),
@@ -288,15 +288,15 @@ public class Message {
 		USER_DATA_LOADED("&aData loaded!"),
 		USER_DATA_UNREACHABLE("&cData unreachable."),
 		DATABASE_NOT_CONNECTED("&cNo database connection.");
-		
+
 		private String msg;
 		private MsgEnum(String msg) {
 			this.msg = msg;
 		}
-		
+
 		public String getMessage() {
 			return this.msg;
 		}
-		
+
 	}
 }

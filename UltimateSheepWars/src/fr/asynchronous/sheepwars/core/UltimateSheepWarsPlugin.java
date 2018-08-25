@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 
@@ -200,7 +201,15 @@ public class UltimateSheepWarsPlugin extends JavaPlugin {
 			return;
 		}* -> On va pas discriminer les craftbukkit ! */
 		final MinecraftVersion mcVersion = MinecraftVersion.getVersion();
-		if (!mcVersion.inRange(MinecraftVersion.v1_8_R3, MinecraftVersion.v1_12_R1))
+		final List<MinecraftVersion> supportedVersions = new ArrayList<>();
+		supportedVersions.add(MinecraftVersion.v1_8_R3);
+		supportedVersions.add(MinecraftVersion.v1_8_R4);
+		supportedVersions.add(MinecraftVersion.v1_9_R1);
+		supportedVersions.add(MinecraftVersion.v1_9_R2);
+		supportedVersions.add(MinecraftVersion.v1_10_R1);
+		supportedVersions.add(MinecraftVersion.v1_11_R1);
+		supportedVersions.add(MinecraftVersion.v1_12_R1);
+		if (!mcVersion.inRange(supportedVersions)) 
 		{
 			disablePluginLater("UltimateSheepWars doesn't support your server version (" + mcVersion.toString().replaceAll("_", ".") + ")");
 			return;

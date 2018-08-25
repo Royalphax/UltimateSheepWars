@@ -1,6 +1,9 @@
 package fr.asynchronous.sheepwars.core.handler;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.logging.Level;
+
 import org.bukkit.Bukkit;
 
 public enum MinecraftVersion {
@@ -17,7 +20,8 @@ public enum MinecraftVersion {
 	v1_9_R2(10902), 
 	v1_10_R1(11001),
 	v1_11_R1(11101),
-	v1_12_R1(11201);
+	v1_12_R1(11201),
+	v1_13_R1(11301);
 
 	private int version;
 
@@ -42,6 +46,11 @@ public enum MinecraftVersion {
 	}
 	
 	public boolean inRange(MinecraftVersion... versions)
+	{
+		return inRange(Arrays.asList(versions));
+	}
+	
+	public boolean inRange(List<MinecraftVersion> versions)
 	{
 		for (MinecraftVersion ver : versions)
 			if (ver.version() == this.version())
