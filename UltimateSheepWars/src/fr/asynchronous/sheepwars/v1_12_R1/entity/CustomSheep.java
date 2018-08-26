@@ -110,6 +110,9 @@ public class CustomSheep extends EntitySheep {
 		super.move(enummovetype, d0, d1, d2);
 	}
 
+	/**
+	 * Attention : la venu d'un nouvel argument (f2) fait qu'on ne peut plus faire avancer ou reculer le moutons
+	 */
 	@Override
 	public void a(float sideMot, float forMot, float f2) {
 		if (this.sheep != null && this.sheep.getAbilities().contains(SheepAbility.RIDEABLE) && this.onGround && this.passengers.size() == 1) {
