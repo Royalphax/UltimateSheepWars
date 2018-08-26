@@ -1,9 +1,9 @@
 name: UltimateSheepWars
 author: Asynchronous
-version: 4.3.7
+version: 4.3.8
 main: fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin
 softdepend: [Vault]
-website: http://roytreo28.ddns.net/
+website: http://roytreo28.ddns.net/asynchronous
 commands:
   sheepwars:
     description: Manage your sheepwars in game settings
