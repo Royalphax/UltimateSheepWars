@@ -41,14 +41,31 @@ public abstract class KitManager implements Listener
     private Double price;
     private int wins;
     
+    /**
+     * Initialize a new Kit !
+     * 
+     * @param id Unique ID of this Kit. Default kits : 0-9.
+     * @param name Name of this Kit.
+     * @param description Description of this Kit.
+     * @param permission Permission needed to use this Kit.
+     * @param price Price of this Kit.
+     * @param requiredWins Required wins to use this Kit.
+     * @param icon Icon of this Kit.
+     */
     public KitManager(final int id, final String name, final String description, final String permission, final double price, final int requiredWins, final ItemBuilder icon) {
     	this(id, name, new Message(name), new Message(description), permission, price, requiredWins, icon);
     }
     
+    /**
+	 * Use {@link #KitManager(int, String, String, String, double, int, ItemBuilder) this constructor} instead.
+	 */
     public KitManager(final int id, final MsgEnum name, final MsgEnum description, final String permission, final double price, final int requiredWins, final ItemBuilder icon) {
     	this(id, name.toString().replaceAll("KIT_", "").replaceAll("_NAME", ""), Message.getMessage(name), Message.getMessage(description), permission, price, requiredWins, icon);
     }
     
+    /**
+	 * Use {@link #KitManager(int, String, String, String, double, int, ItemBuilder) this constructor} instead.
+	 */
     public KitManager(final int id, final String configPath, final Message name, final Message description, final String permission, final double price, final int requiredWins, final ItemBuilder icon) {
     	this.id = id;
     	this.configPath = "kit." + configPath.replaceAll("_", "-").toLowerCase();
@@ -60,30 +77,51 @@ public abstract class KitManager implements Listener
     	this.wins = requiredWins;
     }
     
+    /**
+	 * Get the kit name according to the player's language.
+	 */
     public String getName(Player player) {
         return this.name.getMessage(player);
     }
     
+    /**
+	 * Get the kit description according to the player's language.
+	 */
     public String getDescription(Player player) {
     	return this.description.getMessage(player);
     }
     
+    /**
+	 * Get the kit icon.
+	 */
     public ItemBuilder getIcon() {
         return this.icon;
     }
     
+    /**
+	 * Get the permission needed to use this kit if permissions are enabled in UltimateSheepWars's config file.
+	 */
     public String getPermission() {
         return this.permission;
     }
     
+    /**
+	 * Plugin who register this kit.
+	 */
     public Plugin getPlugin() {
         return this.plugin;
     }
     
+    /**
+	 * Get if this kit id is equal to another id.
+	 */
     public boolean isKit(int i) {
     	return (this.id == i);
     }
     
+    /**
+	 * Get if a player can use a kit.
+	 */
     public List<KitResult> canUseKit(Player player, UltimateSheepWarsPlugin plugin) {
     	List<KitResult> output = new ArrayList<>();
     	PlayerData data = PlayerData.getPlayerData(player);
@@ -104,18 +142,30 @@ public abstract class KitManager implements Listener
     	return output;
     }
     
+    /**
+	 * Get the amount of required wins to use this kit if required wins is enabled in the UltimateSheepWars's config file.
+	 */
     public int getRequiredWins() {
         return this.wins;
     }
     
+    /**
+	 * Get the price of this sheep if ingame-shop is enabled in the UltimateSheepWars's config file.
+	 */
     public Double getPrice() {
         return this.price;
     }
     
+    /**
+	 * Get kit id.
+	 */
     public int getId() {
         return this.id;
     }
     
+    /**
+	 * No need to use this method.
+	 */
     private String getConfigFieldPath(String field) {
     	return this.configPath + "." + field;
     }
@@ -128,13 +178,25 @@ public abstract class KitManager implements Listener
     	FAILURE_NOT_ENOUGH_WINS;
     }
     
+    /**
+     * Triggered when the game begins.
+     * 
+     * @param player Player who chose this kit.
+     * @return <b>true</b> if you want to let the plugin equiping all the default things to the player (leather armor, sword, bow, etc.). <b>false</b> if you want to set a special inventory content to the player.
+     */
     public abstract boolean onEquip(final Player player);
     
+    /**
+     * Get if this ID is linked to a kit.
+     */
     public static boolean existKit(int id)
     {
     	return !(getFromId(id) == null);
     }
     
+    /**
+     * Get a Kit from an ID.
+     */
     public static KitManager getFromId(int id)
     {
     	for (KitManager kit : availableKits)
@@ -143,6 +205,9 @@ public abstract class KitManager implements Listener
     	return null;
     }
     
+    /**
+     * Get the same instance of a Kit.
+     */
     public static KitManager getInstanceKit(KitManager kit) {
     	for (KitManager k : availableKits) {
     		if (k.getId() == kit.getId()) {
@@ -153,10 +218,16 @@ public abstract class KitManager implements Listener
 		return null;
     }
     
+    /**
+     * Get registered kits.
+     */
     public static List<KitManager> getAvailableKits() {
     	return availableKits;
     }
 
+    /**
+	 * Use {@link fr.asynchronous.sheepwars.core.UltimateSheepWarsAPI UltimateSheepWarsAPI} methods instead.
+	 */
 	public static boolean registerKit(KitManager kit, Plugin plugin) throws ConfigFileNotSet, IOException {
 		if (!availableKits.contains(kit)) {
 			if (configFile == null || config == null)
@@ -183,6 +254,9 @@ public abstract class KitManager implements Listener
 		return false;
 	}
 	
+	/**
+	 * Use {@link fr.asynchronous.sheepwars.core.UltimateSheepWarsAPI UltimateSheepWarsAPI} methods instead.
+	 */
 	public static boolean unregisterKit(KitManager kit) {
 		if (availableKits.contains(kit)) {
 			HandlerList.unregisterAll(kit);
@@ -192,6 +266,9 @@ public abstract class KitManager implements Listener
 		return false;
 	}
     
+	/**
+	 * No need to use this method.
+	 */
     public static void setupConfig(File file)
     {
     	if (!file.exists()) {

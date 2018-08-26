@@ -44,7 +44,7 @@ public class BoosterWoolTask extends BukkitRunnable {
 		this.maxWait = this.boosterInterval + this.boosterLifeTime;
 		this.time = this.boosterInterval - 1;
 		for (BoosterManager boost : BoosterManager.getAvailableBoosters())
-			this.colors.add(boost.getDisplayColor().getColor());
+			this.colors.add(boost.getWoolColor());
 		for (Location boosters : ConfigManager.getLocations(Field.BOOSTERS))
 			boosters.getBlock().setMetadata(BOOSTER_METADATA, new FixedMetadataValue(this.currentTask.plugin, true));
 	}

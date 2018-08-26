@@ -23,7 +23,7 @@ public class AnvilGUI extends AAnvilGUI{
         }
 
         @Override
-        public boolean a(EntityHuman entityhuman) {
+        public boolean canUse(EntityHuman entityhuman) {
             return true;
         }
     }

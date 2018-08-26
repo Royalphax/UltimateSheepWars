@@ -25,7 +25,6 @@ public class ArmoredSheepKit extends KitManager {
 		return true;
 	}
 
-
 	@EventHandler
 	public void onSheepLaunch(final SheepLaunchEvent event) {
 		final PlayerData data = PlayerData.getPlayerData(event.getLauncher());

@@ -34,11 +34,6 @@ public class LangCommand implements CommandExecutor {
             if (Language.getLanguage(sub) != null)
             {
             	data.setLanguage(Language.getLanguage(sub));
-            	if (GameState.isStep(GameState.WAITING)) {
-            		PlayerJoin.equip(PlayerData.getPlayerData(player));
-            	}
-            	player.setScoreboard(Language.getLanguage(sub).getScoreboardWrapper().getScoreboard());
-            	player.sendMessage(ChatColor.GRAY + Language.getLanguage(sub).getIntro());
             } else {
             	player.sendMessage(ChatColor.RED + "This language doesn't exist.");
             }
