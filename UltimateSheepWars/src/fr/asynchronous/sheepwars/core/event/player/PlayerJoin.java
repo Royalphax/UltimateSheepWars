@@ -143,20 +143,5 @@ public class PlayerJoin extends UltimateSheepWarsEventListener {
 			inv.setItem(4, new ItemBuilder(ConfigManager.getItemStack(Field.PARTICLES_ON_ITEM)).setName(data.getLanguage().getMessage(MsgEnum.PARTICLES_OFF)).toItemStack());
 		}
 		player.setScoreboard(data.getLanguage().getScoreboardWrapper().getScoreboard());
-
-		/**if (plugin.MySQL_ENABLE) {
-			if (!player.hasMetadata("stats_top"))
-				player.setMetadata("stats_top", new FixedMetadataValue(plugin, 0));
-			inv.setItem(13, Utils.getItemStats(null, player, data, plugin));
-			PlayerData.DATA_TYPE actual = PlayerData.DATA_TYPE.getFromId((int) player.getMetadata("stats_top").get(0).value());
-			PlayerData.DATA_TYPE before = PlayerData.DATA_TYPE.before(actual);
-			PlayerData.DATA_TYPE after = PlayerData.DATA_TYPE.after(actual);
-			inv.setItem(21, new ItemBuilder(Material.ARROW).setName(Language.getMessageByLanguage(data.getLocale(), Message.RANKING_GOTO_LEFT).replace("%RANKING%", Language.getMessageByLanguage(data.getLocale(), before.message))).toItemStack());
-			inv.setItem(22, Utils.getItemStats(actual, player, data, plugin));
-			inv.setItem(23, new ItemBuilder(Material.ARROW).setName(Language.getMessageByLanguage(data.getLocale(), Message.RANKING_GOTO_RIGHT).replace("%RANKING%", Language.getMessageByLanguage(data.getLocale(), after.message))).toItemStack());
-		} else {
-			String bar = ChatColor.YELLOW + "----------------------------";
-			inv.setItem(22, new ItemBuilder(Material.PAINTING).setName(ChatColor.GOLD + "Stats : " + Language.getMessageByLanguage(data.getLocale(), Message.SCOREBOARD_TITLE)).setLore(bar, Language.getMessageByLanguage(PlayerData.getPlayerData(plugin, player).getLocale(), Message.DATABASE_NOT_CONNECTED), bar).toItemStack());
-		}**/
 	}
 }
