@@ -186,7 +186,8 @@ public enum TeamManager {
 			iMeta.setPatterns(Arrays.asList(new Pattern(DyeColor.WHITE, PatternType.CREEPER)));
 			i.setItemMeta(iMeta);
 		} else if (material == Material.WOOL) {
-			MaterialData data = new Wool(this.dyecolor);
+			Wool data = new Wool();
+			data.setColor(this.dyecolor);
 			i.setData(data);
 		} else if (material == Material.INK_SACK) {
 			MaterialData data = UltimateSheepWarsPlugin.getVersionManager().getNMSUtils().getDye(this.dyecolor);

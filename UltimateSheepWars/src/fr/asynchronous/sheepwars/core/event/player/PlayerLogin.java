@@ -43,9 +43,11 @@ public class PlayerLogin extends UltimateSheepWarsEventListener {
 			new BukkitRunnable() {
 				public void run() {
 					String locale = event.getPlayer().spigot().getLocale();
-					if (ConfigManager.getBoolean(Field.AUTO_GENERATE_LANGUAGES))
+					if (ConfigManager.getBoolean(Field.AUTO_GENERATE_LANGUAGES)) {
 						data.setLanguage(Language.getLanguage(locale));
-					player.sendMessage(ChatColor.GRAY + data.getLanguage().getIntro());
+					} else {
+						player.sendMessage(ChatColor.GRAY + data.getLanguage().getIntro());
+					}
 				}
 			}.runTaskLater(this.plugin, (20 * 5));
 	}

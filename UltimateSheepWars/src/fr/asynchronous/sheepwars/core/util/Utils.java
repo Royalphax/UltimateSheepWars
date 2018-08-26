@@ -43,11 +43,10 @@ public class Utils {
 		if (i1.hasItemMeta() && i2.hasItemMeta()) {
 			if (!i1.getItemMeta().getDisplayName().equals(i2.getItemMeta().getDisplayName()))
 				return false;
+		} else {
+			if (!i1.getType().equals(i2.getType()))
+				return false;
 		}
-		if (!i1.getType().equals(i2.getType()))
-			return false;
-		if (!i1.getData().equals(i2.getData()))
-			return false;
 		return true;
 	}
 
