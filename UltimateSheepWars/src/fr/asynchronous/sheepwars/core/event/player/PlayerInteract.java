@@ -115,9 +115,9 @@ public class PlayerInteract extends UltimateSheepWarsEventListener
         			player.updateInventory();
                     Sounds.playSound(player, player.getLocation(), Sounds.NOTE_STICKS, 1f, 1f);
                     
-        		} else if (item.isSimilar(TeamManager.RED.getIcon(player)) || item.isSimilar(TeamManager.BLUE.getIcon(player))) {
+        		} else if (Utils.areSimilar(item, TeamManager.RED.getIcon(player)) || Utils.areSimilar(item, TeamManager.BLUE.getIcon(player))) {
         			for (TeamManager team : Arrays.asList(TeamManager.RED, TeamManager.BLUE)) {
-                        if (item.isSimilar(team.getIcon(player))) {
+                        if (Utils.areSimilar(item, team.getIcon(player))) {
                             final String displayName = team.getDisplayName(player);
                             final TeamManager playerTeam = data.getTeam();
                             if (playerTeam == team) {

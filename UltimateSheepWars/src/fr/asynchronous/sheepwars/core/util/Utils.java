@@ -38,6 +38,18 @@ public class Utils {
 	private Utils() {
 		throw new IllegalStateException("Utility class");
 	}
+	
+	public static boolean areSimilar(ItemStack i1, ItemStack i2) {
+		if (i1.hasItemMeta() && i2.hasItemMeta()) {
+			if (!i1.getItemMeta().getDisplayName().equals(i2.getItemMeta().getDisplayName()))
+				return false;
+		}
+		if (!i1.getType().equals(i2.getType()))
+			return false;
+		if (!i1.getData().equals(i2.getData()))
+			return false;
+		return true;
+	}
 
 	public static ArrayList<String> getPlayerStats(PlayerData data, Language lang, DisplayStyle style) {
 		ChatColor color = data.getTeam().getColor();
