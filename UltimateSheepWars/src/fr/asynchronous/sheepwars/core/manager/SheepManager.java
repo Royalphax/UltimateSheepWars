@@ -93,14 +93,23 @@ public abstract class SheepManager {
 		this(new Message(name), name, color, duration, friendly, health, drop, random, sheepAbilities);
 	}
 
+	/**
+	 * Use {@link #SheepManager(String, DyeColor, int, boolean, double, boolean, float, SheepAbility...) this constructor} instead.
+	 */
 	public SheepManager(final MsgEnum name, final DyeColor color, final int duration, final boolean friendly, final boolean drop, final float random, final SheepAbility... sheepAbilities) {
 		this(Message.getMessage(name), name.toString().replaceAll("_NAME", ""), color, duration, friendly, SHEEP_DEFAULT_HEALTH, drop, random, sheepAbilities);
 	}
 
+	/**
+	 * Use {@link #SheepManager(String, DyeColor, int, boolean, double, boolean, float, SheepAbility...) this constructor} instead.
+	 */
 	public SheepManager(final MsgEnum name, final DyeColor color, final int duration, final boolean friendly, final boolean drop, final SheepAbility... sheepAbilities) {
 		this(Message.getMessage(name), name.toString().replaceAll("_NAME", ""), color, duration, friendly, SHEEP_DEFAULT_HEALTH, drop, 1.0f, sheepAbilities);
 	}
 
+	/**
+	 * Use {@link #SheepManager(String, DyeColor, int, boolean, double, boolean, float, SheepAbility...) this constructor} instead.
+	 */
 	public SheepManager(final Message name, final String configPath, final DyeColor color, final int duration, final boolean friendly, final double health, final boolean drop, final float random, final SheepAbility... sheepAbilities) {
 		this.msgName = name;
 		this.configPath = "sheep." + configPath.replaceAll("_", "-").toLowerCase();
@@ -113,46 +122,77 @@ public abstract class SheepManager {
 		this.sheepAbilities = Arrays.<SheepAbility>asList(sheepAbilities);
 	}
 
-	public org.bukkit.entity.Sheep spawnSheep(final Location location, final Player player, Plugin plugin) {
+	private org.bukkit.entity.Sheep spawnSheep(final Location location, final Player player, Plugin plugin) {
 		return UltimateSheepWarsPlugin.getVersionManager().getSheepFactory().spawnSheep(location, player, this, plugin);
 	}
 
+	/**
+	 * Get the sheep name according to the player's language.
+	 */
 	public String getName(Player player) {
 		return this.msgName.getMessage(player);
 	}
 
+	/**
+	 * Get sheep color.
+	 * @return The color of the sheep.
+	 */
 	public DyeColor getColor() {
 		return color;
 	}
 
+	/**
+	 * Get the sheep icon according to the player's language.
+	 */
 	public ItemStack getIcon(Player player) {
 		return new ItemBuilder(Material.WOOL).setColor(this.color).setName(getName(player)).toItemStack();
 	}
 
+	/**
+	 * Get the sheep duration.
+	 */
 	public int getDuration() {
 		return this.duration;
 	}
 
+	/**
+	 * Get if this sheep is friendly or aggressive.
+	 */
 	public boolean isFriendly() {
 		return this.friendly;
 	}
 
+	/**
+	 * Get the sheep health.
+	 */
 	public double getHealth() {
 		return this.health;
 	}
 
+	/**
+	 * Get if the sheep is allowed to drop its wool on death.
+	 */
 	public boolean isDropAllowed() {
 		return this.drop;
 	}
 
+	/**
+	 * Get the luck to get this sheep (between 0.0 and 1.0).
+	 */
 	public float getRandom() {
 		return this.random;
 	}
 
+	/**
+	 * Get the sheep abilities.
+	 */
 	public List<SheepAbility> getAbilities() {
 		return this.sheepAbilities;
 	}
 
+	/**
+	 * No need to use this method.
+	 */
 	private String getConfigFieldPath(String field) {
 		return this.configPath + "." + field;
 	}
@@ -196,6 +236,9 @@ public abstract class SheepManager {
 	 */
 	public abstract void onFinish(final Player player, final org.bukkit.entity.Sheep bukkitSheep, final boolean death, final Plugin plugin);
 
+	/**
+	 * Throw this sheep from a player.
+	 */
 	public boolean throwSheep(Player launcher, Plugin plugin) {
 		Location playerLocation = launcher.getLocation().add(0, 2, 0);
 		Location location = playerLocation.toVector().add(playerLocation.getDirection().multiply(0.5)).toLocation(launcher.getWorld());
@@ -240,10 +283,16 @@ public abstract class SheepManager {
 		return null;
 	}
 
+	/**
+	 * Get registered sheeps.
+	 */
 	public static List<SheepManager> getAvailableSheeps() {
 		return availableSheeps;
 	}
 
+	/**
+	 * Use {@link fr.asynchronous.sheepwars.core.UltimateSheepWarsAPI UltimateSheepWarsAPI} methods instead.
+	 */
 	public static boolean registerSheep(SheepManager sheep) throws ConfigFileNotSet, IOException {
 		if (!availableSheeps.contains(sheep)) {
 			if (configFile == null || config == null)
@@ -274,6 +323,9 @@ public abstract class SheepManager {
 		return false;
 	}
 
+	/**
+	 * Use {@link fr.asynchronous.sheepwars.core.UltimateSheepWarsAPI UltimateSheepWarsAPI} methods instead.
+	 */
 	public static boolean unregisterSheep(SheepManager sheep) {
 		if (availableSheeps.contains(sheep)) {
 			availableSheeps.remove(sheep);
@@ -282,6 +334,9 @@ public abstract class SheepManager {
 		return false;
 	}
 
+	/**
+	 * No need to use this method.
+	 */
 	public static void setupConfig(File file) {
 		if (!file.exists()) {
 			new FileNotFoundException(file.getName() + " not found. You probably need to create it.").printStackTrace();

@@ -15,6 +15,13 @@ public class SheepLaunchEvent extends Event {
 	private final SheepManager sheepClass;
 	private boolean isCancelled = false;
 	
+	/**
+	 * Event triggered when a player launch his sheep.
+	 * 
+	 * @param launcher Player who launch his sheep.
+	 * @param entity Bukkit sheep entity.
+	 * @param sheepClass Sheep class instance.
+	 */
 	public SheepLaunchEvent(Player launcher, Sheep entity, SheepManager sheepClass) {
 		this.launcher = launcher;
 		this.entity = entity;
