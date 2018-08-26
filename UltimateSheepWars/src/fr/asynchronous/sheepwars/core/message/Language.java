@@ -160,10 +160,10 @@ public class Language {
 	public static Language getLanguage(String locale) {
 		String first = locale.split("_")[0]; 
 		for (Language lang : languages)
-			if (lang.getLocale().equals(locale))
+			if (lang.getLocale().equalsIgnoreCase(locale))
 				return lang;
 		for (Language lang : languages)
-			if (lang.getLocale().equals(first + "_X"))
+			if (lang.getLocale().equalsIgnoreCase(first + "_X"))
 				return lang;
 		if (!ConfigManager.getBoolean(Field.AUTO_GENERATE_LANGUAGES)) 
 			return getDefaultLanguage();
