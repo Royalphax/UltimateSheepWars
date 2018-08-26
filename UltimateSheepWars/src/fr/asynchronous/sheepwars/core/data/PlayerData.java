@@ -17,10 +17,13 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.WeatherType;
 import org.bukkit.entity.Player;
 
+import fr.asynchronous.sheepwars.core.event.player.PlayerJoin;
+import fr.asynchronous.sheepwars.core.handler.GameState;
 import fr.asynchronous.sheepwars.core.handler.Sounds;
 import fr.asynchronous.sheepwars.core.kit.NoneKit;
 import fr.asynchronous.sheepwars.core.manager.ExceptionManager;
@@ -221,6 +224,13 @@ public class PlayerData extends DataManager {
 
 	public void setLanguage(final Language lang) {
 		this.language = lang;
+		if (GameState.isStep(GameState.WAITING)) {
+    		PlayerJoin.equip(PlayerData.getPlayerData(player));
+    	}
+		if (player.isOnline()) {
+			getPlayer().setScoreboard(lang.getScoreboardWrapper().getScoreboard());
+			getPlayer().sendMessage(ChatColor.GRAY + lang.getIntro());
+		}
 	}
 
 	public void setKills(final int i) {
@@ -318,6 +328,10 @@ public class PlayerData extends DataManager {
 		return "PlayerData(" + "uid=" + this.uid + ", name=" + this.name + ", locale=" + this.language.getLocale() + ", particle=" + this.particle + ", wins=" + this.wins + ", kills=" + this.kills + ", deaths=" + this.deaths + ", games=" + this.games + ", sheepThrown=" + this.sheepThrown + ", sheepKilled=" + this.sheepKilled + ", totalTime=" + this.totalTime + ", actualKills=" + this.actualKills + ", lastKit=" + this.kit.getId() + ", winRate=" + this.winRate + ", kdRatio=" + this.kdRatio + ", updatedAt=" + this.updatedAt + ", createdAt=" + this.createdAt + ")";
 	}
 
+	/**
+	 * Get player's data.
+	 * @return player's data.
+	 */
 	public static PlayerData getPlayerData(final OfflinePlayer player) {
 		PlayerData playerData = new PlayerData(player);
 		if (!dataMap.containsKey(player))
