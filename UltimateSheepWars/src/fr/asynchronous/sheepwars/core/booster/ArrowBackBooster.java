@@ -40,11 +40,6 @@ public class ArrowBackBooster extends BoosterManager
             final Arrow arrow = (Arrow)event.getEntity();
             if (arrow.getShooter() instanceof Player) {
                 final Player player = (Player)arrow.getShooter();
-                if (player.getVehicle() != null)
-                {
-                	event.setCancelled(true);
-                	return;
-                }
                 final TeamManager team = PlayerData.getPlayerData(player).getTeam();
                 if (team != null && this.teams.containsKey(team)) {
                     final long time = (long)this.teams.get(team);
