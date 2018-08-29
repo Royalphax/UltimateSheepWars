@@ -219,7 +219,7 @@ public abstract class SheepManager {
 	 * Most important method called every tick.
 	 * 
 	 * @param player Player who has launched the sheep.
-	 * @param ticks Sheep's ticks (number incremented every twentieth of a second starting from 0 at the moment the sheep appeared).
+	 * @param ticks Sheep's ticks (number decremented every twentieth of a second starting from (<code>sheep.getDuration*20</code>) at the moment the sheep appeared).
 	 * @param bukkitSheep The sheep's bukkit entity.
 	 * @param plugin UltimateSheepWars plugin instance (useful to launch runnables).
 	 * @return <b>true</b> if you want to stop the sheep and directly go to the <i>onFinish([...]);</i> method, <b>false</b> if you want to continue ticking.
