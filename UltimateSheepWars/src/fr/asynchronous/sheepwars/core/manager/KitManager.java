@@ -16,7 +16,6 @@ import org.bukkit.plugin.Plugin;
 
 import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.data.PlayerData;
-import fr.asynchronous.sheepwars.core.exception.ConfigFileNotSet;
 import fr.asynchronous.sheepwars.core.exception.KitNotRegistredException;
 import fr.asynchronous.sheepwars.core.handler.Contributor;
 import fr.asynchronous.sheepwars.core.manager.ConfigManager.Field;
@@ -27,6 +26,7 @@ import fr.asynchronous.sheepwars.core.util.ItemBuilder;
 public abstract class KitManager implements Listener
 {
     private static ArrayList<KitManager> availableKits = new ArrayList<>();
+    private static ArrayList<KitManager> waitingKits = new ArrayList<>();
     private static File configFile;
     private static FileConfiguration config;
     
@@ -228,10 +228,12 @@ public abstract class KitManager implements Listener
     /**
 	 * Use {@link fr.asynchronous.sheepwars.core.UltimateSheepWarsAPI UltimateSheepWarsAPI} methods instead.
 	 */
-	public static boolean registerKit(KitManager kit, Plugin plugin) throws ConfigFileNotSet, IOException {
+	public static boolean registerKit(KitManager kit, Plugin plugin) throws IOException {
 		if (!availableKits.contains(kit)) {
-			if (configFile == null || config == null)
-				throw new ConfigFileNotSet("You have to set the config file used to store kit's data before registering a new kit.");
+			if (configFile == null || config == null) {
+				waitingKits.add(kit);
+				return false;
+			}
 			boolean enable = config.getBoolean(kit.getConfigFieldPath("enable"), true);
 			double price = config.getDouble(kit.getConfigFieldPath("price"), -1.0);
 			int requiredWins = config.getInt(kit.getConfigFieldPath("required-wins"), -1);
@@ -269,7 +271,7 @@ public abstract class KitManager implements Listener
 	/**
 	 * No need to use this method.
 	 */
-    public static void setupConfig(File file)
+    public static void setupConfig(File file, UltimateSheepWarsPlugin plugin)
     {
     	if (!file.exists()) {
     		new FileNotFoundException(file.getName() + " not found. You probably need to create it.").printStackTrace();
@@ -277,5 +279,14 @@ public abstract class KitManager implements Listener
     	}
     	configFile = file;
     	config = YamlConfiguration.loadConfiguration(file);
+    	for (KitManager kit : waitingKits)
+    		try {
+				registerKit(kit, plugin);
+				plugin.getLogger().info("Custom Kit : " + kit.getClass().getName() + " fully registred!");
+			} catch (IOException e) {
+				plugin.getLogger().info("Can't register custom kit " + kit.getClass().getName() + ", an error occured!");
+				new ExceptionManager(e).register(true);
+			}
+    	waitingKits.clear();
     }
 }

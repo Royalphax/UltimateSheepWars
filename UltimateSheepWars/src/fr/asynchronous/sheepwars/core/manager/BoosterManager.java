@@ -13,7 +13,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 
-import fr.asynchronous.sheepwars.core.exception.ConfigFileNotSet;
+import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.handler.DisplayColor;
 import fr.asynchronous.sheepwars.core.message.Message;
 import fr.asynchronous.sheepwars.core.message.Message.MsgEnum;
@@ -23,6 +23,7 @@ import fr.asynchronous.sheepwars.core.util.RandomUtils;
 public abstract class BoosterManager implements Listener {
 	
 	private static List<BoosterManager> availableBoosters = new ArrayList<>();
+	private static List<BoosterManager> waitingBoosters = new ArrayList<>();
 	private static File configFile;
     private static FileConfiguration config;
 
@@ -159,10 +160,12 @@ public abstract class BoosterManager implements Listener {
 	/**
 	 * Use {@link fr.asynchronous.sheepwars.core.UltimateSheepWarsAPI UltimateSheepWarsAPI} methods instead.
 	 */
-	public static boolean registerBooster(BoosterManager booster) throws ConfigFileNotSet, IOException {
+	public static boolean registerBooster(BoosterManager booster) throws IOException {
 		if (!availableBoosters.contains(booster)) {
-			if (configFile == null || config == null)
-				throw new ConfigFileNotSet("You have to set the config file used to store booster's data before registering a booster.");
+			if (configFile == null || config == null) {
+				waitingBoosters.add(booster);
+				return false;
+			}
 			boolean enable = config.getBoolean(booster.getConfigFieldPath("enable"), true);
 			if (!enable)
 				return false;
@@ -194,7 +197,7 @@ public abstract class BoosterManager implements Listener {
 	/**
 	 * No need to use this method.
 	 */
-	public static void setupConfig(File file)
+	public static void setupConfig(File file, UltimateSheepWarsPlugin plugin)
     {
     	if (!file.exists()) {
     		new FileNotFoundException(file.getName() + " not found. You probably need to create it.").printStackTrace();
@@ -202,6 +205,15 @@ public abstract class BoosterManager implements Listener {
     	}
     	configFile = file;
     	config = YamlConfiguration.loadConfiguration(file);
+    	for (BoosterManager booster : waitingBoosters)
+			try {
+				registerBooster(booster);
+				plugin.getLogger().info("Custom Booster : " + booster.getClass().getName() + " fully registred!");
+			} catch (IOException e) {
+				plugin.getLogger().info("Can't register custom booster " + booster.getClass().getName() + ", an error occured!");
+				new ExceptionManager(e).register(true);
+			}
+    	waitingBoosters.clear();
     }
 	
 	/**

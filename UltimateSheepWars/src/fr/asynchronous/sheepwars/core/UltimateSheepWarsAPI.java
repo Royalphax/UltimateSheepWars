@@ -33,7 +33,7 @@ public class UltimateSheepWarsAPI {
 	public static boolean registerSheep(SheepManager sheepClass) {
 		try {
 			return SheepManager.registerSheep(sheepClass);
-		} catch (ConfigFileNotSet | IOException e) {
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		return false;
@@ -60,7 +60,7 @@ public class UltimateSheepWarsAPI {
 	public static boolean registerKit(KitManager kitClass, Plugin owningPlugin) {
 		try {
 			return KitManager.registerKit(kitClass, owningPlugin);
-		} catch (ConfigFileNotSet | IOException e) {
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		return false;
@@ -86,7 +86,7 @@ public class UltimateSheepWarsAPI {
 	public static boolean registerBooster(BoosterManager boosterClass) {
 		try {
 			return BoosterManager.registerBooster(boosterClass);
-		} catch (ConfigFileNotSet | IOException e) {
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		return false;

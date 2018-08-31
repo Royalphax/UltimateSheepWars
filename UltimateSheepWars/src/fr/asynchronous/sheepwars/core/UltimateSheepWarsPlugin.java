@@ -496,17 +496,17 @@ public class UltimateSheepWarsPlugin extends JavaPlugin {
 			File boosterFile = new File(this.getDataFolder(), "boosters.yml");
 			if (!boosterFile.exists())
 				boosterFile.createNewFile();
-			BoosterManager.setupConfig(boosterFile);
+			BoosterManager.setupConfig(boosterFile, this);
 
 			File kitFile = new File(this.getDataFolder(), "kits.yml");
 			if (!kitFile.exists())
 				kitFile.createNewFile();
-			KitManager.setupConfig(kitFile);
+			KitManager.setupConfig(kitFile, this);
 
 			File sheepFile = new File(this.getDataFolder(), "sheeps.yml");
 			if (!sheepFile.exists())
 				sheepFile.createNewFile();
-			SheepManager.setupConfig(sheepFile);
+			SheepManager.setupConfig(sheepFile, this);
 		} catch (IOException ex) {
 			new ExceptionManager(ex).register(true);
 			disablePlugin(Level.WARNING, "Something prevent the plugin to create important configuration files. Maybe it doesn't have the required permission.");

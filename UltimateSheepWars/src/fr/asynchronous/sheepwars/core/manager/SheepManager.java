@@ -25,7 +25,6 @@ import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.data.PlayerData;
 import fr.asynchronous.sheepwars.core.event.usw.SheepGiveEvent;
 import fr.asynchronous.sheepwars.core.event.usw.SheepLaunchEvent;
-import fr.asynchronous.sheepwars.core.exception.ConfigFileNotSet;
 import fr.asynchronous.sheepwars.core.handler.SheepAbility;
 import fr.asynchronous.sheepwars.core.handler.Sounds;
 import fr.asynchronous.sheepwars.core.manager.ConfigManager.Field;
@@ -38,6 +37,7 @@ public abstract class SheepManager {
 
 	private static final double SHEEP_DEFAULT_HEALTH = 8.0;
 	private static List<SheepManager> availableSheeps = new ArrayList<>();
+	private static List<SheepManager> waitingSheeps = new ArrayList<>();
 	private static File configFile;
 	private static FileConfiguration config;
 
@@ -293,10 +293,12 @@ public abstract class SheepManager {
 	/**
 	 * Use {@link fr.asynchronous.sheepwars.core.UltimateSheepWarsAPI UltimateSheepWarsAPI} methods instead.
 	 */
-	public static boolean registerSheep(SheepManager sheep) throws ConfigFileNotSet, IOException {
+	public static boolean registerSheep(SheepManager sheep) throws IOException {
 		if (!availableSheeps.contains(sheep)) {
-			if (configFile == null || config == null)
-				throw new ConfigFileNotSet("You have to set the config file used to store sheep's data before registering a custom sheep.");
+			if (configFile == null || config == null) {
+				waitingSheeps.add(sheep);
+				return false;
+			}
 			boolean enable = config.getBoolean(sheep.getConfigFieldPath("enable"), true);
 			if (!enable)
 				return false;
@@ -337,12 +339,21 @@ public abstract class SheepManager {
 	/**
 	 * No need to use this method.
 	 */
-	public static void setupConfig(File file) {
+	public static void setupConfig(File file, UltimateSheepWarsPlugin plugin) {
 		if (!file.exists()) {
 			new FileNotFoundException(file.getName() + " not found. You probably need to create it.").printStackTrace();
 			return;
 		}
 		configFile = file;
 		config = YamlConfiguration.loadConfiguration(file);
+		for (SheepManager sheep : waitingSheeps)
+			try {
+				registerSheep(sheep);
+				plugin.getLogger().info("Custom Sheep : " + sheep.getClass().getName() + " fully registred!");
+			} catch (IOException e) {
+				plugin.getLogger().info("Can't register custom sheep " + sheep.getClass().getName() + ", an error occured!");
+				new ExceptionManager(e).register(true);
+			}
+		waitingSheeps.clear();
 	}
 }
