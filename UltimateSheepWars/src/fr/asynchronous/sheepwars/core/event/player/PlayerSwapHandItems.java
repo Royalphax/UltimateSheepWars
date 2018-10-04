@@ -1,5 +1,8 @@
 package fr.asynchronous.sheepwars.core.event.player;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
@@ -17,7 +20,14 @@ public class PlayerSwapHandItems extends UltimateSheepWarsEventListener {
 	@EventHandler
 	public void onPlayerSwapHandItems(final PlayerSwapHandItemsEvent e) {
 		
-		if (GameState.isStep(GameState.WAITING) || e.getOffHandItem().getType() == Material.WOOL || e.getOffHandItem().getType().toString().contains("LEATHER")) {
+		final Material offHandItem = e.getOffHandItem().getType();
+		final Material mainHandItem = e.getMainHandItem().getType();
+		
+		final List<Material> notAllowedMaterials = new ArrayList<>();
+		notAllowedMaterials.add(Material.WOOL);
+		notAllowedMaterials.add(Material.LEATHER_CHESTPLATE);
+		
+		if (GameState.isStep(GameState.WAITING) || notAllowedMaterials.contains(offHandItem) || notAllowedMaterials.contains(mainHandItem)) {
 			
 			Sounds.playSound(e.getPlayer(), Sounds.VILLAGER_NO, 1f, 1f);
 			e.setCancelled(true);
