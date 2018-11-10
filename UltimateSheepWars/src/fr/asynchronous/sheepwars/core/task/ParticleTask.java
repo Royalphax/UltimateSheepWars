@@ -8,7 +8,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.handler.Contributor;
-import fr.asynchronous.sheepwars.core.handler.Contributor.ParticleEffect;
+import fr.asynchronous.sheepwars.core.handler.Particles.ParticleEffect;
 
 public class ParticleTask extends BukkitRunnable {
 
@@ -29,8 +29,14 @@ public class ParticleTask extends BukkitRunnable {
 
 	public void run() {
 		if (this.player.isOnline()) {
-			if (Contributor.isContributor(player) && Contributor.getContributor(player).isEffectActive() && this.player.getGameMode() != GameMode.SPECTATOR) {
-				this.effect.getAction().update(this.player, this.isMoving);
+			if (this.player.getGameMode() != GameMode.SPECTATOR) {
+				if (Contributor.isContributor(player)) {
+					Contributor contrib = Contributor.getContributor(player);
+					if (this.effect == contrib.getEffect() && contrib.isEffectActive())
+						this.effect.getAction().update(this.player, this.isMoving);
+				} else {
+					this.effect.getAction().update(this.player, this.isMoving);
+				}
 			}
 		} else {
 			this.cancel();

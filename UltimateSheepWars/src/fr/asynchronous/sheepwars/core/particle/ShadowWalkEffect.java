@@ -8,7 +8,7 @@ import org.bukkit.util.Vector;
 
 import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.handler.Particles;
-import fr.asynchronous.sheepwars.core.handler.Contributor.ParticleEffect.ParticleEffectType;
+import fr.asynchronous.sheepwars.core.handler.Particles.ParticleEffect.ParticleEffectType;
 
 public class ShadowWalkEffect implements ParticleEffectType {
 

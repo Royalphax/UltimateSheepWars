@@ -6,14 +6,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
-import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
-import fr.asynchronous.sheepwars.core.particle.EnchantEffect;
-import fr.asynchronous.sheepwars.core.particle.FlameCircleEffect;
-import fr.asynchronous.sheepwars.core.particle.FlameRingsEffect;
-import fr.asynchronous.sheepwars.core.particle.FlameSpiralEffect;
-import fr.asynchronous.sheepwars.core.particle.ShadowWalkEffect;
-import fr.asynchronous.sheepwars.core.particle.WitchSpiralEffect;
-import fr.asynchronous.sheepwars.core.task.ParticleTask;
+import fr.asynchronous.sheepwars.core.handler.Particles.ParticleEffect;
 
 public enum Contributor {
 	
@@ -141,45 +134,5 @@ public enum Contributor {
 			return getContributor(player).getPrefix();
 		}
 		return "";
-	}
-	
-	public static enum ParticleEffect {
-		
-		FLAME_RINGS((ParticleEffectType)new FlameRingsEffect(), 0),
-		FLAME_CIRCLE((ParticleEffectType)new FlameCircleEffect(), 0),
-		FLAME_SPIRAL((ParticleEffectType)new FlameSpiralEffect(), 0),
-		WITCH_SPIRAL((ParticleEffectType)new WitchSpiralEffect(), 0),
-		ENCHANT((ParticleEffectType)new EnchantEffect(), 5),
-		SHADOW_WALK((ParticleEffectType)new ShadowWalkEffect(), 8);
-
-		private ParticleEffectType action;
-		private int ticks;
-		
-		private ParticleEffect(ParticleEffectType action, int ticks)
-		{
-			this.action = action;
-			this.ticks = ticks;
-		}
-		
-		public ParticleEffectType getAction()
-		{
-			return this.action;
-		}
-		
-		public int getTicks()
-		{
-			return this.ticks;
-		}
-		
-		public interface ParticleEffectType
-	    {
-	        void update(Player player, Boolean moving);
-	    }
-		
-		public static void equipEffect(Player player, UltimateSheepWarsPlugin plugin)
-		{
-			if (isContributor(player))
-				new ParticleTask(getContributor(player).getEffect(), player, plugin);
-		}
 	}
 }
