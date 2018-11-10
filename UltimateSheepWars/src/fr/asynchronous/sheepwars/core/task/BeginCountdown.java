@@ -17,6 +17,7 @@ import org.bukkit.scoreboard.Scoreboard;
 
 import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.data.PlayerData;
+import fr.asynchronous.sheepwars.core.event.usw.GameStartEvent;
 import fr.asynchronous.sheepwars.core.handler.GameState;
 import fr.asynchronous.sheepwars.core.handler.Sounds;
 import fr.asynchronous.sheepwars.core.kit.MoreHealthKit;
@@ -101,6 +102,17 @@ public class BeginCountdown extends BukkitRunnable {
 					player.setFallDistance(0.0f);
 					player.teleport(team.getNextSpawn());
 					UltimateSheepWarsPlugin.getVersionManager().getTitleUtils().defaultTitle(Type.TITLE, player, data.getLanguage().getMessage(MsgEnum.GAME_START_TITLE), data.getLanguage().getMessage(MsgEnum.GAME_START_SUBTITLE).replace("%TIME%", ConfigManager.getInt(Field.GIVE_SHEEP_INTERVAL).toString()));
+				}
+				GameStartEvent event = new GameStartEvent(this.plugin);
+				Bukkit.getPluginManager().callEvent(event);
+				if (event.isCloudNetSupportEnable()) {
+					try {
+						de.dytanic.cloudnet.bridge.CloudServer.getInstance().setServerState(de.dytanic.cloudnet.lib.server.ServerState.INGAME);
+						de.dytanic.cloudnet.bridge.CloudServer.getInstance().changeToIngame();
+						de.dytanic.cloudnet.bridge.CloudServer.getInstance().update();
+					} catch (NoClassDefFoundError ex) {
+						// Do nothing
+					}
 				}
 				new GameTask(this.plugin);
 			}
