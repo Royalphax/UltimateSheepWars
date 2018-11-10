@@ -31,6 +31,7 @@ public class ConfigManager {
 
 	public enum Field {
 
+		ENABLE_HUB_COMMAND("enable-hub-command", FieldType.BOOLEAN, true),
 		FALLBACK_SERVER("fallback-server-name", FieldType.STRING, "none"),
 		COUNTDOWN("countdown-before-starting", FieldType.INT, 60),
 		MIN_PLAYERS("min-players-to-start", FieldType.INT, 6),
@@ -53,6 +54,7 @@ public class ConfigManager {
 		PARTICLES_OFF_ITEM("item.particles-off-id", FieldType.ITEMSTACK, "STICK"),
 		TEAM_BLUE_MATERIAL("item.team-blue", FieldType.MATERIAL, "BANNER"),
 		TEAM_RED_MATERIAL("item.team-red", FieldType.MATERIAL, "BANNER"),
+		CUSTOMIZE_TABLIST("customize-tablist", FieldType.BOOLEAN, true),
 		ENABLE_KIT_PERMISSIONS("enable-permissions", FieldType.BOOLEAN, false),
 		ENABLE_INGAME_SHOP("enable-ingame-shop", FieldType.BOOLEAN, false),
 		ENABLE_ALL_KITS("enable-all-kits", FieldType.BOOLEAN, true),

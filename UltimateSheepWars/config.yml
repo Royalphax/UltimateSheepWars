@@ -5,6 +5,10 @@
 #Note: Use color codes (&1, &3, &l,...)
 prefix: '&8[&9SheepWars&8]'
 #
+#Enable the default hub command of UltimateSheepWars.
+#Useful if you don't have any hub command set up yet.
+enable-hub-command: true
+#
 #The fallback server is the name of the server where
 #people are automatically redirect after the game.
 #Note: For BungeeCord ONLY!
@@ -20,6 +24,9 @@ min-players-to-start: 2
 #Specify the number of seconds you want the killed player to stay in the killer's vision. 
 #Set 0 if you want to disable this option.
 killer-view-stay-time: 5
+#
+#Do you want to let the plugin customize the tablist ?
+customize-tablist: true
 #
 #To set up max players, simply
 #change it in your server.properties

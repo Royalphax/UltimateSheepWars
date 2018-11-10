@@ -197,7 +197,7 @@ public class Message {
 		SCOREBOARD_TEAM_BLUE("&9Team Blue &8(&e%SIZE%&8) "),
 		RECORDS("%PLAYER%'s stats"),
 		BOOSTER_ACTION("%PLAYER% activate %BOOSTER%"),
-		BOOSTER_ARROW_KNOCKBACK("&7&lKnockback Arrows &e(&b10 &eseconds)"),
+		BOOSTER_ARROW_KNOCKBACK("&7&lKnockback Arrows &e(&b15 &eseconds)"),
 		BOOSTER_ARROW_FIRE("&6&lFire Arrows &e(&b15 &eseconds)"),
 		BOOSTER_MORE_SHEEP("&b&lMore Sheep &e(&b+1 &esheep!)"),
 		BOOSTER_BLOCKING_SHEEP("&8&lBlocking Sheep &e(&b8 &eseconds)"),
