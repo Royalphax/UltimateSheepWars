@@ -7,8 +7,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import fr.asynchronous.sheepwars.core.data.PlayerData;
-import fr.asynchronous.sheepwars.core.event.player.PlayerJoin;
-import fr.asynchronous.sheepwars.core.handler.GameState;
 import fr.asynchronous.sheepwars.core.message.Language;
 import fr.asynchronous.sheepwars.core.util.Utils;
 

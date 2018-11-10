@@ -16,8 +16,10 @@ import fr.asynchronous.sheepwars.core.handler.GameState;
 import fr.asynchronous.sheepwars.core.handler.Hologram;
 import fr.asynchronous.sheepwars.core.handler.Particles;
 import fr.asynchronous.sheepwars.core.handler.Sounds;
+import fr.asynchronous.sheepwars.core.manager.BoosterManager;
 import fr.asynchronous.sheepwars.core.manager.ConfigManager;
 import fr.asynchronous.sheepwars.core.manager.ConfigManager.Field;
+import fr.asynchronous.sheepwars.core.manager.KitManager;
 import fr.asynchronous.sheepwars.core.manager.SheepManager;
 import fr.asynchronous.sheepwars.core.manager.TeamManager;
 import fr.asynchronous.sheepwars.core.message.Message;
@@ -60,15 +62,18 @@ public class MainCommand implements CommandExecutor {
 					player.sendMessage(ChatColor.GRAY + "/sw addSpawn/clearSpawns <team> " + (ConfigManager.getLocations(Field.RED_SPAWNS).isEmpty() || ConfigManager.getLocations(Field.BLUE_SPAWNS).isEmpty() || ConfigManager.getLocations(Field.SPEC_SPAWNS).isEmpty() ? no : ok) + " (" + (!ConfigManager.getLocations(Field.BLUE_SPAWNS).isEmpty() ? ChatColor.GREEN : ChatColor.RED) + "blue§7/" + (!ConfigManager.getLocations(Field.RED_SPAWNS).isEmpty() ? ChatColor.GREEN : ChatColor.RED) + "red§7/" + (!ConfigManager.getLocations(Field.SPEC_SPAWNS).isEmpty() ? ChatColor.GREEN : ChatColor.RED) + "spec§7)");
 					player.sendMessage("");
 					player.sendMessage(ChatColor.RED + "" + ChatColor.ITALIC + "When ingame configuration is over, stop your server, edit");
-					player.sendMessage(ChatColor.RED + "" + ChatColor.ITALIC + " the config to suit your needs and restart the server.");
+					player.sendMessage(ChatColor.RED + "" + ChatColor.ITALIC + "the config to suit your needs and restart the server.");
 				} else {
 					player.sendMessage("/sw setLobby " + ChatColor.DARK_GRAY + "- " + ChatColor.GRAY + "Set the lobby");
 					player.sendMessage("/sw addBooster/clearBoosters " + ChatColor.DARK_GRAY + "- " + ChatColor.GRAY + "Add a booster");
 					player.sendMessage("/sw addSpawn/clearSpawns <team> " + ChatColor.DARK_GRAY + "- " + ChatColor.GRAY + "Add a blue/red/spec spawn");
 					player.sendMessage("");
 					player.sendMessage("/sw start " + ChatColor.DARK_GRAY + "- " + ChatColor.GRAY + "Reduce countdown");
-					player.sendMessage("/sw give " + ChatColor.DARK_GRAY + "- " + ChatColor.GRAY + "Give you all sheeps");
-					// player.sendMessage("/sw changeowner " + ChatColor.DARK_GRAY + "- " + ChatColor.GRAY + "Change plugin's owner");
+					player.sendMessage("/sw give" + ChatColor.DARK_GRAY + "- " + ChatColor.GRAY + "Give you all sheeps");
+					player.sendMessage("/sw kits " + ChatColor.DARK_GRAY + "- " + ChatColor.GRAY + "See all loaded kits");
+					player.sendMessage("/sw sheeps " + ChatColor.DARK_GRAY + "- " + ChatColor.GRAY + "See all loaded sheeps");
+					player.sendMessage("/sw boosters " + ChatColor.DARK_GRAY + "- " + ChatColor.GRAY + "See all loaded boosters");
+					player.sendMessage("/sw listmsg " + ChatColor.DARK_GRAY + "- " + ChatColor.GRAY + "See all loaded messages");
 					player.sendMessage("");
 					player.sendMessage("/stats <player> " + ChatColor.DARK_GRAY + "- " + ChatColor.GRAY + "Check player's stats");
 					player.sendMessage("/lang " + ChatColor.DARK_GRAY + "- " + ChatColor.GRAY + "Change your language");
@@ -127,18 +132,63 @@ public class MainCommand implements CommandExecutor {
 				player.sendMessage("Players data: " + PlayerData.getData().size());
 
 				player.sendMessage("Tested.");
+			} else if (sub.equalsIgnoreCase("sheeps")) {
+				player.sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + "Loaded Sheeps :");
+				for (SheepManager sheep : SheepManager.getAvailableSheeps()) {
+					player.sendMessage(ChatColor.GRAY + "∙ " + sheep.getName(player));
+					player.sendMessage(ChatColor.GRAY + "  ∙ Duration : " + ChatColor.YELLOW + sheep.getDuration() + " seconds");
+					player.sendMessage(ChatColor.GRAY + "  ∙ Health : " + ChatColor.YELLOW + sheep.getHealth() + " half hearts");
+					player.sendMessage(ChatColor.GRAY + "  ∙ Luck get rate : " + ChatColor.YELLOW + (sheep.getRandom() * 100.0) + " %");
+					player.sendMessage(ChatColor.GRAY + "  ∙ Abilities : " + ChatColor.YELLOW + sheep.getAbilities().toString());
+					player.sendMessage(ChatColor.GRAY + "  ∙ Color : " + ChatColor.YELLOW + sheep.getColor());
+					player.sendMessage(ChatColor.GRAY + "  ∙ Is friendly : " + ChatColor.YELLOW + sheep.isFriendly());
+					player.sendMessage(ChatColor.GRAY + "  ∙ Drop wool : " + ChatColor.YELLOW + sheep.isDropAllowed());
+				}
+				Sounds.playSound(player, player.getLocation(), Sounds.ORB_PICKUP, 1f, 1f);
+			} else if (sub.equalsIgnoreCase("kits")) {
+				player.sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + "Loaded Kits :");
+				for (KitManager kit : KitManager.getAvailableKits()) {
+					player.sendMessage(ChatColor.GRAY + "∙ " + kit.getName(player) + ChatColor.GRAY + " (Id " + ChatColor.YELLOW + kit.getId() + ChatColor.GRAY + ")");
+					player.sendMessage(ChatColor.GRAY + "  ∙ Required wins : " + ChatColor.YELLOW + kit.getRequiredWins());
+					player.sendMessage(ChatColor.GRAY + "  ∙ Permission : " + ChatColor.YELLOW + kit.getPermission());
+					player.sendMessage(ChatColor.GRAY + "  ∙ Price : " + ChatColor.YELLOW + kit.getPrice());
+					player.sendMessage(ChatColor.GRAY + "  ∙ Icon : " + ChatColor.YELLOW + kit.getIcon().toItemStack().getType().toString().replaceAll("_", " "));
+					player.sendMessage(ChatColor.GRAY + "  ∙ Description : " + ChatColor.YELLOW + kit.getDescription(player));
+				}
+				Sounds.playSound(player, player.getLocation(), Sounds.ORB_PICKUP, 1f, 1f);
+			} else if (sub.equalsIgnoreCase("boosters")) {
+				player.sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + "Loaded Boosters :");
+				for (BoosterManager boost : BoosterManager.getAvailableBoosters()) {
+					player.sendMessage(ChatColor.GRAY + "∙ " + boost.getName().getMessage(player));
+					player.sendMessage(ChatColor.GRAY + "  ∙ Duration : " + ChatColor.YELLOW + boost.getDuration());
+					player.sendMessage(ChatColor.GRAY + "  ∙ BossBar color : " + ChatColor.YELLOW + boost.getDisplayColor().toString().replaceAll("_", " "));
+					player.sendMessage(ChatColor.GRAY + "  ∙ Wool color : " + ChatColor.YELLOW + boost.getWoolColor().toString().replaceAll("_", " "));
+				}
+				Sounds.playSound(player, player.getLocation(), Sounds.ORB_PICKUP, 1f, 1f);
 			} else if (sub.equalsIgnoreCase("give")) {
 				if (GameState.isStep(GameState.INGAME)) {
-					for (SheepManager sheep : SheepManager.getAvailableSheeps()) {
-						ItemStack i = sheep.getIcon(player).clone();
-						i.setAmount(32);
-						player.getInventory().addItem(i);
+					if (args.length > 1) {
+						if (args[1].equalsIgnoreCase("*")) {
+							for (Player online : Bukkit.getOnlinePlayers())
+								giveSheeps(online, player);
+							player.sendMessage(ChatColor.GREEN + "The sheep were given to all the players !");
+						} else if (Bukkit.getPlayer(args[1]) != null) {
+							Player receiver = Bukkit.getPlayer(args[1]);
+							giveSheeps(receiver, player);
+						} else {
+							player.sendMessage(ChatColor.RED + args[1] + " is not connected.");
+						}
+					} else {
+						giveSheeps(player, null);
 					}
+				} else {
+					player.sendMessage(ChatColor.RED + "You can't give you the sheeps while the game hasn't started.");
+					Sounds.playSound(player, player.getLocation(), Sounds.VILLAGER_NO, 1f, 1f);
 				}
-				Sounds.playSound(player, player.getLocation(), Sounds.VILLAGER_NO, 1f, 1f);
 			} else if (sub.equalsIgnoreCase("listmsg") && player.isOp()) {
-				for (MsgEnum m : MsgEnum.values())
-					player.sendMessage(ChatColor.UNDERLINE + m.toString() + ":" + ChatColor.RESET + " " + Message.getMessage(player, m));
+				for (MsgEnum msg : MsgEnum.values())
+					player.sendMessage(msg.getMessage() + "" + ChatColor.DARK_AQUA + " ➡ " + ChatColor.RESET + " " + Message.getMessage(player, msg));
+				player.sendMessage(ChatColor.GREEN + "Default Language (English)" + ChatColor.DARK_AQUA + " ➡ " + ChatColor.GREEN + " Your Language (" + PlayerData.getPlayerData(player).getLanguage().getName() + ")");
 			} else {
 				sender.sendMessage(ChatColor.RED + "Wrong command !");
 			}
@@ -148,5 +198,17 @@ public class MainCommand implements CommandExecutor {
 		player.sendMessage(ChatColor.GRAY + "∙ Many thanks to @Roytreo28 (" + ChatColor.RED + "Developer" + ChatColor.GRAY + "), @KingRider26 (" + ChatColor.RED + "Co-Developer" + ChatColor.GRAY + "), @6985jjorda (English Translation), @felibouille (German Translation), @jeussa (Instant Explosion Firework Effect)");
 		player.sendMessage(ChatColor.GRAY + "∙ If you encounter any issue, come and talk to us: " + ChatColor.AQUA + "https://discord.gg/nZthcPh");
 		return false;
+	}
+	
+	public void giveSheeps(Player player, Player giver) {
+		for (SheepManager sheep : SheepManager.getAvailableSheeps()) {
+			ItemStack i = sheep.getIcon(player).clone();
+			i.setAmount(32);
+			player.getInventory().addItem(i);
+		}
+		Sounds.playSound(player, player.getLocation(), Sounds.VILLAGER_YES, 1f, 1f);
+		if (giver != null) {
+			player.sendMessage(ChatColor.GREEN + "You got all the sheep of the game. You can thank " + giver.getName() + ".");
+		}
 	}
 }

@@ -16,6 +16,7 @@ import fr.asynchronous.sheepwars.core.data.PlayerData;
 import fr.asynchronous.sheepwars.core.event.UltimateSheepWarsEventListener;
 import fr.asynchronous.sheepwars.core.handler.Contributor;
 import fr.asynchronous.sheepwars.core.handler.GameState;
+import fr.asynchronous.sheepwars.core.handler.Particles.ParticleEffect;
 import fr.asynchronous.sheepwars.core.kit.NoneKit;
 import fr.asynchronous.sheepwars.core.manager.ConfigManager;
 import fr.asynchronous.sheepwars.core.manager.ConfigManager.Field;
@@ -60,7 +61,7 @@ public class PlayerJoin extends UltimateSheepWarsEventListener {
 			Contributor contributor = Contributor.getContributor(player);
 			player.sendMessage(ChatColor.GRAY + contributor.getSpecialMessage());
 			if (contributor.getEffect() != null)
-				Contributor.ParticleEffect.equipEffect(player, this.plugin);
+				ParticleEffect.equipEffect(player, this.plugin);
 		}
 		
 		/** On fonctionne par gamestate **/
