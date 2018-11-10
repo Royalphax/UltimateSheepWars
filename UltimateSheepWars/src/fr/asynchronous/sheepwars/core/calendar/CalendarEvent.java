@@ -17,11 +17,13 @@ public abstract class CalendarEvent implements Listener {
 
 	private int id;
 	private String name;
+	private Type type;
 	private BukkitTask currentTask;
 
-	public CalendarEvent(int id, String name) {
+	public CalendarEvent(int id, String name, Type type) {
 		this.id = id;
 		this.name = name;
+		this.type = type;
 	}
 
 	public int getID() {
@@ -30,6 +32,10 @@ public abstract class CalendarEvent implements Listener {
 
 	public String getName() {
 		return this.name;
+	}
+	
+	public Type getType() {
+		return type;
 	}
 
 	public abstract void activate(Plugin activatingPlugin);
@@ -45,36 +51,21 @@ public abstract class CalendarEvent implements Listener {
 		return (cal.before(getEndDate()) && cal.after(getStartDate()));
 	}
 
-	public int secBeforeEnd() {
+	public long secBeforeEnd() {
 		Calendar cal = Calendar.getInstance();
 		Calendar endDate = getEndDate();
-		if (cal.after(endDate))
-			return 0;
-		return Math.toIntExact((endDate.getTimeInMillis() - cal.getTimeInMillis()) / 1000);
+		return ((endDate.getTimeInMillis() - cal.getTimeInMillis()) / 1000);
 	}
 
-	public int secBeforeStart() {
+	public long secBeforeStart() {
 		Calendar cal = Calendar.getInstance();
 		Calendar startDate = getStartDate();
-		if (cal.after(startDate))
-			return 0;
-		return Math.toIntExact((startDate.getTimeInMillis() - cal.getTimeInMillis()) / 1000);
+		return ((startDate.getTimeInMillis() - cal.getTimeInMillis()) / 1000);
 	}
 
 	private void registerEvents(final Plugin plugin) {
 		Bukkit.getPluginManager().registerEvents(this, plugin);
 		this.activate(plugin);
-		this.currentTask = new BukkitRunnable() {
-			public void run() {
-				unregisterEvents(plugin);
-			}
-		}.runTaskLaterAsynchronously(plugin, secBeforeEnd() * 20);
-	}
-
-	private void unregisterEvents(final Plugin plugin) {
-		this.deactivate(plugin);
-		HandlerList.unregisterAll(this);
-		this.startTask(plugin);
 	}
 
 	private void startTask(final Plugin plugin) {
@@ -82,7 +73,7 @@ public abstract class CalendarEvent implements Listener {
 			public void run() {
 				registerEvents(plugin);
 			}
-		}.runTaskLaterAsynchronously(plugin, secBeforeStart() * 20);
+		}.runTaskLater(plugin, secBeforeStart() * 20);
 	}
 
 	public static boolean enableCalendarEvent(CalendarEvent calendarEvent, Plugin owningPlugin) {
@@ -94,7 +85,7 @@ public abstract class CalendarEvent implements Listener {
 		}
 		if (calendarEvent.isTimePeriod()) {
 			calendarEvent.registerEvents(owningPlugin);
-		} else {
+		} else if (calendarEvent.getType() == Type.ONE_OFF && calendarEvent.secBeforeStart() < 86400) {
 			calendarEvent.startTask(owningPlugin);
 		}
 		enabledEvents.add(calendarEvent);
@@ -109,5 +100,10 @@ public abstract class CalendarEvent implements Listener {
 			return true;
 		}
 		return false;
+	}
+	
+	public static enum Type {
+		ONE_OFF(),
+		TIME_PERIOD();
 	}
 }

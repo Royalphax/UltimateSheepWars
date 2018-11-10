@@ -11,7 +11,7 @@ import fr.asynchronous.sheepwars.core.event.usw.SheepLaunchEvent;
 public class AprilFoolEvent extends CalendarEvent {
 
 	public AprilFoolEvent() {
-		super(0, "AprilFool");
+		super(0, "AprilFool", Type.TIME_PERIOD);
 	}
 
 	@EventHandler

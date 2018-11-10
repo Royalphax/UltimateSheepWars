@@ -5,7 +5,6 @@ import java.util.Random;
 
 import org.bukkit.Bukkit;
 import org.bukkit.FireworkEffect;
-import org.bukkit.FireworkEffect.Type;
 import org.bukkit.World;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Firework;
@@ -23,7 +22,7 @@ public class HappyNewYearEvent extends CalendarEvent {
 	private BukkitTask task;
 	
 	public HappyNewYearEvent() {
-		super(3, "NewYear");
+		super(4, "NewYear", CalendarEvent.Type.ONE_OFF);
 	}
 
 	@Override
@@ -67,7 +66,7 @@ public class HappyNewYearEvent extends CalendarEvent {
 							for (Player online : world.getPlayers()) {
 								final Firework firework = (Firework) online.getWorld().spawnEntity(online.getLocation().add(0,2,0), EntityType.FIREWORK);
 								final FireworkMeta fireworkMeta = firework.getFireworkMeta();
-								final FireworkEffect effect = FireworkEffect.builder().flicker(random.nextBoolean()).withColor(RandomUtils.getRandomColor()).withFade(RandomUtils.getRandomColor()).with(Type.values()[random.nextInt(Type.values().length)]).trail(random.nextBoolean()).build();
+								final FireworkEffect effect = FireworkEffect.builder().flicker(random.nextBoolean()).withColor(RandomUtils.getRandomColor()).withFade(RandomUtils.getRandomColor()).with(org.bukkit.FireworkEffect.Type.values()[random.nextInt(Type.values().length)]).trail(random.nextBoolean()).build();
 								fireworkMeta.addEffect(effect);
 								fireworkMeta.setPower(random.nextInt(2) + 1);
 								firework.setFireworkMeta(fireworkMeta);
@@ -87,4 +86,6 @@ public class HappyNewYearEvent extends CalendarEvent {
 		if (this.task != null)
 			this.task.cancel();
 	}
+	
+	
 }
