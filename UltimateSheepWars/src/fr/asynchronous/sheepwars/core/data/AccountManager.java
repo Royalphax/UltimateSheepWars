@@ -96,7 +96,7 @@ public class AccountManager {
 			new ExceptionManager(e).register(true);
 		}
 		askForOwnerName = false;
-		new DataRegister(this.plugin, this.plugin.isLocalhostConnection(), true);
+		new DataRegister(this.plugin, this.plugin.isLocalhostConnection(), false);
 		return true;
 	}
 

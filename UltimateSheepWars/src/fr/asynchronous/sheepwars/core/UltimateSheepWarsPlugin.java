@@ -30,6 +30,11 @@ import fr.asynchronous.sheepwars.core.booster.NauseaBooster;
 import fr.asynchronous.sheepwars.core.booster.PoisonBooster;
 import fr.asynchronous.sheepwars.core.booster.RegenerationBooster;
 import fr.asynchronous.sheepwars.core.booster.ResistanceBooster;
+import fr.asynchronous.sheepwars.core.calendar.event.AprilFoolEvent;
+import fr.asynchronous.sheepwars.core.calendar.event.ChristmassMonthEvent;
+import fr.asynchronous.sheepwars.core.calendar.event.EasterEggEvent;
+import fr.asynchronous.sheepwars.core.calendar.event.HalloweenDaysEvent;
+import fr.asynchronous.sheepwars.core.calendar.event.HappyNewYearEvent;
 import fr.asynchronous.sheepwars.core.command.ContributorCommand;
 import fr.asynchronous.sheepwars.core.command.HubCommand;
 import fr.asynchronous.sheepwars.core.command.LangCommand;
@@ -45,7 +50,6 @@ import fr.asynchronous.sheepwars.core.event.block.BlockPlace;
 import fr.asynchronous.sheepwars.core.event.block.BlockSpread;
 import fr.asynchronous.sheepwars.core.event.entity.CreatureSpawn;
 import fr.asynchronous.sheepwars.core.event.entity.EntityBlockForm;
-import fr.asynchronous.sheepwars.core.event.entity.EntityChangeBlock;
 import fr.asynchronous.sheepwars.core.event.entity.EntityDamage;
 import fr.asynchronous.sheepwars.core.event.entity.EntityDamageByPlayer;
 import fr.asynchronous.sheepwars.core.event.entity.EntityDeath;
@@ -209,6 +213,7 @@ public class UltimateSheepWarsPlugin extends JavaPlugin {
 		supportedVersions.add(MinecraftVersion.v1_10_R1);
 		supportedVersions.add(MinecraftVersion.v1_11_R1);
 		supportedVersions.add(MinecraftVersion.v1_12_R1);
+		//supportedVersions.add(MinecraftVersion.v1_13_R2);
 		if (!mcVersion.inRange(supportedVersions)) 
 		{
 			disablePluginLater("UltimateSheepWars doesn't support your server version (" + mcVersion.toString().replaceAll("_", ".") + ")");
@@ -276,13 +281,12 @@ public class UltimateSheepWarsPlugin extends JavaPlugin {
         this.getCommand("sheepwars").setExecutor(new MainCommand(this));
         this.getCommand("lang").setExecutor(new LangCommand());
         this.getCommand("stats").setExecutor(new StatsCommand());
-        this.getCommand("hub").setExecutor(new HubCommand(this));
         this.getCommand("contributor").setExecutor(new ContributorCommand(this));
         
         /** Register Events **/
         this.register(BlockBreak.class, BlockPlace.class, BlockSpread.class, BlockExplode.class, 
         		
-        		CreatureSpawn.class, EntityBlockForm.class, EntityChangeBlock.class, 
+        		CreatureSpawn.class, EntityBlockForm.class,  
         		EntityDamageByPlayer.class, EntityDeath.class, EntityExplode.class, 
         		EntityTarget.class, FoodLevelChange.class, EntityDamage.class,
         		
@@ -415,6 +419,10 @@ public class UltimateSheepWarsPlugin extends JavaPlugin {
         	getLogger().info("[CONFIG] You have enable required-wins but no database was detected. This is conflicting :(");
         	ConfigManager.setBoolean(Field.ENABLE_KIT_REQUIRED_WINS, false);
         }
+        
+        if (ConfigManager.getBoolean(Field.ENABLE_HUB_COMMAND)) {
+        	this.getCommand("hub").setExecutor(new HubCommand(this));
+        }
 
         /** Setup settings config file **/
         settingsFile = new File(getDataFolder(), "settings.yml");
@@ -527,7 +535,7 @@ public class UltimateSheepWarsPlugin extends JavaPlugin {
 		UltimateSheepWarsAPI.registerBoosters(new ArrowBackBooster(), new ArrowFireBooster(), new BlockingSheepBooster(), new MoreSheepBooster(),
 				new NauseaBooster(), new PoisonBooster(), new RegenerationBooster(), new ResistanceBooster());
 		/** Register Calendar Events **/
-		//UltimateSheepWarsAPI.registerCalendarEvents(this, new AprilFoolEvent(), new ChristmassMonthEvent(), new EasterEggEvent(), new HappyNewYearEvent());
+		UltimateSheepWarsAPI.registerCalendarEvents(this, new AprilFoolEvent(), new ChristmassMonthEvent(), new EasterEggEvent(), new HappyNewYearEvent(), new HalloweenDaysEvent());
 	}
 	
 	private void setupProviders()
