@@ -22,8 +22,6 @@ import net.minecraft.server.v1_12_R1.ChatMessage;
 import net.minecraft.server.v1_12_R1.ChatModifier;
 import net.minecraft.server.v1_12_R1.EntityHuman;
 import net.minecraft.server.v1_12_R1.EntityPlayer;
-import net.minecraft.server.v1_12_R1.PacketPlayOutWorldBorder;
-import net.minecraft.server.v1_12_R1.WorldBorder;
 
 public class NMSUtils implements INMSUtils {
 

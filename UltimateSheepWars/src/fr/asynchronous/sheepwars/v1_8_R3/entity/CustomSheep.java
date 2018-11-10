@@ -5,12 +5,11 @@ import java.lang.reflect.Field;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
+import org.bukkit.craftbukkit.v1_8_R3.util.UnsafeList;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.util.Vector;
-
-import com.google.common.collect.Sets;
 
 import fr.asynchronous.sheepwars.core.UltimateSheepWarsAPI;
 import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
@@ -71,10 +70,10 @@ public class CustomSheep extends EntitySheep {
 				bField.setAccessible(true);
 				Field cField = PathfinderGoalSelector.class.getDeclaredField("c");
 				cField.setAccessible(true);
-				bField.set(this.goalSelector, Sets.newLinkedHashSet());
-				bField.set(this.targetSelector, Sets.newLinkedHashSet());
-				cField.set(this.goalSelector, Sets.newLinkedHashSet());
-				cField.set(this.targetSelector, Sets.newLinkedHashSet());
+				bField.set(this.goalSelector, new UnsafeList<>());
+				bField.set(this.targetSelector, new UnsafeList<>());
+				cField.set(this.goalSelector, new UnsafeList<>());
+				cField.set(this.targetSelector, new UnsafeList<>());
 			} catch (Exception e) {
 				new ExceptionManager(e).register(true);
 			}

@@ -100,6 +100,6 @@ public class NMSUtils implements INMSUtils {
 
 	@Override
 	public MaterialData getDye(DyeColor color) {
-		return new Dye(color);
+		return new Dye(color.getDyeData());
 	}
 }
