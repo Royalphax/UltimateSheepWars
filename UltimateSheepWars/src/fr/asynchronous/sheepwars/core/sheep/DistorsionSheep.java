@@ -25,7 +25,7 @@ public class DistorsionSheep extends SheepManager
 	private static final int RADIUS = 4;
     
 	public DistorsionSheep() {
-		super(MsgEnum.DISTORSION_SHEEP_NAME, DyeColor.MAGENTA, 5, false, true);
+		super(MsgEnum.DISTORSION_SHEEP_NAME, DyeColor.MAGENTA, 5, false, true, 0.8f);
 	}
 	
 	@Override

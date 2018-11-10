@@ -17,7 +17,7 @@ import fr.asynchronous.sheepwars.core.util.MathUtils;
 public class FragmentationSheep extends SheepManager
 {
 	public FragmentationSheep() {
-		super(MsgEnum.FRAGMENTATION_SHEEP_NAME, DyeColor.GRAY, 5, false, true);
+		super(MsgEnum.FRAGMENTATION_SHEEP_NAME, DyeColor.GRAY, 5, false, true, 0.8f);
 	}
     
     @Override

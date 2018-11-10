@@ -16,7 +16,7 @@ import fr.asynchronous.sheepwars.core.message.Message.MsgEnum;
 public class SeekerSheep extends SheepManager
 {
     public SeekerSheep() {
-		super(MsgEnum.SEEKER_SHEEP_NAME, DyeColor.LIME, 30, false, true, SheepAbility.SEEK_PLAYERS);
+		super(MsgEnum.SEEKER_SHEEP_NAME, DyeColor.LIME, 30, false, true, 0.5f, SheepAbility.SEEK_PLAYERS);
 	}
 
 	@Override

@@ -23,7 +23,7 @@ import fr.asynchronous.sheepwars.core.util.EntityUtils;
 public class SwapSheep extends SheepManager
 {
     public SwapSheep() {
-		super(MsgEnum.SWAP_SHEEP_NAME, DyeColor.MAGENTA, 5, false, true);
+		super(MsgEnum.SWAP_SHEEP_NAME, DyeColor.MAGENTA, 5, false, true, 0.25f);
 	}
 
 	@Override

@@ -26,7 +26,7 @@ public class EarthQuakeSheep extends SheepManager
     private static final int RADIUS = 6;
     
     public EarthQuakeSheep() {
-		super(MsgEnum.EARTHQUAKE_SHEEP_NAME, DyeColor.BROWN, 10, false, true);
+		super(MsgEnum.EARTHQUAKE_SHEEP_NAME, DyeColor.BROWN, 10, false, true, 0.8f);
 	}
 
 	@Override

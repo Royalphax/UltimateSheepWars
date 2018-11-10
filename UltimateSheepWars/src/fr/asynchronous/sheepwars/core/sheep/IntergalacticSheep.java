@@ -32,7 +32,7 @@ public class IntergalacticSheep extends SheepManager {
 	}
 	
 	public IntergalacticSheep() {
-		super(MsgEnum.INTERGALACTIC_SHEEP_NAME, DyeColor.BLUE, 10, false, false, SheepAbility.FIRE_PROOF);
+		super(MsgEnum.INTERGALACTIC_SHEEP_NAME, DyeColor.BLUE, 10, false, false, 0.15f, SheepAbility.FIRE_PROOF);
 	}
 
 	@Override

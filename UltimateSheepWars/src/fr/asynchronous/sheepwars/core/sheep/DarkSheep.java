@@ -21,7 +21,7 @@ public class DarkSheep extends SheepManager
     private static final int RADIUS = 8;
     
 	public DarkSheep() {
-		super(MsgEnum.DARK_SHEEP_NAME, DyeColor.BLACK, 5, false, true, 0.25f);
+		super(MsgEnum.DARK_SHEEP_NAME, DyeColor.BLACK, 5, false, true);
 	}
     
 	@Override

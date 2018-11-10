@@ -28,7 +28,7 @@ public class LightningSheep extends SheepManager
     private static final int RADIUS = 6;
     
     public LightningSheep() {
-		super(MsgEnum.LIGHTNING_SHEEP_NAME, DyeColor.YELLOW, 5, false, true, SheepAbility.FIRE_PROOF);
+		super(MsgEnum.LIGHTNING_SHEEP_NAME, DyeColor.YELLOW, 5, false, true, 0.5f, SheepAbility.FIRE_PROOF);
 	}
 
 	@Override

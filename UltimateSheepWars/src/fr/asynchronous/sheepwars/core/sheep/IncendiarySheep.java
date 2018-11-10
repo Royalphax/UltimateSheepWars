@@ -14,7 +14,7 @@ public class IncendiarySheep extends SheepManager
 {
     
     public IncendiarySheep() {
-		super(MsgEnum.INCENDIARY_SHEEP_NAME, DyeColor.ORANGE, 5, false, true);
+		super(MsgEnum.INCENDIARY_SHEEP_NAME, DyeColor.ORANGE, 5, false, true, 0.8f);
 	}
 
 	@Override
