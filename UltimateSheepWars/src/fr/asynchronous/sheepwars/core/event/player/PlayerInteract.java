@@ -9,9 +9,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.data.PlayerData;
@@ -90,16 +87,7 @@ public class PlayerInteract extends UltimateSheepWarsEventListener
                     
         		} else if (mat.equals(ConfigManager.getItemStack(Field.RETURN_TO_HUB_ITEM).getType())) {
         			
-                    player.addPotionEffect(new PotionEffect(PotionEffectType.CONFUSION, 20*5, 5));
-                    Sounds.playSound(player, player.getLocation(), Sounds.PORTAL_TRAVEL, 1f, 1f);
-                	Message.sendMessage(player, MsgEnum.HUB_TELEPORTATION);
-                	Utils.returnToHub(this.plugin, player);
-                	new BukkitRunnable(){
-                		public void run(){
-                			if (player.isOnline())
-                				Message.sendMessage(player, MsgEnum.CONNECTION_FAILED);
-                		}
-                	}.runTaskLater(this.plugin, (20 * 5));
+                	player.chat("/hub");
                 	
         		} else if (mat.equals(ConfigManager.getItemStack(Field.PARTICLES_ON_ITEM).getType()) || mat.equals(ConfigManager.getItemStack(Field.PARTICLES_OFF_ITEM).getType())) {
         			

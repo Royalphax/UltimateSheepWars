@@ -237,11 +237,4 @@ public class Utils {
 			output.add(new String(new BigInteger(ints[i]).toByteArray()));
 		return output;
 	}
-	
-	public static void returnToHub(final UltimateSheepWarsPlugin plugin, final Player player) {
-		final ByteArrayDataOutput out = ByteStreams.newDataOutput();
-		out.writeUTF("Connect");
-		out.writeUTF(ConfigManager.getString(Field.FALLBACK_SERVER));
-		player.sendPluginMessage((Plugin) plugin, "BungeeCord", out.toByteArray());
-	}
 }
