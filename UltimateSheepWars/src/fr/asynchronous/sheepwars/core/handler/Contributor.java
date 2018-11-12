@@ -12,7 +12,7 @@ public enum Contributor {
 	
 	ROYTREO28("Roytreo28", "711e5a53-14a1-409b-bf48-7e8c1cc22440", ChatColor.RED + "Développeur " + ChatColor.YELLOW, 4, ParticleEffect.FLAME_RINGS, "Effet actif: " + ChatColor.GREEN + "Flame Rings"),
 	DROLEUR("Droleur", "da6610cb-3f5b-4638-aaf7-e6bb8fa1c22a", ChatColor.LIGHT_PURPLE + "Contributeur " + ChatColor.YELLOW, 3, ParticleEffect.ENCHANT, "Effet actif: " + ChatColor.GREEN + "Witch Spiral"),
-	KINGRIDER26("KingRider26", "fb053956-f24e-4ef5-aa2a-747575701858", ChatColor.LIGHT_PURPLE + "Contributeur " + ChatColor.YELLOW, 3, ParticleEffect.FLAME_RINGS, "Salut KingRider! Etant un des rares developpeurs que j'apprécie et que j'aide, je t'offre l'effet anneaux de feu en jeu."),
+	KINGRIDER26("KingRider26", "fb053956-f24e-4ef5-aa2a-747575701858", ChatColor.LIGHT_PURPLE + "Contributeur " + ChatColor.YELLOW, 3, ParticleEffect.SHADOW_WALK, "Salut KingRider! Etant un des rares developpeurs que j'apprécie et que j'aide, je t'offre l'effet anneaux de feu en jeu."),
 	FINOWAY("Finoway", "aa42d5e0-a244-4da8-84df-95138f8e7371", "", 1, ParticleEffect.FLAME_SPIRAL, "Salut Finoway! Tu m'as bien aidé pour le plugin, je te remercie en t'offrant un effet de particule."),
 	MILOWGAMING("milowgaming", "5c09ddc7-1186-4338-97eb-baf9c11da551", "", 1, ParticleEffect.ENCHANT, "Salut milowgaming, merci pour ton aide d'un soir. Je t'offre l'effet enchanteur !"),
 	THE_GUNTH("TheGunth", "aa8f4b05-808e-4bbf-a844-6ce7bc7afe2c", "", 1, ParticleEffect.ENCHANT, "Salut TheGunth, merci pour ton aide d'un soir. Je t'offre l'effet enchanteur !"),

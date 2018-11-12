@@ -76,6 +76,10 @@ public class Language {
 			this.scoreboard_wrapper.setLine(8, ChatColor.RED + "", true);
 		this.initTeams();
 		languages.add(this);
+		
+		// Don't forget to init scoreboard teams count
+		TeamManager.RED.updateScoreboardTeamCount();
+        TeamManager.BLUE.updateScoreboardTeamCount();
 	}
 
 	public String getName() {

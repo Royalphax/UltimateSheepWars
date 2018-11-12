@@ -455,10 +455,6 @@ public class UltimateSheepWarsPlugin extends JavaPlugin {
     		getLogger().warning("[!] The scoreboard-decoration's length is higher than maximum allowed (" + ConfigManager.getString(Field.SCOREBOARD_DECORATION).length() + " > 21)");
     	}
         
-        /** Initialize other classes **/
-        TeamManager.RED.updateScoreboardTeamCount();
-        TeamManager.BLUE.updateScoreboardTeamCount();
-        
         /** Init Game **/ 
 		GameState.setCurrentStep(GameState.WAITING);
 	}
