@@ -13,8 +13,6 @@ public class GameStartEvent extends Event {
 	
 	/**
 	 * Event triggered when the game starts.
-	 * 
-	 * @param plugin UltimateSheepWars plugin's instance.
 	 */
 	public GameStartEvent(UltimateSheepWarsPlugin plugin) {
 		this.cloudNetAPISupport = true;

@@ -15,9 +15,6 @@ public class SheepGiveEvent extends Event {
 	
 	/**
 	 * Event triggered when a sheep will be given to a player.
-	 * 
-	 * @param player Player who will receive the sheep.
-	 * @param sheepClass Sheep class instance.
 	 */
 	public SheepGiveEvent(Player player, SheepManager sheepClass) {
 		this.player = player;
