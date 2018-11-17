@@ -17,6 +17,8 @@ import org.bukkit.scheduler.BukkitRunnable;
 import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.data.DataManager;
 import fr.asynchronous.sheepwars.core.data.PlayerData;
+import fr.asynchronous.sheepwars.core.event.usw.GameEndEvent;
+import fr.asynchronous.sheepwars.core.event.usw.SheepLaunchEvent;
 import fr.asynchronous.sheepwars.core.handler.GameState;
 import fr.asynchronous.sheepwars.core.manager.ConfigManager;
 import fr.asynchronous.sheepwars.core.manager.ConfigManager.Field;
@@ -155,7 +157,12 @@ public class GameTask extends BukkitRunnable {
 		}
 	}
 
-	public void stopGame(final TeamManager winnerTeam) {
+	public void stopGame(TeamManager winnerTeam) {
+		GameEndEvent event = new GameEndEvent(winnerTeam);
+		Bukkit.getPluginManager().callEvent(event);
+		if (winnerTeam != event.getWinnerTeam()) {
+			winnerTeam = event.getWinnerTeam();
+		}
 		new TerminatedGameTask(this.plugin);
 		for (Entry<OfflinePlayer, PlayerData> entry : PlayerData.getData()) {
 			final OfflinePlayer offPlayer = entry.getKey();
