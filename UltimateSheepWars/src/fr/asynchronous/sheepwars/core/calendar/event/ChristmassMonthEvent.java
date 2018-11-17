@@ -32,7 +32,7 @@ public class ChristmassMonthEvent extends CalendarEvent {
 	private BukkitTask task;
 
 	public ChristmassMonthEvent() {
-		super(1, "Christmass", Type.TIME_PERIOD);
+		super(1, "Christmass");
 	}
 
 	@Override

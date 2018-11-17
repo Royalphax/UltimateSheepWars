@@ -19,7 +19,7 @@ import net.md_5.bungee.api.ChatColor;
 public class HalloweenDaysEvent extends CalendarEvent {
 
 	public HalloweenDaysEvent() {
-		super(3, "Halloween", Type.TIME_PERIOD);
+		super(3, "Halloween");
 	}
 
 	@Override

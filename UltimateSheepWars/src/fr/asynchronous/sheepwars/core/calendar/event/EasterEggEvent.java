@@ -24,7 +24,7 @@ import fr.asynchronous.sheepwars.core.util.RandomUtils;
 public class EasterEggEvent extends CalendarEvent {
 
 	public EasterEggEvent() {
-		super(2, "EasterEgg", Type.TIME_PERIOD);
+		super(2, "EasterEgg");
 	}
 
 	@Override
