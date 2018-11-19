@@ -12,11 +12,13 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.material.Dye;
 import org.bukkit.material.MaterialData;
 
+import fr.asynchronous.sheepwars.core.handler.InteractiveType;
 import fr.asynchronous.sheepwars.core.message.Language;
 import fr.asynchronous.sheepwars.core.version.INMSUtils;
 import fr.asynchronous.sheepwars.v1_9_R2.util.SpecialMessage;
 import net.minecraft.server.v1_9_R2.ChatClickable.EnumClickAction;
 import net.minecraft.server.v1_9_R2.ChatHoverable;
+import net.minecraft.server.v1_9_R2.ChatHoverable.EnumHoverAction;
 import net.minecraft.server.v1_9_R2.ChatMessage;
 import net.minecraft.server.v1_9_R2.ChatModifier;
 import net.minecraft.server.v1_9_R2.EntityHuman;
@@ -27,6 +29,18 @@ import net.minecraft.server.v1_9_R2.PacketPlayOutWorldBorder;
 import net.minecraft.server.v1_9_R2.WorldBorder;
 
 public class NMSUtils implements INMSUtils {
+	
+	@Override
+	public void displayInteractiveText(Player player, String before, String between, String after, InteractiveType type, String value) {
+		SpecialMessage msg = new SpecialMessage(before);
+		if (type.isClickable()) {
+			msg.setClick(between, EnumClickAction.valueOf(type.toString()), value);
+		} else if (type.isHoverable()) {
+			msg.setHover(between, EnumHoverAction.valueOf(type.toString()), value);
+		}
+		msg.append(after);
+		msg.sendToPlayer(player);
+	}
 
 	@Override
 	public void setKiller(Entity entity, Entity killer) {

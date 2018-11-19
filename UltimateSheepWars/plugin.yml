@@ -1,14 +1,13 @@
 name: UltimateSheepWars
 author: Asynchronous
-version: 4.4.7
+version: 4.5.2
 main: fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin
 softdepend: [Vault]
 website: http://roytreo28.ddns.net/asynchronous
 commands:
-  sheepwars:
-    description: Manage your sheepwars in game settings
-    aliases: [sw]
-    permission: sheepwars.admin
+  ultimatesheepwars:
+    description: Manage your ultimate sheepwars in game settings
+    aliases: [ultimatesheepwars, usw, sheepwars, sw]
   lang:
     description: Change your language
     aliases: [language, langage]
@@ -20,13 +19,13 @@ commands:
     aliases: [contrib, c]
     description: Only for contributors
 permissions:
-  sheepwars.admin:
+  usw.admin:
     description: Become an administrator of sheepwars
     default: op
-  sheepwars.teams.bypass:
+  usw.teams.bypass:
     description: Bypass team conditions 
-  sheepwars.vip:
-    description: Ability to join full servers
+  usw.login.bypass:
+    description: Bypass login restrictions
   sheepwars.kit.morehealth:
     description: Unlock the More health kit
   sheepwars.kit.betterbow:
