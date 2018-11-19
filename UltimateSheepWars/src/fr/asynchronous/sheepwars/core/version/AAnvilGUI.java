@@ -18,7 +18,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
-import fr.asynchronous.sheepwars.core.util.ItemBuilder;
+import fr.asynchronous.sheepwars.core.handler.ItemBuilder;
 
 public abstract class AAnvilGUI {
 	public enum AnvilSlot {

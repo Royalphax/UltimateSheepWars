@@ -8,7 +8,11 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.material.MaterialData;
 
+import fr.asynchronous.sheepwars.core.handler.InteractiveType;
+
 public interface INMSUtils {
+	
+	public void displayInteractiveText(Player player, String before, String between, String after, InteractiveType type, String value);
 
 	public void setKiller(final Entity entity, final Entity killer);
 	
