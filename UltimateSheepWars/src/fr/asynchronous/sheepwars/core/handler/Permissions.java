@@ -28,9 +28,7 @@ public enum Permissions {
 	public boolean hasPermission(Player player, boolean warn) {
 		boolean output = false;
 		for (String perm : this.perms) {
-			System.out.println("Test perm : " + perm);
 			if (player.hasPermission(perm)) {
-				System.out.println("TU L'AS");
 				output = true;
 				break;
 			}
