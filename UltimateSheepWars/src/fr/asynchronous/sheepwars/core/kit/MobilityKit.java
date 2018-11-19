@@ -10,10 +10,10 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import fr.asynchronous.sheepwars.core.data.PlayerData;
+import fr.asynchronous.sheepwars.core.handler.ItemBuilder;
 import fr.asynchronous.sheepwars.core.manager.KitManager;
 import fr.asynchronous.sheepwars.core.manager.TeamManager;
 import fr.asynchronous.sheepwars.core.message.Message.MsgEnum;
-import fr.asynchronous.sheepwars.core.util.ItemBuilder;
 
 public class MobilityKit extends KitManager {
 

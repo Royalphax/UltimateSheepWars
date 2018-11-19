@@ -6,11 +6,11 @@ import org.bukkit.event.EventHandler;
 
 import fr.asynchronous.sheepwars.core.data.PlayerData;
 import fr.asynchronous.sheepwars.core.event.usw.SheepGiveEvent;
+import fr.asynchronous.sheepwars.core.handler.ItemBuilder;
 import fr.asynchronous.sheepwars.core.handler.Sounds;
 import fr.asynchronous.sheepwars.core.manager.KitManager;
 import fr.asynchronous.sheepwars.core.manager.SheepManager;
 import fr.asynchronous.sheepwars.core.message.Message.MsgEnum;
-import fr.asynchronous.sheepwars.core.util.ItemBuilder;
 import fr.asynchronous.sheepwars.core.util.RandomUtils;
 
 public class MoreSheepKit extends KitManager {

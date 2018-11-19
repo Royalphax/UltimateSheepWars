@@ -19,6 +19,7 @@ import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.data.PlayerData;
 import fr.asynchronous.sheepwars.core.event.usw.GameStartEvent;
 import fr.asynchronous.sheepwars.core.handler.GameState;
+import fr.asynchronous.sheepwars.core.handler.ItemBuilder;
 import fr.asynchronous.sheepwars.core.handler.Sounds;
 import fr.asynchronous.sheepwars.core.kit.MoreHealthKit;
 import fr.asynchronous.sheepwars.core.manager.ConfigManager;
@@ -29,7 +30,6 @@ import fr.asynchronous.sheepwars.core.message.Language;
 import fr.asynchronous.sheepwars.core.message.Message;
 import fr.asynchronous.sheepwars.core.message.Message.MsgEnum;
 import fr.asynchronous.sheepwars.core.util.EntityUtils;
-import fr.asynchronous.sheepwars.core.util.ItemBuilder;
 import fr.asynchronous.sheepwars.core.version.ATitleUtils.Type;
 
 public class BeginCountdown extends BukkitRunnable {

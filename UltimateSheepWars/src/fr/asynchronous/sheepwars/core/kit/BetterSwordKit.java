@@ -11,10 +11,10 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.ItemStack;
 
 import fr.asynchronous.sheepwars.core.data.PlayerData;
+import fr.asynchronous.sheepwars.core.handler.ItemBuilder;
 import fr.asynchronous.sheepwars.core.manager.KitManager;
 import fr.asynchronous.sheepwars.core.manager.TeamManager;
 import fr.asynchronous.sheepwars.core.message.Message.MsgEnum;
-import fr.asynchronous.sheepwars.core.util.ItemBuilder;
 import fr.asynchronous.sheepwars.core.util.RandomUtils;
 
 public class BetterSwordKit extends KitManager {

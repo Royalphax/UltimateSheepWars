@@ -25,12 +25,12 @@ import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.data.PlayerData;
 import fr.asynchronous.sheepwars.core.event.usw.SheepGiveEvent;
 import fr.asynchronous.sheepwars.core.event.usw.SheepLaunchEvent;
+import fr.asynchronous.sheepwars.core.handler.ItemBuilder;
 import fr.asynchronous.sheepwars.core.handler.SheepAbility;
 import fr.asynchronous.sheepwars.core.handler.Sounds;
 import fr.asynchronous.sheepwars.core.manager.ConfigManager.Field;
 import fr.asynchronous.sheepwars.core.message.Message;
 import fr.asynchronous.sheepwars.core.message.Message.MsgEnum;
-import fr.asynchronous.sheepwars.core.util.ItemBuilder;
 import fr.asynchronous.sheepwars.core.util.MathUtils;
 
 public abstract class SheepManager {

@@ -8,11 +8,11 @@ import org.bukkit.metadata.FixedMetadataValue;
 import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.data.PlayerData;
 import fr.asynchronous.sheepwars.core.event.usw.SheepLaunchEvent;
+import fr.asynchronous.sheepwars.core.handler.ItemBuilder;
 import fr.asynchronous.sheepwars.core.manager.ConfigManager;
 import fr.asynchronous.sheepwars.core.manager.ConfigManager.Field;
 import fr.asynchronous.sheepwars.core.manager.KitManager;
 import fr.asynchronous.sheepwars.core.message.Message.MsgEnum;
-import fr.asynchronous.sheepwars.core.util.ItemBuilder;
 
 public class ArmoredSheepKit extends KitManager {
 

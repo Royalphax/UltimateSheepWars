@@ -13,9 +13,9 @@ import org.bukkit.inventory.ItemStack;
 
 import fr.asynchronous.sheepwars.core.gui.base.GuiScreen;
 import fr.asynchronous.sheepwars.core.handler.Contributor;
+import fr.asynchronous.sheepwars.core.handler.ItemBuilder;
 import fr.asynchronous.sheepwars.core.handler.Sounds;
 import fr.asynchronous.sheepwars.core.task.BeginCountdown;
-import fr.asynchronous.sheepwars.core.util.ItemBuilder;
 
 public class ContributorsInventory extends GuiScreen {
 
@@ -42,8 +42,8 @@ public class ContributorsInventory extends GuiScreen {
 		}
 		messageLore.add(ChatColor.WHITE + nextLore);
 
-		setItem(new ItemBuilder(Material.INK_SACK).setColor((this.contributor.isEffectActive() ? DyeColor.LIME : DyeColor.GRAY)).setName(ChatColor.YELLOW + "Contributor Particles: " + (this.contributor.isEffectActive() ? ChatColor.GREEN : ChatColor.RED) + ChatColor.BOLD + (this.contributor.getEffect().toString().replaceAll("_", " "))).setLore(ChatColor.GRAY + "Click to toggle it!").toItemStack(), 0);
-		setItem(new ItemBuilder(Material.BARRIER).setName(ChatColor.RED + "Close").toItemStack(), 8);
+		setItem(new ItemBuilder(Material.INK_SACK).setColor((this.contributor.isEffectActive() ? DyeColor.LIME : DyeColor.GRAY)).setName(ChatColor.YELLOW + "Contributor Particles: " + (this.contributor.isEffectActive() ? ChatColor.GREEN : ChatColor.RED) + ChatColor.BOLD + (this.contributor.getEffect().toString().replaceAll("_", " "))).setLore(ChatColor.GRAY + "Click to toggle it!").toItemStack(), 3);
+		setItem(new ItemBuilder(Material.ARROW).setName(ChatColor.RED + "Close").toItemStack(), 5);
 		setItem(new ItemBuilder(Material.SKULL_ITEM, 1, (byte) SkullType.PLAYER.ordinal()).setSkullOwner(this.player.getName()).setName(ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + "CONTRIBUTOR " + ChatColor.YELLOW + this.player.getName()).addLoreLine("", ChatColor.GRAY + "Developer's message:").addLoreLine(messageLore).toItemStack(), 4);
 	}
 
@@ -69,12 +69,6 @@ public class ContributorsInventory extends GuiScreen {
 				Sounds.playSound(clicker, clicker.getLocation(), Sounds.CLICK, 1f, 1f);
 				clicker.closeInventory();
 				clicker.chat("/contrib");
-			} else if (item.getItemMeta().getDisplayName().contains("Shorten countdown")) {
-				Sounds.playSoundAll(clicker.getLocation(), Sounds.NOTE_SNARE_DRUM, 1f, 1f);
-				if (!this.plugin.hasPreGameTaskStarted())
-					new BeginCountdown(this.plugin);
-				this.plugin.getPreGameTask().shortenCountdown();
-				clicker.closeInventory();
 			}
 		}
 		event.setCancelled(true);

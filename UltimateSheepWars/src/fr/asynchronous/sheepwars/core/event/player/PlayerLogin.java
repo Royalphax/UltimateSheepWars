@@ -10,6 +10,7 @@ import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.data.PlayerData;
 import fr.asynchronous.sheepwars.core.event.UltimateSheepWarsEventListener;
 import fr.asynchronous.sheepwars.core.handler.GameState;
+import fr.asynchronous.sheepwars.core.handler.Permissions;
 import fr.asynchronous.sheepwars.core.manager.ConfigManager;
 import fr.asynchronous.sheepwars.core.manager.ConfigManager.Field;
 import fr.asynchronous.sheepwars.core.message.Language;
@@ -26,7 +27,7 @@ public class PlayerLogin extends UltimateSheepWarsEventListener {
 
 		/** On regarde si on le kick ou pas **/
 		if (GameState.isStep(GameState.WAITING)) {
-			if (event.getResult() == PlayerLoginEvent.Result.KICK_FULL && player.hasPermission("sheepwars.vip")) {
+			if (event.getResult() == PlayerLoginEvent.Result.KICK_FULL && Permissions.USW_BYPASS_LOGIN.hasPermission(player)) {
 				event.allow();
 			}
 		} else {

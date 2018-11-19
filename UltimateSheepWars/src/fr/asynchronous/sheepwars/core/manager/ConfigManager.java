@@ -20,7 +20,7 @@ import org.bukkit.inventory.ItemStack;
 import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.exception.ConfigurationManagerClassHasntBeenInitialized;
 import fr.asynchronous.sheepwars.core.exception.InvalidFieldTypeException;
-import fr.asynchronous.sheepwars.core.util.ItemBuilder;
+import fr.asynchronous.sheepwars.core.handler.ItemBuilder;
 import fr.asynchronous.sheepwars.core.util.Utils;
 
 public class ConfigManager {

@@ -58,11 +58,11 @@ public class PlayerMove extends UltimateSheepWarsEventListener
         if (to.getBlockY() < 0 && (from.getBlockX() != to.getBlockX() || from.getBlockY() != to.getBlockY() || from.getBlockZ() != to.getBlockZ())) {
         	final PlayerData data = PlayerData.getPlayerData(player);
         	if (GameState.isStep(GameState.WAITING)) {
-        		player.addPotionEffect(new PotionEffect(PotionEffectType.CONFUSION, 60, 5));
+        		player.addPotionEffect(new PotionEffect(PotionEffectType.CONFUSION, 100, 5, false, false));
         		player.setFallDistance(0.0f);
-            	UltimateSheepWarsPlugin.getVersionManager().getTitleUtils().titlePacket(player, 5, 10, 5, "", ChatColor.ITALIC+"Woosh!");
-                player.teleport(ConfigManager.getLocation(Field.LOBBY));
-                Sounds.playSound(player, to, Sounds.ENDERDRAGON_WINGS, 1f, 2.0f);
+        		player.teleport(ConfigManager.getLocation(Field.LOBBY));
+            	UltimateSheepWarsPlugin.getVersionManager().getTitleUtils().titlePacket(player, 5, 10, 5, "", ChatColor.ITALIC + "Wow!");
+                Sounds.playSound(player, player.getLocation(), Sounds.ENDERMAN_TELEPORT, 1f, 1f);
             
         	} else if (data.getTeam() == TeamManager.SPEC) {
         		Field field = Field.SPEC_SPAWNS;

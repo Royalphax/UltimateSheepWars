@@ -23,12 +23,13 @@ import org.bukkit.scoreboard.Scoreboard;
 
 import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.data.PlayerData;
+import fr.asynchronous.sheepwars.core.handler.ItemBuilder;
 import fr.asynchronous.sheepwars.core.handler.MinecraftVersion;
+import fr.asynchronous.sheepwars.core.handler.Permissions;
 import fr.asynchronous.sheepwars.core.manager.ConfigManager.Field;
 import fr.asynchronous.sheepwars.core.message.Language;
 import fr.asynchronous.sheepwars.core.message.Message;
 import fr.asynchronous.sheepwars.core.message.Message.MsgEnum;
-import fr.asynchronous.sheepwars.core.util.ItemBuilder;
 import fr.asynchronous.sheepwars.core.util.RandomUtils;
 import fr.asynchronous.sheepwars.core.util.ReflectionUtils;
 import fr.asynchronous.sheepwars.core.util.ReflectionUtils.PackageType;
@@ -39,7 +40,6 @@ public enum TeamManager {
 	SPEC("spec", Message.getMessage(MsgEnum.SPEC_NAME), Material.STONE, Field.SPEC_SPAWNS, DyeColor.SILVER, ChatColor.GRAY, 0, 0, 0),
 	NULL("null", new Message("null"), Material.AIR, null, DyeColor.WHITE, ChatColor.WHITE, 255, 255, 255);
 
-	public static final String BYPASS_TEAMS_PERMISSION = "sheepwars.teams.bypass";
 	public static int redSlot;
 	public static int blueSlot;
 
@@ -275,7 +275,7 @@ public enum TeamManager {
 				List<Player> nonPrioPlayers = new ArrayList<>();
 				List<Player> prioPlayers = new ArrayList<>();
 				for (Player redPlayer : TeamManager.RED.getOnlinePlayers()) {
-					if (redPlayer.hasPermission(BYPASS_TEAMS_PERMISSION)) {
+					if (Permissions.USW_BYPASS_TEAMS.hasPermission(redPlayer)) {
 						prioPlayers.add(redPlayer);
 					} else {
 						nonPrioPlayers.add(redPlayer);
@@ -301,7 +301,7 @@ public enum TeamManager {
 				List<Player> nonPrioPlayers = new ArrayList<>();
 				List<Player> prioPlayers = new ArrayList<>();
 				for (Player noTeamPlayer : noTeamPlayers) {
-					if (noTeamPlayer.hasPermission(BYPASS_TEAMS_PERMISSION)) {
+					if (Permissions.USW_BYPASS_TEAMS.hasPermission(noTeamPlayer)) {
 						prioPlayers.add(noTeamPlayer);
 					} else {
 						nonPrioPlayers.add(noTeamPlayer);
@@ -336,7 +336,7 @@ public enum TeamManager {
 				List<Player> nonPrioPlayers = new ArrayList<>();
 				List<Player> prioPlayers = new ArrayList<>();
 				for (Player bluePlayer : TeamManager.BLUE.getOnlinePlayers()) {
-					if (bluePlayer.hasPermission(BYPASS_TEAMS_PERMISSION)) {
+					if (Permissions.USW_BYPASS_TEAMS.hasPermission(bluePlayer)) {
 						prioPlayers.add(bluePlayer);
 					} else {
 						nonPrioPlayers.add(bluePlayer);
@@ -362,7 +362,7 @@ public enum TeamManager {
 				List<Player> nonPrioPlayers = new ArrayList<>();
 				List<Player> prioPlayers = new ArrayList<>();
 				for (Player noTeamPlayer : noTeamPlayers) {
-					if (noTeamPlayer.hasPermission(BYPASS_TEAMS_PERMISSION)) {
+					if (Permissions.USW_BYPASS_TEAMS.hasPermission(noTeamPlayer)) {
 						prioPlayers.add(noTeamPlayer);
 					} else {
 						nonPrioPlayers.add(noTeamPlayer);

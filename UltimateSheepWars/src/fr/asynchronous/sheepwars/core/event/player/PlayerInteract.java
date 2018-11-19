@@ -16,7 +16,9 @@ import fr.asynchronous.sheepwars.core.event.UltimateSheepWarsEventListener;
 import fr.asynchronous.sheepwars.core.gui.manager.GuiManager;
 import fr.asynchronous.sheepwars.core.handler.Contributor;
 import fr.asynchronous.sheepwars.core.handler.GameState;
+import fr.asynchronous.sheepwars.core.handler.ItemBuilder;
 import fr.asynchronous.sheepwars.core.handler.Particles;
+import fr.asynchronous.sheepwars.core.handler.Permissions;
 import fr.asynchronous.sheepwars.core.handler.Sounds;
 import fr.asynchronous.sheepwars.core.manager.ConfigManager;
 import fr.asynchronous.sheepwars.core.manager.ConfigManager.Field;
@@ -24,7 +26,6 @@ import fr.asynchronous.sheepwars.core.manager.SheepManager;
 import fr.asynchronous.sheepwars.core.manager.TeamManager;
 import fr.asynchronous.sheepwars.core.message.Message;
 import fr.asynchronous.sheepwars.core.message.Message.MsgEnum;
-import fr.asynchronous.sheepwars.core.util.ItemBuilder;
 import fr.asynchronous.sheepwars.core.util.MathUtils;
 import fr.asynchronous.sheepwars.core.util.Utils;
 
@@ -112,7 +113,7 @@ public class PlayerInteract extends UltimateSheepWarsEventListener
                         		Message.sendMessage(player, MsgEnum.ALREADY_IN_THIS_TEAM);
                                 break;
                             }
-                            if (!player.hasPermission(TeamManager.BYPASS_TEAMS_PERMISSION) && !Contributor.isImportant(player) && Bukkit.getOnlinePlayers().size() > 1 && team.getOnlinePlayers().size() >= MathUtils.ceil((Bukkit.getOnlinePlayers().size() / 2)))
+                            if (!Permissions.USW_BYPASS_TEAMS.hasPermission(player) && !Contributor.isImportant(player) && Bukkit.getOnlinePlayers().size() > 1 && team.getOnlinePlayers().size() >= MathUtils.ceil((Bukkit.getOnlinePlayers().size() / 2)))
                             {
 								Message.sendMessage(player, MsgEnum.CANT_JOIN_FULL_TEAM);
 								break;
