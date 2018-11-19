@@ -14,6 +14,11 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.BlockIterator;
 
 public class BlockUtils {
+	
+	private BlockUtils() {
+		throw new IllegalStateException("Utility class");
+	}
+	
 	public static HashSet<Byte> blockPassSet = new HashSet<Byte>();
 
 	public static HashSet<Byte> blockAirFoliageSet = new HashSet<Byte>();

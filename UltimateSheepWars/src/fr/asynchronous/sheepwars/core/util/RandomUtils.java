@@ -11,6 +11,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
 public final class RandomUtils {
+	
+	private RandomUtils() {
+		throw new IllegalStateException("Utility class");
+	}
 
 	public static final Random random;
 

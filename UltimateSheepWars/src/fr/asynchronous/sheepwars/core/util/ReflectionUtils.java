@@ -33,8 +33,9 @@ public final class ReflectionUtils {
         return Class.forName(type + "." + name);
     }
     
-    private ReflectionUtils() {
-    }
+	private ReflectionUtils() {
+		throw new IllegalStateException("Utility class");
+	}
 
     /**
      * Returns the constructor of a given class with the given parameter types

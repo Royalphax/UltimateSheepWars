@@ -18,15 +18,11 @@ import org.bukkit.SkullType;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.plugin.Plugin;
 
-import com.google.common.io.ByteArrayDataOutput;
-import com.google.common.io.ByteStreams;
-
-import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.data.PlayerData;
 import fr.asynchronous.sheepwars.core.handler.Contributor;
 import fr.asynchronous.sheepwars.core.handler.DisplayStyle;
+import fr.asynchronous.sheepwars.core.handler.ItemBuilder;
 import fr.asynchronous.sheepwars.core.manager.ConfigManager;
 import fr.asynchronous.sheepwars.core.manager.ConfigManager.Field;
 import fr.asynchronous.sheepwars.core.manager.TeamManager;
@@ -236,5 +232,14 @@ public class Utils {
 		for (int i = 0; i < ints.length; i++)
 			output.add(new String(new BigInteger(ints[i]).toByteArray()));
 		return output;
+	}
+	
+	public static boolean isInteger(String str) {
+		try {
+			Integer.parseInt(str);
+		} catch (NumberFormatException ex) {
+			return false;
+		}
+		return true;
 	}
 }

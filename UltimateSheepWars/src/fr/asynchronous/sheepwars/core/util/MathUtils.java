@@ -6,6 +6,10 @@ import org.bukkit.util.Vector;
 
 public final class MathUtils {
 	
+	private MathUtils() {
+		throw new IllegalStateException("Utility class");
+	}
+	
     public static final float nanoToSec = 1.0E-9f;
     public static final float FLOAT_ROUNDING_ERROR = 1.0E-6f;
     public static final float PI = 3.1415927f;
