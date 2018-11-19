@@ -112,6 +112,10 @@ public enum Particles {
 	public String getName() {
 		return this.name;
 	}
+	
+	public String getString() {
+		return (version.newerThan(this.supportedVersion) ? this.toString() : (this.alternative == null ? TOWN_AURA.toString() : this.alternative.toString()));
+	}
 
 	public int getId() {
 		return (version.newerThan(this.supportedVersion) ? this.id : (this.alternative == null ? TOWN_AURA.getId() : this.alternative.getId()));

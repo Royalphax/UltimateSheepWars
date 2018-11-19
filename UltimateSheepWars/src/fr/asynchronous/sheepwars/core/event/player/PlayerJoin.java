@@ -1,5 +1,7 @@
 package fr.asynchronous.sheepwars.core.event.player;
 
+import java.util.List;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
@@ -11,21 +13,25 @@ import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
+import fr.asynchronous.sheepwars.core.command.MainCommand;
 import fr.asynchronous.sheepwars.core.data.DataManager;
 import fr.asynchronous.sheepwars.core.data.PlayerData;
 import fr.asynchronous.sheepwars.core.event.UltimateSheepWarsEventListener;
 import fr.asynchronous.sheepwars.core.handler.Contributor;
 import fr.asynchronous.sheepwars.core.handler.GameState;
+import fr.asynchronous.sheepwars.core.handler.InteractiveType;
+import fr.asynchronous.sheepwars.core.handler.ItemBuilder;
 import fr.asynchronous.sheepwars.core.handler.Particles.ParticleEffect;
+import fr.asynchronous.sheepwars.core.handler.Permissions;
 import fr.asynchronous.sheepwars.core.kit.NoneKit;
 import fr.asynchronous.sheepwars.core.manager.ConfigManager;
 import fr.asynchronous.sheepwars.core.manager.ConfigManager.Field;
 import fr.asynchronous.sheepwars.core.manager.TeamManager;
+import fr.asynchronous.sheepwars.core.manager.URLManager;
 import fr.asynchronous.sheepwars.core.message.Message;
 import fr.asynchronous.sheepwars.core.message.Message.MsgEnum;
 import fr.asynchronous.sheepwars.core.task.BeginCountdown;
 import fr.asynchronous.sheepwars.core.util.EntityUtils;
-import fr.asynchronous.sheepwars.core.util.ItemBuilder;
 import fr.asynchronous.sheepwars.core.util.Utils;
 import fr.asynchronous.sheepwars.core.version.ATitleUtils.Type;
 
@@ -50,6 +56,18 @@ public class PlayerJoin extends UltimateSheepWarsEventListener {
 		if (!Utils.isPluginConfigured()) {
 			event.setJoinMessage(ChatColor.YELLOW + "" + ChatColor.BOLD + "! " + ChatColor.RED + "Plugin UltimateSheepWars isn't fully configured yet. Setup it with " + ChatColor.UNDERLINE + "/sw help" + ChatColor.RED + " or contact an Administrator.");
 			return;
+		}
+		
+		if ((Permissions.USW_ADMIN.hasPermission(player) || Permissions.USW_DEVELOPER.hasPermission(player)) && !URLManager.isUpToDate()) {
+			List<String> news = URLManager.getInfoVersion();
+			if (!news.isEmpty()) {
+				player.sendMessage(MainCommand.PREFIX + ChatColor.RED + "A new version of the plugin is available. " + ChatColor.UNDERLINE + "Changelog :");
+				for (int i = 0; i < news.size(); i++) {
+					String newsLine = news.get(i);
+					player.sendMessage(MainCommand.PREFIX + ChatColor.GREEN + (newsLine.startsWith("#") ? "✚ " : "") + ChatColor.RESET + (newsLine.startsWith("#") ? ChatColor.YELLOW + "" + ChatColor.BOLD + newsLine.replaceFirst("#", "") : ChatColor.GRAY + "  " + newsLine));
+				}
+			}
+			UltimateSheepWarsPlugin.getVersionManager().getNMSUtils().displayInteractiveText(player, MainCommand.PREFIX + ChatColor.RED + "Please stay updated : ", ChatColor.GREEN + "(click)", "", InteractiveType.OPEN_URL, "https://www.spigotmc.org/resources/17393/");
 		}
 		
 		/** Sinon, c'est parti! **/

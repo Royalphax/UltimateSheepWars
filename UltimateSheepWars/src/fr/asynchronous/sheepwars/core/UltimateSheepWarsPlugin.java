@@ -278,7 +278,7 @@ public class UltimateSheepWarsPlugin extends JavaPlugin {
         this.world.setThundering(false);
         
         /** Init commands **/
-        this.getCommand("sheepwars").setExecutor(new MainCommand(this));
+        this.getCommand("ultimatesheepwars").setExecutor(new MainCommand(this));
         this.getCommand("lang").setExecutor(new LangCommand());
         this.getCommand("stats").setExecutor(new StatsCommand());
         this.getCommand("contributor").setExecutor(new ContributorCommand(this));

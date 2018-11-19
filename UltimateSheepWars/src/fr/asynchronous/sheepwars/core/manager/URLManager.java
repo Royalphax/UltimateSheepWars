@@ -16,11 +16,8 @@ public class URLManager {
 
 	private URL url;
 	
-	private static String latestVersion;
-
-	static {
-		latestVersion = "null";
-	}
+	private static boolean isUpdated = true;
+	private static List<String> infoVersion = new ArrayList<>();
 
 	public enum Link {
 		BASE_URL("roytreo28.ddns.net"),
@@ -72,14 +69,12 @@ public class URLManager {
 	}
 
 	public static Boolean checkVersion(String version, Boolean localhost, Link link) throws MalformedURLException, IOException {
-		Boolean isUpToDate = true;
 		String content;
 		content = new URLManager(link.getURL() + "/version.txt", localhost).read();
 		if (!content.trim().equals(version.trim())) {
-			latestVersion = content.trim();
-			isUpToDate = false;
+			isUpdated = false;
 		}
-		return isUpToDate;
+		return isUpdated;
 	}
 	
 	public static List<String> getInfoVersion(Link link, String version) throws IOException {
@@ -98,10 +93,15 @@ public class URLManager {
 				output.add(s);
 		}
 		
-		return output;
+		infoVersion = new ArrayList<>(output);
+		return infoVersion;
 	}
 	
-	public static String getLatestVersion() {
-		return latestVersion;
+	public static boolean isUpToDate() {
+		return isUpdated;
+	}
+	
+	public static List<String> getInfoVersion() {
+		return infoVersion;
 	}
 }

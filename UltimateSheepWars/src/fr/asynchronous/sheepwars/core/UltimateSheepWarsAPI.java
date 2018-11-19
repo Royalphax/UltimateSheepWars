@@ -168,4 +168,13 @@ public class UltimateSheepWarsAPI {
 		for (CalendarEvent clazz : calendarEvents)
 			registerCalendarEvent(owningPlugin, clazz);
 	}
+	
+	public static void unregisterCalendarEvent(CalendarEvent calendarEvent) {
+		CalendarEvent.disableCalendarEvent(calendarEvent);
+	}
+	
+	public static void unregisterCalendarEvents(CalendarEvent... calendarEvents) {
+		for (CalendarEvent clazz : calendarEvents)
+			unregisterCalendarEvent(clazz);
+	}
 }
