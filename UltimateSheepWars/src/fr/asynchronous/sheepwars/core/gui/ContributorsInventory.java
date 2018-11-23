@@ -15,14 +15,13 @@ import fr.asynchronous.sheepwars.core.gui.base.GuiScreen;
 import fr.asynchronous.sheepwars.core.handler.Contributor;
 import fr.asynchronous.sheepwars.core.handler.ItemBuilder;
 import fr.asynchronous.sheepwars.core.handler.Sounds;
-import fr.asynchronous.sheepwars.core.task.BeginCountdown;
 
 public class ContributorsInventory extends GuiScreen {
 
 	public Contributor contributor;
 
 	public ContributorsInventory() {
-		super(1, false);
+		super(0, 1, false);
 	}
 
 	@Override

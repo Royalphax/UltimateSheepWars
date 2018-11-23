@@ -67,15 +67,17 @@ public class MainCommand implements CommandExecutor {
 					player.sendMessage(ChatColor.RED + "" + ChatColor.ITALIC + "the config to suit your needs and restart the server.");
 					player.sendMessage("");
 				} else {
-					player.sendMessage(ChatColor.ITALIC + "Parameters : <> = optional, [] = needed.");
+					player.sendMessage(ChatColor.ITALIC + "Param : <> = optional, [] = needed. Teams : blue, red or spec");
 					if (Permissions.USW_ADMIN.hasPermission(player)) {
 						player.sendMessage("");
 						player.sendMessage("/usw setLobby " + ChatColor.DARK_GRAY + "- " + ChatColor.GRAY + "Set the lobby");
-						player.sendMessage("/usw addBooster/clearBoosters " + ChatColor.DARK_GRAY + "- " + ChatColor.GRAY + "Add a booster");
-						player.sendMessage("/usw addSpawn/clearSpawns [team] " + ChatColor.DARK_GRAY + "- " + ChatColor.GRAY + "Add a blue, red or spec spawn");
+						player.sendMessage("/usw addBooster " + ChatColor.DARK_GRAY + "- " + ChatColor.GRAY + "Add a booster location");
+						player.sendMessage("/usw clearBoosters " + ChatColor.DARK_GRAY + "- " + ChatColor.GRAY + "Clear booster locations");
+						player.sendMessage("/usw addSpawn [team] " + ChatColor.DARK_GRAY + "- " + ChatColor.GRAY + "Add a team spawn location");
+						player.sendMessage("/usw clearSpawns [team] " + ChatColor.DARK_GRAY + "- " + ChatColor.GRAY + "Clear team spawn locations");
 						player.sendMessage("");
 						player.sendMessage("/usw start " + ChatColor.DARK_GRAY + "- " + ChatColor.GRAY + "Reduce countdown");
-						player.sendMessage("/usw give <player/*> " + ChatColor.DARK_GRAY + "- " + ChatColor.GRAY + "Give you all sheeps");
+						player.sendMessage("/usw give <player/*> <amount> <N°,...> " + ChatColor.DARK_GRAY + "- " + ChatColor.GRAY + "Give you all sheeps");
 						player.sendMessage("/usw kits <N°> " + ChatColor.DARK_GRAY + "- " + ChatColor.GRAY + "See all loaded kits");
 						player.sendMessage("/usw sheeps <N°> " + ChatColor.DARK_GRAY + "- " + ChatColor.GRAY + "See all loaded sheeps");
 						player.sendMessage("/usw boosters <N°> " + ChatColor.DARK_GRAY + "- " + ChatColor.GRAY + "See all loaded boosters");
@@ -169,6 +171,9 @@ public class MainCommand implements CommandExecutor {
 					player.sendMessage("  ∙ " + ChatColor.GRAY + "Color : " + ChatColor.YELLOW + sheep.getColor());
 					player.sendMessage("  ∙ " + ChatColor.GRAY + "Is friendly : " + ChatColor.YELLOW + sheep.isFriendly());
 					player.sendMessage("  ∙ " + ChatColor.GRAY + "Drop wool : " + ChatColor.YELLOW + sheep.isDropAllowed());
+					if (args.length > 2 && args[2].equalsIgnoreCase("throw")) {
+						sheep.throwSheep(player, this.plugin);
+					}
 				} else {
 					player.sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + "Loaded Sheeps :");
 					int x = 0;

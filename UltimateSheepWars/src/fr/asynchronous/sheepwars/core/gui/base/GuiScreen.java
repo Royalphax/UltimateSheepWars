@@ -15,6 +15,7 @@ import fr.asynchronous.sheepwars.core.gui.manager.GuiManager;
 
 public abstract class GuiScreen implements Listener {
 
+	public int id;
 	public int size;
 	public boolean update;
 	
@@ -22,11 +23,16 @@ public abstract class GuiScreen implements Listener {
 	public Player player;
 	public UltimateSheepWarsPlugin plugin;
 
-	public GuiScreen(int size, boolean update) {
+	public GuiScreen(int id, int size, boolean update) {
+		this.id = id;
 		this.size = size;
 		if (size > 6)
 			throw new IllegalArgumentException("Size of the inventory can't exceed 6 because minecraft accepts only 6 lines max.");
 		this.update = update;
+	}
+	
+	public int getId() {
+		return id;
 	}
 
 	public Player getPlayer() {
@@ -37,15 +43,14 @@ public abstract class GuiScreen implements Listener {
 		return this.update;
 	}
 
-	public void open(UltimateSheepWarsPlugin plugin, Player player, String inventoryName, boolean registerEvents) {
+	public void open(UltimateSheepWarsPlugin plugin, Player player, String inventoryName) {
 		this.inventory = Bukkit.createInventory(null, size * 9, inventoryName);
 		this.player = player;
 		this.plugin = plugin;
 		player.openInventory(this.inventory);
 		drawScreen();
 		player.updateInventory();
-		if (registerEvents)
-			Bukkit.getPluginManager().registerEvents(this, plugin);
+		Bukkit.getPluginManager().registerEvents(this, plugin);
 		onOpen();
 	}
 
@@ -101,9 +106,15 @@ public abstract class GuiScreen implements Listener {
 
 	@EventHandler
 	public void onPlayerInventory(InventoryCloseEvent e) {
-		if (!GuiManager.isOpened(this.getClass())) {
-			HandlerList.unregisterAll(this);
+		if (!(e.getPlayer() instanceof Player))
+			return;
+		Player player = (Player) e.getPlayer();
+		if (GuiManager.hasOpenedGui(player)) {
+			GuiManager.closePlayer(player);
 			onClose();
+		}
+		if (!GuiManager.isOpened(this)) {
+			HandlerList.unregisterAll(this);
 		}
 	}
 }

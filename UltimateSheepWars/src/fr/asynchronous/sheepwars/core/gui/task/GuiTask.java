@@ -17,7 +17,7 @@ public class GuiTask extends BukkitRunnable {
 		this.plugin = plugin;
 		this.player = player;
 		this.gui = gui;
-		gui.open(plugin, player, inventoryName, true);
+		gui.open(plugin, player, inventoryName);
 	}
 
 	@Override

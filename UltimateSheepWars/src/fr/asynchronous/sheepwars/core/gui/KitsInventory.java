@@ -41,7 +41,7 @@ public class KitsInventory extends GuiScreen {
 	private boolean kitScreen = true;
 
 	public KitsInventory() {
-		super(6, false);
+		super(1, 6, false);
 	}
 
 	@Override
