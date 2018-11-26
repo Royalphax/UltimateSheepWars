@@ -265,6 +265,7 @@ public class Message {
 		JOIN_BLUE_ITEM("&9Join blue team"),
 		GHOST_DESCRIPTION("&7You are now a &fGhost&7, to leave, type &e/hub\n&7Only &fGhosts &7can hear your speak !"),
 		SHEEP_RECEIVED("&7Received: %SHEEP_NAME%"),
+		SEVERAL_SHEEP_RECEIVED("&7Received: %SHEEP_NAME% &e(x%AMOUNT%)"),
 		PRE_START_SUBTITLE("&bPrepare to fight !"),
 		GAME_START_TITLE("&bThe game is starting !"),
 		GAME_START_SUBTITLE("&6one sheep every &a%TIME% &6seconds"),
