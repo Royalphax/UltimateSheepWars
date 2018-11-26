@@ -1,5 +1,8 @@
 package fr.asynchronous.sheepwars.core.command;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -8,7 +11,6 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 
 import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.data.PlayerData;
@@ -77,9 +79,9 @@ public class MainCommand implements CommandExecutor {
 						player.sendMessage("/usw clearSpawns [team] " + ChatColor.DARK_GRAY + "- " + ChatColor.GRAY + "Clear team spawn locations");
 						player.sendMessage("");
 						player.sendMessage("/usw start " + ChatColor.DARK_GRAY + "- " + ChatColor.GRAY + "Reduce countdown");
-						player.sendMessage("/usw give <player/*> <amount> <N°,...> " + ChatColor.DARK_GRAY + "- " + ChatColor.GRAY + "Give you all sheeps");
+						player.sendMessage("/usw give <player/*> <N°,...> <amount,...>" + ChatColor.DARK_GRAY + "- " + ChatColor.GRAY + "Give you all sheeps");
 						player.sendMessage("/usw kits <N°> " + ChatColor.DARK_GRAY + "- " + ChatColor.GRAY + "See all loaded kits");
-						player.sendMessage("/usw sheeps <N°> " + ChatColor.DARK_GRAY + "- " + ChatColor.GRAY + "See all loaded sheeps");
+						player.sendMessage("/usw sheeps <N°> <throw>" + ChatColor.DARK_GRAY + "- " + ChatColor.GRAY + "See all loaded sheeps");
 						player.sendMessage("/usw boosters <N°> " + ChatColor.DARK_GRAY + "- " + ChatColor.GRAY + "See all loaded boosters");
 					}
 					player.sendMessage("");
@@ -151,9 +153,9 @@ public class MainCommand implements CommandExecutor {
 				player.sendMessage("Pending tasks: " + Bukkit.getScheduler().getPendingTasks().size());
 				player.sendMessage("Particle players: " + PlayerData.getParticlePlayers().size());
 				player.sendMessage("Players data: " + PlayerData.getData().size());
-				
+
 			} else if (sub.equalsIgnoreCase("sheeps")) {
-				
+
 				if (!Permissions.USW_DEVELOPER.hasPermission(player, true))
 					return true;
 				int i = -1;
@@ -172,7 +174,11 @@ public class MainCommand implements CommandExecutor {
 					player.sendMessage("  ∙ " + ChatColor.GRAY + "Is friendly : " + ChatColor.YELLOW + sheep.isFriendly());
 					player.sendMessage("  ∙ " + ChatColor.GRAY + "Drop wool : " + ChatColor.YELLOW + sheep.isDropAllowed());
 					if (args.length > 2 && args[2].equalsIgnoreCase("throw")) {
-						sheep.throwSheep(player, this.plugin);
+						if (!GameState.isStep(GameState.WAITING)) {
+							player.sendMessage(ChatColor.RED + "You cannot try to throw a sheep during or after the game.");
+						} else {
+							sheep.throwSheep(player, this.plugin);
+						}
 					}
 				} else {
 					player.sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + "Loaded Sheeps :");
@@ -183,9 +189,9 @@ public class MainCommand implements CommandExecutor {
 					}
 				}
 				Sounds.playSound(player, player.getLocation(), Sounds.ORB_PICKUP, 1f, 1f);
-				
+
 			} else if (sub.equalsIgnoreCase("kits")) {
-				
+
 				if (!Permissions.USW_DEVELOPER.hasPermission(player, true))
 					return true;
 				int i = -1;
@@ -209,9 +215,9 @@ public class MainCommand implements CommandExecutor {
 					}
 				}
 				Sounds.playSound(player, player.getLocation(), Sounds.ORB_PICKUP, 1f, 1f);
-				
+
 			} else if (sub.equalsIgnoreCase("boosters")) {
-				
+
 				if (!Permissions.USW_DEVELOPER.hasPermission(player, true))
 					return true;
 				int i = -1;
@@ -236,28 +242,80 @@ public class MainCommand implements CommandExecutor {
 				Sounds.playSound(player, player.getLocation(), Sounds.ORB_PICKUP, 1f, 1f);
 			} else if (sub.equalsIgnoreCase("give")) {
 				if (GameState.isStep(GameState.INGAME)) {
-					int amount = 64;
-					if (args.length > 1) {
+					List<SheepManager> sheeps = new ArrayList<>(SheepManager.getAvailableSheeps());
+					List<Integer> amounts = new ArrayList<>();
+					List<Player> players = new ArrayList<>();
+					players.add(player);
+
+					if (args.length > 1) { // A été spécifié le/les joueurs.
+
 						if (args[1].equalsIgnoreCase("*")) {
 							if (!Permissions.USW_GIVE_ALL.hasPermission(player, true))
 								return true;
-							for (Player online : Bukkit.getOnlinePlayers())
-								giveSheeps(online, player, amount);
-							player.sendMessage(ChatColor.GREEN + "The sheep were given to all the players !");
-						} else if (Bukkit.getPlayer(args[1]) != null) {
+							players.clear();
+							for (Player online : player.getWorld().getPlayers())
+								if (!PlayerData.getPlayerData(online).isSpectator() && !players.contains(online))
+									players.add(online);
+						}
+						else if (Bukkit.getPlayer(args[1]) != null) {
 							if (!Permissions.USW_GIVE_OTHER.hasPermission(player, true))
 								return true;
-							Player receiver = Bukkit.getPlayer(args[1]);
-							giveSheeps(receiver, player, amount);
+							players.clear();
+							players.add(Bukkit.getPlayer(args[1]));
 						} else {
 							if (!Permissions.USW_GIVE_OTHER.hasPermission(player, true))
 								return true;
 							player.sendMessage(ChatColor.RED + args[1] + " is not connected.");
-						}
-					} else {
-						if (!Permissions.USW_GIVE_SELF.hasPermission(player, true))
 							return true;
-						giveSheeps(player, null, amount);
+						}
+
+						if (args.length > 2) { // A été spécifié les moutons.
+							sheeps.clear();
+
+							List<Integer> sheepsId = new ArrayList<>();
+							for (String str : args[2].split(",")) {
+								try {
+									sheepsId.add(Integer.parseInt(str));
+								} catch (NumberFormatException ex) {
+									continue;
+								}
+							}
+							
+							List<SheepManager> availableSheeps = SheepManager.getAvailableSheeps();
+							for (int i : sheepsId)
+								sheeps.add(availableSheeps.get(i));
+
+							if (args.length > 3) { // A été spécifié les amounts.
+								for (String str : args[3].split(",")) {
+									try {
+										amounts.add(Integer.parseInt(str));
+									} catch (NumberFormatException ex) {
+										continue;
+									}
+								}
+							}
+						}
+					}
+
+					if (players.size() == 1 && players.contains(player) && !Permissions.USW_GIVE_SELF.hasPermission(player, true))
+						return true;
+					
+					if (sheeps.isEmpty()) {
+						player.sendMessage(ChatColor.RED + "No sheep has been given (check the syntax of your command).");
+						return true;
+					}
+					
+					for (Player people : players) {
+						int amount = 64;
+						for (int i = 0; i < sheeps.size(); i++) {
+							if (i < amounts.size())
+								amount = amounts.get(i);
+							SheepManager.giveSheep(people, sheeps.get(i), amount);
+						}
+						Sounds.playSound(people, people.getLocation(), Sounds.VILLAGER_YES, 1f, 1f);
+						if (people != player) {
+							people.sendMessage(ChatColor.GREEN + "✚ " + player.getName() + " gave you some sheep.");
+						}
 					}
 				} else {
 					player.sendMessage(ChatColor.RED + "You can't try to give you the sheeps while the game hasn't started.");
@@ -273,17 +331,5 @@ public class MainCommand implements CommandExecutor {
 		UltimateSheepWarsPlugin.getVersionManager().getNMSUtils().displayInteractiveText(player, "∙ " + ChatColor.GRAY + "If you encounter any issue, come and talk to us : ", ChatColor.AQUA + "(click)", "", InteractiveType.OPEN_URL, "https://discord.gg/nZthcPh");
 		player.sendMessage("∙ " + ChatColor.GRAY + "Use " + ChatColor.WHITE + "/usw help " + ChatColor.GRAY + "to see the list of all available commands.");
 		return false;
-	}
-
-	public void giveSheeps(Player player, Player giver, int amo) {
-		for (SheepManager sheep : SheepManager.getAvailableSheeps()) {
-			ItemStack i = sheep.getIcon(player).clone();
-			i.setAmount(amo);
-			player.getInventory().addItem(i);
-		}
-		Sounds.playSound(player, player.getLocation(), Sounds.VILLAGER_YES, 1f, 1f);
-		if (giver != null && player != giver) {
-			player.sendMessage(ChatColor.GREEN + giver.getName() + " gave you all sheep of the game.");
-		}
 	}
 }
