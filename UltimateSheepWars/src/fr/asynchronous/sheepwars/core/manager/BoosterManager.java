@@ -220,6 +220,6 @@ public abstract class BoosterManager implements Listener {
 	 * Get registered boosters.
 	 */
 	public static List<BoosterManager> getAvailableBoosters() {
-		return availableBoosters;
+		return new ArrayList<>(availableBoosters);
 	}
 }

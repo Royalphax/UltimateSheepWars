@@ -60,16 +60,25 @@ public abstract class SheepManager {
 		}
 		giveSheep(player, sheep);
 	}
-
+	
 	public static void giveSheep(final Player player, final SheepManager sheep) {
+		giveSheep(player, sheep, 1);
+	}
+
+	public static void giveSheep(final Player player, final SheepManager sheep, final int amount) {
 		PlayerData playerData = PlayerData.getPlayerData(player);
 		if (playerData.getTeam() != TeamManager.SPEC) {
 			if (sheep.onGive(player)) {
 				SheepGiveEvent event = new SheepGiveEvent(player, sheep);
 				Bukkit.getPluginManager().callEvent(event);
 				if (!event.isCancelled()) {
-					player.getInventory().addItem(sheep.getIcon(player));
-					player.sendMessage(Message.getMessage(player, MsgEnum.SHEEP_RECEIVED).replaceAll("%SHEEP_NAME%", sheep.getName(player)));
+					for (int i = 0; i < amount; i++) 
+						player.getInventory().addItem(sheep.getIcon(player));
+					if (amount > 1) {
+						player.sendMessage(Message.getMessage(player, MsgEnum.SEVERAL_SHEEP_RECEIVED).replaceAll("%SHEEP_NAME%", sheep.getName(player)).replaceAll("%AMOUNT%", String.valueOf(amount)));
+					} else {
+						player.sendMessage(Message.getMessage(player, MsgEnum.SHEEP_RECEIVED).replaceAll("%SHEEP_NAME%", sheep.getName(player)));
+					}
 				}
 			} else {
 				giveRandomSheep(player);
@@ -287,7 +296,7 @@ public abstract class SheepManager {
 	 * Get registered sheeps.
 	 */
 	public static List<SheepManager> getAvailableSheeps() {
-		return availableSheeps;
+		return new ArrayList<>(availableSheeps);
 	}
 
 	/**

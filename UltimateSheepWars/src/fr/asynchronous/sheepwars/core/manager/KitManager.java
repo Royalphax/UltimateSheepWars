@@ -222,7 +222,7 @@ public abstract class KitManager implements Listener
      * Get registered kits.
      */
     public static List<KitManager> getAvailableKits() {
-    	return availableKits;
+    	return new ArrayList<>(availableKits);
     }
 
     /**
