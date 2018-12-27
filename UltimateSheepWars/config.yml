@@ -41,10 +41,10 @@ game-time: 20
 boarding-time: 10
 #
 #Interval between a give of sheep
-give-sheep-seconds: 40
+give-sheep-seconds: 25
 #
 #Interval between a spawn of a booster
-booster-interval-seconds: 30
+booster-interval-seconds: 15
 #
 #Time before a booster disapeared
 booster-life-time-seconds: 10
@@ -75,7 +75,7 @@ auto-generate-language: true
 sheep-countdown-before-explosion: 5
 #
 #The power when you launch sheep (depending on your map size to launch the sheep from one side to another)
-sheep-launch-velocity: 2.2
+sheep-launch-velocity: 3.0
 #
 #The default health of sheeps (half-hearts)
 sheep-health: 8

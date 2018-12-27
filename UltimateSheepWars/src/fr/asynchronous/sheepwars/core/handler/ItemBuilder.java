@@ -13,6 +13,7 @@ import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.SkullType;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BannerMeta;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -39,6 +40,10 @@ public class ItemBuilder {
 
 	public ItemBuilder(ItemStack is) {
 		this.is = is;
+	}
+	
+	public ItemBuilder(ItemBuilder origin) {
+		this(origin.is);
 	}
 	
 	public ItemBuilder(Material m, int amount) {
@@ -137,6 +142,13 @@ public class ItemBuilder {
 
 	public ItemBuilder setUnbreakable() {
 		is.getItemMeta().spigot().setUnbreakable(true);
+		return this;
+	}
+	
+	public ItemBuilder hideAttributes() {
+		ItemMeta im = is.getItemMeta();
+		im.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+		is.setItemMeta(im);
 		return this;
 	}
 

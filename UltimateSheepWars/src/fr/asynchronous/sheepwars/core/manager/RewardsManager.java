@@ -31,7 +31,7 @@ public class RewardsManager {
 			for (String comm : event.commands)
 				this.instance.getServer().dispatchCommand(Bukkit.getConsoleSender(), comm.replaceAll("%PLAYER%", player.getName()));
 		try {
-			this.instance.getEconomyProvider().depositPlayer(player, event.vaultReward);
+			UltimateSheepWarsPlugin.getEconomyProvider().depositPlayer(player, event.vaultReward);
 		} catch (NoClassDefFoundError | NullPointerException e) {
 			// Do nothing
 		}

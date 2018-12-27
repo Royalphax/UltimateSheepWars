@@ -249,7 +249,7 @@ public abstract class SheepManager {
 	 * Throw this sheep from a player.
 	 */
 	public boolean throwSheep(Player launcher, Plugin plugin) {
-		Location playerLocation = launcher.getLocation().add(0, 2, 0);
+		Location playerLocation = launcher.getEyeLocation().clone();
 		Location location = playerLocation.toVector().add(playerLocation.getDirection().multiply(0.5)).toLocation(launcher.getWorld());
 
 		Sheep entity = spawnSheep(location, launcher, plugin);
@@ -266,7 +266,8 @@ public abstract class SheepManager {
 			return false;
 		} else {
 			if (!this.friendly)
-				entity.setVelocity(playerLocation.getDirection().add(new Vector(0, 0.1, 0)).multiply(ConfigManager.getDouble(Field.SHEEP_VELOCITY)));
+				//entity.setVelocity(launcher.getEyeLocation().getDirection().clone().multiply(3.5));
+				entity.setVelocity(playerLocation.getDirection().multiply(ConfigManager.getDouble(Field.SHEEP_VELOCITY)));
 			Sounds.playSoundAll(location, Sounds.HORSE_SADDLE, 1f, 1f);
 			return true;
 		}

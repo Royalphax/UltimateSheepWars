@@ -11,14 +11,21 @@ import fr.asynchronous.sheepwars.core.message.Message.MsgEnum;
 public class MoreHealthKit extends KitManager {
 
 	public static final Double HEARTS_MORE = 2.0;
-	
+
 	public MoreHealthKit() {
-		super(6, MsgEnum.KIT_MORE_HEALTH_NAME, MsgEnum.KIT_MORE_HEALTH_DESCRIPTION, "sheepwars.kit.morehealth", 15.0, 5, new ItemBuilder(Material.APPLE));
+		super(6, MsgEnum.KIT_MORE_HEALTH_NAME, new ItemBuilder(Material.APPLE), new MoreHealthKitLevel());
 	}
 
-	@Override
-	public boolean onEquip(Player player) {
-		UltimateSheepWarsPlugin.getVersionManager().getNMSUtils().setHealth(player, 20.0 + (HEARTS_MORE * 2.0));
-		return true;
+	public static class MoreHealthKitLevel extends KitLevel {
+
+		public MoreHealthKitLevel() {
+			super(MsgEnum.KIT_MORE_HEALTH_DESCRIPTION, "sheepwars.kit.morehealth", 10, 10);
+		}
+
+		@Override
+		public boolean onEquip(Player player) {
+			UltimateSheepWarsPlugin.getVersionManager().getNMSUtils().setHealth(player, 20.0 + (HEARTS_MORE * 2.0));
+			return true;
+		}
 	}
 }

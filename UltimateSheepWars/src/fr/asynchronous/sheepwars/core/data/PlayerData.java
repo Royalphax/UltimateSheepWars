@@ -59,7 +59,7 @@ public class PlayerData extends DataManager {
 	private int sheepKilled;
 	private int totalTime;
 	private KitManager kit;
-	private ArrayList<KitManager> kits;
+	private Map<KitManager, Integer> kits;
 	private TeamManager team;
 	private String winRate;
 	private String kdRatio;
@@ -81,7 +81,8 @@ public class PlayerData extends DataManager {
 		this.sheepKilled = 0;
 		this.totalTime = 0;
 		this.kit = new NoneKit();
-		this.kits = new ArrayList<>();
+		this.kits = new HashMap<>();
+		this.kits.put(this.kit, 0);
 		this.team = TeamManager.NULL;
 		this.winRate = "0.0";
 		this.kdRatio = "0.0";
@@ -131,19 +132,24 @@ public class PlayerData extends DataManager {
 	}
 
 	public List<KitManager> getKits() {
-		List<KitManager> kits = new ArrayList<>(this.kits);
-		for (KitManager kit : this.kits)
-			if (kit.getId() == 9 || kit.getId() == 8)
+		List<KitManager> kits = new ArrayList<>(this.kits.keySet());
+		for (KitManager kit : this.kits.keySet())
+			if (kit.isFreeKit())
 				kits.remove(kit);
 		return kits;
 	}
 
 	public String getKitsString() {
 		StringBuilder output = new StringBuilder("");
-		for (KitManager k : this.kits)
-			if (k.getId() != this.kit.getId())
+		for (KitManager k : this.kits.keySet()) {
+			if (k.getId() != this.kit.getId()) {
 				output.append(k.getId());
+				output.append(this.kits.get(k));
+				output.append("-");
+			}
+		}
 		output.append(this.kit.getId());
+		output.append(this.kits.get(this.kit));
 		return output.toString().trim();
 	}
 
@@ -225,8 +231,8 @@ public class PlayerData extends DataManager {
 	public void setLanguage(final Language lang) {
 		this.language = lang;
 		if (GameState.isStep(GameState.WAITING)) {
-    		PlayerJoin.equip(PlayerData.getPlayerData(player));
-    	}
+			PlayerJoin.equip(PlayerData.getPlayerData(player));
+		}
 		if (player.isOnline()) {
 			getPlayer().setScoreboard(lang.getScoreboardWrapper().getScoreboard());
 			getPlayer().sendMessage(ChatColor.GRAY + lang.getIntro());
@@ -237,20 +243,63 @@ public class PlayerData extends DataManager {
 		this.kills = i;
 	}
 
-	public void setKit(KitManager kit) {
+	public int getKitLevel(KitManager kit) {
+		if (hasKit(kit)) {
+			return this.kits.get(kit);
+		} else {
+			return -1;
+		}
+	}
+
+	public int getKitLevel() {
+		return getKitLevel(this.kit);
+	}
+
+	public boolean hasKit(KitManager kit) {
+		return this.kits.containsKey(kit);
+	}
+
+	public void setKit(KitManager kit, Integer level) {
+		setKit(kit, level, false);
+	}
+
+	public void setKit(KitManager kit, Integer level, boolean lastOne) {
 		kit = KitManager.getInstanceKit(kit);
 		this.kit = kit;
-		addKit(this.kit);
+		addKit(this.kit, level);
 		if (this.player.isOnline()) {
-			this.player.getPlayer().sendMessage(Message.getMessage(this.player.getPlayer(), MsgEnum.KIT_CHOOSE_MESSAGE).replace("%KIT%", kit.getName(this.player.getPlayer())));
+			String message;
+			if (!lastOne) {
+				message = Message.getMessage(this.player.getPlayer(), MsgEnum.KIT_CHOOSE_MESSAGE);
+			} else {
+				message = Message.getMessage(this.player.getPlayer(), MsgEnum.KIT_LAST_SELECTED);
+			}
+			message = message.replaceAll("%KIT_NAME%", kit.getName(this.language));
+			String levelMessage;
+			if (kit.getLevels().size() > 1) {
+				levelMessage = new String(kit.getLevel(level).getName(this.language));
+			} else {
+				levelMessage = "";
+			}
+			message = message.replaceAll("%LEVEL_NAME%", levelMessage);
+			this.player.getPlayer().sendMessage(message);
 			Sounds.playSound(getPlayer(), Sounds.STEP_WOOD, 1f, 0f);
 		}
 	}
 
-	public void addKit(KitManager kit) {
+	public void addKit(KitManager kit, Integer level) {
 		kit = KitManager.getInstanceKit(kit);
-		if (!this.kits.contains(kit))
-			this.kits.add(kit);
+		if (this.kits.containsKey(kit))
+			this.kits.remove(kit);
+		this.kits.put(kit, level);
+	}
+
+	public void removeKit(KitManager kit) {
+		kit = KitManager.getInstanceKit(kit);
+		if (this.kits.containsKey(kit))
+			this.kits.remove(kit);
+		if (this.kit == kit)
+			setKit(new NoneKit(), 0);
 	}
 
 	public void setTeam(TeamManager team) {
@@ -330,6 +379,7 @@ public class PlayerData extends DataManager {
 
 	/**
 	 * Get player's data.
+	 * 
 	 * @return player's data.
 	 */
 	public static PlayerData getPlayerData(final OfflinePlayer player) {
@@ -355,16 +405,32 @@ public class PlayerData extends DataManager {
 						setSheepThrown(res.getInt("sheep_thrown"));
 						setSheepKilled(res.getInt("sheep_killed"));
 						setTotalTime(res.getInt("total_time"));
-						String[] availableKits = res.getString("kits").split("");
-						for (String kitId : availableKits)
-							if (KitManager.existKit(Integer.parseInt(kitId)))
-								addKit(KitManager.getFromId(Integer.parseInt(kitId)));
-						setKit(KitManager.getFromId(Integer.parseInt(availableKits[availableKits.length - 1])));
+						if (res.getString("kits").contains("-")) {
+							String[] availableKits = res.getString("kits").split("-");
+							for (int i = 0; i < availableKits.length - 1; i++) {
+								String kitString = availableKits[i];
+								String[] kitStringSplitted = kitString.split("");
+								final int kitId = Integer.parseInt(kitStringSplitted[0]);
+								final int kitLevel = Integer.parseInt(kitStringSplitted[1]);
+								if (KitManager.existKit(kitId)) {
+									addKit(KitManager.getFromId(kitId), kitLevel);
+								}
+							}
+							String[] lastKit = availableKits[availableKits.length - 1].split("");
+							setKit(KitManager.getFromId(Integer.parseInt(lastKit[0])), Integer.parseInt(lastKit[1]), true);
+						} else {
+							String[] availableKits = res.getString("kits").split("");
+							for (String kitId : availableKits)
+								if (KitManager.existKit(Integer.parseInt(kitId)))
+									addKit(KitManager.getFromId(Integer.parseInt(kitId)), 0);
+							setKit(KitManager.getFromId(Integer.parseInt(availableKits[availableKits.length - 1])), 0);
+
+						}
 						setUpdatedAt(res.getDate("updated_at"));
 						setCreatedAt(res.getDate("created_at"));
 					}
 					res.close();
-				} catch (ClassNotFoundException | SQLException ex) {
+				} catch (ClassNotFoundException | SQLException | NumberFormatException | ArrayIndexOutOfBoundsException ex) {
 					new ExceptionManager(ex).register(true);
 				}
 				this.loaded = true;
@@ -478,7 +544,7 @@ public class PlayerData extends DataManager {
 			}
 		}
 
-		public Map<String, Integer> getRanking(int limit) { 
+		public Map<String, Integer> getRanking(int limit) {
 			Map<String, Integer> output = new HashMap<>();
 			int i = 0;
 			Iterator<Entry<String, Integer>> iter = this.playerTop.entrySet().iterator();
@@ -488,7 +554,7 @@ public class PlayerData extends DataManager {
 				i++;
 			}
 			return sortByValue(output);
-			
+
 		}
 
 		public static DataType getFromId(int id) {
@@ -497,7 +563,7 @@ public class PlayerData extends DataManager {
 					return data;
 			return null;
 		}
-		
+
 		private static Map<String, Integer> sortByValue(Map<String, Integer> unsortMap) {
 
 			List<Map.Entry<String, Integer>> list = new LinkedList<Map.Entry<String, Integer>>(unsortMap.entrySet());

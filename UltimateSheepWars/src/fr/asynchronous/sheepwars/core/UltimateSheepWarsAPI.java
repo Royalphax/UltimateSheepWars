@@ -49,6 +49,21 @@ public class UltimateSheepWarsAPI {
 	public static boolean unregisterSheep(SheepManager sheepClass) {
 		return SheepManager.unregisterSheep(sheepClass);
 	}
+	
+	/**
+	 * Unregister all registred sheeps.
+	 * 
+	 * @return number of sheep classes that have been erased.
+	 */
+	public static int unregisterAllSheeps() {
+		int i = 0;
+		for (SheepManager sheep : SheepManager.getAvailableSheeps()) 
+		{
+			unregisterSheep(sheep);
+			i++;
+		}
+		return i;
+	}
 
 	/**
 	 * Register your custom kit.
@@ -75,6 +90,21 @@ public class UltimateSheepWarsAPI {
 	 */
 	public static boolean unregisterKit(KitManager kitClass) {
 		return KitManager.unregisterKit(kitClass);
+	}
+	
+	/**
+	 * Unregister all registred kits.
+	 * 
+	 * @return number of kit classes that have been erased.
+	 */
+	public static int unregisterAllKits() {
+		int i = 0;
+		for (KitManager kit : KitManager.getAvailableKits()) 
+		{
+			unregisterKit(kit);
+			i++;
+		}
+		return i;
 	}
 
 	/**
@@ -104,7 +134,22 @@ public class UltimateSheepWarsAPI {
 	}
 	
 	/**
-	 * Set your own inventory to display kits.
+	 * Unregister all registred boosters.
+	 * 
+	 * @return number of booster classes that have been erased.
+	 */
+	public static int unregisterAllBoosters() {
+		int i = 0;
+		for (BoosterManager booster : BoosterManager.getAvailableBoosters()) 
+		{
+			unregisterBooster(booster);
+			i++;
+		}
+		return i;
+	}
+	
+	/**
+	 * Set your own inventory class to display kits.
 	 * 
 	 * @param kitsInventory Inventory class.
 	 */

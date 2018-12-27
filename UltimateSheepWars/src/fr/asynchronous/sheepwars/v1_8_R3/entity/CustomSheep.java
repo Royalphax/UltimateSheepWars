@@ -18,7 +18,6 @@ import fr.asynchronous.sheepwars.core.handler.Particles;
 import fr.asynchronous.sheepwars.core.handler.SheepAbility;
 import fr.asynchronous.sheepwars.core.manager.ExceptionManager;
 import fr.asynchronous.sheepwars.core.manager.SheepManager;
-import net.minecraft.server.v1_8_R3.Entity;
 import net.minecraft.server.v1_8_R3.EntityHuman;
 import net.minecraft.server.v1_8_R3.EntityLiving;
 import net.minecraft.server.v1_8_R3.EntitySheep;
@@ -55,7 +54,7 @@ public class CustomSheep extends EntitySheep {
 	@SuppressWarnings({"unchecked", "rawtypes"})
 	public CustomSheep(net.minecraft.server.v1_8_R3.World world, Player player, SheepManager sheep, Plugin plugin) {
 		this(world, player, plugin);
-
+		
 		this.sheep = sheep;
 		this.ticks = sheep.getDuration() <= 0 ? Long.MAX_VALUE : sheep.getDuration() * 20;
 
@@ -107,12 +106,17 @@ public class CustomSheep extends EntitySheep {
 		}
 		super.move(d0, d1, d2);
 	}
+	
+	@Override
+	public void g(double d0, double d1, double d2) {
+		// Do nothing
+	}
+
 
 	@Override
 	public void g(float sideMot, float forMot) {
-		if (this.sheep != null && this.sheep.getAbilities().contains(SheepAbility.RIDEABLE) && this.onGround && this.passenger != null) {
-			final Entity passenger = this.passenger;
-			if (passenger == null || !(passenger instanceof EntityHuman)) {
+		if (this.sheep != null && this.onGround && this.sheep.getAbilities().contains(SheepAbility.RIDEABLE)) {
+			if (this.passenger == null || !(this.passenger instanceof EntityHuman) || !this.sheep.getAbilities().contains(SheepAbility.RIDEABLE)) {
 				super.g(sideMot, forMot);
 				this.S = 1.0f;
 				this.aK = 0.02f;
@@ -132,7 +136,9 @@ public class CustomSheep extends EntitySheep {
 			try {
 				jump = EntityLiving.class.getDeclaredField("aY");
 			} catch (NoSuchFieldException localNoSuchFieldException) {
+				// Do nothing
 			} catch (SecurityException localSecurityException) {
+				// Do nothing
 			}
 
 			jump.setAccessible(true);

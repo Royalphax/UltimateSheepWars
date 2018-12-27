@@ -21,23 +21,25 @@ public class Message {
 	private String msg;
 
 	public Message(MsgEnum msgEnum) {
-		this(msgEnum.toString().toLowerCase().replaceAll("_", "-"), msgEnum.getMessage());
+		this(getRaw(msgEnum.toString()), msgEnum.getMessage());
 	}
 
-	public Message(String messageId, String message) {
+	private Message(String messageId, String message) {
 		this.strId = messageId;
 		this.msg = message;
 
 		if (getMessageByStringId(messageId) != null) {
-			new StringIdAlreadyUsed("You can't register a message with same string ID as another.").printStackTrace();
+			new StringIdAlreadyUsed("You can't register two messages with the same string ID.").printStackTrace();
 		} else {
 			map.add(this);
 		}
 	}
 
 	public Message(String message) {
-		this.strId = getRaw(message);
-		this.msg = message;
+		this(getRaw(message), message);
+		//->Pas sur^
+		//this.strId = getRaw(message);
+		//this.msg = message;
 	}
 
 	public String getStringId() {
@@ -46,6 +48,10 @@ public class Message {
 
 	public String getMessage() {
 		return this.msg;
+	}
+	
+	public String getMessage(Language lang) {
+		return lang.getMessage(this);
 	}
 
 	public String getMessage(Player player) {
@@ -61,7 +67,7 @@ public class Message {
 		return this.msg.replaceAll("§", "&");
 	}
 
-	private String getRaw(String input) {
+	public static String getRaw(String input) {
 		String output = Normalizer.normalize(input, Normalizer.Form.NFD);
 		output = output.replaceAll("[^\\p{ASCII}]", "");
 		output = output.replaceAll("[+.^:,%$@*&]", "");
@@ -69,6 +75,7 @@ public class Message {
 		output = output.replaceAll("\\\\", "");
 		output = output.trim();
 		output = output.replaceAll(" ", "_");
+		output = output.replaceAll("_", "-");
 		output = output.toLowerCase();
 		return output;
 	}
@@ -208,38 +215,44 @@ public class Message {
 		BOOSTER_RESISTANCE("&f&lResistance &e(&b30 &eseconds)"),
 		DIED_MESSAGE("%VICTIM% &7died."),
 		SLAYED_MESSAGE("%VICTIM% &7has been slayed by %KILLER%."),
-		KIT_LAST_SELECTED("&7&oLast selected kit: &6%KIT%"),
-		KIT_CHOOSE_MESSAGE("&7&oKit selected: &6%KIT%"),
+		KIT("kit"),
+		LEVEL("level"),
+		KIT_LAST_SELECTED("&7&oLast selected kit: &6%KIT_NAME% &e%LEVEL_NAME%"),
+		KIT_CHOOSE_MESSAGE("&7&oSelected kit: &6%KIT_NAME% &e%LEVEL_NAME%"),
 		KITS_ITEM("&6Kits & Stats &7(Right-Click)"),
-		KIT_BETTER_BOW_NAME("&eBetter bow"),
-		KIT_MORE_HEALTH_NAME("&eMore health"),
-		KIT_BETTER_SWORD_NAME("&eBetter sword"),
-		KIT_MOBILITY_NAME("&eMobility"),
-		KIT_BUILDER_NAME("&eBuilder"),
-		KIT_DESTROYER_NAME("&eDestroyer"),
-		KIT_ARMORED_SHEEP_NAME("&eArmored sheep"),
-		KIT_MORE_SHEEP_NAME("&eMore sheeps"),
-		KIT_RANDOM_NAME("&eRandom"),
-		KIT_NULL_NAME("&eNone"),
-		KIT_MORE_SHEEP_DESCRIPTION("&7Gives chances to have\n&7extra sheeps\n&7\n&b+15% &7to receive one more sheep"),
-		KIT_BETTER_BOW_DESCRIPTION("&7Improves your bow\n&7and give it critical & punch\n&7\n&b+20%&7 chance to punch\n&7&b+10% &7chance to critical"),
-		KIT_MORE_HEALTH_DESCRIPTION("&7Increases health by &b2 &chearts"),
-		KIT_BETTER_SWORD_DESCRIPTION("&7Improves your sword\n&7\n&b+5% &7chance to critical"),
-		KIT_MOBILITY_DESCRIPTION("&7Improves your mobility\n&7\n&7Swiftness I\n&7Feather falling I"),
-		KIT_BUILDER_DESCRIPTION("&7Gives you an anvil, sand and bricks\n&7\n&bx1 &7anvil\n&bx5 &7bricks\n&bx5 &7sand blocks"),
-		KIT_DESTROYER_DESCRIPTION("&7Gives you TNT and improve your bow\n&7Right click to launch TNT !\n&7\n&bx3 &7TNT block\n&7&b+5% &7chance to put your arrows in fire"),
-		KIT_ARMORED_SHEEP_DESCRIPTION("&7Increases resistance and\n&7health points of sheeps\n&7\n&b+150% &7health"),
-		KIT_RANDOM_DESCRIPTION("&7This is random."),
-		KIT_NULL_DESCRIPTION("&7Select no kit."),
-		KIT_INVENTORY_NAME("Kit: %KIT%"),
+		KIT_BETTER_BOW_NAME("&6Better bow"),
+		KIT_MORE_HEALTH_NAME("&6More health"),
+		KIT_BETTER_SWORD_NAME("&6Better sword"),
+		KIT_MOBILITY_NAME("&6Mobility"),
+		KIT_BUILDER_NAME("&6Builder"),
+		KIT_DESTROYER_NAME("&6Destroyer"),
+		KIT_ARMORED_SHEEP_NAME("&6Armored sheep"),
+		KIT_MORE_SHEEP_NAME("&6More sheeps"),
+		KIT_ICON_NAME_FORMAT("%KIT_NAME% %LEVEL_NAME%"),
+		KIT_RANDOM_NAME("&6Random"),
+		KIT_NULL_NAME("&6None"),
+		KIT_MORE_SHEEP_DESCRIPTION("&b+15% &7to receive one more sheep"),
+		KIT_BETTER_BOW_DESCRIPTION("&b+20%&7 chance to punch\n&b+10% &7chance to critical"),
+		KIT_MORE_HEALTH_DESCRIPTION("&7Increases health by &b2 &7hearts"),
+		KIT_BETTER_SWORD_DESCRIPTION("&b+5% &7chance to critical"),
+		KIT_MOBILITY_DESCRIPTION("&7Swiftness &bI\n&7Feather falling &bI"),
+		KIT_BUILDER_DESCRIPTION("&bx5 &7anvil\n&bx5 &7bricks\n&bx5 &7sand blocks"),
+		KIT_DESTROYER_DESCRIPTION("&bx3 &7TNT blocks\n&b+5% &7chance to throw fire arrows"),
+		KIT_ARMORED_SHEEP_DESCRIPTION("&7Sheeps health increased by &b+50%"),
+		KIT_RANDOM_DESCRIPTION("&7Choose a kit randomly from those you have."),
+		KIT_NULL_DESCRIPTION("&7Do nothing."),
+		KIT_INVENTORY_NAME("Kit: &6%KIT_NAME% &e%LEVEL_NAME%"),
 		KIT_AVAILABLE("&aYou can use it !"),
-		KIT_NOT_UNLOCKED_MESSAGE("&cYou don't have this kit."),
-		KIT_BOUGHT("&aYou have successfully bought this kit !"),
-		KIT_CANT_BUY("&aYou can't buy this kit."),
-		KIT_LORE_BUY_IT("&7Price: &e%COST%\n&eRight-click &7to buy this kit."),
-		KIT_LORE_TOO_EXPENSIVE("&7&mPrice: &e&m%COST%\n&cYou can't buy this kit.\n&cYou need &e%NEEDED% more."),
-		KIT_LORE_NOT_PERMISSION("&cYou have not the permission\n&crequired to use this kit."),
-		KIT_LORE_NEED_WINS("&cYou need &e%VICTORIES% &cvictory more\n&cto use this kit."),
+		KIT_NOT_UNLOCKED_MESSAGE("&cYou don't have unlocked this %KIT_OR_LEVEL% yet."),
+		KIT_BOUGHT("&aYou have successfully unlocked this %KIT_OR_LEVEL% !"),
+		KIT_CANT_BUY("&aYou can't buy this %KIT_OR_LEVEL%."),
+		KIT_LORE_BUY_IT("&7Price: &e%COST%\n&eRight-click &7to buy this %KIT_OR_LEVEL%."),
+		KIT_LORE_TOO_EXPENSIVE("&7&mPrice: &e&m%COST%\n&cYou can't buy this %KIT_OR_LEVEL%.\n&cYou need &e%NEEDED% more."),
+		KIT_LORE_NOT_PERMISSION("&cYou have not the permission\n&crequired to use this %KIT_OR_LEVEL%."),
+		KIT_LORE_NEED_WINS("&cYou need &e%VICTORIES% &cvictory more\n&cto use this %KIT_OR_LEVEL%."),
+		KIT_NEXT_LEVEL_INCLUDES("&aNext level includes :"),
+		KIT_LEFT_CLICK_TO_SELECT("&eLeft-click &7to select this %KIT_OR_LEVEL%"),
+		KIT_LEVEL_DEFAULT_NAME("&e%LEVEL_ID%"),
 		SHEEP_GET_DOWN("Sneak to exit the sheep"),
 		BOARDING_SHEEP_NAME("&fBoarding sheep"),
 		DARK_SHEEP_NAME("&8Dark sheep"),

@@ -26,10 +26,10 @@ import fr.asynchronous.sheepwars.core.handler.InventoryOrganizer;
 import fr.asynchronous.sheepwars.core.handler.ItemBuilder;
 import fr.asynchronous.sheepwars.core.handler.Sounds;
 import fr.asynchronous.sheepwars.core.kit.NoneKit;
-import fr.asynchronous.sheepwars.core.kit.RandomKit;
 import fr.asynchronous.sheepwars.core.manager.ConfigManager;
 import fr.asynchronous.sheepwars.core.manager.ConfigManager.Field;
 import fr.asynchronous.sheepwars.core.manager.KitManager;
+import fr.asynchronous.sheepwars.core.manager.KitManager.KitLevel;
 import fr.asynchronous.sheepwars.core.manager.KitManager.KitResult;
 import fr.asynchronous.sheepwars.core.message.Message;
 import fr.asynchronous.sheepwars.core.message.Message.MsgEnum;
@@ -50,7 +50,7 @@ public class KitsInventory extends GuiScreen {
 		decorateBorders();
 		drawKitsScreen();
 	}
-	
+
 	public void clearScreen() {
 		for (int i : InventoryOrganizer.EdgeMode.NO_EDGE.getSlots())
 			setItem(new ItemStack(Material.AIR), i);
@@ -60,31 +60,81 @@ public class KitsInventory extends GuiScreen {
 		clearScreen();
 		LinkedList<ItemStack> items = new LinkedList<>();
 		for (KitManager kit : KitManager.getAvailableKits()) {
-			ItemBuilder itemBuilder = kit.getIcon().setName(kit.getName(this.player)).setLore(kit.getDescription(this.player).split("\n"));
-			if (kit != new RandomKit() && kit != new NoneKit()) {
-				List<KitResult> results = kit.canUseKit(this.player, this.plugin);
-				for (KitResult result : results) {
+			ItemBuilder itemBuilder = kit.getIcon();
+			String itemName = this.playerData.getLanguage().getMessage(MsgEnum.KIT_ICON_NAME_FORMAT).replaceAll("%KIT_NAME%", kit.getName(this.playerData.getLanguage()));
+			if (!kit.isFreeKit()) {
+
+				KitLevel current = kit.getLevel(this.player);
+				KitLevel next = null;
+				if (this.playerData.hasKit(kit)) {
+
+					itemBuilder.setLore(current.getDescription(this.playerData.getLanguage()).split("\n"));
 					itemBuilder.addLoreLine("");
-					switch (result) {
-						case FAILURE_NOT_ALLOWED :
-							itemBuilder.addLoreLine(Message.getMessage(this.player, MsgEnum.KIT_LORE_NOT_PERMISSION).replaceAll("%PERMISSION%", kit.getPermission()).split("\n"));
-							break;
-						case FAILURE_NOT_ENOUGH_WINS :
-							itemBuilder.addLoreLine(Message.getMessage(this.player, MsgEnum.KIT_LORE_NEED_WINS).replaceAll("%VICTORIES%", Integer.toString(kit.getRequiredWins() - playerData.getWins())).split("\n"));
-							break;
-						case FAILURE_NOT_PURCHASED :
-							itemBuilder.addLoreLine(Message.getMessage(this.player, MsgEnum.KIT_LORE_BUY_IT).replaceAll("%COST%", Double.toString(kit.getPrice())).split("\n"));
-							break;
-						case FAILURE_TOO_EXPENSIVE :
-							Double diff = (kit.getPrice() - this.plugin.getEconomyProvider().getBalance(this.player));
-							itemBuilder.addLoreLine(Message.getMessage(this.player, MsgEnum.KIT_LORE_TOO_EXPENSIVE).replaceAll("%NEEDED%", Double.toString(diff)).replaceAll("%COST%", Double.toString(kit.getPrice())).split("\n"));
-							break;
-						case SUCCESS :
-							itemBuilder.addLoreLine(Message.getMessage(this.player, MsgEnum.KIT_AVAILABLE));
-							break;
+
+					if (kit.hasLevel(current.getId() + 1)) {
+						itemBuilder.addLoreLine(this.playerData.getLanguage().getMessage(MsgEnum.KIT_LEFT_CLICK_TO_SELECT).replaceAll("%KIT_OR_LEVEL%", this.playerData.getLanguage().getMessage(MsgEnum.LEVEL)));
+						next = kit.getLevel(current.getId() + 1);
+						itemBuilder.addLoreLine("");
+						itemBuilder.addLoreLine(this.playerData.getLanguage().getMessage(MsgEnum.KIT_NEXT_LEVEL_INCLUDES));
+						itemBuilder.addLoreLine(next.getDescription(this.playerData.getLanguage()).split("\n"));
+						itemBuilder.addLoreLine("");
+					} else {
+						itemBuilder.addLoreLine(this.playerData.getLanguage().getMessage(MsgEnum.KIT_LEFT_CLICK_TO_SELECT).replaceAll("%KIT_OR_LEVEL%", this.playerData.getLanguage().getMessage(MsgEnum.KIT)));
+					}
+					
+					if (kit.getLevels().size() > 1) {
+						itemName = itemName.replaceAll("%LEVEL_NAME%", current.getName(this.playerData.getLanguage()));
+					} else {
+						itemName = itemName.replaceAll("%LEVEL_NAME%", "");
+					}
+					
+				} else {
+					next = kit.getLevel(0);
+					itemBuilder.setLore(next.getDescription(this.playerData.getLanguage()).split("\n"));
+					itemBuilder.addLoreLine("");
+					
+					if (kit.getLevels().size() > 1) {
+						itemName = itemName.replaceAll("%LEVEL_NAME%", next.getName(this.playerData.getLanguage()));
+					} else {
+						itemName = itemName.replaceAll("%LEVEL_NAME%", "");
 					}
 				}
+				
+				if (next != null) {
+					String kitOrLevel = this.playerData.getLanguage().getMessage(MsgEnum.KIT);
+					if (kit.getLevels().size() > 1)
+						kitOrLevel = this.playerData.getLanguage().getMessage(MsgEnum.LEVEL);
+					List<KitResult> results = next.canUseLevel(this.player);
+					for (KitResult result : results) {
+						switch (result) {
+							case FAILURE_NOT_ALLOWED :
+								itemBuilder.addLoreLine(Message.getMessage(this.player, MsgEnum.KIT_LORE_NOT_PERMISSION).replaceAll("%PERMISSION%", next.getPermission()).replaceAll("%KIT_OR_LEVEL%", kitOrLevel).split("\n"));
+								break;
+							case FAILURE_NOT_ENOUGH_WINS :
+								itemBuilder.addLoreLine(Message.getMessage(this.player, MsgEnum.KIT_LORE_NEED_WINS).replaceAll("%VICTORIES%", Integer.toString(next.getRequiredWins() - this.playerData.getWins())).replaceAll("%KIT_OR_LEVEL%", kitOrLevel).split("\n"));
+								break;
+							case FAILURE_NEXT_LEVEL_NOT_PURCHASED :
+								itemBuilder.addLoreLine(Message.getMessage(this.player, MsgEnum.KIT_LORE_BUY_IT).replaceAll("%COST%", Double.toString(next.getPrice())).replaceAll("%KIT_OR_LEVEL%", kitOrLevel).split("\n"));
+								break;
+							case FAILURE_NEXT_LEVEL_TOO_EXPENSIVE :
+								Double diff = (next.getPrice() - UltimateSheepWarsPlugin.getEconomyProvider().getBalance(this.player));
+								itemBuilder.addLoreLine(Message.getMessage(this.player, MsgEnum.KIT_LORE_TOO_EXPENSIVE).replaceAll("%NEEDED%", Double.toString(diff)).replaceAll("%COST%", Double.toString(next.getPrice())).replaceAll("%KIT_OR_LEVEL%", kitOrLevel).split("\n"));
+								break;
+							case ALREADY_OWNED :
+								// This case is not supposed to happen.
+								itemBuilder.addLoreLine(Message.getMessage(this.player, MsgEnum.KIT_AVAILABLE));
+								break;
+						}
+					}
+				}
+			} else {
+				itemName = itemName.replaceAll("%LEVEL_NAME%", "");
+				itemBuilder.setLore(kit.getLevel(0).getDescription(this.playerData.getLanguage()));
+				itemBuilder.addLoreLine("");
+				itemBuilder.addLoreLine(this.playerData.getLanguage().getMessage(MsgEnum.KIT_LEFT_CLICK_TO_SELECT).replaceAll("%KIT_OR_LEVEL%", this.playerData.getLanguage().getMessage(MsgEnum.KIT)));
 			}
+			itemBuilder.setName(itemName);
+
 			if (this.playerData.getKit().getId() == kit.getId()) {
 				itemBuilder.addIllegallyGlow();
 			} else {
@@ -92,7 +142,7 @@ public class KitsInventory extends GuiScreen {
 			}
 			items.add(itemBuilder.toItemStack());
 		}
-		
+
 		new InventoryOrganizer(this.inventory).organize(items, this.plugin);
 
 		ItemStack item;
@@ -102,7 +152,7 @@ public class KitsInventory extends GuiScreen {
 		} else {
 			item = new ItemBuilder(Material.SKULL_ITEM, 1, (byte) SkullType.PLAYER.ordinal()).setSkullOwner(player.getName()).setName(this.playerData.getLanguage().getMessage(MsgEnum.DATABASE_NOT_CONNECTED)).toItemStack();
 		}
-		
+
 		setItem(item, (items.size() >= 23 ? 4 : 49));
 	}
 
@@ -134,7 +184,7 @@ public class KitsInventory extends GuiScreen {
 		final PlayerData playerData = PlayerData.getPlayerData(clicker);
 
 		if (item != null && item.getItemMeta() != null && item.getItemMeta().hasDisplayName()) {
-				
+
 			if (item.getItemMeta().getDisplayName().startsWith(ChatColor.GOLD + "Stats : ") && DataManager.isConnected()) {
 				if (this.kitScreen) {
 					drawRankingScreen();
@@ -146,50 +196,56 @@ public class KitsInventory extends GuiScreen {
 			} else if (!item.getItemMeta().getDisplayName().contains("✖") && (event.getSlot() != 49 || event.getSlot() != 4) && this.kitScreen) {
 				KitManager kit = new NoneKit();
 				for (KitManager k : KitManager.getAvailableKits()) {
-					if (k.getName(clicker).equals(item.getItemMeta().getDisplayName())) {
+					if (item.getItemMeta().getDisplayName().contains(k.getName(clicker))) {
 						kit = k;
 						break;
 					}
 				}
-				if (!kit.isKit(new RandomKit().getId()) && !kit.isKit(new NoneKit().getId())) {
+				if (!kit.isFreeKit()) {
 					boolean shopclick = false;
 					if (event.getClick() == ClickType.RIGHT && ConfigManager.getBoolean(Field.ENABLE_INGAME_SHOP))
 						shopclick = true;
-					if (shopclick) {
-						if (!clicker.hasPermission(kit.getPermission())) {
-							if (this.plugin.getEconomyProvider().getBalance(clicker) >= kit.getPrice()) {
-								this.plugin.getEconomyProvider().withdrawPlayer(clicker, kit.getPrice());
-								this.plugin.givePermission(clicker, kit.getPermission());
+					String kitOrLevel = this.playerData.getLanguage().getMessage(MsgEnum.KIT);
+					if (kit.getLevels().size() > 1)
+						kitOrLevel = this.playerData.getLanguage().getMessage(MsgEnum.LEVEL);
+					if (shopclick && kit.hasLevel(this.playerData.getKitLevel(kit) + 1)) {
+						KitLevel wanted = kit.getLevel(this.playerData.getKitLevel(kit) + 1);
+						if (!clicker.hasPermission(wanted.getPermission())) {
+							if (UltimateSheepWarsPlugin.getEconomyProvider().getBalance(clicker) >= wanted.getPrice()) {
+								UltimateSheepWarsPlugin.getEconomyProvider().withdrawPlayer(clicker, wanted.getPrice());
+								this.plugin.givePermission(clicker, wanted.getPermission());
 								Sounds.playSound(clicker, clicker.getLocation(), Sounds.LEVEL_UP, 1f, 1f);
 								FireworkEffect effect = FireworkEffect.builder().withFlicker().with(Type.BALL).withColor(Color.YELLOW).withFade(Color.ORANGE).build();
 								UltimateSheepWarsPlugin.getVersionManager().getCustomEntities().spawnInstantExplodingFirework(clicker.getLocation().add(0, 1, 0), effect, new ArrayList<>(Arrays.asList(clicker)));
-								playerData.setKit(kit);
+								clicker.sendMessage(Message.getMessage(clicker, MsgEnum.KIT_BOUGHT).replaceAll("%KIT_OR_LEVEL%", kitOrLevel));
+								playerData.setKit(kit, wanted.getId());
 							} else {
 								Sounds.playSound(clicker, clicker.getLocation(), Sounds.VILLAGER_NO, 1f, 1f);
 							}
 						} else {
-							this.playerData.setKit(kit);
+							playerData.setKit(kit, wanted.getId());
 						}
 					} else {
-						if (kit.canUseKit(clicker, this.plugin).contains(KitResult.SUCCESS)) {
-							this.playerData.setKit(kit);
+						int currLevel = this.playerData.getKitLevel(kit);
+						if (kit.hasLevel(currLevel) && kit.getLevel(currLevel).canUseLevel(clicker).contains(KitResult.ALREADY_OWNED)) {
+							playerData.setKit(kit, currLevel);
 						} else {
-							clicker.sendMessage(ConfigManager.getString(Field.PREFIX) + ChatColor.GRAY + Message.getMessage(clicker, MsgEnum.KIT_NOT_UNLOCKED_MESSAGE));
+							clicker.sendMessage(ChatColor.GRAY + Message.getMessage(clicker, MsgEnum.KIT_NOT_UNLOCKED_MESSAGE).replaceAll("%KIT_OR_LEVEL%", kitOrLevel));
 						}
 					}
 				} else {
-					this.playerData.setKit(kit);
+					this.playerData.setKit(kit, 0);
 				}
 				clicker.closeInventory();
 			}
 		}
 		event.setCancelled(true);
 	}
-	
+
 	public void decorateBorders() {
 		ItemStack itemStack = new ItemBuilder(Material.STAINED_GLASS_PANE, 1, (byte) (this.playerData.hasTeam() ? this.playerData.getTeam().getDyeColor().ordinal() : DyeColor.WHITE.ordinal())).setName(ChatColor.DARK_GRAY + "✖").toItemStack();
 		List<Integer> decorationSlots = Arrays.asList(36, 27, 18, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 17, 26, 35, 44, 45, 53);
 		for (int i : decorationSlots)
-        	setItem(itemStack, i);
+			setItem(itemStack, i);
 	}
 }

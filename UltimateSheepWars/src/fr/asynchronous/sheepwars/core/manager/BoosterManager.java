@@ -37,28 +37,47 @@ public abstract class BoosterManager implements Listener {
 	 * Initialize a new Booster !
 	 * 
 	 * @param name Display name of this booster.
-	 * @param displayColor Display color of this booster.
+	 * @param displayColor Display color of this booster (wool color will be the same).
 	 * @param duration Duration of this booster (0 for instant booster such as instant potion effect).
 	 */
 	public BoosterManager(final String name, final DisplayColor displayColor, final int duration) {
-		this(new Message(name), name, displayColor, duration);
+		this(name, displayColor, displayColor.getColor(), duration);
+	}
+	
+	/**
+	 * Initialize a new Booster !
+	 * 
+	 * @param name Display name of this booster.
+	 * @param displayColor Display color of this booster (boss bar and chat color).
+	 * @param woolColor Wool color of this booster.
+	 * @param duration Duration of this booster (0 for instant booster such as instant potion effect).
+	 */
+	public BoosterManager(final String name, final DisplayColor displayColor, DyeColor woolColor, final int duration) {
+		this(new Message(name), name, displayColor, woolColor, duration);
 	}
 	
 	/**
 	 * Use {@link #BoosterManager(String, DisplayColor, int) this constructor} instead.
 	 */
 	public BoosterManager(final MsgEnum name, final DisplayColor displayColor, final int duration) {
-		this(Message.getMessage(name), name.toString().replaceAll("BOOSTER_", ""), displayColor, duration);
+		this(name, displayColor, displayColor.getColor(), duration);
 	}
 	
 	/**
 	 * Use {@link #BoosterManager(String, DisplayColor, int) this constructor} instead.
 	 */
-	public BoosterManager(final Message name, final String configPath, final DisplayColor displayColor, final int duration) {
+	public BoosterManager(final MsgEnum name, final DisplayColor displayColor, DyeColor woolColor, final int duration) {
+		this(Message.getMessage(name), name.toString().replaceAll("BOOSTER_", ""), displayColor, woolColor, duration);
+	}
+	
+	/**
+	 * Use {@link #BoosterManager(String, DisplayColor, int) this constructor} instead.
+	 */
+	public BoosterManager(final Message name, final String configPath, final DisplayColor displayColor, DyeColor woolColor, final int duration) {
 		this.name = name;
 		this.configPath = "booster." + configPath.replaceAll("_", "-").toLowerCase();
 		this.displayColor = displayColor;
-		this.woolColor = displayColor.getColor();
+		this.woolColor = woolColor;
 		this.duration = duration;
 	}
 	

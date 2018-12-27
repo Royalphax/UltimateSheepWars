@@ -23,7 +23,6 @@ import fr.asynchronous.sheepwars.core.handler.InteractiveType;
 import fr.asynchronous.sheepwars.core.handler.ItemBuilder;
 import fr.asynchronous.sheepwars.core.handler.Particles.ParticleEffect;
 import fr.asynchronous.sheepwars.core.handler.Permissions;
-import fr.asynchronous.sheepwars.core.kit.NoneKit;
 import fr.asynchronous.sheepwars.core.manager.ConfigManager;
 import fr.asynchronous.sheepwars.core.manager.ConfigManager.Field;
 import fr.asynchronous.sheepwars.core.manager.TeamManager;
@@ -132,8 +131,8 @@ public class PlayerJoin extends UltimateSheepWarsEventListener {
 						cancel();
 						if (DataManager.isConnected()) {
 							sendAction(player, data.getLanguage().getMessage(MsgEnum.USER_DATA_LOADED));
-							if (data.getKit().getId() != new NoneKit().getId())
-								player.sendMessage(data.getLanguage().getMessage(MsgEnum.KIT_LAST_SELECTED).replace("%KIT%", data.getKit().getName(player)));
+							//if (data.getKit().getId() != new NoneKit().getId())
+							//	player.sendMessage(data.getLanguage().getMessage(MsgEnum.KIT_LAST_SELECTED).replace("%KIT%", data.getKit().getName(player)));
 						} else {
 							sendAction(player, data.getLanguage().getMessage(MsgEnum.DATABASE_NOT_CONNECTED));
 						}

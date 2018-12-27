@@ -8,14 +8,14 @@ import org.bukkit.event.HandlerList;
 
 import fr.asynchronous.sheepwars.core.manager.TeamManager;
 
+/**
+ * Event triggered when the game starts.
+ */
 public class GameEndEvent extends Event {
 
 	private static final HandlerList handlers = new HandlerList();
 	private TeamManager winnerTeam;
 	
-	/**
-	 * Event triggered when the game starts.
-	 */
 	public GameEndEvent(TeamManager winnerTeam) {
 		this.winnerTeam = winnerTeam;
 	}

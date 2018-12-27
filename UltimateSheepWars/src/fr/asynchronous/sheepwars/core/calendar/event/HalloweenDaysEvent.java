@@ -14,7 +14,6 @@ import fr.asynchronous.sheepwars.core.calendar.CalendarEvent;
 import fr.asynchronous.sheepwars.core.handler.Sounds;
 import fr.asynchronous.sheepwars.core.manager.ConfigManager;
 import fr.asynchronous.sheepwars.core.manager.ConfigManager.Field;
-import net.md_5.bungee.api.ChatColor;
 
 public class HalloweenDaysEvent extends CalendarEvent {
 
@@ -55,7 +54,7 @@ public class HalloweenDaysEvent extends CalendarEvent {
 	@EventHandler(priority = EventPriority.HIGH)
 	public void onJoin(PlayerJoinEvent event) {
 		Player player = event.getPlayer();
-		player.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + "Happy Halloween " + ChatColor.YELLOW + ChatColor.BOLD + player.getName() + ChatColor.GOLD + ChatColor.BOLD + " !");
+		//player.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + "Happy Halloween " + ChatColor.YELLOW + ChatColor.BOLD + player.getName() + ChatColor.GOLD + ChatColor.BOLD + " !");
 		Sounds.playSound(player, null, Sounds.AMBIENCE_CAVE, 1.0f, 0.0f);
 	}
 }

@@ -77,11 +77,17 @@ public class PlayerInteract extends UltimateSheepWarsEventListener
         			Message.sendMessage(player, MsgEnum.PLAYER_CANT_LAUNCH_SHEEP);
         		}
         		event.setCancelled(true);
+        		
         	} else if (GameState.isStep(GameState.WAITING)) {
         		
         		if (mat.equals(ConfigManager.getItemStack(Field.KIT_ITEM).getType())) {
         			
-                    String inventoryName = data.getLanguage().getMessage(MsgEnum.KIT_INVENTORY_NAME).replaceAll("%KIT%", data.getKit().getName(player));
+                    String inventoryName = data.getLanguage().getMessage(MsgEnum.KIT_INVENTORY_NAME).replaceAll("%KIT_NAME%", data.getKit().getName(player));
+                    if (data.getKit().getLevels().size() > 1 && data.getKitLevel() >= 0) {
+                    	inventoryName = inventoryName.replaceAll("%LEVEL_NAME%", data.getKit().getLevel(data.getKitLevel()).getName(data.getLanguage()));
+                    } else {
+                    	inventoryName = inventoryName.replaceAll("%LEVEL_NAME%", "");
+                    }
                     if (inventoryName.length() > 32)
                     	inventoryName = inventoryName.substring(0, 32);
                     GuiManager.openGui(this.plugin, player, inventoryName, GuiManager.getKitsInventoryNewInstance());

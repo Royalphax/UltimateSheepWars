@@ -24,9 +24,11 @@ import fr.asynchronous.sheepwars.core.manager.BoosterManager;
 import fr.asynchronous.sheepwars.core.manager.ConfigManager;
 import fr.asynchronous.sheepwars.core.manager.ConfigManager.Field;
 import fr.asynchronous.sheepwars.core.manager.KitManager;
+import fr.asynchronous.sheepwars.core.manager.KitManager.KitLevel;
 import fr.asynchronous.sheepwars.core.manager.SheepManager;
 import fr.asynchronous.sheepwars.core.manager.TeamManager;
 import fr.asynchronous.sheepwars.core.manager.URLManager;
+import fr.asynchronous.sheepwars.core.message.Language;
 import fr.asynchronous.sheepwars.core.message.Message;
 import fr.asynchronous.sheepwars.core.task.BeginCountdown;
 import fr.asynchronous.sheepwars.core.util.Utils;
@@ -153,6 +155,11 @@ public class MainCommand implements CommandExecutor {
 				player.sendMessage("Pending tasks: " + Bukkit.getScheduler().getPendingTasks().size());
 				player.sendMessage("Particle players: " + PlayerData.getParticlePlayers().size());
 				player.sendMessage("Players data: " + PlayerData.getData().size());
+				PlayerData data = PlayerData.getPlayerData(player);
+				for (KitManager kit : data.getKits()) {
+					player.sendMessage("- " + kit.getName(data.getLanguage()));
+					player.sendMessage("  - Level : " + data.getKitLevel(kit));
+				}
 
 			} else if (sub.equalsIgnoreCase("sheeps")) {
 
@@ -203,11 +210,16 @@ public class MainCommand implements CommandExecutor {
 						if (k.getId() == i)
 							kit = k;
 					player.sendMessage("∙ " + ChatColor.GRAY + kit.getName(player) + ChatColor.GRAY + " (Id " + ChatColor.YELLOW + kit.getId() + ChatColor.GRAY + ")");
-					player.sendMessage("  ∙ " + ChatColor.GRAY + "Required wins : " + ChatColor.YELLOW + kit.getRequiredWins());
-					player.sendMessage("  ∙ " + ChatColor.GRAY + "Permission : " + ChatColor.YELLOW + kit.getPermission());
-					player.sendMessage("  ∙ " + ChatColor.GRAY + "Price : " + ChatColor.YELLOW + kit.getPrice());
 					player.sendMessage("  ∙ " + ChatColor.GRAY + "Icon : " + ChatColor.YELLOW + kit.getIcon().toItemStack().getType().toString().replaceAll("_", " "));
-					player.sendMessage("  ∙ " + ChatColor.GRAY + "Description : " + ChatColor.YELLOW + kit.getDescription(player));
+					final Language lang = PlayerData.getPlayerData(player).getLanguage();
+					for (KitLevel level : kit.getLevels()) {
+						player.sendMessage("  ∙ " + ChatColor.GOLD + "Level " + ChatColor.YELLOW + level.getId());
+						player.sendMessage("    ∙ " + ChatColor.GRAY + "Required wins : " + ChatColor.YELLOW + level.getRequiredWins());
+						player.sendMessage("    ∙ " + ChatColor.GRAY + "Permission : " + ChatColor.YELLOW + level.getPermission());
+						player.sendMessage("    ∙ " + ChatColor.GRAY + "Price : " + ChatColor.YELLOW + level.getPrice());
+						player.sendMessage("    ∙ " + ChatColor.GRAY + "Name : " + ChatColor.YELLOW + level.getName(lang));
+						player.sendMessage("    ∙ " + ChatColor.GRAY + "Description : " + ChatColor.YELLOW + level.getDescription(lang).replaceAll("\n", "⏎"));
+					}
 				} else {
 					player.sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + "Loaded Kits :");
 					for (KitManager kit : KitManager.getAvailableKits()) {
@@ -256,8 +268,7 @@ public class MainCommand implements CommandExecutor {
 							for (Player online : player.getWorld().getPlayers())
 								if (!PlayerData.getPlayerData(online).isSpectator() && !players.contains(online))
 									players.add(online);
-						}
-						else if (Bukkit.getPlayer(args[1]) != null) {
+						} else if (Bukkit.getPlayer(args[1]) != null) {
 							if (!Permissions.USW_GIVE_OTHER.hasPermission(player, true))
 								return true;
 							players.clear();
@@ -280,7 +291,7 @@ public class MainCommand implements CommandExecutor {
 									continue;
 								}
 							}
-							
+
 							List<SheepManager> availableSheeps = SheepManager.getAvailableSheeps();
 							for (int i : sheepsId)
 								sheeps.add(availableSheeps.get(i));
@@ -299,12 +310,12 @@ public class MainCommand implements CommandExecutor {
 
 					if (players.size() == 1 && players.contains(player) && !Permissions.USW_GIVE_SELF.hasPermission(player, true))
 						return true;
-					
+
 					if (sheeps.isEmpty()) {
 						player.sendMessage(ChatColor.RED + "No sheep has been given (check the syntax of your command).");
 						return true;
 					}
-					
+
 					for (Player people : players) {
 						int amount = 64;
 						for (int i = 0; i < sheeps.size(); i++) {

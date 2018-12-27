@@ -12,18 +12,27 @@ import fr.asynchronous.sheepwars.core.util.RandomUtils;
 public class RandomKit extends KitManager {
 
 	public RandomKit() {
-		super(9, MsgEnum.KIT_RANDOM_NAME, MsgEnum.KIT_RANDOM_DESCRIPTION, "", 0, 0, new ItemBuilder(Material.SKULL_ITEM).setSkullTexture("http://textures.minecraft.net/texture/797955462e4e576664499ac4a1c572f6143f19ad2d6194776198f8d136fdb2"));
+		super(9, MsgEnum.KIT_RANDOM_NAME, true, new ItemBuilder(Material.SKULL_ITEM).setSkullTexture("http://textures.minecraft.net/texture/797955462e4e576664499ac4a1c572f6143f19ad2d6194776198f8d136fdb2"), new RandomKitLevel());
 	}
 
-	@Override
-	public boolean onEquip(Player player) {
-		final PlayerData data = PlayerData.getPlayerData(player);
-		if (data.getKits().isEmpty()) {
-			data.setKit(new NoneKit());
-		} else {
-			KitManager kit = RandomUtils.getRandom(data.getKits());
-			data.setKit(kit);
+	public static class RandomKitLevel extends KitLevel {
+
+		public RandomKitLevel() {
+			super(MsgEnum.KIT_RANDOM_DESCRIPTION, "", 0, 0);
 		}
-		return data.getKit().onEquip(player);
+
+		@Override
+		public boolean onEquip(Player player) {
+			final PlayerData data = PlayerData.getPlayerData(player);
+			KitManager kit;
+			if (data.getKits().isEmpty()) {
+				kit = new NoneKit();
+				data.setKit(kit, 0);
+			} else {
+				kit = RandomUtils.getRandom(data.getKits());
+				data.setKit(kit, data.getKitLevel(kit));
+			}
+			return kit.getLevel(data.getKitLevel()).onEquip(player);
+		}
 	}
 }

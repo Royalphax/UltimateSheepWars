@@ -16,22 +16,29 @@ import fr.asynchronous.sheepwars.core.util.RandomUtils;
 public class MoreSheepKit extends KitManager {
 
 	public static final Integer PERCENT_TO_GET_ONE_MORE_SHEEP = 15;
-	
+
 	public MoreSheepKit() {
-		super(7, MsgEnum.KIT_MORE_SHEEP_NAME, MsgEnum.KIT_MORE_SHEEP_DESCRIPTION, "sheepwars.kit.moresheep", 10, 10, new ItemBuilder(Material.WOOL));
+		super(7, MsgEnum.KIT_MORE_SHEEP_NAME, new ItemBuilder(Material.WOOL), new MoreSheepKitLevel());
 	}
 
-	@Override
-	public boolean onEquip(Player player) {
-		return true;
-	}
+	public static class MoreSheepKitLevel extends KitLevel {
 
-	@EventHandler
-	public void onGiveSheep(SheepGiveEvent event) {
-		final PlayerData data = PlayerData.getPlayerData(event.getPlayer());
-		if (data.getKit().getId() == this.getId() && RandomUtils.getRandomByPercent(PERCENT_TO_GET_ONE_MORE_SHEEP)) {
-			SheepManager.giveRandomSheep(event.getPlayer());
-			Sounds.playSound(event.getPlayer(), Sounds.VILLAGER_YES, 1.0f, 1.5f);
+		public MoreSheepKitLevel() {
+			super(MsgEnum.KIT_MORE_SHEEP_DESCRIPTION, "sheepwars.kit.moresheep", 10, 10);
+		}
+
+		@Override
+		public boolean onEquip(Player player) {
+			return true;
+		}
+
+		@EventHandler
+		public void onGiveSheep(SheepGiveEvent event) {
+			final PlayerData data = PlayerData.getPlayerData(event.getPlayer());
+			if (data.getKit().getId() == this.getId() && RandomUtils.getRandomByPercent(PERCENT_TO_GET_ONE_MORE_SHEEP)) {
+				SheepManager.giveRandomSheep(event.getPlayer());
+				Sounds.playSound(event.getPlayer(), Sounds.VILLAGER_YES, 1.0f, 1.5f);
+			}
 		}
 	}
 }

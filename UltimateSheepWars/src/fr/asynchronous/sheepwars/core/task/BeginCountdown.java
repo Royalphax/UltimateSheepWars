@@ -1,6 +1,8 @@
 package fr.asynchronous.sheepwars.core.task;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -25,6 +27,7 @@ import fr.asynchronous.sheepwars.core.kit.MoreHealthKit;
 import fr.asynchronous.sheepwars.core.manager.ConfigManager;
 import fr.asynchronous.sheepwars.core.manager.ConfigManager.Field;
 import fr.asynchronous.sheepwars.core.manager.KitManager;
+import fr.asynchronous.sheepwars.core.manager.KitManager.KitLevel;
 import fr.asynchronous.sheepwars.core.manager.TeamManager;
 import fr.asynchronous.sheepwars.core.message.Language;
 import fr.asynchronous.sheepwars.core.message.Message;
@@ -77,6 +80,7 @@ public class BeginCountdown extends BukkitRunnable {
 					board.registerNewObjective("kills", "playerKillCount").setDisplaySlot(DisplaySlot.PLAYER_LIST);
 				}
 				boolean shakeup = TeamManager.checkTeams();
+				List<KitLevel> alreadyRegistred = new ArrayList<>();
 				for (Player player : Bukkit.getOnlinePlayers()) {
 					PlayerData data = PlayerData.getPlayerData(player);
 					if (!data.hasTeam() && !shakeup)
@@ -85,7 +89,12 @@ public class BeginCountdown extends BukkitRunnable {
 					final TeamManager team = data.getTeam();
 					final Color color = team.getLeatherColor();
 					final KitManager kit = data.getKit();
-					boolean equipBasics = kit.onEquip(player);
+					final KitLevel level = kit.getLevel(data.getKitLevel());
+					if (!alreadyRegistred.contains(level)) {
+						alreadyRegistred.add(level);
+						Bukkit.getPluginManager().registerEvents(level, this.plugin);
+					}
+					boolean equipBasics = level.onEquip(player);
 					if (equipBasics) {
 						player.getInventory().setHelmet(new ItemBuilder(Material.LEATHER_HELMET).setLeatherArmorColor(color).addEnchant(Enchantment.PROTECTION_PROJECTILE, 2).setUnbreakable().toItemStack());
 						player.getInventory().setChestplate(new ItemBuilder(Material.LEATHER_CHESTPLATE).setLeatherArmorColor(color).addEnchant(Enchantment.PROTECTION_PROJECTILE, 2).setUnbreakable().toItemStack());

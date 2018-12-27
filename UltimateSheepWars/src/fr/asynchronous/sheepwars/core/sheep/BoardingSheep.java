@@ -30,7 +30,7 @@ public class BoardingSheep extends SheepManager
 		return (bukkitSheep.getPassenger() == null);
 	}
 
-	@Override 
+	@Override
 	public void onFinish(Player player, Sheep bukkitSheep, boolean bool, Plugin plugin) {
 		// Do nothing
 	}

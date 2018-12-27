@@ -6,6 +6,9 @@ import org.bukkit.event.HandlerList;
 
 import fr.asynchronous.sheepwars.core.manager.SheepManager;
 
+/**
+ * Event triggered when a sheep will be given to a player.
+ */
 public class SheepGiveEvent extends Event {
 
 	private static final HandlerList handlers = new HandlerList();
@@ -13,9 +16,6 @@ public class SheepGiveEvent extends Event {
 	private final SheepManager sheepClass;
 	private boolean isCancelled = false;
 	
-	/**
-	 * Event triggered when a sheep will be given to a player.
-	 */
 	public SheepGiveEvent(Player player, SheepManager sheepClass) {
 		this.player = player;
 		this.sheepClass = sheepClass;

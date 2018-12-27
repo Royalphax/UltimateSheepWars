@@ -6,29 +6,19 @@ import org.bukkit.event.HandlerList;
 import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
 
 /**
- * Event triggered when the game starts.
+ * Event triggered when the plugin has load all its properties.
  */
-public class GameStartEvent extends Event {
+public class UltimateSheepWarsLoadedEvent extends Event {
 
 	private static final HandlerList handlers = new HandlerList();
-	private boolean cloudNetAPISupport;
 	private UltimateSheepWarsPlugin plugin;
 	
-	public GameStartEvent(UltimateSheepWarsPlugin plugin) {
-		this.cloudNetAPISupport = true;
+	public UltimateSheepWarsLoadedEvent(UltimateSheepWarsPlugin plugin) {
 		this.plugin = plugin;
 	}
 	
 	public UltimateSheepWarsPlugin getGameInstance() {
 		return this.plugin;
-	}
-	
-	public void setCloudNetSupport(boolean enable) {
-		this.cloudNetAPISupport = enable;
-	}
-	
-	public boolean isCloudNetSupportEnable() {
-		return this.cloudNetAPISupport;
 	}
 	
 	@Override

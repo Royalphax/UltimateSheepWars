@@ -78,6 +78,7 @@ import fr.asynchronous.sheepwars.core.event.projectile.ProjectileHit;
 import fr.asynchronous.sheepwars.core.event.projectile.ProjectileLaunch;
 import fr.asynchronous.sheepwars.core.event.server.ServerCommand;
 import fr.asynchronous.sheepwars.core.event.server.ServerListPing;
+import fr.asynchronous.sheepwars.core.event.usw.UltimateSheepWarsLoadedEvent;
 import fr.asynchronous.sheepwars.core.gui.KitsInventory;
 import fr.asynchronous.sheepwars.core.handler.GameState;
 import fr.asynchronous.sheepwars.core.handler.MinecraftVersion;
@@ -146,9 +147,9 @@ public class UltimateSheepWarsPlugin extends JavaPlugin {
     private Boolean vaultInstalled;
     private Boolean leaderHeadsInstalled;
     
-    private Permission permissionProvider;
-    private Economy economyProvider;
-    private Chat chatProvider;
+    private static Permission permissionProvider = null;
+    private static Economy economyProvider = null;
+    private static Chat chatProvider = null;
     
     /** Settings file & config **/
     private FileConfiguration settingsConfig;
@@ -164,9 +165,6 @@ public class UltimateSheepWarsPlugin extends JavaPlugin {
     private World world;
 	
 	public UltimateSheepWarsPlugin() {
-        this.permissionProvider = null;
-        this.economyProvider = null;
-        this.chatProvider = null;
         this.enablePlugin = true;
         this.disableMessage = "";
         this.vaultInstalled = false;
@@ -188,7 +186,7 @@ public class UltimateSheepWarsPlugin extends JavaPlugin {
 		this.getPluginLoader().disablePlugin(this);
 	}
 	
-	public Boolean isSpigotServer(){
+	public Boolean isSpigotServer() {
         try{
             Class.forName("org.bukkit.entity.Player$Spigot");
             return true;
@@ -376,8 +374,8 @@ public class UltimateSheepWarsPlugin extends JavaPlugin {
 		
 		/** Setup Providers **/
 		this.setupProviders();
-        boolean ecop = (this.economyProvider != null);
-        boolean permp = (this.permissionProvider != null);
+        boolean ecop = (economyProvider != null);
+        boolean permp = (permissionProvider != null);
 		
         /** Setup Soft-Depends (LeaderHeads) **/
 		leaderHeadsInstalled = Bukkit.getPluginManager().isPluginEnabled("LeaderHeads");
@@ -444,7 +442,7 @@ public class UltimateSheepWarsPlugin extends JavaPlugin {
         this.world.setKeepSpawnInMemory(true);//Peut faire freeze le load
         this.world.getSpawnLocation().getChunk().load(true);
         
-        /** Setup BungeeCord **/
+        /** Setup BungeeCord **/  
         Bukkit.getMessenger().registerOutgoingPluginChannel((Plugin)this, "BungeeCord");
         
         /** Check for conflict values **/
@@ -457,6 +455,10 @@ public class UltimateSheepWarsPlugin extends JavaPlugin {
         
         /** Init Game **/ 
 		GameState.setCurrentStep(GameState.WAITING);
+		
+		/** Plus qu'a faire l'event **/
+		final UltimateSheepWarsLoadedEvent event = new UltimateSheepWarsLoadedEvent(this);
+		Bukkit.getPluginManager().callEvent(event);
 	}
 	
 	@Override
@@ -555,7 +557,7 @@ public class UltimateSheepWarsPlugin extends JavaPlugin {
 			// Do Nothing
 		}
     }
-
+	
 	@SuppressWarnings("unchecked")
 	private <T> T loadLeaderHeadsModule(String name) throws ReflectiveOperationException {
         return (T) ReflectionUtils.instantiateObject(Class.forName(UltimateSheepWarsPlugin.PACKAGE + ".leaderheads." + name));
@@ -634,15 +636,19 @@ public class UltimateSheepWarsPlugin extends JavaPlugin {
 	}
 	
 	public boolean isChatProviderInstalled() {
-		return (this.chatProvider != null);
+		return (chatProvider != null);
 	}
 	
-	public Chat getChatProvider() {
-		return this.chatProvider;
+	public static Chat getChatProvider() {
+		return chatProvider;
 	}
 	
-	public Economy getEconomyProvider() {
-		return this.economyProvider;
+	public static Economy getEconomyProvider() {
+		return economyProvider;
+	}
+	
+	public static Permission getPermissionProvider() {
+		return permissionProvider;
 	}
 	
 	public void setPreGameTask(BeginCountdown task) {

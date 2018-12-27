@@ -14,7 +14,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
@@ -25,7 +24,6 @@ import fr.asynchronous.sheepwars.core.handler.Particles;
 import fr.asynchronous.sheepwars.core.handler.Sounds;
 import fr.asynchronous.sheepwars.core.util.BlockUtils;
 import fr.asynchronous.sheepwars.core.util.MathUtils;
-import net.md_5.bungee.api.ChatColor;
 
 public class ChristmassMonthEvent extends CalendarEvent {
 
@@ -70,7 +68,7 @@ public class ChristmassMonthEvent extends CalendarEvent {
 				if (ticks > max) {
 					max = rdm.nextInt(30);
 					for (Player online : world.getPlayers())
-						UltimateSheepWarsPlugin.getVersionManager().getParticleFactory().playParticles(online, Particles.FIREWORKS_SPARK, online.getLocation().add(0, 5, 0), range, 0.5f, range, 1, 0f);
+						UltimateSheepWarsPlugin.getVersionManager().getParticleFactory().playParticles(online, Particles.FIREWORKS_SPARK, online.getLocation().add(0, 6.5, 0), range, 0.5f, range, 1, 0f);
 				}
 			}
 		}.runTaskTimer(activatingPlugin, 0, 0);
@@ -87,15 +85,15 @@ public class ChristmassMonthEvent extends CalendarEvent {
 		Player player = event.getPlayer();
 		if (!event.hasItem()) {
 			player.launchProjectile(Snowball.class);
-			Sounds.playSound(player, null, Sounds.NOTE_STICKS, 1.0f, 2.0f);
+			Sounds.playSound(player, null, Sounds.DIG_SNOW, 1.0f, 2.0f);
 		}
 	}
 	
-	@EventHandler(priority = EventPriority.HIGH)
+	/**@EventHandler(priority = EventPriority.HIGH)
 	public void onJoin(PlayerJoinEvent event) {
 		Player player = event.getPlayer();
 		player.sendMessage(ChatColor.AQUA + "" + ChatColor.BOLD + "Merry Christmass " + ChatColor.WHITE + ChatColor.BOLD + player.getName() + ChatColor.AQUA + ChatColor.BOLD + " !");
-	}
+	}**/
 
 	@EventHandler
 	public void onSnowballImpact(ProjectileHitEvent event) {
@@ -121,6 +119,15 @@ public class ChristmassMonthEvent extends CalendarEvent {
 					top.setData((byte) (data + 1));
 				}
 			}
+			
+			final Block topFinal = top;
+			new BukkitRunnable() {
+				public void run () {
+					if (topFinal.getType() == Material.SNOW) {
+						topFinal.setType(Material.AIR);
+					}
+				}
+			}.runTaskLater(this.plugin, MathUtils.random(20, 80));
 		}
 	}
 }

@@ -66,8 +66,7 @@ public class ContributorsInventory extends GuiScreen {
 			} else if (item.getItemMeta().getDisplayName().contains("Contributor Particles")) {
 				this.contributor.setEffectActive(!this.contributor.isEffectActive());
 				Sounds.playSound(clicker, clicker.getLocation(), Sounds.CLICK, 1f, 1f);
-				clicker.closeInventory();
-				clicker.chat("/contrib");
+				drawScreen();
 			}
 		}
 		event.setCancelled(true);
