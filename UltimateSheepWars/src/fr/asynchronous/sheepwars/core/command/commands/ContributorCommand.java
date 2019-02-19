@@ -1,4 +1,4 @@
-package fr.asynchronous.sheepwars.core.command;
+package fr.asynchronous.sheepwars.core.command.commands;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -7,8 +7,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
-import fr.asynchronous.sheepwars.core.gui.ContributorsInventory;
-import fr.asynchronous.sheepwars.core.gui.manager.GuiManager;
+import fr.asynchronous.sheepwars.core.gui.GuiManager;
+import fr.asynchronous.sheepwars.core.gui.guis.ContributorsInventory;
 import fr.asynchronous.sheepwars.core.handler.Contributor;
 
 public class ContributorCommand implements CommandExecutor {

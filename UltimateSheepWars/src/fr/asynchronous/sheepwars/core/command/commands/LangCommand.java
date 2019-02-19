@@ -1,4 +1,4 @@
-package fr.asynchronous.sheepwars.core.command;
+package fr.asynchronous.sheepwars.core.command.commands;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
