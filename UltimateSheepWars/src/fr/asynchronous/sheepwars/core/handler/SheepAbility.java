@@ -4,7 +4,8 @@ public enum SheepAbility {
 
 	SEEK_PLAYERS(),
 	RIDEABLE(),
-	FLOATING_SLOWLY(),
+	EAT_BLOCKS(),
+	DISABLE_SLIDE(),
 	FIRE_PROOF();
 	
 }

@@ -7,12 +7,12 @@ import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
+import fr.asynchronous.sheepwars.core.SheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.event.UltimateSheepWarsEventListener;
 
 public class ProjectileLaunch extends UltimateSheepWarsEventListener
 {
-    public ProjectileLaunch(final UltimateSheepWarsPlugin plugin) {
+    public ProjectileLaunch(final SheepWarsPlugin plugin) {
         super(plugin);
     }
     

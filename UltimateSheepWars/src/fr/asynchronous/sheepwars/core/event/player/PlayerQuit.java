@@ -5,7 +5,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerQuitEvent;
 
-import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
+import fr.asynchronous.sheepwars.core.SheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.data.PlayerData;
 import fr.asynchronous.sheepwars.core.event.UltimateSheepWarsEventListener;
 import fr.asynchronous.sheepwars.core.handler.GameState;
@@ -15,7 +15,7 @@ import fr.asynchronous.sheepwars.core.message.Message.MsgEnum;
 
 public class PlayerQuit extends UltimateSheepWarsEventListener
 {
-    public PlayerQuit(final UltimateSheepWarsPlugin plugin) {
+    public PlayerQuit(final SheepWarsPlugin plugin) {
         super(plugin);
     }
     

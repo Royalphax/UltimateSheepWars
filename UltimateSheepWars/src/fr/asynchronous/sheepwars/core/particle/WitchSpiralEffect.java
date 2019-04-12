@@ -4,7 +4,7 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
-import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
+import fr.asynchronous.sheepwars.core.SheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.handler.Particles;
 import fr.asynchronous.sheepwars.core.handler.Particles.ParticleEffect.ParticleEffectType;
 
@@ -23,7 +23,7 @@ public class WitchSpiralEffect implements ParticleEffectType {
           double z = Math.cos(0.3141592653589793D * this.step) * 1.0D;
           Vector v = new Vector(x, y, z);
           loc.add(v);
-          UltimateSheepWarsPlugin.getVersionManager().getParticleFactory().playParticles(Particles.SPELL_WITCH, loc, 0.0f, 0.0f, 0.0f, 1, 0.0f);
+          SheepWarsPlugin.getVersionManager().getParticleFactory().playParticles(Particles.SPELL_WITCH, loc, 0.0f, 0.0f, 0.0f, 1, 0.0f);
           this.step += 1.0F;
           this.i = ((float)(this.i + 0.1D));
           if (this.i > 6.0F) {
@@ -32,7 +32,7 @@ public class WitchSpiralEffect implements ParticleEffectType {
         }
         else
         {
-        	UltimateSheepWarsPlugin.getVersionManager().getParticleFactory().playParticles(Particles.SPELL_WITCH, loc, 0.2f, 0.2f, 0.2f, 1, 0.1f);
+        	SheepWarsPlugin.getVersionManager().getParticleFactory().playParticles(Particles.SPELL_WITCH, loc, 0.2f, 0.2f, 0.2f, 1, 0.1f);
         }
 	}
 }

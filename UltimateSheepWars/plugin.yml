@@ -1,13 +1,13 @@
 name: UltimateSheepWars
 author: Asynchronous
 version: 4.5.6
-main: fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin
+main: fr.asynchronous.sheepwars.core.USWPlugin
 softdepend: [Vault]
 website: http://roytreo28.ddns.net/asynchronous
 commands:
   ultimatesheepwars:
-    description: Manage your ultimate sheepwars in game settings
-    aliases: [ultimatesheepwars, usw, sheepwars, sw]
+    description: Manage your ultimate sheepwars in-game settings
+    aliases: [ultimatesw, usw, sheepwars, sw]
   lang:
     description: Change your language
     aliases: [language, langage]

@@ -3,15 +3,17 @@ package fr.asynchronous.sheepwars.core.event.player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerRespawnEvent;
 
-import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
+import fr.asynchronous.sheepwars.core.SheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.event.UltimateSheepWarsEventListener;
 import fr.asynchronous.sheepwars.core.handler.GameState;
 import fr.asynchronous.sheepwars.core.manager.ConfigManager;
+import fr.asynchronous.sheepwars.core.manager.TeamManager;
 import fr.asynchronous.sheepwars.core.manager.ConfigManager.Field;
+import fr.asynchronous.sheepwars.core.util.RandomUtils;
 
 public class PlayerRespawn extends UltimateSheepWarsEventListener
 {
-    public PlayerRespawn(final UltimateSheepWarsPlugin plugin) {
+    public PlayerRespawn(final SheepWarsPlugin plugin) {
         super(plugin);
     }
     
@@ -19,13 +21,10 @@ public class PlayerRespawn extends UltimateSheepWarsEventListener
     public void onPlayerRespawn(final PlayerRespawnEvent event) {
     	
         if (GameState.isStep(GameState.WAITING)) {
-            event.setRespawnLocation(ConfigManager.getLocation(Field.LOBBY));
+            event.setRespawnLocation(ConfigManager.getLocation(Field.LOBBY).toBukkitLocation());
         }
         else {
-        	Field field = Field.SPEC_SPAWNS;
-    		if (ConfigManager.getLocations(field).isEmpty())
-    			field = Field.BOOSTERS;
-            event.setRespawnLocation(ConfigManager.getRdmLocationFromList(field));
+            event.setRespawnLocation(RandomUtils.getRandom(SheepWarsPlugin.getWorldManager().getVotedMap().getTeamSpawns(TeamManager.SPEC).getBukkitLocations()));
         }
     }
 }

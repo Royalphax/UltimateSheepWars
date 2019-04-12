@@ -15,7 +15,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.util.Vector;
 
-import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
+import fr.asynchronous.sheepwars.core.SheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.data.PlayerData;
 
 public class EntityUtils {
@@ -56,7 +56,7 @@ public class EntityUtils {
 	public static void resetPlayer(final Player player, final GameMode gameMode) {
 		player.setGameMode(gameMode);
 		player.setFireTicks(0);
-		UltimateSheepWarsPlugin.getVersionManager().getNMSUtils().setHealth(player, 20.0D);
+		SheepWarsPlugin.getVersionManager().getNMSUtils().setHealth(player, 20.0D);
 		player.setHealthScaled(true);
 		player.setHealth(20.0);
 		player.setFoodLevel(20);

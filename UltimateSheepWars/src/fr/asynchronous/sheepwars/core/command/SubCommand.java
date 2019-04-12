@@ -8,8 +8,9 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
-import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
+import fr.asynchronous.sheepwars.core.SheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.handler.Permissions;
+import fr.asynchronous.sheepwars.core.util.JustifyUtils;
 import net.md_5.bungee.api.ChatColor;
 
 public abstract class SubCommand {
@@ -19,9 +20,9 @@ public abstract class SubCommand {
 	private String[] aliases;
 	private String shortDescription, longDescription, usage;
 	private List<Permissions> permissions;
-	private UltimateSheepWarsPlugin ultimateSheepWars;
+	private SheepWarsPlugin ultimateSheepWars;
 
-	public SubCommand(String shortDescription, String longDescription, String usage, Permissions permission, UltimateSheepWarsPlugin ultimateSheepWars, String... aliases) {
+	public SubCommand(String shortDescription, String longDescription, String usage, Permissions permission, SheepWarsPlugin ultimateSheepWars, String... aliases) {
 		this.aliases = aliases;
 		this.shortDescription = shortDescription;
 		this.longDescription = longDescription;
@@ -30,8 +31,8 @@ public abstract class SubCommand {
 		this.usage = usage;
 		this.ultimateSheepWars = ultimateSheepWars;
 	}
-	
-	public SubCommand(String shortDescription, String longDescription, String usage, List<Permissions> permissions, UltimateSheepWarsPlugin ultimateSheepWars, String... aliases) {
+
+	public SubCommand(String shortDescription, String longDescription, String usage, List<Permissions> permissions, SheepWarsPlugin ultimateSheepWars, String... aliases) {
 		this.aliases = aliases;
 		this.shortDescription = shortDescription;
 		this.longDescription = longDescription;
@@ -55,18 +56,11 @@ public abstract class SubCommand {
 			case LONG :
 				return this.longDescription;
 			case FULL :
-				StringBuilder longDesc = new StringBuilder();
-				final int maxLineSize = 30;
-				int lineSize = 0;
-				for (String strElement : this.longDescription.split(" ")) {
-					if (strElement.length() + lineSize > maxLineSize) {
-						longDesc.append("\n");
-						lineSize = 0;
-					}
-					longDesc.append(strElement);
-					lineSize += strElement.length();
-				}
-				return ChatColor.WHITE + "Description :\n∙ " + ChatColor.GRAY + longDesc.toString() + "\n\n" + ChatColor.WHITE + "Permission required :\n∙ " + ChatColor.GRAY + this.getPermissions().toString().replaceAll("[", "").replaceAll("]", "") + "\n\n" + ChatColor.WHITE + "Aliases :\n∙ " + ChatColor.GRAY + this.aliases.toString().replaceAll("[", "").replaceAll("]", "");
+				List<String> justified = JustifyUtils.fullJustify(this.longDescription.split(" "), 40);
+				StringBuilder finalText = new StringBuilder();
+				for (String just : justified)
+					finalText.append(just + "\n" + ChatColor.GRAY);
+				return ChatColor.WHITE + "Description :\n∙ " + ChatColor.GRAY + finalText.toString() + "\n" + ChatColor.WHITE + "Permission(s) required :\n∙ " + ChatColor.GRAY + this.getPermissions().toString() + "\n\n" + ChatColor.WHITE + "Aliase(s) :\n∙ " + ChatColor.GRAY + makeList(this.aliases).toString();
 		}
 		return "null";
 	}
@@ -76,7 +70,7 @@ public abstract class SubCommand {
 		LONG(),
 		FULL();
 	}
-	
+
 	public List<Permissions> getPermissions() {
 		return permissions;
 	}
@@ -92,11 +86,15 @@ public abstract class SubCommand {
 			commandSender.sendMessage(ChatColor.RED + "This command is not allowed from console.");
 		}
 	}
+	
+	protected void usage(CommandSender commandSender) {
+		commandSender.sendMessage(ChatColor.RED + "Usage: " + this.usage);
+	}
 
-	public UltimateSheepWarsPlugin getUltimateSheepWarsInstance() {
+	public SheepWarsPlugin getUltimateSheepWarsInstance() {
 		return ultimateSheepWars;
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	protected static <T> List<T> makeList(T... params) {
 		List<T> output = new ArrayList<>();

@@ -7,13 +7,13 @@ import org.bukkit.entity.TNTPrimed;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 
-import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
+import fr.asynchronous.sheepwars.core.SheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.data.PlayerData;
 import fr.asynchronous.sheepwars.core.event.UltimateSheepWarsEventListener;
 import fr.asynchronous.sheepwars.core.handler.Sounds;
 
 public class PlayerDamageByEntity extends UltimateSheepWarsEventListener {
-	public PlayerDamageByEntity(final UltimateSheepWarsPlugin plugin) {
+	public PlayerDamageByEntity(final SheepWarsPlugin plugin) {
 		super(plugin);
 	}
 
@@ -32,7 +32,7 @@ public class PlayerDamageByEntity extends UltimateSheepWarsEventListener {
 					Sounds.playSound(damager, damager.getLocation(), Sounds.VILLAGER_NO, 1.0f, 1.0f);
 					event.setCancelled(true);
 				} else {
-					UltimateSheepWarsPlugin.getVersionManager().getNMSUtils().setKiller(player, damager);
+					SheepWarsPlugin.getVersionManager().getNMSUtils().setKiller(player, damager);
 				}
 			} else if (damagerEntity instanceof TNTPrimed && damagerEntity.hasMetadata("no-damage-team-" + playerData.getTeam().getName())) {
 				Sounds.playSound(player, null, Sounds.FIZZ, 1.0f, 1.0f);

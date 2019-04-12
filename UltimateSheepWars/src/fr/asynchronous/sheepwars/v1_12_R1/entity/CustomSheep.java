@@ -12,13 +12,12 @@ import org.bukkit.util.Vector;
 
 import com.google.common.collect.Sets;
 
-import fr.asynchronous.sheepwars.core.UltimateSheepWarsAPI;
-import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
+import fr.asynchronous.sheepwars.core.SheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.data.PlayerData;
 import fr.asynchronous.sheepwars.core.handler.Particles;
 import fr.asynchronous.sheepwars.core.handler.SheepAbility;
 import fr.asynchronous.sheepwars.core.manager.ExceptionManager;
-import fr.asynchronous.sheepwars.core.manager.SheepManager;
+import fr.asynchronous.sheepwars.core.sheep.SheepWarsSheep;
 import net.minecraft.server.v1_12_R1.Entity;
 import net.minecraft.server.v1_12_R1.EntityHuman;
 import net.minecraft.server.v1_12_R1.EntityLiving;
@@ -35,11 +34,12 @@ import net.minecraft.server.v1_12_R1.PathfinderGoalSelector;
 
 public class CustomSheep extends EntitySheep {
 
-	private SheepManager sheep;
+	private SheepWarsSheep sheep;
 	private Player player;
 	private net.minecraft.server.v1_12_R1.World world;
 	private boolean ground = false;
 	private boolean isDead = false;
+	private boolean upComingCollision = false;
 	private long ticks;
 	private Plugin plugin;
 
@@ -55,7 +55,7 @@ public class CustomSheep extends EntitySheep {
 	}
 
 	@SuppressWarnings({"unchecked", "rawtypes"})
-	public CustomSheep(net.minecraft.server.v1_12_R1.World world, Player player, SheepManager sheep, Plugin plugin) {
+	public CustomSheep(net.minecraft.server.v1_12_R1.World world, Player player, SheepWarsSheep sheep, Plugin plugin) {
 		this(world, player, plugin);
 
 		this.sheep = sheep;
@@ -88,28 +88,51 @@ public class CustomSheep extends EntitySheep {
 		}
 	}
 
+	private static final int RADIUS = 2;
+	private static final int SPEED_DIVIDER = 20;
+	private static double relativeX = 0.0;
+	private static double relativeY = 0.0;
+	private static double relativeZ = 0.0;
+
 	@Override
 	public void move(EnumMoveType enummovetype, double d0, double d1, double d2) {
-		if (this.getBukkitEntity().hasMetadata(UltimateSheepWarsAPI.SHEEPWARS_SHEEP_METADATA) && !this.ground) {
-			Location from = new Location(this.getBukkitEntity().getWorld(), this.locX, this.locY, this.locZ);
-			Location to = from.clone().add(this.motX, this.motY, this.motZ);
-
-			Vector dir = to.subtract(from).toVector();
-			Vector copy = dir.clone();
-			boolean noclip = true;
-			for (double i = 0; i <= 1; i += 0.2) {
-				copy.multiply(i);
-				Location loc = from.clone().add(copy);
-				UltimateSheepWarsPlugin.getVersionManager().getParticleFactory().playParticles(Particles.FIREWORKS_SPARK, from, 0.0F, 0.0F, 0.0F, 1, 0.0F);
-				if (loc.getBlock().getType() != Material.AIR)
-					noclip = false;
-				copy = dir.clone();
+		if (this.sheep != null) {
+			final Location from = new Location(this.getBukkitEntity().getWorld(), this.locX, this.locY, this.locZ);
+			final Location to = from.clone().add(this.motX, this.motY, this.motZ);
+			if (!this.ground && !this.sheep.isFriendly()) {
+				final Vector dir = to.subtract(from).toVector();
+				Vector copy = dir.clone();
+				boolean noclip = true;
+				for (double i = 0; i <= 1; i += 0.2) {
+					copy.multiply(i);
+					final Location loc = from.clone().add(copy);
+					SheepWarsPlugin.getVersionManager().getParticleFactory().playParticles(Particles.FIREWORKS_SPARK, from, 0.0F, 0.0F, 0.0F, 1, 0.0F);
+					final Location frontLoc = loc.clone().add(copy.clone().normalize().multiply(RADIUS));
+					if (!this.upComingCollision && frontLoc.getBlock().getType() != Material.AIR) {
+						this.upComingCollision = true;
+						relativeX = d0 / (double) SPEED_DIVIDER;
+						relativeY = d1 / (double) SPEED_DIVIDER;
+						relativeZ = d2 / (double) SPEED_DIVIDER;
+					}
+					if (loc.getBlock().getType() != Material.AIR) {
+						noclip = false;
+						break;
+					}
+					copy = dir.clone();
+				}
+				this.noclip = noclip;
 			}
-			this.noclip = noclip;
+			if (this.sheep.hasAbility(SheepAbility.EAT_BLOCKS) && this.upComingCollision) {
+				if (!this.ground)
+					this.ground = true;
+				d0 = relativeX;
+				d1 = relativeY;
+				d2 = relativeZ;
+			}
 		}
 		super.move(enummovetype, d0, d1, d2);
 	}
-
+	
 	/**
 	 * Attention : la venu d'un nouvel argument (f2) fait qu'on ne peut plus faire avancer ou reculer le moutons
 	 */
@@ -178,24 +201,33 @@ public class CustomSheep extends EntitySheep {
 	public void n() {
 		try {
 			if (this.sheep != null) {
-				if ((this.onGround || this.inWater || this.sheep.isFriendly()) && !this.ground)
+				if ((this.onGround || this.inWater || this.sheep.isFriendly()) && !this.ground) {
 					this.ground = true;
-				if (this.ground && !this.isDead && (this.ticks <= 0 || !isAlive() || this.sheep.onTicking(this.player, this.ticks, getBukkitSheep(), this.plugin))) {
-					this.isDead = true;
-					boolean death = true;
-					if (!this.passengers.isEmpty())
-						for (Entity ent : this.passengers)
-							ent.getBukkitEntity().eject();
-					if (isAlive()) {
-						die();
-						death = false;
+					if (this.sheep.hasAbility(SheepAbility.DISABLE_SLIDE)) {
+						this.motX = 0;
+						this.motY = 0;
+						this.motZ = 0;
 					}
-					this.sheep.onFinish(this.player, getBukkitSheep(), death, this.plugin);
-					if (death)
-						this.dropDeathLoot();
-					return;
 				}
-				this.ticks--;
+				if (this.ground) {
+					if (!this.isDead && (this.ticks <= 0 || !isAlive() || this.sheep.onTicking(this.player, this.ticks, getBukkitSheep(), this.plugin))) {
+						this.isDead = true;
+						boolean death = true;
+						if (!this.passengers.isEmpty())
+							for (Entity ent : this.passengers) {
+								ent.getBukkitEntity().eject();
+							}
+						if (isAlive()) {
+							die();
+							death = false;
+						}
+						this.sheep.onFinish(this.player, getBukkitSheep(), death, this.plugin);
+						if (death)
+							this.dropDeathLoot();
+						return;
+					}
+					this.ticks--;
+				}
 			}
 		} catch (Exception ex) {
 			return;
@@ -211,7 +243,7 @@ public class CustomSheep extends EntitySheep {
 			if (damageCause == DamageCause.ENTITY_ATTACK) {
 				if (getBukkitSheep().getKiller() instanceof Player) {
 					PlayerData.getPlayerData(killer).increaseSheepKilled(1);
-					SheepManager.giveSheep(killer, this.sheep);
+					SheepWarsSheep.giveSheep(killer, this.sheep);
 				}
 			} else {
 				Location location = getBukkitEntity().getLocation();
@@ -238,6 +270,6 @@ public class CustomSheep extends EntitySheep {
 
 	public void explode(float power, boolean breakBlocks, boolean fire) {
 		getBukkitEntity().remove();
-		UltimateSheepWarsPlugin.getVersionManager().getWorldUtils().createExplosion(this.player, getBukkitSheep().getWorld(), this.locX, this.locY, this.locZ, power, breakBlocks, fire);
+		SheepWarsPlugin.getVersionManager().getWorldUtils().createExplosion(this.player, getBukkitSheep().getWorld(), this.locX, this.locY, this.locZ, power, breakBlocks, fire);
 	}
 }

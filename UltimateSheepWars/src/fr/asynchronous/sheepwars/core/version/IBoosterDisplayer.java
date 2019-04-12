@@ -1,12 +1,14 @@
 package fr.asynchronous.sheepwars.core.version;
 
-import fr.asynchronous.sheepwars.core.manager.BoosterManager;
+import java.util.UUID;
+
+import fr.asynchronous.sheepwars.core.booster.SheepWarsBooster;
 
 public interface IBoosterDisplayer {
 
-	public void startDisplay(final BoosterManager booster);
+	public UUID startDisplay(final SheepWarsBooster booster);
 	
-	public void tickDisplay(final BoosterManager booster, final int duration);
+	public void tickDisplay(final UUID id, final int duration, final int maxDuration);
 	
-	public void endDisplay(final BoosterManager booster);
+	public void endDisplay(final UUID id);
 }

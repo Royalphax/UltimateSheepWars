@@ -4,12 +4,12 @@ import org.bukkit.entity.Sheep;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityDamageEvent;
 
-import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
+import fr.asynchronous.sheepwars.core.SheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.event.UltimateSheepWarsEventListener;
 
 public class EntityDamage extends UltimateSheepWarsEventListener
 {
-    public EntityDamage(final UltimateSheepWarsPlugin plugin) {
+    public EntityDamage(final SheepWarsPlugin plugin) {
         super(plugin);
     }
     

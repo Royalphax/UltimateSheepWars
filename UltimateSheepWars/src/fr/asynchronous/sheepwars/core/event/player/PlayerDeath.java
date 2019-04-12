@@ -14,7 +14,7 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
+import fr.asynchronous.sheepwars.core.SheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.data.PlayerData;
 import fr.asynchronous.sheepwars.core.event.UltimateSheepWarsEventListener;
 import fr.asynchronous.sheepwars.core.handler.GameState;
@@ -30,7 +30,7 @@ import fr.asynchronous.sheepwars.core.util.RandomUtils;
 
 public class PlayerDeath extends UltimateSheepWarsEventListener
 {
-    public PlayerDeath(final UltimateSheepWarsPlugin plugin) {
+    public PlayerDeath(final SheepWarsPlugin plugin) {
         super(plugin);
     }
     
@@ -68,7 +68,7 @@ public class PlayerDeath extends UltimateSheepWarsEventListener
             Sounds.playSoundAll(player.getLocation(), Sounds.VILLAGER_DEATH, 1.0f, 2.0f);
             this.plugin.getRewardsManager().rewardPlayer(Events.ON_DEATH, player);
             Message.sendMessage(player, MsgEnum.GHOST_DESCRIPTION);
-            UltimateSheepWarsPlugin.getVersionManager().getTitleUtils().titlePacket(player, 0, 60, 20, playerData.getLanguage().getMessage(MsgEnum.ELIMINATED), subtitle);
+            SheepWarsPlugin.getVersionManager().getTitleUtils().titlePacket(player, 0, 60, 20, playerData.getLanguage().getMessage(MsgEnum.ELIMINATED), subtitle);
             this.plugin.getGameTask().setSpectator(event.getEntity(), true);
             Location loc = player.getLocation().add(0,1,0);
             World w = loc.getWorld();
@@ -107,7 +107,7 @@ public class PlayerDeath extends UltimateSheepWarsEventListener
         if (player.getLocation().getY() <= 5 && countdown <= 0)
         {
         	Location spawn = TeamManager.SPEC.getNextSpawn();
-            player.teleport((spawn == null) ? ConfigManager.getLocation(Field.LOBBY) : spawn);
+            player.teleport((spawn == null) ? ConfigManager.getLocation(Field.LOBBY).toBukkitLocation() : spawn);
         }
     }
 }

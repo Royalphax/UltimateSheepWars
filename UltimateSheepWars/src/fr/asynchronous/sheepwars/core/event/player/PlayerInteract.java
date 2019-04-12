@@ -10,10 +10,10 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
-import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
+import fr.asynchronous.sheepwars.core.SheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.data.PlayerData;
 import fr.asynchronous.sheepwars.core.event.UltimateSheepWarsEventListener;
-import fr.asynchronous.sheepwars.core.gui.manager.GuiManager;
+import fr.asynchronous.sheepwars.core.gui.GuiManager;
 import fr.asynchronous.sheepwars.core.handler.Contributor;
 import fr.asynchronous.sheepwars.core.handler.GameState;
 import fr.asynchronous.sheepwars.core.handler.ItemBuilder;
@@ -22,17 +22,17 @@ import fr.asynchronous.sheepwars.core.handler.Permissions;
 import fr.asynchronous.sheepwars.core.handler.Sounds;
 import fr.asynchronous.sheepwars.core.manager.ConfigManager;
 import fr.asynchronous.sheepwars.core.manager.ConfigManager.Field;
-import fr.asynchronous.sheepwars.core.manager.SheepManager;
 import fr.asynchronous.sheepwars.core.manager.TeamManager;
 import fr.asynchronous.sheepwars.core.message.Message;
 import fr.asynchronous.sheepwars.core.message.Message.MsgEnum;
+import fr.asynchronous.sheepwars.core.sheep.SheepWarsSheep;
 import fr.asynchronous.sheepwars.core.util.MathUtils;
 import fr.asynchronous.sheepwars.core.util.Utils;
 
 public class PlayerInteract extends UltimateSheepWarsEventListener
 {
 	
-    public PlayerInteract(final UltimateSheepWarsPlugin plugin) {
+    public PlayerInteract(final SheepWarsPlugin plugin) {
         super(plugin);
     }
     
@@ -54,7 +54,7 @@ public class PlayerInteract extends UltimateSheepWarsEventListener
         	
         	if (GameState.isStep(GameState.INGAME) && mat.equals(Material.WOOL)) {
         		if (!data.getTeam().isBlocked() && !player.isInsideVehicle()) {
-        			SheepManager sheep = SheepManager.getCorrespondingSheep(item, player);
+        			SheepWarsSheep sheep = SheepWarsSheep.getCorrespondingSheep(item, player);
         			if (sheep != null) {
         				ItemStack newItem = item.clone();
         				final int amount = item.getAmount() - 1;
@@ -105,7 +105,7 @@ public class PlayerInteract extends UltimateSheepWarsEventListener
                     } else {
                     	data.setAllowParticles(true);
                     	player.getInventory().setItem(4, new ItemBuilder(ConfigManager.getItemStack(Field.PARTICLES_ON_ITEM)).setName(data.getLanguage().getMessage(MsgEnum.PARTICLES_ON)).toItemStack());
-                    	UltimateSheepWarsPlugin.getVersionManager().getParticleFactory().playParticles(player, Particles.SPELL_INSTANT, player.getLocation().add(0, 1, 0), 1f, 0.5f, 1f, 10, 0.0f);
+                    	SheepWarsPlugin.getVersionManager().getParticleFactory().playParticles(player, Particles.SPELL_INSTANT, player.getLocation().add(0, 1, 0), 1f, 0.5f, 1f, 10, 0.0f);
                     }
         			player.updateInventory();
                     Sounds.playSound(player, player.getLocation(), Sounds.NOTE_STICKS, 1f, 1f);
@@ -137,6 +137,6 @@ public class PlayerInteract extends UltimateSheepWarsEventListener
     }
 	
 	public void setItemInHand(final ItemStack item, final Player player) {
-		UltimateSheepWarsPlugin.getVersionManager().getNMSUtils().setItemInHand(item, player);
+		SheepWarsPlugin.getVersionManager().getNMSUtils().setItemInHand(item, player);
 	}
 }

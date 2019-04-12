@@ -9,21 +9,20 @@ import java.net.URLConnection;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 
-import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
+import fr.asynchronous.sheepwars.core.SheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.manager.ConfigManager;
 import fr.asynchronous.sheepwars.core.manager.ConfigManager.Field;
 import fr.asynchronous.sheepwars.core.manager.ExceptionManager;
-import fr.asynchronous.sheepwars.core.util.Utils;
 import fr.asynchronous.sheepwars.core.version.AAnvilGUI;
 import net.md_5.bungee.api.ChatColor;
 
 public class AccountManager {
 
-	private UltimateSheepWarsPlugin plugin;
+	private SheepWarsPlugin plugin;
 	private boolean askForOwnerName;
 	private String owner;
 
-	public AccountManager(UltimateSheepWarsPlugin plugin, String userid) {
+	public AccountManager(SheepWarsPlugin plugin, String userid) {
 		this.plugin = plugin;
 		this.askForOwnerName = false;
 		String owner = ConfigManager.getString(Field.OWNER);
@@ -41,7 +40,7 @@ public class AccountManager {
 
 	public void openGUI(final Player player) {
 		player.setGameMode(GameMode.SPECTATOR);
-		UltimateSheepWarsPlugin.getVersionManager().newAnvilGUI(player, this.plugin, new AAnvilGUI.AnvilClickEventHandler() {
+		SheepWarsPlugin.getVersionManager().newAnvilGUI(player, this.plugin, new AAnvilGUI.AnvilClickEventHandler() {
 			@Override
 			public void onAnvilClick(AAnvilGUI.AnvilClickEvent event) {
 				if (event.getSlot() == AAnvilGUI.AnvilSlot.OUTPUT && event.getName() != null) {
@@ -49,7 +48,7 @@ public class AccountManager {
 					event.setWillDestroy(true);
 					String output = event.getName();
 					if (setOwner(output.trim())) {
-						player.sendMessage(ChatColor.GREEN + "This plugin was linked to " + ChatColor.AQUA + output + ChatColor.GREEN + "'s spigot account. " + (!Utils.isPluginConfigured() ? ChatColor.GREEN + "Now, begin/continue to setup the game with /sw help." : "The server is ready to play !"));
+						player.sendMessage(ChatColor.GREEN + "This plugin was linked to " + ChatColor.AQUA + output + ChatColor.GREEN + "'s spigot account. " + (!plugin.isConfigured() ? ChatColor.GREEN + "Now, begin/continue to setup the game with /sw help." : "The server is ready to play !"));
 						player.setGameMode(GameMode.CREATIVE);
 					} else {
 						player.sendMessage(ChatColor.RED + "Try again.");

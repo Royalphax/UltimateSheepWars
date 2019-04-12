@@ -1,6 +1,5 @@
 package fr.asynchronous.sheepwars.v1_13_R2;
 
-import org.bukkit.ChatColor;
 import org.bukkit.DyeColor;
 import org.bukkit.craftbukkit.v1_13_R2.entity.CraftPlayer;
 import org.bukkit.enchantments.Enchantment;
@@ -13,13 +12,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.material.Dye;
 import org.bukkit.material.MaterialData;
 
-import fr.asynchronous.sheepwars.core.message.Language;
 import fr.asynchronous.sheepwars.core.version.INMSUtils;
-import fr.asynchronous.sheepwars.v1_13_R2.util.SpecialMessage;
-import net.minecraft.server.v1_13_R2.ChatClickable.EnumClickAction;
-import net.minecraft.server.v1_13_R2.ChatHoverable;
-import net.minecraft.server.v1_13_R2.ChatMessage;
-import net.minecraft.server.v1_13_R2.ChatModifier;
 import net.minecraft.server.v1_13_R2.EntityHuman;
 import net.minecraft.server.v1_13_R2.EntityPlayer;
 
@@ -49,16 +42,6 @@ public class NMSUtils implements INMSUtils {
 		}
         copy.setItemMeta(meta);
         return copy;
-	}
-
-	@Override
-	public void displayAvailableLanguages(Player player) {
-		for (Language langs : Language.getLanguages()) {
-			SpecialMessage msg = new SpecialMessage(ChatColor.YELLOW + "- " + langs.getName() + " " + ChatColor.DARK_GRAY + "[");
-			msg.setClick(ChatColor.GREEN + "➔", EnumClickAction.RUN_COMMAND, "/lang " + langs.getLocale().replace(".yml", "")).setChatModifier(new ChatModifier().setChatHoverable(new ChatHoverable(ChatHoverable.EnumHoverAction.SHOW_TEXT, new ChatMessage(ChatColor.YELLOW + "Click to select", new Object[0]))));
-			msg.append(ChatColor.DARK_GRAY + "]");
-			msg.sendToPlayer(player);
-		}
 	}
 
 	@Override

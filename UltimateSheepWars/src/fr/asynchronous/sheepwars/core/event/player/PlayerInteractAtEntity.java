@@ -5,12 +5,12 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.util.Vector;
 
-import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
+import fr.asynchronous.sheepwars.core.SheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.event.UltimateSheepWarsEventListener;
 import fr.asynchronous.sheepwars.core.handler.Sounds;
 
 public class PlayerInteractAtEntity extends UltimateSheepWarsEventListener {
-	public PlayerInteractAtEntity(final UltimateSheepWarsPlugin plugin) {
+	public PlayerInteractAtEntity(final SheepWarsPlugin plugin) {
 		super(plugin);
 	}
 

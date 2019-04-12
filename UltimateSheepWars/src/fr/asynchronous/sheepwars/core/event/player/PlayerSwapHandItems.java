@@ -7,13 +7,13 @@ import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 
-import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
+import fr.asynchronous.sheepwars.core.SheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.event.UltimateSheepWarsEventListener;
 import fr.asynchronous.sheepwars.core.handler.GameState;
 import fr.asynchronous.sheepwars.core.handler.Sounds;
 
 public class PlayerSwapHandItems extends UltimateSheepWarsEventListener {
-	public PlayerSwapHandItems(final UltimateSheepWarsPlugin plugin) {
+	public PlayerSwapHandItems(final SheepWarsPlugin plugin) {
 		super(plugin);
 	}
 

@@ -12,7 +12,7 @@ import java.util.logging.Logger;
 
 import org.bukkit.Bukkit;
 
-import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
+import fr.asynchronous.sheepwars.core.SheepWarsPlugin;
 
 public class ExceptionManager {
 	
@@ -33,10 +33,10 @@ public class ExceptionManager {
 			logger.info("[UltimateSheepWars > ExceptionManager] For more information or any help, please contact the developer.");
 		}
 		String timeLog = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(Calendar.getInstance().getTime());
-        File folder = new File(UltimateSheepWarsPlugin.DATAFOLDER, "reports/");
+        File folder = new File(SheepWarsPlugin.DATAFOLDER, "reports/");
         if (!folder.exists()) 
         	folder.mkdirs();
-        File logFile = new File(UltimateSheepWarsPlugin.DATAFOLDER, "reports/" + timeLog + ".txt");
+        File logFile = new File(SheepWarsPlugin.DATAFOLDER, "reports/" + timeLog + ".txt");
 
         StringWriter errors = new StringWriter();
         throwable.printStackTrace(new PrintWriter(errors));

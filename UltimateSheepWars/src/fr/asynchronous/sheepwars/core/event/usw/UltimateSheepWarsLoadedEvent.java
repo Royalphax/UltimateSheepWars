@@ -3,7 +3,7 @@ package fr.asynchronous.sheepwars.core.event.usw;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
-import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
+import fr.asynchronous.sheepwars.core.SheepWarsPlugin;
 
 /**
  * Event triggered when the plugin has load all its properties.
@@ -11,13 +11,13 @@ import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
 public class UltimateSheepWarsLoadedEvent extends Event {
 
 	private static final HandlerList handlers = new HandlerList();
-	private UltimateSheepWarsPlugin plugin;
+	private SheepWarsPlugin plugin;
 	
-	public UltimateSheepWarsLoadedEvent(UltimateSheepWarsPlugin plugin) {
+	public UltimateSheepWarsLoadedEvent(SheepWarsPlugin plugin) {
 		this.plugin = plugin;
 	}
 	
-	public UltimateSheepWarsPlugin getGameInstance() {
+	public SheepWarsPlugin getGameInstance() {
 		return this.plugin;
 	}
 	

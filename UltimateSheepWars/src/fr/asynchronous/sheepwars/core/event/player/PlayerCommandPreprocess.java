@@ -5,11 +5,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 
-import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
+import fr.asynchronous.sheepwars.core.SheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.event.UltimateSheepWarsEventListener;
 
 public class PlayerCommandPreprocess extends UltimateSheepWarsEventListener {
-	public PlayerCommandPreprocess(final UltimateSheepWarsPlugin plugin) {
+	public PlayerCommandPreprocess(final SheepWarsPlugin plugin) {
 		super(plugin);
 	}
 

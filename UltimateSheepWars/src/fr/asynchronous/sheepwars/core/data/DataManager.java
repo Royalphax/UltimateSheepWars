@@ -6,7 +6,7 @@ import java.util.logging.Level;
 
 import org.bukkit.OfflinePlayer;
 
-import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
+import fr.asynchronous.sheepwars.core.SheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.data.PlayerData.DataType;
 import fr.asynchronous.sheepwars.core.manager.ConfigManager;
 import fr.asynchronous.sheepwars.core.manager.ExceptionManager;
@@ -30,7 +30,7 @@ public abstract class DataManager {
 	
 	public abstract void uploadData(OfflinePlayer player);
 	
-	public static void initDatabaseConnections(UltimateSheepWarsPlugin plugin) {
+	public static void initDatabaseConnections(SheepWarsPlugin plugin) {
 		final boolean localhost = plugin.isLocalhostConnection();
 		final Long start = System.currentTimeMillis();
 		tryingToConnect = true;

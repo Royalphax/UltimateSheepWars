@@ -4,7 +4,7 @@ import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockBreakEvent;
 
-import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
+import fr.asynchronous.sheepwars.core.SheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.data.PlayerData;
 import fr.asynchronous.sheepwars.core.event.UltimateSheepWarsEventListener;
 import fr.asynchronous.sheepwars.core.handler.GameState;
@@ -12,7 +12,7 @@ import fr.asynchronous.sheepwars.core.manager.TeamManager;
 
 public class BlockBreak extends UltimateSheepWarsEventListener
 {
-    public BlockBreak(final UltimateSheepWarsPlugin plugin) {
+    public BlockBreak(final SheepWarsPlugin plugin) {
         super(plugin);
     }
     

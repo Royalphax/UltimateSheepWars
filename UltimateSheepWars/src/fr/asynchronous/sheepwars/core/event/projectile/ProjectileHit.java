@@ -12,17 +12,17 @@ import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.material.Wool;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
+import fr.asynchronous.sheepwars.core.SheepWarsPlugin;
+import fr.asynchronous.sheepwars.core.booster.SheepWarsBooster;
 import fr.asynchronous.sheepwars.core.data.PlayerData;
 import fr.asynchronous.sheepwars.core.event.UltimateSheepWarsEventListener;
 import fr.asynchronous.sheepwars.core.handler.Sounds;
-import fr.asynchronous.sheepwars.core.manager.BoosterManager;
 import fr.asynchronous.sheepwars.core.message.Message.MsgEnum;
 import fr.asynchronous.sheepwars.core.task.BoosterWoolTask;
 import fr.asynchronous.sheepwars.core.util.BlockUtils;
 
 public class ProjectileHit extends UltimateSheepWarsEventListener {
-	public ProjectileHit(final UltimateSheepWarsPlugin plugin) {
+	public ProjectileHit(final SheepWarsPlugin plugin) {
 		super(plugin);
 	}
 
@@ -47,7 +47,7 @@ public class ProjectileHit extends UltimateSheepWarsEventListener {
 						if (data.hasTeam()) {
 							block.setType(Material.AIR);
 							Sounds.playSoundAll(block.getLocation(), Sounds.CHICKEN_EGG_POP, 5f, 2f);
-							final BoosterManager booster = BoosterManager.activateBooster(player, wool.getColor(), plugin);
+							final SheepWarsBooster booster = SheepWarsBooster.activateBooster(player, wool.getColor(), plugin);
 							for (Player online : Bukkit.getOnlinePlayers()) {
 								PlayerData onlineData = PlayerData.getPlayerData(online);
 								online.sendMessage(onlineData.getLanguage().getMessage(MsgEnum.BOOSTER_ACTION).replaceAll("%PLAYER%", data.getTeam().getColor() + player.getName()).replaceAll("%BOOSTER%", onlineData.getLanguage().getMessage(booster.getName())));

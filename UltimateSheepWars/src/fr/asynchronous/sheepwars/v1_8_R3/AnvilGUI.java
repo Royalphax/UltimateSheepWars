@@ -3,7 +3,7 @@ package fr.asynchronous.sheepwars.v1_8_R3;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
-import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
+import fr.asynchronous.sheepwars.core.SheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.version.AAnvilGUI;
 import net.minecraft.server.v1_8_R3.BlockPosition;
 import net.minecraft.server.v1_8_R3.ChatMessage;
@@ -13,7 +13,7 @@ import net.minecraft.server.v1_8_R3.EntityPlayer;
 import net.minecraft.server.v1_8_R3.PacketPlayOutOpenWindow;
 
 public class AnvilGUI extends AAnvilGUI{
-	public AnvilGUI(Player player, UltimateSheepWarsPlugin plugin, AnvilClickEventHandler handler, String itemName, String... itemLore) {
+	public AnvilGUI(Player player, SheepWarsPlugin plugin, AnvilClickEventHandler handler, String itemName, String... itemLore) {
         super(player, plugin, handler, itemName, itemLore);
     }
 

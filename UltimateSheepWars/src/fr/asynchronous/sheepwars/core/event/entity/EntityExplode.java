@@ -6,14 +6,14 @@ import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityExplodeEvent;
 
-import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
+import fr.asynchronous.sheepwars.core.SheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.event.UltimateSheepWarsEventListener;
 import fr.asynchronous.sheepwars.core.handler.GameState;
 import fr.asynchronous.sheepwars.core.util.EntityUtils;
 import fr.asynchronous.sheepwars.core.util.MathUtils;
 
 public class EntityExplode extends UltimateSheepWarsEventListener {
-	public EntityExplode(final UltimateSheepWarsPlugin plugin) {
+	public EntityExplode(final SheepWarsPlugin plugin) {
 		super(plugin);
 	}
 

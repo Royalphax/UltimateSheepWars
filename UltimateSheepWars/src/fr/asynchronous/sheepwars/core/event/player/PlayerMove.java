@@ -9,7 +9,7 @@ import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
+import fr.asynchronous.sheepwars.core.SheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.data.PlayerData;
 import fr.asynchronous.sheepwars.core.event.UltimateSheepWarsEventListener;
 import fr.asynchronous.sheepwars.core.handler.GameState;
@@ -19,13 +19,14 @@ import fr.asynchronous.sheepwars.core.manager.ConfigManager.Field;
 import fr.asynchronous.sheepwars.core.manager.TeamManager;
 import fr.asynchronous.sheepwars.core.message.Message.MsgEnum;
 import fr.asynchronous.sheepwars.core.task.ParticleTask;
+import fr.asynchronous.sheepwars.core.util.RandomUtils;
 import fr.asynchronous.sheepwars.core.version.ATitleUtils.Type;
 
 public class PlayerMove extends UltimateSheepWarsEventListener
 {
 	private static final String FALLING_METADATA = "falling";
 	
-    public PlayerMove(final UltimateSheepWarsPlugin plugin) {
+    public PlayerMove(final SheepWarsPlugin plugin) {
         super(plugin);
     }
     
@@ -36,19 +37,15 @@ public class PlayerMove extends UltimateSheepWarsEventListener
         final Location to = event.getTo();
         
         /** On verifie que monsieur a deja rentre ses identifiants **/
-        if (UltimateSheepWarsPlugin.getAccount().askForOwnerName())
+        if (SheepWarsPlugin.getAccount().askForOwnerName())
         {
         	/**if (!player.isFlying() && player.getLocation().subtract(0,1,0).getBlock().getType() == Material.AIR) {
         		player.setAllowFlight(true);
         		player.setFlying(true);
         	}**/
-        	UltimateSheepWarsPlugin.getAccount().openGUI(player);
+        	SheepWarsPlugin.getAccount().openGUI(player);
         	
         }
-        
-        /** On empeche les joueurs possedant la metadata de bouger **/
-        if (player.hasMetadata("cancel_move") && ((from.getBlockX() != to.getBlockX()) || (from.getBlockY() != to.getBlockY()) || (from.getBlockZ() != to.getBlockZ())))
-        	player.teleport(from);
         
         /** On fait bouger les particules **/
         if (((from.getX() != to.getX()) || (from.getY() != to.getY()) || (from.getZ() != to.getZ())))
@@ -60,28 +57,25 @@ public class PlayerMove extends UltimateSheepWarsEventListener
         	if (GameState.isStep(GameState.WAITING)) {
         		player.addPotionEffect(new PotionEffect(PotionEffectType.CONFUSION, 100, 5, false, false));
         		player.setFallDistance(0.0f);
-        		player.teleport(ConfigManager.getLocation(Field.LOBBY));
-            	UltimateSheepWarsPlugin.getVersionManager().getTitleUtils().titlePacket(player, 5, 10, 5, "", ChatColor.ITALIC + "Wow!");
+        		player.teleport(ConfigManager.getLocation(Field.LOBBY).toBukkitLocation());
+            	SheepWarsPlugin.getVersionManager().getTitleUtils().titlePacket(player, 5, 10, 5, "", "Plof!");
                 Sounds.playSound(player, player.getLocation(), Sounds.ENDERMAN_TELEPORT, 1f, 1f);
             
         	} else if (data.getTeam() == TeamManager.SPEC) {
-        		Field field = Field.SPEC_SPAWNS;
-        		if (ConfigManager.getLocations(field).isEmpty())
-        			field = Field.BOOSTERS;
-        		player.teleport(ConfigManager.getRdmLocationFromList(field));
+        		player.teleport(RandomUtils.getRandom(SheepWarsPlugin.getWorldManager().getVotedMap().getTeamSpawns(TeamManager.SPEC).getBukkitLocations()));
         		
         	} else if (!GameState.isStep(GameState.INGAME))
             {
             	player.setAllowFlight(true);
             	player.setFlying(true);
-        		player.teleport(ConfigManager.getRdmLocationFromList(Field.BOOSTERS));
+            	player.teleport(RandomUtils.getRandom(SheepWarsPlugin.getWorldManager().getVotedMap().getBoosterSpawns().getBukkitLocations()));
             }
             else {
                 if (!player.hasMetadata(FALLING_METADATA) || System.currentTimeMillis() - (player.getMetadata(FALLING_METADATA).get(0)).asLong() >= 2000L) {
                     if (!player.hasMetadata(FALLING_METADATA))
                     	Sounds.playSound(player, to, Sounds.BLAZE_HIT, 1f, 2.0f);
                     player.setMetadata(FALLING_METADATA, new FixedMetadataValue(this.plugin, System.currentTimeMillis()));
-                    UltimateSheepWarsPlugin.getVersionManager().getTitleUtils().defaultTitle(Type.TITLE, player, "", ChatColor.RED + data.getLanguage().getMessage(MsgEnum.OUT_OF_THE_GAME));
+                    SheepWarsPlugin.getVersionManager().getTitleUtils().defaultTitle(Type.TITLE, player, "", ChatColor.RED + data.getLanguage().getMessage(MsgEnum.OUT_OF_THE_GAME));
                 }
                 player.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, 60, 1));
             }

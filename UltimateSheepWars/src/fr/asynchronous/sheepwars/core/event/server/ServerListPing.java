@@ -3,13 +3,13 @@ package fr.asynchronous.sheepwars.core.event.server;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.server.ServerListPingEvent;
 
-import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
+import fr.asynchronous.sheepwars.core.SheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.event.UltimateSheepWarsEventListener;
 import fr.asynchronous.sheepwars.core.handler.GameState;
 
 public class ServerListPing extends UltimateSheepWarsEventListener
 {
-    public ServerListPing(final UltimateSheepWarsPlugin plugin) {
+    public ServerListPing(final SheepWarsPlugin plugin) {
         super(plugin);
     }
     

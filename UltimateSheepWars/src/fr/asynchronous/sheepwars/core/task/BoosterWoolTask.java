@@ -10,11 +10,11 @@ import org.bukkit.block.Block;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
+import fr.asynchronous.sheepwars.core.SheepWarsPlugin;
+import fr.asynchronous.sheepwars.core.booster.SheepWarsBooster;
 import fr.asynchronous.sheepwars.core.handler.GameState;
 import fr.asynchronous.sheepwars.core.handler.Particles;
 import fr.asynchronous.sheepwars.core.handler.Sounds;
-import fr.asynchronous.sheepwars.core.manager.BoosterManager;
 import fr.asynchronous.sheepwars.core.manager.ConfigManager;
 import fr.asynchronous.sheepwars.core.manager.ConfigManager.Field;
 import fr.asynchronous.sheepwars.core.message.Message;
@@ -43,9 +43,9 @@ public class BoosterWoolTask extends BukkitRunnable {
 		this.boosterLifeTime = ConfigManager.getInt(Field.BOOSTER_LIFE_TIME);
 		this.maxWait = this.boosterInterval + this.boosterLifeTime;
 		this.time = this.boosterInterval - 1;
-		for (BoosterManager boost : BoosterManager.getAvailableBoosters())
+		for (SheepWarsBooster boost : SheepWarsBooster.getAvailableBoosters())
 			this.colors.add(boost.getWoolColor());
-		for (Location boosters : ConfigManager.getLocations(Field.BOOSTERS))
+		for (Location boosters : SheepWarsPlugin.getWorldManager().getVotedMap().getBoosterSpawns().getBukkitLocations())
 			boosters.getBlock().setMetadata(BOOSTER_METADATA, new FixedMetadataValue(this.currentTask.plugin, true));
 	}
 
@@ -58,7 +58,7 @@ public class BoosterWoolTask extends BukkitRunnable {
 					this.firstTime = false;
 					Message.broadcast(MsgEnum.BOOSTERS_MESSAGE);
 				}
-				this.magicBlockLocation = ConfigManager.getRdmLocationFromList(Field.BOOSTERS);
+				this.magicBlockLocation = RandomUtils.getRandom(SheepWarsPlugin.getWorldManager().getVotedMap().getBoosterSpawns().getBukkitLocations());
 				this.magicBlock = this.magicBlockLocation.getBlock();
 				this.lastSavedMaterial = this.magicBlock.getType();
 				this.magicBlock.setType(Material.WOOL);
@@ -66,7 +66,7 @@ public class BoosterWoolTask extends BukkitRunnable {
 			}
 			if (magicBlock.getType() == Material.WOOL) {
 				this.magicBlock.setData(RandomUtils.getRandom(this.colors).getWoolData());
-				UltimateSheepWarsPlugin.getVersionManager().getParticleFactory().playParticles(Particles.REDSTONE, this.magicBlockLocation, 1.0f, 1.0f, 1.0f, 20, 1.0f);
+				SheepWarsPlugin.getVersionManager().getParticleFactory().playParticles(Particles.REDSTONE, this.magicBlockLocation, 1.0f, 1.0f, 1.0f, 20, 1.0f);
 			}
 		}
 		if (this.time == this.boosterInterval || !GameState.isStep(GameState.INGAME)) {

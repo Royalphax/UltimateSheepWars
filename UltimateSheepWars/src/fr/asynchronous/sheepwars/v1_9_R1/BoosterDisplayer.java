@@ -2,6 +2,7 @@ package fr.asynchronous.sheepwars.v1_9_R1;
 
 import java.util.HashMap;
 import java.util.Map.Entry;
+import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -9,33 +10,35 @@ import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Player;
 
+import fr.asynchronous.sheepwars.core.booster.SheepWarsBooster;
 import fr.asynchronous.sheepwars.core.data.PlayerData;
 import fr.asynchronous.sheepwars.core.handler.DisplayColor;
-import fr.asynchronous.sheepwars.core.manager.BoosterManager;
 import fr.asynchronous.sheepwars.core.message.Language;
 import fr.asynchronous.sheepwars.core.message.Message;
 import fr.asynchronous.sheepwars.core.version.IBoosterDisplayer;
 
 public class BoosterDisplayer implements IBoosterDisplayer {
 
-	private HashMap<BoosterManager, CustomBossBar> barMap = new HashMap<>();
+	private static HashMap<UUID, CustomBossBar> barMap = new HashMap<>();
 
 	@Override
-	public void startDisplay(BoosterManager booster) {
-		if (!this.barMap.containsKey(booster))
-			this.barMap.put(booster, new CustomBossBar(booster.getName(), booster.getDisplayColor()));
-		this.barMap.get(booster).show();
+	public UUID startDisplay(SheepWarsBooster booster) {
+		UUID id = UUID.randomUUID();
+		barMap.put(id, new CustomBossBar(booster.getName(), booster.getDisplayColor()));
+		barMap.get(id).show();
+		return id;
 	}
 
 	@Override
-	public void tickDisplay(BoosterManager booster, int duration) {
-		double progress = (double)duration / (double)(booster.getDuration() * 20);
-		this.barMap.get(booster).tick(progress);
+	public void tickDisplay(UUID id, int duration, int maxDuration) {
+		double progress = (double)duration / (double)maxDuration;
+		barMap.get(id).tick(progress);
 	}
 
 	@Override
-	public void endDisplay(BoosterManager booster) {
-		this.barMap.get(booster).hide();
+	public void endDisplay(UUID id) {
+		barMap.get(id).hide();
+		barMap.remove(id);
 	}
 
 	private class CustomBossBar {

@@ -14,26 +14,27 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
+import fr.asynchronous.sheepwars.core.SheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.data.DataManager;
 import fr.asynchronous.sheepwars.core.data.PlayerData;
 import fr.asynchronous.sheepwars.core.event.usw.GameEndEvent;
+import fr.asynchronous.sheepwars.core.event.usw.GameStartEvent;
 import fr.asynchronous.sheepwars.core.handler.GameState;
 import fr.asynchronous.sheepwars.core.manager.ConfigManager;
 import fr.asynchronous.sheepwars.core.manager.ConfigManager.Field;
 import fr.asynchronous.sheepwars.core.manager.ExceptionManager;
 import fr.asynchronous.sheepwars.core.manager.RewardsManager.Events;
-import fr.asynchronous.sheepwars.core.manager.SheepManager;
 import fr.asynchronous.sheepwars.core.manager.TeamManager;
 import fr.asynchronous.sheepwars.core.message.Language;
 import fr.asynchronous.sheepwars.core.message.Message;
 import fr.asynchronous.sheepwars.core.message.Message.MsgEnum;
-import fr.asynchronous.sheepwars.core.sheep.BoardingSheep;
+import fr.asynchronous.sheepwars.core.sheep.SheepWarsSheep;
+import fr.asynchronous.sheepwars.core.sheep.sheeps.BoardingSheep;
 import fr.asynchronous.sheepwars.core.util.EntityUtils;
 import fr.asynchronous.sheepwars.core.util.RandomUtils;
 
 public class GameTask extends BukkitRunnable {
-	public final UltimateSheepWarsPlugin plugin;
+	public final SheepWarsPlugin plugin;
 	public final int gameTime;
 	public final int boosterInterval;
 	public final int boosterLifeTime;
@@ -43,9 +44,8 @@ public class GameTask extends BukkitRunnable {
 	private int boosterCountdown;
 	private int giveSheepCountdown;
 
-	public GameTask(final UltimateSheepWarsPlugin plugin) {
+	public GameTask(final SheepWarsPlugin plugin) {
 		this.plugin = plugin;
-		plugin.setGameTask(this);
 		this.gameTime = ConfigManager.getInt(Field.GAME_TIME);
 		this.boosterInterval = ConfigManager.getInt(Field.BOOSTER_INTERVAL);
 		this.boosterLifeTime = ConfigManager.getInt(Field.BOOSTER_LIFE_TIME);
@@ -53,6 +53,18 @@ public class GameTask extends BukkitRunnable {
 		this.remainingDurationInSecs = (this.gameTime * 60);
 		this.boosterCountdown = this.boosterInterval;
 		this.giveSheepCountdown = 0;
+		plugin.setGameTask(this);
+		GameStartEvent event = new GameStartEvent(plugin);
+		Bukkit.getPluginManager().callEvent(event);
+		if (event.isCloudNetSupportEnable()) {
+			try {
+				de.dytanic.cloudnet.bridge.CloudServer.getInstance().setServerState(de.dytanic.cloudnet.lib.server.ServerState.INGAME);
+				de.dytanic.cloudnet.bridge.CloudServer.getInstance().changeToIngame();
+				de.dytanic.cloudnet.bridge.CloudServer.getInstance().update();
+			} catch (NoClassDefFoundError ex) {
+				// Do nothing
+			}
+		}
 		new BoosterWoolTask(this).runTaskTimer(this.plugin, 0, 20);
 		this.runTaskTimer(plugin, 0, 20);
 	}
@@ -63,7 +75,7 @@ public class GameTask extends BukkitRunnable {
 				final PlayerData data = PlayerData.getPlayerData(online);
 				if (data.getTeam() != TeamManager.SPEC) {
 					data.increaseTotalTime(1);
-					UltimateSheepWarsPlugin.getVersionManager().getTitleUtils().actionBarPacket(online, data.getLanguage().getMessage(MsgEnum.ACTION_KILLS_STATS).replace("%KILLS%", data.getActualKills() + ""));
+					SheepWarsPlugin.getVersionManager().getTitleUtils().actionBarPacket(online, data.getLanguage().getMessage(MsgEnum.ACTION_KILLS_STATS).replace("%KILLS%", data.getActualKills() + ""));
 				}
 			}
 			/** Fin du jeu ou arret brutal (se traduit par changement d'etape du jeu) **/
@@ -72,7 +84,7 @@ public class GameTask extends BukkitRunnable {
 				if (GameState.isStep(GameState.INGAME)) {
 					for (Player online : Bukkit.getOnlinePlayers()) {
 						final Language lang = PlayerData.getPlayerData(online).getLanguage();
-						UltimateSheepWarsPlugin.getVersionManager().getTitleUtils().titlePacket(online, 5, 10 * 20, 20, lang.getMessage(MsgEnum.FINISH_EQUALITY), lang.getMessage(MsgEnum.GAME_END_EQUALITY_DESCRIPTION));
+						SheepWarsPlugin.getVersionManager().getTitleUtils().titlePacket(online, 5, 10 * 20, 20, lang.getMessage(MsgEnum.FINISH_EQUALITY), lang.getMessage(MsgEnum.GAME_END_EQUALITY_DESCRIPTION));
 					}
 					this.stopGame(null);
 					return;
@@ -85,7 +97,7 @@ public class GameTask extends BukkitRunnable {
 			final String remainingSecsDisplay = ((remainingSecs < 10) ? "0" : "") + remainingSecs;
 			for (Language lang : Language.getLanguages()) {
 				try {
-					lang.getScoreboardWrapper().setTitle(ChatColor.DARK_GRAY + "- " + ChatColor.YELLOW + lang.getMessage(MsgEnum.GAME_DISPLAY_NAME) + " " + ChatColor.GREEN + remainingMinsDisplay + ":" + remainingSecsDisplay + ChatColor.DARK_GRAY + " -");
+					lang.getScoreboardWrapper().setTitle(lang.getMessage(MsgEnum.SCOREBOARD_INGAME_TITLE).replaceAll("%MINUTES%", remainingMinsDisplay).replaceAll("%SECONDS%", remainingSecsDisplay));
 				} catch (IllegalArgumentException ex) {
 					new ExceptionManager(ex).register(true);
 				}
@@ -104,7 +116,7 @@ public class GameTask extends BukkitRunnable {
 		giveSheepCountdown--;
 		if (giveSheepCountdown <= 0) {
 			for (Player player : Bukkit.getOnlinePlayers())
-				SheepManager.giveRandomSheep(player);
+				SheepWarsSheep.giveRandomSheep(player);
 			giveSheepCountdown = ConfigManager.getInt(Field.GIVE_SHEEP_INTERVAL);
 		}
 	}
@@ -142,13 +154,14 @@ public class GameTask extends BukkitRunnable {
 							this.cancel();
 							return;
 						}
-						Location location = ConfigManager.getRdmLocationFromList(Field.BOOSTERS);
+						Location location = RandomUtils.getRandom(SheepWarsPlugin.getWorldManager().getVotedMap().getBoosterSpawns().getBukkitLocations());
+						location.add(RandomUtils.random.nextInt(11) - 5, RandomUtils.random.nextInt(11) - 5, RandomUtils.random.nextInt(11) - 5);
 						ArrayList<Player> onlines = new ArrayList<>();
 						for (Player online : Bukkit.getOnlinePlayers())
 							onlines.add(online);
 						Random rdm = new Random();
 						FireworkEffect effect = FireworkEffect.builder().flicker(rdm.nextBoolean()).withColor(RandomUtils.getRandomColor()).withFade(RandomUtils.getRandomColor()).with(Type.BALL_LARGE).build();
-						UltimateSheepWarsPlugin.getVersionManager().getCustomEntities().spawnInstantExplodingFirework(location, effect, onlines);
+						SheepWarsPlugin.getVersionManager().getCustomEntities().spawnInstantExplodingFirework(location, effect, onlines);
 						this.ticks--;
 					}
 				}.runTaskTimer(plugin, 0, 10);
@@ -175,7 +188,7 @@ public class GameTask extends BukkitRunnable {
 					this.plugin.getRewardsManager().rewardPlayer(Events.ON_LOOSE, data.getPlayer());
 				}
 				player.sendMessage(ChatColor.GOLD.toString() + ChatColor.BOLD + data.getLanguage().getMessage(MsgEnum.VICTORY).replaceAll("%WINNER%", winnerTeam.getColor() + winnerTeam.getDisplayName(player)) + " " + Message.getDecoration() + ChatColor.AQUA + " " + ChatColor.BOLD + data.getLanguage().getMessage(MsgEnum.CONGRATULATIONS) + " " + Message.getDecoration());
-				UltimateSheepWarsPlugin.getVersionManager().getTitleUtils().titlePacket(player, 5, 10 * 20, 20, ChatColor.YELLOW + "" + data.getLanguage().getMessage(MsgEnum.GAME_END_TITLE), Message.getDecoration() + "" + ChatColor.GOLD + " " + ChatColor.BOLD + data.getLanguage().getMessage(MsgEnum.VICTORY).replaceAll("%WINNER%", winnerTeam.getColor() + winnerTeam.getDisplayName(player)) + " " + Message.getDecoration());
+				SheepWarsPlugin.getVersionManager().getTitleUtils().titlePacket(player, 5, 10 * 20, 20, ChatColor.YELLOW + "" + data.getLanguage().getMessage(MsgEnum.GAME_END_TITLE), Message.getDecoration() + "" + ChatColor.GOLD + " " + ChatColor.BOLD + data.getLanguage().getMessage(MsgEnum.VICTORY).replaceAll("%WINNER%", winnerTeam.getColor() + winnerTeam.getDisplayName(player)) + " " + Message.getDecoration());
 			}
 			if (DataManager.isConnected())
 				data.uploadData(offPlayer);

@@ -6,7 +6,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Sheep;
 import org.bukkit.plugin.Plugin;
 
-import fr.asynchronous.sheepwars.core.manager.SheepManager;
+import fr.asynchronous.sheepwars.core.sheep.SheepWarsSheep;
 import fr.asynchronous.sheepwars.core.version.ISheepSpawner;
 import fr.asynchronous.sheepwars.v1_9_R1.entity.CustomSheep;
 import net.minecraft.server.v1_9_R1.World;
@@ -22,7 +22,7 @@ public class SheepSpawner implements ISheepSpawner {
 	}
 
 	@Override
-	public Sheep spawnSheep(Location location, Player player, SheepManager sheepManager, Plugin plugin) {
+	public Sheep spawnSheep(Location location, Player player, SheepWarsSheep sheepManager, Plugin plugin) {
 		final CustomSheep customSheep = new CustomSheep((World) ((CraftWorld) location.getWorld()).getHandle(), player, sheepManager, plugin);
 		if (sheepManager.isFriendly()) {
 			customSheep.setPosition(location.getX(), player.getLocation().getY(), location.getZ());

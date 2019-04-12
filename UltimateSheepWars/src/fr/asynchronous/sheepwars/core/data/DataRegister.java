@@ -25,7 +25,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
 import org.spigotmc.SpigotConfig;
 
-import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
+import fr.asynchronous.sheepwars.core.SheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.manager.URLManager;
 
 /**
@@ -41,7 +41,7 @@ public class DataRegister {
 	private String explanations;
 	private boolean explanations_row = true;
 
-	public DataRegister(final UltimateSheepWarsPlugin plugin, final Boolean localhost, final Boolean debug) {
+	public DataRegister(final SheepWarsPlugin plugin, final Boolean localhost, final Boolean debug) {
 		this.plugin = plugin;
 		this.localhost = localhost;
 		this.explanations = "";
@@ -417,7 +417,7 @@ public class DataRegister {
 
 		@Override
 		public String getData(Plugin plugin) {
-			return UltimateSheepWarsPlugin.user_id;
+			return SheepWarsPlugin.user_id;
 		}
 	}
 
@@ -425,7 +425,7 @@ public class DataRegister {
 
 		@Override
 		public String getData(Plugin plugin) {
-			return UltimateSheepWarsPlugin.getAccount().getOwner();
+			return SheepWarsPlugin.getAccount().getOwner();
 		}
 	}
 
@@ -433,7 +433,7 @@ public class DataRegister {
 
 		@Override
 		public String getData(Plugin plugin) {
-			return UltimateSheepWarsPlugin.download_id;
+			return SheepWarsPlugin.download_id;
 		}
 	}
 

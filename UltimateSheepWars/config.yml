@@ -69,6 +69,11 @@ scoreboard-decoration: 'my.server.com'
 #it will create a new one.
 auto-generate-language: true
 #
+#This is the name of the folder of the map in 'sheepwars-maps/'
+#which contains the lobby of the game. If you want to rename the map folder,
+#you have also to rename it here.
+lobby-map-folder-name: 'sheepwars-backup'
+#
 #===============# Sheep settings #===============#
 #
 #Countdown before a sheep explode (in seconds) (useful only for explosive, incendiary and fragmentation sheep)
@@ -88,6 +93,7 @@ item:
   return-to-hub-id: BED
   particles-on-id: BLAZE_ROD
   particles-off-id: STICK
+  voting-item: PAPER
   #-----# Team items #-----#
   team-blue: BANNER
   team-red: BANNER

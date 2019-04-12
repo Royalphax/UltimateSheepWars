@@ -1,6 +1,5 @@
 package fr.asynchronous.sheepwars.v1_9_R1;
 
-import org.bukkit.ChatColor;
 import org.bukkit.DyeColor;
 import org.bukkit.craftbukkit.v1_9_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_9_R1.inventory.CraftItemStack;
@@ -12,15 +11,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.material.Dye;
 import org.bukkit.material.MaterialData;
 
-import fr.asynchronous.sheepwars.core.handler.InteractiveType;
-import fr.asynchronous.sheepwars.core.message.Language;
 import fr.asynchronous.sheepwars.core.version.INMSUtils;
-import fr.asynchronous.sheepwars.v1_9_R1.util.SpecialMessage;
-import net.minecraft.server.v1_9_R1.ChatClickable.EnumClickAction;
-import net.minecraft.server.v1_9_R1.ChatHoverable.EnumHoverAction;
-import net.minecraft.server.v1_9_R1.ChatHoverable;
-import net.minecraft.server.v1_9_R1.ChatMessage;
-import net.minecraft.server.v1_9_R1.ChatModifier;
 import net.minecraft.server.v1_9_R1.EntityHuman;
 import net.minecraft.server.v1_9_R1.EntityPlayer;
 import net.minecraft.server.v1_9_R1.NBTTagCompound;
@@ -30,18 +21,6 @@ import net.minecraft.server.v1_9_R1.WorldBorder;
 
 public class NMSUtils implements INMSUtils {
 
-	@Override
-	public void displayInteractiveText(Player player, String before, String between, String after, InteractiveType type, String value) {
-		SpecialMessage msg = new SpecialMessage(before);
-		if (type.isClickable()) {
-			msg.setClick(between, EnumClickAction.valueOf(type.toString()), value);
-		} else if (type.isHoverable()) {
-			msg.setHover(between, EnumHoverAction.valueOf(type.toString()), value);
-		}
-		msg.append(after);
-		msg.sendToPlayer(player);
-	}
-	
 	@Override
 	public void setKiller(Entity entity, Entity killer) {
 		EntityPlayer entityKiller = ((CraftPlayer) killer).getHandle();
@@ -72,16 +51,6 @@ public class NMSUtils implements INMSUtils {
 		nmsStack.setTag(tag);
 
 		return CraftItemStack.asCraftMirror(nmsStack);
-	}
-
-	@Override
-	public void displayAvailableLanguages(Player player) {
-		for (Language langs : Language.getLanguages()) {
-			SpecialMessage msg = new SpecialMessage(ChatColor.YELLOW + "- " + langs.getName() + " " + ChatColor.DARK_GRAY + "[");
-			msg.setClick(ChatColor.GREEN + "➔", EnumClickAction.RUN_COMMAND, "/lang " + langs.getLocale().replace(".yml", "")).setChatModifier(new ChatModifier().setChatHoverable(new ChatHoverable(ChatHoverable.EnumHoverAction.SHOW_TEXT, new ChatMessage(ChatColor.YELLOW + "Click to select", new Object[0]))));
-			msg.append(ChatColor.DARK_GRAY + "]");
-			msg.sendToPlayer(player);
-		}
 	}
 
 	@Override

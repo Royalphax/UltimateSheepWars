@@ -4,6 +4,7 @@ import java.util.Calendar;
 import java.util.Random;
 
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -18,11 +19,10 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
-import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
+import fr.asynchronous.sheepwars.core.SheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.calendar.CalendarEvent;
 import fr.asynchronous.sheepwars.core.handler.Particles;
 import fr.asynchronous.sheepwars.core.handler.Sounds;
-import fr.asynchronous.sheepwars.core.util.BlockUtils;
 import fr.asynchronous.sheepwars.core.util.MathUtils;
 
 public class ChristmassMonthEvent extends CalendarEvent {
@@ -68,7 +68,7 @@ public class ChristmassMonthEvent extends CalendarEvent {
 				if (ticks > max) {
 					max = rdm.nextInt(30);
 					for (Player online : world.getPlayers())
-						UltimateSheepWarsPlugin.getVersionManager().getParticleFactory().playParticles(online, Particles.FIREWORKS_SPARK, online.getLocation().add(0, 6.5, 0), range, 0.5f, range, 1, 0f);
+						SheepWarsPlugin.getVersionManager().getParticleFactory().playParticles(online, Particles.FIREWORKS_SPARK, online.getLocation().add(0, 6.5, 0), range, 0.5f, range, 1, 0f);
 				}
 			}
 		}.runTaskTimer(activatingPlugin, 0, 0);
@@ -83,7 +83,7 @@ public class ChristmassMonthEvent extends CalendarEvent {
 	@EventHandler(priority = EventPriority.LOW)
 	public void onInteract(PlayerInteractEvent event) {
 		Player player = event.getPlayer();
-		if (!event.hasItem()) {
+		if (!event.hasItem() && player.getGameMode() == GameMode.SURVIVAL) {
 			player.launchProjectile(Snowball.class);
 			Sounds.playSound(player, null, Sounds.DIG_SNOW, 1.0f, 2.0f);
 		}
@@ -109,7 +109,7 @@ public class ChristmassMonthEvent extends CalendarEvent {
 			}
 		}
 
-		if (MathUtils.randomBoolean() && (top.getType() == Material.AIR || top.getType() == Material.SNOW) && BlockUtils.fullSolid(top.getRelative(BlockFace.DOWN))) {
+		if (MathUtils.randomBoolean() && (top.getType() == Material.AIR || top.getType() == Material.SNOW)) {
 			if (top.getType() != Material.SNOW) {
 				top.setType(Material.SNOW);
 				top.setData((byte) 0);

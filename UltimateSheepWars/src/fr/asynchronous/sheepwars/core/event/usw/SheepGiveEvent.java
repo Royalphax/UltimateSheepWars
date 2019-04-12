@@ -4,7 +4,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
-import fr.asynchronous.sheepwars.core.manager.SheepManager;
+import fr.asynchronous.sheepwars.core.sheep.SheepWarsSheep;
 
 /**
  * Event triggered when a sheep will be given to a player.
@@ -13,10 +13,10 @@ public class SheepGiveEvent extends Event {
 
 	private static final HandlerList handlers = new HandlerList();
 	private final Player player;
-	private final SheepManager sheepClass;
+	private final SheepWarsSheep sheepClass;
 	private boolean isCancelled = false;
 	
-	public SheepGiveEvent(Player player, SheepManager sheepClass) {
+	public SheepGiveEvent(Player player, SheepWarsSheep sheepClass) {
 		this.player = player;
 		this.sheepClass = sheepClass;
 	}
@@ -25,7 +25,7 @@ public class SheepGiveEvent extends Event {
 		return this.player;
 	}
 	
-	public SheepManager getSheep() {
+	public SheepWarsSheep getSheep() {
 		return this.sheepClass;
 	}
 	

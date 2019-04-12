@@ -22,12 +22,13 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.WeatherType;
 import org.bukkit.entity.Player;
 
-import fr.asynchronous.sheepwars.core.event.player.PlayerJoin;
+import fr.asynchronous.sheepwars.core.SheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.handler.GameState;
+import fr.asynchronous.sheepwars.core.handler.PlayableMap;
 import fr.asynchronous.sheepwars.core.handler.Sounds;
-import fr.asynchronous.sheepwars.core.kit.NoneKit;
+import fr.asynchronous.sheepwars.core.kit.SheepWarsKit;
+import fr.asynchronous.sheepwars.core.kit.kits.NoneKit;
 import fr.asynchronous.sheepwars.core.manager.ExceptionManager;
-import fr.asynchronous.sheepwars.core.manager.KitManager;
 import fr.asynchronous.sheepwars.core.manager.TeamManager;
 import fr.asynchronous.sheepwars.core.message.Language;
 import fr.asynchronous.sheepwars.core.message.Message;
@@ -49,7 +50,8 @@ public class PlayerData extends DataManager {
 	private String uid;
 	private String name;
 	private Language language;
-	private Boolean particle;
+	private boolean particle;
+	private boolean cancelMove;
 	private int wins;
 	private int kills;
 	private int actualKills;
@@ -58,11 +60,12 @@ public class PlayerData extends DataManager {
 	private int sheepThrown;
 	private int sheepKilled;
 	private int totalTime;
-	private KitManager kit;
-	private Map<KitManager, Integer> kits;
+	private SheepWarsKit kit;
+	private Map<SheepWarsKit, Integer> kits;
 	private TeamManager team;
 	private String winRate;
 	private String kdRatio;
+	private PlayableMap votedMap;
 	private Date updatedAt;
 	private Date createdAt;
 
@@ -86,6 +89,7 @@ public class PlayerData extends DataManager {
 		this.team = TeamManager.NULL;
 		this.winRate = "0.0";
 		this.kdRatio = "0.0";
+		this.votedMap = null;
 		final Date now = new Date(System.currentTimeMillis());
 		this.updatedAt = now;
 		this.createdAt = now;
@@ -127,13 +131,17 @@ public class PlayerData extends DataManager {
 		return this.actualKills;
 	}
 
-	public KitManager getKit() {
+	public SheepWarsKit getKit() {
 		return this.kit;
 	}
+	
+	public PlayableMap getVotedMap() {
+		return this.votedMap;
+	}
 
-	public List<KitManager> getKits() {
-		List<KitManager> kits = new ArrayList<>(this.kits.keySet());
-		for (KitManager kit : this.kits.keySet())
+	public List<SheepWarsKit> getKits() {
+		List<SheepWarsKit> kits = new ArrayList<>(this.kits.keySet());
+		for (SheepWarsKit kit : this.kits.keySet())
 			if (kit.isFreeKit())
 				kits.remove(kit);
 		return kits;
@@ -141,14 +149,16 @@ public class PlayerData extends DataManager {
 
 	public String getKitsString() {
 		StringBuilder output = new StringBuilder("");
-		for (KitManager k : this.kits.keySet()) {
+		for (SheepWarsKit k : this.kits.keySet()) {
 			if (k.getId() != this.kit.getId()) {
 				output.append(k.getId());
+				output.append(",");
 				output.append(this.kits.get(k));
 				output.append("-");
 			}
 		}
 		output.append(this.kit.getId());
+		output.append(",");
 		output.append(this.kits.get(this.kit));
 		return output.toString().trim();
 	}
@@ -208,6 +218,16 @@ public class PlayerData extends DataManager {
 	public void setCreatedAt(final Date createdAt) {
 		this.createdAt = createdAt;
 	}
+	
+	public void cancelMove(final boolean bool) {
+		this.cancelMove = bool;
+		if (this.player.isOnline())
+			SheepWarsPlugin.getVersionManager().getNMSUtils().cancelMove(getPlayer(), bool);
+	}
+	
+	public boolean cantMove() {
+		return this.cancelMove;
+	}
 
 	public void setName(final String name) {
 		this.name = name;
@@ -227,23 +247,27 @@ public class PlayerData extends DataManager {
 				this.getPlayer().setPlayerWeather(WeatherType.CLEAR);
 		}
 	}
+	
+	public void setVotedMap(final PlayableMap map) {
+		this.votedMap = map;
+	}
 
 	public void setLanguage(final Language lang) {
 		this.language = lang;
-		if (GameState.isStep(GameState.WAITING)) {
-			PlayerJoin.equip(PlayerData.getPlayerData(player));
-		}
 		if (player.isOnline()) {
-			getPlayer().setScoreboard(lang.getScoreboardWrapper().getScoreboard());
+			if (GameState.isStep(GameState.WAITING)) {
+				lang.equipPlayer(getPlayer());
+			}
 			getPlayer().sendMessage(ChatColor.GRAY + lang.getIntro());
 		}
+		getPlayer().setScoreboard(lang.getScoreboardWrapper().getScoreboard());
 	}
 
 	public void setKills(final int i) {
 		this.kills = i;
 	}
 
-	public int getKitLevel(KitManager kit) {
+	public int getKitLevel(SheepWarsKit kit) {
 		if (hasKit(kit)) {
 			return this.kits.get(kit);
 		} else {
@@ -255,16 +279,16 @@ public class PlayerData extends DataManager {
 		return getKitLevel(this.kit);
 	}
 
-	public boolean hasKit(KitManager kit) {
+	public boolean hasKit(SheepWarsKit kit) {
 		return this.kits.containsKey(kit);
 	}
 
-	public void setKit(KitManager kit, Integer level) {
+	public void setKit(SheepWarsKit kit, Integer level) {
 		setKit(kit, level, false);
 	}
 
-	public void setKit(KitManager kit, Integer level, boolean lastOne) {
-		kit = KitManager.getInstanceKit(kit);
+	public void setKit(SheepWarsKit kit, Integer level, boolean lastOne) {
+		kit = SheepWarsKit.getInstanceKit(kit);
 		this.kit = kit;
 		addKit(this.kit, level);
 		if (this.player.isOnline()) {
@@ -287,15 +311,15 @@ public class PlayerData extends DataManager {
 		}
 	}
 
-	public void addKit(KitManager kit, Integer level) {
-		kit = KitManager.getInstanceKit(kit);
+	public void addKit(SheepWarsKit kit, Integer level) {
+		kit = SheepWarsKit.getInstanceKit(kit);
 		if (this.kits.containsKey(kit))
 			this.kits.remove(kit);
 		this.kits.put(kit, level);
 	}
 
-	public void removeKit(KitManager kit) {
-		kit = KitManager.getInstanceKit(kit);
+	public void removeKit(SheepWarsKit kit) {
+		kit = SheepWarsKit.getInstanceKit(kit);
 		if (this.kits.containsKey(kit))
 			this.kits.remove(kit);
 		if (this.kit == kit)
@@ -409,21 +433,21 @@ public class PlayerData extends DataManager {
 							String[] availableKits = res.getString("kits").split("-");
 							for (int i = 0; i < availableKits.length - 1; i++) {
 								String kitString = availableKits[i];
-								String[] kitStringSplitted = kitString.split("");
+								String[] kitStringSplitted = kitString.split(",");
 								final int kitId = Integer.parseInt(kitStringSplitted[0]);
 								final int kitLevel = Integer.parseInt(kitStringSplitted[1]);
-								if (KitManager.existKit(kitId)) {
-									addKit(KitManager.getFromId(kitId), kitLevel);
+								if (SheepWarsKit.existKit(kitId)) {
+									addKit(SheepWarsKit.getFromId(kitId), kitLevel);
 								}
 							}
 							String[] lastKit = availableKits[availableKits.length - 1].split("");
-							setKit(KitManager.getFromId(Integer.parseInt(lastKit[0])), Integer.parseInt(lastKit[1]), true);
+							setKit(SheepWarsKit.getFromId(Integer.parseInt(lastKit[0])), Integer.parseInt(lastKit[1]), true);
 						} else {
 							String[] availableKits = res.getString("kits").split("");
 							for (String kitId : availableKits)
-								if (KitManager.existKit(Integer.parseInt(kitId)))
-									addKit(KitManager.getFromId(Integer.parseInt(kitId)), 0);
-							setKit(KitManager.getFromId(Integer.parseInt(availableKits[availableKits.length - 1])), 0);
+								if (SheepWarsKit.existKit(Integer.parseInt(kitId)))
+									addKit(SheepWarsKit.getFromId(Integer.parseInt(kitId)), 0);
+							setKit(SheepWarsKit.getFromId(Integer.parseInt(availableKits[availableKits.length - 1])), 0);
 
 						}
 						setUpdatedAt(res.getDate("updated_at"));

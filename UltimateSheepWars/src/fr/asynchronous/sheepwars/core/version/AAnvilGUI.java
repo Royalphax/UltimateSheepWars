@@ -17,7 +17,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
+import fr.asynchronous.sheepwars.core.SheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.handler.ItemBuilder;
 
 public abstract class AAnvilGUI {
@@ -91,7 +91,7 @@ public abstract class AAnvilGUI {
 
 	protected AnvilClickEventHandler handler;
 
-	protected UltimateSheepWarsPlugin plugin;
+	protected SheepWarsPlugin plugin;
 
 	protected Map<AnvilSlot, ItemStack> items = new HashMap<AnvilSlot, ItemStack>();
 
@@ -99,7 +99,7 @@ public abstract class AAnvilGUI {
 
 	protected Listener listener;
 
-	public AAnvilGUI(final Player player, final UltimateSheepWarsPlugin plugin, final AnvilClickEventHandler handler, final String itemName, final String... itemLore) {
+	public AAnvilGUI(final Player player, final SheepWarsPlugin plugin, final AnvilClickEventHandler handler, final String itemName, final String... itemLore) {
 		this.player = player;
 		this.plugin = plugin;
 		this.handler = handler;

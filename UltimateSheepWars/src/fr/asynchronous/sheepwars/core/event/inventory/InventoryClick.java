@@ -3,13 +3,13 @@ package fr.asynchronous.sheepwars.core.event.inventory;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.inventory.InventoryClickEvent;
 
-import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
+import fr.asynchronous.sheepwars.core.SheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.event.UltimateSheepWarsEventListener;
 import fr.asynchronous.sheepwars.core.handler.GameState;
 
 public class InventoryClick extends UltimateSheepWarsEventListener {
 	
-	public InventoryClick(final UltimateSheepWarsPlugin plugin) {
+	public InventoryClick(final SheepWarsPlugin plugin) {
 		super(plugin);
 	}
 

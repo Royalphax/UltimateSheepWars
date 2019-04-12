@@ -16,11 +16,13 @@ import fr.asynchronous.sheepwars.core.util.MathUtils;
 import fr.asynchronous.sheepwars.core.version.ICustomEntityType;
 import fr.asynchronous.sheepwars.v1_13_R2.entity.CustomSheep;
 import fr.asynchronous.sheepwars.v1_13_R2.entity.EntityMeteor;
+import fr.asynchronous.sheepwars.v1_13_R2.entity.InstantFireworksEntity;
 import fr.asynchronous.sheepwars.v1_13_R2.entity.firework.FireworkSpawner;
 import net.minecraft.server.v1_13_R2.BiomeBase;
 import net.minecraft.server.v1_13_R2.BiomeBase.BiomeMeta;
 import net.minecraft.server.v1_13_R2.Biomes;
 import net.minecraft.server.v1_13_R2.EntityFireball;
+import net.minecraft.server.v1_13_R2.EntityFireworks;
 import net.minecraft.server.v1_13_R2.EntityInsentient;
 import net.minecraft.server.v1_13_R2.EntitySheep;
 import net.minecraft.server.v1_13_R2.EntityTypes;
@@ -29,6 +31,8 @@ import net.minecraft.server.v1_13_R2.MinecraftKey;
 public enum CustomEntityType {
 	@SuppressWarnings({"unchecked", "rawtypes"})
 	SHEEP("Sheep", 91, EntityType.SHEEP, (Class) EntitySheep.class, (Class) CustomSheep.class),
+	@SuppressWarnings({"unchecked", "rawtypes"})
+	INSTANT_FIREWORKS("FireworksRocketEntity", 22, EntityType.FIREWORK, (Class) EntityFireworks.class, (Class) InstantFireworksEntity.class),
 	@SuppressWarnings({"unchecked", "rawtypes"})
 	METEOR("Fireball", 12, EntityType.FIREBALL, (Class) EntityFireball.class, (Class) EntityMeteor.class);
 
@@ -143,6 +147,14 @@ public enum CustomEntityType {
 		@Override
 		public void spawnInstantExplodingFirework(Location location, FireworkEffect effect, ArrayList<Player> players) {
 			FireworkSpawner.spawn(location, effect, players);
+			/*final ItemStack fireworkItem = new ItemStack(Material.FIREWORK);
+			FireworkMeta meta = (FireworkMeta) fireworkItem.getItemMeta();
+			meta.addEffect(effect);
+			fireworkItem.setItemMeta(meta);
+			final InstantFireworksEntity firework = new InstantFireworksEntity((net.minecraft.server.v1_8_R3.World) ((CraftWorld) location.getWorld()).getHandle(), CraftItemStack.asNMSCopy(fireworkItem));
+			firework.setPosition(location.getX(), location.getY(), location.getZ());
+			((CraftWorld) location.getWorld()).getHandle().addEntity((net.minecraft.server.v1_8_R3.Entity) firework);
+			return (Firework) firework.getBukkitEntity();*/
 		}
 
 		@Override

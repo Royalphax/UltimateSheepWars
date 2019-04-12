@@ -4,19 +4,19 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
-import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
+import fr.asynchronous.sheepwars.core.SheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.command.SubCommand;
 import fr.asynchronous.sheepwars.core.data.PlayerData;
 import fr.asynchronous.sheepwars.core.handler.Permissions;
 import fr.asynchronous.sheepwars.core.handler.Sounds;
-import fr.asynchronous.sheepwars.core.kit.USWKit;
-import fr.asynchronous.sheepwars.core.kit.USWKit.KitLevel;
+import fr.asynchronous.sheepwars.core.kit.SheepWarsKit;
+import fr.asynchronous.sheepwars.core.kit.SheepWarsKit.KitLevel;
 import fr.asynchronous.sheepwars.core.message.Language;
 import fr.asynchronous.sheepwars.core.util.Utils;
 
 public class ShowKitsSubCommand extends SubCommand {
 	
-	public ShowKitsSubCommand(UltimateSheepWarsPlugin plugin) {
+	public ShowKitsSubCommand(SheepWarsPlugin plugin) {
 		super("Display loaded kits", "This command allows developers to see which kit has been loaded. You can display more informations on the kit by adding its ID at the end of the command.", "/usw kits <id>", Permissions.USW_DEVELOPER, plugin, "kits");
 	}
 	
@@ -25,9 +25,9 @@ public class ShowKitsSubCommand extends SubCommand {
 		int i = -1;
 		if (args.length > 1 && Utils.isInteger(args[1]))
 			i = Integer.parseInt(args[1]);
-		if (i >= 0 && USWKit.getAvailableKits().size() > 0) {
-			USWKit kit = USWKit.getAvailableKits().get(0);
-			for (USWKit k : USWKit.getAvailableKits())
+		if (i >= 0 && SheepWarsKit.getAvailableKits().size() > 0) {
+			SheepWarsKit kit = SheepWarsKit.getAvailableKits().get(0);
+			for (SheepWarsKit k : SheepWarsKit.getAvailableKits())
 				if (k.getId() == i)
 					kit = k;
 			player.sendMessage("∙ " + ChatColor.GRAY + kit.getName(player) + ChatColor.GRAY + " (Id " + ChatColor.YELLOW + kit.getId() + ChatColor.GRAY + ")");
@@ -43,7 +43,7 @@ public class ShowKitsSubCommand extends SubCommand {
 			}
 		} else {
 			player.sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + "Loaded Kits :");
-			for (USWKit kit : USWKit.getAvailableKits()) {
+			for (SheepWarsKit kit : SheepWarsKit.getAvailableKits()) {
 				player.sendMessage("∙ " + ChatColor.GRAY + kit.getName(player) + ChatColor.GRAY + " (Id " + ChatColor.YELLOW + kit.getId() + ChatColor.GRAY + ")");
 			}
 		}

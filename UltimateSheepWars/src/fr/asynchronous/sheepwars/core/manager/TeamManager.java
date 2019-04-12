@@ -2,7 +2,6 @@ package fr.asynchronous.sheepwars.core.manager;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.bukkit.Bukkit;
@@ -11,17 +10,11 @@ import org.bukkit.Color;
 import org.bukkit.DyeColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.block.banner.Pattern;
-import org.bukkit.block.banner.PatternType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.BannerMeta;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.material.MaterialData;
-import org.bukkit.material.Wool;
 import org.bukkit.scoreboard.Scoreboard;
 
-import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
+import fr.asynchronous.sheepwars.core.SheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.data.PlayerData;
 import fr.asynchronous.sheepwars.core.handler.ItemBuilder;
 import fr.asynchronous.sheepwars.core.handler.MinecraftVersion;
@@ -35,10 +28,10 @@ import fr.asynchronous.sheepwars.core.util.ReflectionUtils;
 import fr.asynchronous.sheepwars.core.util.ReflectionUtils.PackageType;
 
 public enum TeamManager {
-	BLUE("blue", Message.getMessage(MsgEnum.BLUE_NAME), ConfigManager.getMaterial(Field.TEAM_BLUE_MATERIAL), Field.BLUE_SPAWNS, DyeColor.BLUE, ChatColor.BLUE, 85, 85, 255),
-	RED("red", Message.getMessage(MsgEnum.RED_NAME), ConfigManager.getMaterial(Field.TEAM_RED_MATERIAL), Field.RED_SPAWNS, DyeColor.RED, ChatColor.RED, 255, 50, 50),
-	SPEC("spec", Message.getMessage(MsgEnum.SPEC_NAME), Material.STONE, Field.SPEC_SPAWNS, DyeColor.SILVER, ChatColor.GRAY, 0, 0, 0),
-	NULL("null", new Message("null"), Material.AIR, null, DyeColor.WHITE, ChatColor.WHITE, 255, 255, 255);
+	BLUE("blue", Message.getMessage(MsgEnum.BLUE_NAME), ConfigManager.getMaterial(Field.TEAM_BLUE_MATERIAL), DyeColor.BLUE, ChatColor.BLUE, 85, 85, 255),
+	RED("red", Message.getMessage(MsgEnum.RED_NAME), ConfigManager.getMaterial(Field.TEAM_RED_MATERIAL), DyeColor.RED, ChatColor.RED, 255, 50, 50),
+	SPEC("spec", Message.getMessage(MsgEnum.SPEC_NAME), Material.STONE, DyeColor.SILVER, ChatColor.WHITE, 0, 0, 0),
+	NULL("null", new Message("null"), Material.AIR, DyeColor.WHITE, ChatColor.WHITE, 255, 255, 255);
 
 	public static int redSlot;
 	public static int blueSlot;
@@ -54,7 +47,6 @@ public enum TeamManager {
 	private DyeColor dyecolor;
 	private final ChatColor color;
 	private final Color leatherColor;
-	private Field configField;
 	private List<Player> players;
 	private Boolean blocked;
 	private int lastSpawn;
@@ -87,14 +79,13 @@ public enum TeamManager {
 		return null;
 	}
 
-	private TeamManager(final String name, final Message displayName, final Material material, final Field field, final DyeColor dyecolor, final ChatColor color, int r, int g, int b) {
+	private TeamManager(final String name, final Message displayName, final Material material, final DyeColor dyecolor, final ChatColor color, int r, int g, int b) {
 		this.name = name;
 		this.displayName = displayName;
 		this.dyecolor = dyecolor;
 		this.blocked = false;
 		if (material != null)
 			this.material = material;
-		this.configField = field;
 		this.color = color;
 		this.leatherColor = Color.fromRGB(r, g, b);
 		this.lastSpawn = 0;
@@ -124,7 +115,7 @@ public enum TeamManager {
 	}
 
 	public List<Player> getOnlinePlayers() {
-		return this.players;
+		return new ArrayList<>(this.players);
 	}
 
 	public void setBlocked(boolean bool) {
@@ -136,9 +127,9 @@ public enum TeamManager {
 	}
 
 	public Location getNextSpawn() {
-		List<Location> spawns = getSpawns();
+		List<Location> spawns = SheepWarsPlugin.getWorldManager().getVoteResult().getTeamSpawns(this).getBukkitLocations();
 		if (spawns.isEmpty())
-			return ConfigManager.getLocation(Field.LOBBY);
+			return ConfigManager.getLocation(Field.LOBBY).toBukkitLocation();
 		if (spawns.size() == this.lastSpawn)
 			this.lastSpawn = 0;
 		return spawns.get(this.lastSpawn++);
@@ -149,7 +140,7 @@ public enum TeamManager {
 		blueSlot = 6;
 		if (this != TeamManager.SPEC)
 			updateScoreboardTeamCount();
-		Boolean bool = UltimateSheepWarsPlugin.getVersionManager().getVersion().newerThan(MinecraftVersion.v1_9_R1);
+		Boolean bool = SheepWarsPlugin.getVersionManager().getVersion().newerThan(MinecraftVersion.v1_9_R1);
 		for (Language lang : Language.getLanguages()) {
 			final Scoreboard scoreboard = lang.getScoreboardWrapper().getScoreboard();
 			org.bukkit.scoreboard.Team team = scoreboard.getTeam(this.name);
@@ -176,27 +167,10 @@ public enum TeamManager {
 	}
 
 	public ItemStack getIcon(Player p) {
-		ItemStack i = new ItemBuilder(Material.STONE).setName("null").toItemStack();
-		if (material == null)
-			return i;
-		i = new ItemStack(material, 1);
-		if (material == Material.BANNER) {
-			BannerMeta iMeta = (BannerMeta) i.getItemMeta();
-			iMeta.setBaseColor(this.dyecolor);
-			iMeta.setPatterns(Arrays.asList(new Pattern(DyeColor.WHITE, PatternType.CREEPER)));
-			i.setItemMeta(iMeta);
-		} else if (material == Material.WOOL) {
-			Wool data = new Wool();
-			data.setColor(this.dyecolor);
-			i.setData(data);
-		} else if (material == Material.INK_SACK) {
-			MaterialData data = UltimateSheepWarsPlugin.getVersionManager().getNMSUtils().getDye(this.dyecolor);
-			i.setData(data);
-		}
-		ItemMeta iMeta = i.getItemMeta();
-		iMeta.setDisplayName((this == BLUE ? "" + Message.getMessage(p, ChatColor.BLUE + "", MsgEnum.JOIN_BLUE_ITEM, "") : "" + Message.getMessage(p, ChatColor.RED + "", MsgEnum.JOIN_RED_ITEM, "")));
-		i.setItemMeta(iMeta);
-		return i;
+		if (this.material == null)
+			return new ItemBuilder(Material.STONE).setName("null").toItemStack();
+		ItemBuilder item = new ItemBuilder(this.material).setColor(this.dyecolor).setName((this == BLUE ? "" + Message.getMessage(p, ChatColor.BLUE + "", MsgEnum.JOIN_BLUE_ITEM, "") : "" + Message.getMessage(p, ChatColor.RED + "", MsgEnum.JOIN_RED_ITEM, "")));
+		return item.toItemStack();
 	}
 
 	public String getName() {
@@ -205,6 +179,10 @@ public enum TeamManager {
 
 	public ChatColor getColor() {
 		return this.color;
+	}
+	
+	public net.md_5.bungee.api.ChatColor getBungeeColor() {
+		return net.md_5.bungee.api.ChatColor.valueOf(this.color.name());
 	}
 
 	public Material getMaterial() {
@@ -217,16 +195,6 @@ public enum TeamManager {
 
 	public DyeColor getDyeColor() {
 		return this.dyecolor;
-	}
-
-	public List<Location> getSpawns() {
-		if (this.configField == null)
-			return new ArrayList<>();
-		return ConfigManager.getLocations(this.configField);
-	}
-
-	public void addSpawn(Location location) {
-		ConfigManager.addLocation(this.configField, location);
 	}
 
 	public static boolean checkTeams() {

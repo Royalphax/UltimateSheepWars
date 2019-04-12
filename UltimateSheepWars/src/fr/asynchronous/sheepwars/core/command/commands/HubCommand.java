@@ -13,7 +13,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 
-import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
+import fr.asynchronous.sheepwars.core.SheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.handler.Sounds;
 import fr.asynchronous.sheepwars.core.manager.ConfigManager;
 import fr.asynchronous.sheepwars.core.manager.ConfigManager.Field;
@@ -22,9 +22,9 @@ import fr.asynchronous.sheepwars.core.message.Message.MsgEnum;
 
 public class HubCommand implements CommandExecutor {
 
-	public UltimateSheepWarsPlugin plugin;
+	public SheepWarsPlugin plugin;
 
-	public HubCommand(UltimateSheepWarsPlugin plugin) {
+	public HubCommand(SheepWarsPlugin plugin) {
 		this.plugin = plugin;
 	}
 

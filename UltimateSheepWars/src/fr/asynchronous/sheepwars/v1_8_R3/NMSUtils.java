@@ -1,6 +1,8 @@
 package fr.asynchronous.sheepwars.v1_8_R3;
 
-import org.bukkit.ChatColor;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.bukkit.DyeColor;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack;
@@ -12,15 +14,8 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.material.Dye;
 import org.bukkit.material.MaterialData;
 
-import fr.asynchronous.sheepwars.core.handler.InteractiveType;
-import fr.asynchronous.sheepwars.core.message.Language;
 import fr.asynchronous.sheepwars.core.version.INMSUtils;
-import fr.asynchronous.sheepwars.v1_8_R3.util.SpecialMessage;
-import net.minecraft.server.v1_8_R3.ChatClickable.EnumClickAction;
-import net.minecraft.server.v1_8_R3.ChatHoverable.EnumHoverAction;
-import net.minecraft.server.v1_8_R3.ChatHoverable;
-import net.minecraft.server.v1_8_R3.ChatMessage;
-import net.minecraft.server.v1_8_R3.ChatModifier;
+import fr.asynchronous.sheepwars.v1_8_R3.entity.EntityCancelMove;
 import net.minecraft.server.v1_8_R3.EntityHuman;
 import net.minecraft.server.v1_8_R3.EntityPlayer;
 import net.minecraft.server.v1_8_R3.NBTTagCompound;
@@ -30,18 +25,6 @@ import net.minecraft.server.v1_8_R3.WorldBorder;
 
 public class NMSUtils implements INMSUtils {
 
-	@Override
-	public void displayInteractiveText(Player player, String before, String between, String after, InteractiveType type, String value) {
-		SpecialMessage msg = new SpecialMessage(before);
-		if (type.isClickable()) {
-			msg.setClick(between, EnumClickAction.valueOf(type.toString()), value);
-		} else if (type.isHoverable()) {
-			msg.setHover(between, EnumHoverAction.valueOf(type.toString()), value);
-		}
-		msg.append(after);
-		msg.sendToPlayer(player);
-	}
-	
 	@Override
 	public void setKiller(Entity entity, Entity killer) {
 		EntityPlayer entityKiller = ((CraftPlayer) killer).getHandle();
@@ -75,28 +58,10 @@ public class NMSUtils implements INMSUtils {
 	}
 
 	@Override
-	public void displayAvailableLanguages(Player player) {
-		for (Language langs : Language.getLanguages()) {
-			SpecialMessage msg = new SpecialMessage(ChatColor.YELLOW + "- " + langs.getName() + " " + ChatColor.DARK_GRAY + "[");
-			msg.setClick(ChatColor.GREEN + "➔", EnumClickAction.RUN_COMMAND, "/lang " + langs.getLocale().replace(".yml", "")).setChatModifier(new ChatModifier().setChatHoverable(new ChatHoverable(ChatHoverable.EnumHoverAction.SHOW_TEXT, new ChatMessage(ChatColor.YELLOW + "Click to select", new Object[0]))));
-			msg.append(ChatColor.DARK_GRAY + "]");
-			msg.sendToPlayer(player);
-		}
-	}
-
-	@Override
 	public void displayRedScreen(Player player, boolean activate) {
-		if (activate) {
-			WorldBorder w = new WorldBorder();
-			w.setSize(1.0D);
-			w.setCenter(player.getLocation().getX() + 10000.0D, player.getLocation().getZ() + 10000.0D);
-			((CraftPlayer) player).getHandle().playerConnection.sendPacket(new PacketPlayOutWorldBorder(w, PacketPlayOutWorldBorder.EnumWorldBorderAction.INITIALIZE));
-		} else {
-			WorldBorder ww = new WorldBorder();
-			ww.setSize(3.0E7D);
-			ww.setCenter(player.getLocation().getX(), player.getLocation().getZ());
-			((CraftPlayer) player).getHandle().playerConnection.sendPacket(new PacketPlayOutWorldBorder(ww, PacketPlayOutWorldBorder.EnumWorldBorderAction.INITIALIZE));
-		}
+		WorldBorder border = new WorldBorder();
+        border.setWarningDistance(activate ? Integer.MAX_VALUE : 0);
+        ((CraftPlayer) player).getHandle().playerConnection.sendPacket(new PacketPlayOutWorldBorder(border, PacketPlayOutWorldBorder.EnumWorldBorderAction.SET_WARNING_BLOCKS));
 	}
 
 	@Override
@@ -115,5 +80,26 @@ public class NMSUtils implements INMSUtils {
 	@Override
 	public MaterialData getDye(DyeColor color) {
 		return new Dye(color.getDyeData());
+	}
+
+	public static Map<Player, EntityCancelMove> cancelMoveMap = new HashMap<>();
+	
+	@Override
+	public void cancelMove(Player player, boolean bool) {
+		if (bool) {
+			if (!cancelMoveMap.containsKey(player)) {
+				final EntityCancelMove entity = new EntityCancelMove(player);
+				entity.spawnClientEntity();
+				entity.rideClientEntity();
+				cancelMoveMap.put(player, entity);
+			}
+		} else {
+			if (cancelMoveMap.containsKey(player)) {
+				final EntityCancelMove entity = cancelMoveMap.get(player);
+				entity.unrideClientEntity();
+				entity.destroyClientEntity();
+				cancelMoveMap.remove(player);
+			}
+		}
 	}
 }

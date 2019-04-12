@@ -5,7 +5,7 @@ import org.bukkit.entity.Sheep;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
-import fr.asynchronous.sheepwars.core.manager.SheepManager;
+import fr.asynchronous.sheepwars.core.sheep.SheepWarsSheep;
 
 /**
  * Event triggered when a player launch his sheep.
@@ -15,10 +15,10 @@ public class SheepLaunchEvent extends Event {
 	private static final HandlerList handlers = new HandlerList();
 	private final Player launcher;
 	private final Sheep entity;
-	private final SheepManager sheepClass;
+	private final SheepWarsSheep sheepClass;
 	private boolean isCancelled = false;
 	
-	public SheepLaunchEvent(Player launcher, Sheep entity, SheepManager sheepClass) {
+	public SheepLaunchEvent(Player launcher, Sheep entity, SheepWarsSheep sheepClass) {
 		this.launcher = launcher;
 		this.entity = entity;
 		this.sheepClass = sheepClass;
@@ -32,7 +32,7 @@ public class SheepLaunchEvent extends Event {
 		return this.entity;
 	}
 	
-	public SheepManager getSheep() {
+	public SheepWarsSheep getSheep() {
 		return this.sheepClass;
 	}
 	

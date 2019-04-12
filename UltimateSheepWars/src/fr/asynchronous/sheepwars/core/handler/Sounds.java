@@ -224,6 +224,16 @@ public enum Sounds {
         }
     }
     
+    public void playSound(Player player, Location location, float volume, float pitch)
+	{
+		player.playSound((location == null ? player.getLocation() : location), bukkitSound(), volume, pitch);
+	}
+    
+    public void playSound(Player player, float volume, float pitch)
+	{
+    	playSound(player, (Location) null, volume, pitch);
+	}
+    
     public static void playSoundAll(Location location, Sounds sound, float volume, float pitch)
 	{
 		for (Player online : Bukkit.getOnlinePlayers())

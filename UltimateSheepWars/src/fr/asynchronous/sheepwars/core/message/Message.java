@@ -2,15 +2,16 @@ package fr.asynchronous.sheepwars.core.message;
 
 import java.text.Normalizer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
-import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
+import fr.asynchronous.sheepwars.core.SheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.data.PlayerData;
-import fr.asynchronous.sheepwars.core.exception.StringIdAlreadyUsed;
+import fr.asynchronous.sheepwars.core.exception.UIDException;
 import fr.asynchronous.sheepwars.core.version.ATitleUtils.Type;
 
 public class Message {
@@ -29,7 +30,7 @@ public class Message {
 		this.msg = message;
 
 		if (getMessageByStringId(messageId) != null) {
-			new StringIdAlreadyUsed("You can't register two messages with the same string ID.").printStackTrace();
+			new UIDException("You can't register two messages with the same string ID.").printStackTrace();
 		} else {
 			map.add(this);
 		}
@@ -97,6 +98,25 @@ public class Message {
 	public static void sendMessage(Player player, String prefix, MsgEnum message, String suffix) {
 		player.sendMessage(prefix + getMessage(player, message) + suffix);
 	}
+	
+	public static void broadcast(MsgEnum message, String regex, String replacement) {
+		for (Player online : Bukkit.getOnlinePlayers())
+			sendMessage(online, message, Arrays.asList(regex), Arrays.asList(replacement));
+	}
+	
+	public static void broadcast(MsgEnum message, List<String> regex, List<String> replacement) {
+		for (Player online : Bukkit.getOnlinePlayers())
+			sendMessage(online, message, regex, replacement);
+	}
+	
+	public static void sendMessage(Player player, MsgEnum message, List<String> regex, List<String> replacement) {
+		String msg = getMessage(player, message);
+		int size = (regex.size() > replacement.size() ? replacement.size() : regex.size());
+		for (int i = 0; i < size; i++) {
+			msg = msg.replaceAll(regex.get(i), replacement.get(i));
+		}
+		player.sendMessage(msg);
+	}
 
 	public static void broadcastTitle(MsgEnum title, MsgEnum subtitle) {
 		broadcastTitle("", title, "", "", subtitle, "");
@@ -108,7 +128,7 @@ public class Message {
 	}
 
 	public static void sendTitle(Player player, String prefix1, MsgEnum title, String suffix1, String prefix2, MsgEnum subtitle, String suffix2) {
-		UltimateSheepWarsPlugin.getVersionManager().getTitleUtils().defaultTitle(Type.TITLE, player, prefix1 + getMessage(player, title) + suffix1, prefix2 + getMessage(player, subtitle) + suffix2);
+		SheepWarsPlugin.getVersionManager().getTitleUtils().defaultTitle(Type.TITLE, player, prefix1 + getMessage(player, title) + suffix1, prefix2 + getMessage(player, subtitle) + suffix2);
 	}
 
 	public static void broadcastAction(MsgEnum action) {
@@ -121,7 +141,7 @@ public class Message {
 	}
 
 	public static void sendAction(Player player, String prefix, MsgEnum action, String suffix) {
-		UltimateSheepWarsPlugin.getVersionManager().getTitleUtils().actionBarPacket(player, prefix + getMessage(player, action) + suffix);
+		SheepWarsPlugin.getVersionManager().getTitleUtils().actionBarPacket(player, prefix + getMessage(player, action) + suffix);
 	}
 
 	public static String getMessage(Player player, String prefix, MsgEnum msg, String suffix) {
@@ -220,6 +240,9 @@ public class Message {
 		KIT_LAST_SELECTED("&7&oLast selected kit: &6%KIT_NAME% &e%LEVEL_NAME%"),
 		KIT_CHOOSE_MESSAGE("&7&oSelected kit: &6%KIT_NAME% &e%LEVEL_NAME%"),
 		KITS_ITEM("&6Kits & Stats &7(Right-Click)"),
+		VOTING_ITEM("&6Vote for a Map &7(Right-Click)"),
+		VOTE_MAP_NAME("&eVote for &a%MAP_NAME% &7(Click)"),
+		RANDOM_MAP_NAME("&eVote for a &aRandom map &7(Click)"),
 		KIT_BETTER_BOW_NAME("&6Better bow"),
 		KIT_MORE_HEALTH_NAME("&6More health"),
 		KIT_BETTER_SWORD_NAME("&6Better sword"),
@@ -263,6 +286,7 @@ public class Message {
 		FROZEN_SHEEP_NAME("&bFrozen sheep"),
 		HEALER_SHEEP_NAME("&dHealer sheep"),
 		INCENDIARY_SHEEP_NAME("&6Incendiary sheep"),
+		GLUTTON_SHEEP_NAME("&2Glutton sheep"),
 		INTERGALACTIC_SHEEP_NAME("&1&lINTERGALACTIC SHEEP"),
 		INTERGALACTIC_SHEEP_LAUNCHED("%PLAYER% launched %SHEEP%"),
 		GLOWING_SHEEP_NAME("&7Glowing sheep"),
@@ -289,7 +313,8 @@ public class Message {
 		PLAYERS_DEFICIT("&cThere's not enough players."),
 		LEAVE_ITEM("&6Back to Hub &7(Right-Click)"),
 		OUT_OF_THE_GAME("&cReturn to the fighting area !"),
-		GAME_DISPLAY_NAME("&6SheepWars"),
+		SCOREBOARD_WAITING_TITLE("&8- &eSheepWars &8-"),
+		SCOREBOARD_INGAME_TITLE("&8- &eSheepWars &a%MINUTES%:%SECONDS% &8-"),
 		SCOREBOARD_NEXT_SHEEP_COUNTDOWN("&aNext Sheep: &e%TIME%"),
 		SCOREBOARD_NEXT_BOOSTER_COUNTDOWN("&aNext Booster: &e%TIME%"),
 		ACTION_KILLS_STATS("&aKills: &e%KILLS%"),
@@ -299,6 +324,7 @@ public class Message {
 		USER_DATA_LOADING("&2Data loading.."),
 		USER_DATA_LOADED("&aData loaded!"),
 		USER_DATA_UNREACHABLE("&cData unreachable."),
+		VOTE_SUCCESS("&a&lVoting has ended! &eThe map &f%MAP_NAME% &ehas won."),
 		DATABASE_NOT_CONNECTED("&cNo database connection.");
 
 		private String msg;

@@ -10,7 +10,7 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
+import fr.asynchronous.sheepwars.core.SheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.data.PlayerData;
 import fr.asynchronous.sheepwars.core.event.UltimateSheepWarsEventListener;
 import fr.asynchronous.sheepwars.core.handler.GameState;
@@ -20,7 +20,7 @@ import fr.asynchronous.sheepwars.core.manager.TeamManager;
 public class PlayerDamage extends UltimateSheepWarsEventListener {
 	private ArrayList<OfflinePlayer> redScreeners; 
 	
-	public PlayerDamage(final UltimateSheepWarsPlugin plugin) {
+	public PlayerDamage(final SheepWarsPlugin plugin) {
 		super(plugin);
 		redScreeners = new ArrayList<>();
 	}
@@ -42,7 +42,7 @@ public class PlayerDamage extends UltimateSheepWarsEventListener {
 				}
 				if (event.getCause() == DamageCause.PROJECTILE && event.getDamage() > 2.0) {
 					int i = (int)(event.getDamage() * 0.5D);
-					UltimateSheepWarsPlugin.getVersionManager().getParticleFactory().playParticles(Particles.DAMAGE_INDICATOR, player.getLocation().add(0, 1.5, 0), 0.1f, 0.0f, 0.1f, i, 0.2f);
+					SheepWarsPlugin.getVersionManager().getParticleFactory().playParticles(Particles.DAMAGE_INDICATOR, player.getLocation().add(0, 1.5, 0), 0.1f, 0.0f, 0.1f, i, 0.2f);
 				} 
 			}
 			if (!cancelled && player.getHealth() <= 3.0D && player.getHealth() > 0.0D)
@@ -56,7 +56,7 @@ public class PlayerDamage extends UltimateSheepWarsEventListener {
 		if (!redScreeners.contains(player))
 		{
 			redScreeners.add(player);
-			UltimateSheepWarsPlugin.getVersionManager().getNMSUtils().displayRedScreen(player, true);
+			SheepWarsPlugin.getVersionManager().getNMSUtils().displayRedScreen(player, true);
 			new BukkitRunnable()
 			{
 				public void run()
@@ -65,7 +65,7 @@ public class PlayerDamage extends UltimateSheepWarsEventListener {
 					{
 						cancel();
 						if (player.isOnline()) {
-							UltimateSheepWarsPlugin.getVersionManager().getNMSUtils().displayRedScreen(player, false);
+							SheepWarsPlugin.getVersionManager().getNMSUtils().displayRedScreen(player, false);
 							redScreeners.remove(player);
 						}
 					}

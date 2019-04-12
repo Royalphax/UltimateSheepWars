@@ -8,24 +8,24 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
-import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
+import fr.asynchronous.sheepwars.core.SheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.command.SubCommand;
 import fr.asynchronous.sheepwars.core.data.PlayerData;
 import fr.asynchronous.sheepwars.core.handler.GameState;
 import fr.asynchronous.sheepwars.core.handler.Permissions;
 import fr.asynchronous.sheepwars.core.handler.Sounds;
-import fr.asynchronous.sheepwars.core.sheep.USWSheep;
+import fr.asynchronous.sheepwars.core.sheep.SheepWarsSheep;
 
 public class GiveSheepSubCommand extends SubCommand {
 
-	public GiveSheepSubCommand(UltimateSheepWarsPlugin plugin) {
-		super("Give some extra sheeps to player", "This command allows you to give some sheeps to a player. The first argument allows you to target one player (just put his name) or all the players (put '*'). Then, the second argument allows you to select which sheep you will give (use the '/usw sheeps' IDs). Finally, the last argument allows you to specify how many sheeps will be given (use ',' to specify different amounts for each sheep).", "/usw give <player/*> <Id,...> <amount,...>", makeList(Permissions.USW_GIVE_ALL, Permissions.USW_GIVE_OTHER, Permissions.USW_GIVE_SELF, Permissions.USW_GIVE_X), plugin, "give", "g");
+	public GiveSheepSubCommand(SheepWarsPlugin plugin) {
+		super("Give extra sheeps", "This command allows you to give some extra sheeps to a player. The first argument allows you to target one player (just put his name) or all the players (put '*'). Then, the second argument allows you to select which sheep you will give (use the sheep IDs '/usw sheeps'). Finally, the last argument allows you to specify how many sheeps will be given (use ',' to specify different amounts for each sheep).", "/usw give <player/*> <Id,...> <amount,...>", makeList(Permissions.USW_GIVE_ALL, Permissions.USW_GIVE_OTHER, Permissions.USW_GIVE_SELF, Permissions.USW_GIVE_X), plugin, "give", "g");
 	}
 
 	@Override
 	protected void onExePlayer(Player player, String... args) {
 		if (GameState.isStep(GameState.INGAME)) {
-			List<USWSheep> sheeps = new ArrayList<>(USWSheep.getAvailableSheeps());
+			List<SheepWarsSheep> sheeps = new ArrayList<>(SheepWarsSheep.getAvailableSheeps());
 			List<Integer> amounts = new ArrayList<>();
 			List<Player> players = new ArrayList<>();
 			players.add(player);
@@ -63,7 +63,7 @@ public class GiveSheepSubCommand extends SubCommand {
 						}
 					}
 
-					List<USWSheep> availableSheeps = USWSheep.getAvailableSheeps();
+					List<SheepWarsSheep> availableSheeps = SheepWarsSheep.getAvailableSheeps();
 					for (int i : sheepsId)
 						sheeps.add(availableSheeps.get(i));
 
@@ -92,7 +92,7 @@ public class GiveSheepSubCommand extends SubCommand {
 				for (int i = 0; i < sheeps.size(); i++) {
 					if (i < amounts.size())
 						amount = amounts.get(i);
-					USWSheep.giveSheep(people, sheeps.get(i), amount);
+					SheepWarsSheep.giveSheep(people, sheeps.get(i), amount);
 				}
 				Sounds.playSound(people, people.getLocation(), Sounds.VILLAGER_YES, 1f, 1f);
 				if (people != player) {

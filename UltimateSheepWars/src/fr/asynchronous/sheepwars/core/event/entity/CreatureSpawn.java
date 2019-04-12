@@ -6,12 +6,12 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 
-import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
+import fr.asynchronous.sheepwars.core.SheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.event.UltimateSheepWarsEventListener;
 
 public class CreatureSpawn extends UltimateSheepWarsEventListener
 {
-    public CreatureSpawn(final UltimateSheepWarsPlugin plugin) {
+    public CreatureSpawn(final SheepWarsPlugin plugin) {
         super(plugin);
     }
     

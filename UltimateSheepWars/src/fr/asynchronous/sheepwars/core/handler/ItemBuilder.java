@@ -12,6 +12,8 @@ import org.bukkit.Color;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.SkullType;
+import org.bukkit.block.banner.Pattern;
+import org.bukkit.block.banner.PatternType;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -19,12 +21,14 @@ import org.bukkit.inventory.meta.BannerMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.inventory.meta.SkullMeta;
+import org.bukkit.material.Dye;
 import org.bukkit.material.MaterialData;
+import org.bukkit.material.Wool;
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 
-import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
+import fr.asynchronous.sheepwars.core.SheepWarsPlugin;
 import net.md_5.bungee.api.ChatColor;
 
 public class ItemBuilder {
@@ -117,13 +121,13 @@ public class ItemBuilder {
     }
 
 	public ItemBuilder addIllegallyGlow() {
-		ItemStack newItem = UltimateSheepWarsPlugin.getVersionManager().getNMSUtils().setIllegallyGlowing(is, true);
+		ItemStack newItem = SheepWarsPlugin.getVersionManager().getNMSUtils().setIllegallyGlowing(is, true);
 		is = newItem;
 		return this;
 	}
 	
 	public ItemBuilder removeIllegallyGlow() {
-		ItemStack newItem = UltimateSheepWarsPlugin.getVersionManager().getNMSUtils().setIllegallyGlowing(is, false);
+		ItemStack newItem = SheepWarsPlugin.getVersionManager().getNMSUtils().setIllegallyGlowing(is, false);
 		is = newItem;
 		return this;
 	}
@@ -221,13 +225,26 @@ public class ItemBuilder {
 	}
 	
 	public ItemBuilder setColor(DyeColor color) {
-		Material material = this.is.getType();
-		if (material.equals(Material.INK_SACK)) {
-			this.is = new ItemStack(material, this.is.getAmount(), color.getDyeData());
-		} else if (Arrays.asList(Material.WOOL, Material.STAINED_GLASS_PANE, Material.STAINED_GLASS).contains(material)) {
-			this.is = new ItemStack(material, this.is.getAmount(), color.getWoolData());
-		}
-		return this;
+		final Material type = this.is.getType();
+        switch(type) {
+            case INK_SACK:
+                this.is.setData(new Dye(color));
+                break;
+            case WOOL:
+            	this.is.setData(new Wool(color));
+                break;
+            case BANNER:
+            	BannerMeta bannerMeta = (BannerMeta) this.is.getItemMeta();
+        		bannerMeta.setBaseColor(color);
+        		bannerMeta.setPatterns(Arrays.asList(new Pattern(DyeColor.WHITE, PatternType.CREEPER))); // Easteregg
+        		this.is.setItemMeta(bannerMeta);
+            	break;
+            default:
+            	this.is.setData(new MaterialData(type, color.getWoolData()));
+                break;
+        }
+        this.is.setDurability(this.is.getData().getData());
+        return this;
 	}
 
 	/**public ItemBuilder setDyeColor(DyeColor color) {
@@ -248,7 +265,7 @@ public class ItemBuilder {
 		woolData.setColor(color);
 		is.setData(woolData);
 		return this;
-	}**/
+	}
 	
 	public ItemBuilder setBannerColor(DyeColor color) {
 		if (is.getType() != Material.BANNER)
@@ -257,7 +274,7 @@ public class ItemBuilder {
 		bannerMeta.setBaseColor(color);
 		is.setItemMeta(bannerMeta);
 		return this;
-	}
+	}**/
 
 	public ItemBuilder setLeatherArmorColor(Color color) {
 		try {

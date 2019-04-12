@@ -7,21 +7,21 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import fr.asynchronous.sheepwars.core.data.PlayerData;
-import fr.asynchronous.sheepwars.core.kit.DestroyerKit;
-import fr.asynchronous.sheepwars.core.manager.SheepManager;
+import fr.asynchronous.sheepwars.core.kit.kits.DestroyerKit;
+import fr.asynchronous.sheepwars.core.sheep.SheepWarsSheep;
 
 public class GiveSheepTask extends BukkitRunnable {
 
-	public final SheepManager sheepToGive;
+	public final SheepWarsSheep sheepToGive;
 	
-	public GiveSheepTask(SheepManager sheepToGive) {
+	public GiveSheepTask(SheepWarsSheep sheepToGive) {
 		this.sheepToGive = sheepToGive;
 	}
 
 	public void run() {
 		for (Player online : Bukkit.getOnlinePlayers()) {
-			SheepManager.giveSheep(online, this.sheepToGive);
-			if (PlayerData.getPlayerData(online).getKit().getId() == new DestroyerKit().getId())
+			SheepWarsSheep.giveSheep(online, this.sheepToGive);
+			if (PlayerData.getPlayerData(online).getKit().getId() == DestroyerKit.ID)
 				online.getInventory().addItem(new ItemStack(Material.TNT, 1));
 		}
 	}

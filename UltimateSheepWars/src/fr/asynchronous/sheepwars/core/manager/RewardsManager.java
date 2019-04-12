@@ -7,13 +7,13 @@ import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 
-import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
+import fr.asynchronous.sheepwars.core.SheepWarsPlugin;
 
 public class RewardsManager {
 	
-	private UltimateSheepWarsPlugin instance;
+	private SheepWarsPlugin instance;
 	
-	public RewardsManager(UltimateSheepWarsPlugin instance) {
+	public RewardsManager(SheepWarsPlugin instance) {
 		this.instance = instance;
 		FileConfiguration config = instance.getConfig();
         for (Events ev : Events.values()) {
@@ -31,7 +31,7 @@ public class RewardsManager {
 			for (String comm : event.commands)
 				this.instance.getServer().dispatchCommand(Bukkit.getConsoleSender(), comm.replaceAll("%PLAYER%", player.getName()));
 		try {
-			UltimateSheepWarsPlugin.getEconomyProvider().depositPlayer(player, event.vaultReward);
+			SheepWarsPlugin.getEconomyProvider().depositPlayer(player, event.vaultReward);
 		} catch (NoClassDefFoundError | NullPointerException e) {
 			// Do nothing
 		}

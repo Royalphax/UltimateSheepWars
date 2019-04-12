@@ -7,7 +7,7 @@ import org.bukkit.entity.Player;
 
 import com.google.common.collect.Maps;
 
-import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
+import fr.asynchronous.sheepwars.core.SheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.particle.EnchantEffect;
 import fr.asynchronous.sheepwars.core.particle.FlameCircleEffect;
 import fr.asynchronous.sheepwars.core.particle.FlameRingsEffect;
@@ -75,7 +75,7 @@ public enum Particles {
 	private static final MinecraftVersion version;
 
 	static {
-		version = UltimateSheepWarsPlugin.getVersionManager().getVersion();
+		version = SheepWarsPlugin.getVersionManager().getVersion();
 		particlesId = Maps.newHashMap();
 		particlesName = Maps.newHashMap();
 		for (Particles localEnumParticle : values()) {
@@ -98,11 +98,11 @@ public enum Particles {
 	}
 
 	private Particles(String paramString, int paramInt, boolean paramBoolean, int paramInt2) {
-		this(paramString, paramInt, paramBoolean, paramInt2, MinecraftVersion.v1_8_R1, null);
+		this(paramString, paramInt, paramBoolean, paramInt2, MinecraftVersion.v1_8_R3, null);
 	}
 
 	private Particles(String paramString, int paramInt, boolean paramBoolean) {
-		this(paramString, paramInt, paramBoolean, 0, MinecraftVersion.v1_8_R1, null);
+		this(paramString, paramInt, paramBoolean, 0, MinecraftVersion.v1_8_R3, null);
 	}
 
 	public static Set<String> getParticles() {
@@ -174,12 +174,12 @@ public enum Particles {
 			void update(Player player, Boolean moving);
 		}
 
-		public static void equipEffect(Player player, UltimateSheepWarsPlugin plugin) {
+		public static void equipEffect(Player player, SheepWarsPlugin plugin) {
 			if (Contributor.isContributor(player))
 				new ParticleTask(Contributor.getContributor(player).getEffect(), player, plugin);
 		}
 		
-		public static void equipEffect(Player player, ParticleEffect effect, UltimateSheepWarsPlugin plugin) {
+		public static void equipEffect(Player player, ParticleEffect effect, SheepWarsPlugin plugin) {
 			new ParticleTask(effect, player, plugin);
 		}
 	}

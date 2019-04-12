@@ -6,7 +6,7 @@ import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
+import fr.asynchronous.sheepwars.core.SheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.handler.Contributor;
 import fr.asynchronous.sheepwars.core.handler.Particles.ParticleEffect;
 
@@ -17,7 +17,7 @@ public class ParticleTask extends BukkitRunnable {
 	private ParticleEffect effect;
 	private Player player;
 	private boolean isMoving;
-	public ParticleTask(ParticleEffect effect, Player player, UltimateSheepWarsPlugin plugin) {
+	public ParticleTask(ParticleEffect effect, Player player, SheepWarsPlugin plugin) {
 		if (!map.containsKey(player)) {
 			this.isMoving = false;
 			this.effect = effect;

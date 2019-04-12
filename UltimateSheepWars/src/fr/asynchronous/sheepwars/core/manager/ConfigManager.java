@@ -8,20 +8,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.math.RandomUtils;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.ItemStack;
 
-import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
-import fr.asynchronous.sheepwars.core.exception.ConfigurationManagerClassHasntBeenInitialized;
-import fr.asynchronous.sheepwars.core.exception.InvalidFieldTypeException;
+import fr.asynchronous.sheepwars.core.SheepWarsPlugin;
+import fr.asynchronous.sheepwars.core.exception.InitConfigException;
+import fr.asynchronous.sheepwars.core.exception.InvalidFieldException;
 import fr.asynchronous.sheepwars.core.handler.ItemBuilder;
-import fr.asynchronous.sheepwars.core.util.Utils;
+import fr.asynchronous.sheepwars.core.handler.VirtualLocation;
 
 public class ConfigManager {
 
@@ -52,6 +52,7 @@ public class ConfigManager {
 		RETURN_TO_HUB_ITEM("item.return-to-hub-id", FieldType.ITEMSTACK, "BED"),
 		PARTICLES_ON_ITEM("item.particles-on-id", FieldType.ITEMSTACK, "BLAZE_ROD"),
 		PARTICLES_OFF_ITEM("item.particles-off-id", FieldType.ITEMSTACK, "STICK"),
+		VOTING_ITEM("item.voting-item", FieldType.ITEMSTACK, "PAPER"),
 		TEAM_BLUE_MATERIAL("item.team-blue", FieldType.MATERIAL, "BANNER"),
 		TEAM_RED_MATERIAL("item.team-red", FieldType.MATERIAL, "BANNER"),
 		CUSTOMIZE_TABLIST("customize-tablist", FieldType.BOOLEAN, true),
@@ -67,17 +68,22 @@ public class ConfigManager {
 		MYSQL_USER("mysql.user", FieldType.STRING, "root"),
 		MYSQL_PASSWORD("mysql.pass", FieldType.STRING, "root"),
 		RANKING_TOP("ranking-top", FieldType.INT, 10),
+		LOBBY_MAP_NAME("lobby-map-folder-name", FieldType.STRING, "sheepwars-backup"),
 		WAITING_GAME_STATE_MOTD("game-state.waiting", FieldType.STRING, "&2\\u2714 &aWaiting &2\\u2714"),
 		INGAME_GAME_STATE_MOTD("game-state.in-game", FieldType.STRING, "&4\\u2716 &cRunning &4\\u2716"),
 		TERMINATED_GAME_STATE_MOTD("game-state.terminated", FieldType.STRING, "&6\\u2261 &eTerminated &6\\u2261"),
 		RESTARTING_GAME_STATE_MOTD("game-state.restarting", FieldType.STRING, "&5\\u26A0 &dRestarting &5\\u26A0"),
 		
-		LOBBY("lobby", FieldType.LOCATION, new Location(Bukkit.getWorlds().get(0), 0, 0, 0), SETTINGS_FILE),
+		LOBBY("lobby", FieldType.VIRTUAL_LOCATION, VirtualLocation.getDefault(), SETTINGS_FILE),
 		OWNER("owner", FieldType.STRING, "null", SETTINGS_FILE),
-		BOOSTERS("boosters", FieldType.LOCATION_LIST, new ArrayList<Location>(), SETTINGS_FILE),
-		RED_SPAWNS("teams.red.spawns", FieldType.LOCATION_LIST, new ArrayList<Location>(), SETTINGS_FILE),
-		BLUE_SPAWNS("teams.blue.spawns", FieldType.LOCATION_LIST, new ArrayList<Location>(), SETTINGS_FILE),
-		SPEC_SPAWNS("teams.spec.spawns", FieldType.LOCATION_LIST, new ArrayList<Location>(), SETTINGS_FILE),
+		@Deprecated
+		BOOSTERS("boosters", FieldType.VIRTUAL_LOCATION_LIST, new ArrayList<VirtualLocation>(), SETTINGS_FILE),
+		@Deprecated
+		RED_SPAWNS("teams.red.spawns", FieldType.VIRTUAL_LOCATION_LIST, new ArrayList<VirtualLocation>(), SETTINGS_FILE),
+		@Deprecated
+		BLUE_SPAWNS("teams.blue.spawns", FieldType.VIRTUAL_LOCATION_LIST, new ArrayList<VirtualLocation>(), SETTINGS_FILE),
+		@Deprecated
+		SPEC_SPAWNS("teams.spec.spawns", FieldType.VIRTUAL_LOCATION_LIST, new ArrayList<VirtualLocation>(), SETTINGS_FILE),
 		
 		PREFIX("prefix", FieldType.STRING, "&8[&9SheepWars&8]");
 
@@ -121,51 +127,90 @@ public class ConfigManager {
 		private void setValue(Object obj) {
 			this.value = obj;
 		}
-
-		public static void init(File file) {
-			FileConfiguration config = YamlConfiguration.loadConfiguration(file);
-			for (Field field : values()) {
-				if (field.isFile(file))
-					switch (field.getType()) {
-						case BOOLEAN :
-							field.setValue(config.getBoolean(field.getPath(), (boolean) field.getDefault()));
-							break;
-						case DOUBLE :
-							field.setValue(config.getDouble(field.getPath(), (double) field.getDefault()));
-							break;
-						case INT :
-							field.setValue(config.getInt(field.getPath(), (int) field.getDefault()));
-							break;
-						case ITEMSTACK :
-							String is = config.getString(field.getPath(), (String) field.getDefault());
-							String[] split = is.split(":");
-							if (split.length > 1) {
-								field.setValue(new ItemBuilder(Material.matchMaterial(split[0])).setData(Byte.parseByte(split[1])).toItemStack());
-							} else {
-								field.setValue(new ItemBuilder(Material.matchMaterial(split[0])).toItemStack());
-							}
-							break;
-						case MATERIAL :
-							field.setValue(Material.matchMaterial(config.getString(field.getPath(), (String) field.getDefault())));
-							break;
-						case STRING :
-							field.setValue(ChatColor.translateAlternateColorCodes('&', config.getString(field.getPath(), (String) field.getDefault())));
-							break;
-						case LOCATION :
-							field.setValue(Utils.toLocation(config.getString(field.getPath(), Utils.toString((Location) field.getDefault()))));
-							break;
-						case LOCATION_LIST :
-							ConfigurationSection configSection = config.getConfigurationSection(field.getPath());
-							List<Location> locList = new ArrayList<>();
-					        if (configSection != null)
-					            for (final String key : configSection.getKeys(false))
-					            	locList.add(Utils.toLocation(configSection.getString(key)));
-							field.setValue(locList);
-							break;
-					}
+	}
+	
+	public SheepWarsPlugin plugin;
+	
+	public ConfigManager(SheepWarsPlugin plugin) {
+		this.plugin = plugin;
+		
+		if (!plugin.getDataFolder().exists())
+			plugin.getDataFolder().mkdirs();
+	}
+	
+	public void initConfig() {
+		File file = new File(plugin.getDataFolder(), CONFIG_FILE);
+		if (!file.exists()) {
+			plugin.getLogger().info("Thanks for using UltimateSheepWars from Roytreo28 (@Asynchronous).");
+			plugin.getLogger().info("Generating configuration file ...");
+			try (InputStream in = plugin.getResource(CONFIG_FILE)) {
+				Files.copy(in, file.toPath());
+			} catch (IOException e) {
+				new ExceptionManager(e).register(true);
+				plugin.getLogger().warning("Error when generating configuration file !");
+			} finally {
+				plugin.getLogger().info("Configuration file was generated with success !");
 			}
 		}
+		init(file);
+		initialized = true;
 	}
+	
+	public void init(File file) {
+		FileConfiguration config = YamlConfiguration.loadConfiguration(file);
+		for (Field field : Field.values()) {
+			if (field.isFile(file))
+				switch (field.getType()) {
+					case BOOLEAN :
+						field.setValue(config.getBoolean(field.getPath(), (boolean) field.getDefault()));
+						break;
+					case DOUBLE :
+						field.setValue(config.getDouble(field.getPath(), (double) field.getDefault()));
+						break;
+					case INT :
+						field.setValue(config.getInt(field.getPath(), (int) field.getDefault()));
+						break;
+					case ITEMSTACK :
+						String is = config.getString(field.getPath(), (String) field.getDefault());
+						String[] split = is.split(":");
+						if (split.length > 1) {
+							field.setValue(new ItemBuilder(Material.matchMaterial(split[0])).setData(Byte.parseByte(split[1])).toItemStack());
+						} else {
+							field.setValue(new ItemBuilder(Material.matchMaterial(split[0])).toItemStack());
+						}
+						break;
+					case MATERIAL :
+						field.setValue(Material.matchMaterial(config.getString(field.getPath(), (String) field.getDefault())));
+						break;
+					case STRING :
+						field.setValue(ChatColor.translateAlternateColorCodes('&', config.getString(field.getPath(), (String) field.getDefault())));
+						break;
+					case VIRTUAL_LOCATION :
+						final VirtualLocation location = VirtualLocation.fromString(config.getString(field.getPath(), ((VirtualLocation) field.getDefault()).toString()));
+						field.setValue(location);
+						break;
+					case VIRTUAL_LOCATION_LIST :
+						ConfigurationSection configSection = config.getConfigurationSection(field.getPath());
+						List<VirtualLocation> locList = new ArrayList<>();
+				        if (configSection != null)
+				            for (final String key : configSection.getKeys(false))
+				            	locList.add(VirtualLocation.fromString(configSection.getString(key)));
+						field.setValue(locList);
+						break;
+				}
+		}
+	}
+	
+	public void save() {
+		/** Save the Lobby loc **/
+    	plugin.getSettingsConfig().set("lobby", ConfigManager.getLocation(Field.LOBBY).toString());
+        /** Save the file **/
+        try {
+        	plugin.getSettingsConfig().save(plugin.getSettingsFile());
+		} catch (IOException e) {
+			new ExceptionManager(e).register(true);
+		}
+    }
 
 	private enum FieldType {
 		STRING("String"),
@@ -173,8 +218,8 @@ public class ConfigManager {
 		DOUBLE("Double"),
 		INT("Integer"),
 		ITEMSTACK("ItemStack"),
-		LOCATION("Location"),
-		LOCATION_LIST("List of Locations"),
+		VIRTUAL_LOCATION("Location"),
+		VIRTUAL_LOCATION_LIST("List of Locations"),
 		MATERIAL("Material");
 
 		private String toString;
@@ -199,8 +244,8 @@ public class ConfigManager {
 	}
 	
 	public static void setLocation(Field field, Location arg0) {
-		checkForException(field, FieldType.LOCATION);
-		field.setValue(arg0);
+		checkForException(field, FieldType.VIRTUAL_LOCATION);
+		field.setValue(VirtualLocation.fromBukkitLocation(arg0));
 	}
 	
 	public static void setItemStack(Field field, ItemStack arg0) {
@@ -208,18 +253,25 @@ public class ConfigManager {
 		field.setValue(arg0);
 	}
 	
+	@SuppressWarnings("unchecked")
 	public static void addLocation(Field field, Location arg0) {
-		checkForException(field, FieldType.LOCATION_LIST);
-		List<Location> locations = getLocations(field);
-		locations.add(arg0);
-		field.setValue(locations);
+		checkForException(field, FieldType.VIRTUAL_LOCATION_LIST);
+		((List<VirtualLocation>) field.getValue()).add(VirtualLocation.fromBukkitLocation(arg0));
 	}
 	
 	public static void clearLocations(Field field) {
-		checkForException(field, FieldType.LOCATION_LIST);
-		List<Location> value = getLocations(field);
-		value.clear();
-		field.setValue(value);
+		checkForException(field, FieldType.VIRTUAL_LOCATION_LIST);
+		field.setValue(new ArrayList<VirtualLocation>());
+	}
+	
+	@SuppressWarnings("unchecked")
+	public static void clearLocations(Field field, World filter) {
+		checkForException(field, FieldType.VIRTUAL_LOCATION_LIST);
+		List<VirtualLocation> locations = (List<VirtualLocation>) field.getValue();
+		for (VirtualLocation loc : (List<VirtualLocation>) field.getValue())
+			if (loc.getWorld().equals(filter.getName()))
+				locations.remove(loc);
+		field.setValue(locations);
 	}
 
 	public static String getString(Field field) {
@@ -256,50 +308,44 @@ public class ConfigManager {
 		return (Material) field.getValue();
 	}
 	
-	public static Location getLocation(Field field) {
-		if (field.getType() == FieldType.LOCATION_LIST)
-			return getRdmLocationFromList(field);
-		checkForException(field, FieldType.LOCATION);
-		return (Location) field.getValue();
+	public static VirtualLocation getLocation(Field field) {
+		checkForException(field, FieldType.VIRTUAL_LOCATION);
+		return (VirtualLocation) field.getValue();
 	}
 	
-	@SuppressWarnings("unchecked")
-	public static List<Location> getLocations(Field field) {
-		checkForException(field, FieldType.LOCATION_LIST);
-		return (List<Location>) field.getValue();
-	}
+	/*@SuppressWarnings("unchecked")
+	public static List<Location> getLocations(Field field, World filter) {
+		checkForException(field, FieldType.VIRTUAL_LOCATION_LIST);
+		List<Location> locations = new ArrayList<>();
+		for (VirtualLocation loc : (List<VirtualLocation>) field.getValue())
+			if (loc.getWorld().equals(filter.getName()))
+				locations.add(loc.toBukkitLocation());
+		return locations;
+	}*/
 	
 	@SuppressWarnings("unchecked")
-	public static Location getRdmLocationFromList(Field field) {
-		checkForException(field, FieldType.LOCATION_LIST);
-		List<Location> locs = (List<Location>) field.getValue();
+	public static List<VirtualLocation> getLocations(Field field) {
+		checkForException(field, FieldType.VIRTUAL_LOCATION_LIST);
+		List<VirtualLocation> locations = new ArrayList<>((List<VirtualLocation>) field.getValue());
+		return locations;
+	}
+	
+	public static VirtualLocation getRandomLocation(Field field) {
+		checkForException(field, FieldType.VIRTUAL_LOCATION_LIST);
+		List<VirtualLocation> locs = getLocations(field);
 		return locs.get(RandomUtils.nextInt(locs.size()));
 	}
+	
+	/*public static Location getRandomLocation(Field field, World filter) {
+		checkForException(field, FieldType.VIRTUAL_LOCATION_LIST);
+		List<Location> locs = getLocations(field, filter);
+		return locs.get(RandomUtils.nextInt(locs.size()));
+	}*/
 
 	private static void checkForException(Field field, FieldType type) {
 		if (!initialized)
-			new ConfigurationManagerClassHasntBeenInitialized("You can't get any field before the ConfigurationManager class hasn't been initialized first.").printStackTrace();
+			new InitConfigException("You can't get any field before the ConfigurationManager class hasn't been initialized first.").printStackTrace();
 		if (field.getType() != type)
-			new InvalidFieldTypeException("You can't get the field '" + field.toString() + "' as a/an " + type.toString() + " cause it's an instance of a/an " + field.getType().toString()).printStackTrace();
-	}
-
-	public static void initConfig(UltimateSheepWarsPlugin instance) {
-		if (!instance.getDataFolder().exists())
-			instance.getDataFolder().mkdirs();
-		File file = new File(instance.getDataFolder(), CONFIG_FILE);
-		if (!file.exists()) {
-			instance.getLogger().info("Thanks for using UltimateSheepWars from Roytreo28 (@Asynchronous).");
-			instance.getLogger().info("Generating configuration file ...");
-			try (InputStream in = instance.getResource(CONFIG_FILE)) {
-				Files.copy(in, file.toPath());
-			} catch (IOException e) {
-				new ExceptionManager(e).register(true);
-				instance.getLogger().warning("Error when generating configuration file !");
-			} finally {
-				instance.getLogger().info("Configuration file was generated with success !");
-			}
-		}
-		Field.init(file);
-		initialized = true;
+			new InvalidFieldException("You can't get the field '" + field.toString() + "' as a/an " + type.toString() + " cause it's an instance of a/an " + field.getType().toString()).printStackTrace();
 	}
 }

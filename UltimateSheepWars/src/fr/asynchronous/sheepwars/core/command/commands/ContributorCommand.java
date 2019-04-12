@@ -6,16 +6,16 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
+import fr.asynchronous.sheepwars.core.SheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.gui.GuiManager;
 import fr.asynchronous.sheepwars.core.gui.guis.ContributorsInventory;
 import fr.asynchronous.sheepwars.core.handler.Contributor;
 
 public class ContributorCommand implements CommandExecutor {
 
-	public UltimateSheepWarsPlugin plugin;
+	public SheepWarsPlugin plugin;
 
-	public ContributorCommand(UltimateSheepWarsPlugin plugin) {
+	public ContributorCommand(SheepWarsPlugin plugin) {
 		this.plugin = plugin;
 	}
 

@@ -9,13 +9,10 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.SkullType;
-import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -25,7 +22,6 @@ import fr.asynchronous.sheepwars.core.handler.DisplayStyle;
 import fr.asynchronous.sheepwars.core.handler.ItemBuilder;
 import fr.asynchronous.sheepwars.core.manager.ConfigManager;
 import fr.asynchronous.sheepwars.core.manager.ConfigManager.Field;
-import fr.asynchronous.sheepwars.core.manager.TeamManager;
 import fr.asynchronous.sheepwars.core.message.Language;
 import fr.asynchronous.sheepwars.core.message.Message.MsgEnum;
 
@@ -121,20 +117,6 @@ public class Utils {
 		}
 	}
 
-	public static Location toLocation(final String string) {
-		final String[] splitted = string.split("_");
-		World world = Bukkit.getWorld(splitted[0]);
-		if (world == null || splitted.length < 6) {
-			world = Bukkit.getWorlds().get(0);
-		}
-		return new Location(world, Double.parseDouble(splitted[1]), Double.parseDouble(splitted[2]), Double.parseDouble(splitted[3]), Float.parseFloat(splitted[4]), Float.parseFloat(splitted[5]));
-	}
-
-	public static String toString(final Location location) {
-		final World world = location.getWorld();
-		return String.valueOf(world.getName()) + "_" + location.getX() + "_" + location.getY() + "_" + location.getZ() + "_" + location.getYaw() + "_" + location.getPitch();
-	}
-
 	public static String assignArrayToString(List<String> listString) {
 		String nxt = "";
 		StringBuilder output = new StringBuilder();
@@ -143,16 +125,6 @@ public class Utils {
 			nxt = "\n";
 		}
 		return output.toString().trim();
-	}
-
-	public static boolean isPluginConfigured() {
-		if (ConfigManager.getLocation(Field.LOBBY) == getDefaultLocation() 
-				|| ConfigManager.getLocations(Field.BOOSTERS).isEmpty() 
-				|| TeamManager.BLUE.getSpawns().isEmpty() 
-				|| TeamManager.RED.getSpawns().isEmpty() 
-				|| TeamManager.SPEC.getSpawns().isEmpty())
-			return false;
-		return true;
 	}
 
 	public static boolean inventoryContains(Player player, Material mat) {
@@ -223,10 +195,6 @@ public class Utils {
 		return ret;
 	}
 	
-	public static Location getDefaultLocation() {
-		return new Location(Bukkit.getWorlds().get(0), 0, 0, 0);
-	}
-
 	public static List<String> d(String[] ints) {
 		ArrayList<String> output = new ArrayList<>();
 		for (int i = 0; i < ints.length; i++)

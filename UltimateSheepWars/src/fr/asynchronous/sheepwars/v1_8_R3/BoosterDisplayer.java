@@ -1,36 +1,37 @@
 package fr.asynchronous.sheepwars.v1_8_R3;
 
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
+import java.util.HashMap;
+import java.util.UUID;
 
-import fr.asynchronous.sheepwars.core.manager.BoosterManager;
+import fr.asynchronous.sheepwars.core.booster.SheepWarsBooster;
 import fr.asynchronous.sheepwars.core.version.IBoosterDisplayer;
+import fr.asynchronous.sheepwars.v1_8_R3.util.BossBar;
 
 public class BoosterDisplayer implements IBoosterDisplayer {
 
-	private static BoosterManager shownBooster = null;
+	private static HashMap<UUID, BossBar> barMap = new HashMap<>();
+	private static UUID shownBoosterId = null; // Qu'une seule bossBar peut etre affichée en 1.8
 
 	@Override
-	public void startDisplay(BoosterManager booster) {
-		if (shownBooster == null) {
-			shownBooster = booster;
+	public UUID startDisplay(SheepWarsBooster booster) {
+		UUID id = UUID.randomUUID();
+		barMap.put(id, new BossBar(booster.getName(), 1.0f));
+		barMap.get(id).show();
+		shownBoosterId = id;
+		return id;
+	}
+
+	@Override
+	public void tickDisplay(UUID id, int duration, int maxDuration) {
+		if (id.equals(shownBoosterId)) {
+			final float progress = (float) duration / (float) maxDuration;
+			barMap.get(id).setProgress(progress);
 		}
 	}
 
 	@Override
-	public void tickDisplay(BoosterManager booster, int duration) {
-		if (shownBooster == null) {
-			shownBooster = booster;
-		} else if (shownBooster == booster) {
-			final float progress = (float) duration / (float) (booster.getDuration() * 20);
-			for (Player online : Bukkit.getOnlinePlayers())
-				online.setExp(progress);
-		}
+	public void endDisplay(UUID id) {
+		barMap.get(id).hide();
+		barMap.remove(id);
 	}
-
-	@Override
-	public void endDisplay(BoosterManager booster) {
-		shownBooster = null;
-	}
-
 }

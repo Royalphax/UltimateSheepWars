@@ -5,11 +5,11 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityDeathEvent;
 
-import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
+import fr.asynchronous.sheepwars.core.SheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.event.UltimateSheepWarsEventListener;
 
 public class EntityDeath extends UltimateSheepWarsEventListener {
-	public EntityDeath(final UltimateSheepWarsPlugin plugin) {
+	public EntityDeath(final SheepWarsPlugin plugin) {
 		super(plugin);
 	}
 

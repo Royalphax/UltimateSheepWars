@@ -4,18 +4,18 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
-import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
+import fr.asynchronous.sheepwars.core.SheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.command.SubCommand;
 import fr.asynchronous.sheepwars.core.handler.GameState;
 import fr.asynchronous.sheepwars.core.handler.Permissions;
 import fr.asynchronous.sheepwars.core.handler.Sounds;
-import fr.asynchronous.sheepwars.core.sheep.USWSheep;
+import fr.asynchronous.sheepwars.core.sheep.SheepWarsSheep;
 import fr.asynchronous.sheepwars.core.util.Utils;
 
 public class ShowSheepsSubCommand extends SubCommand {
 	
-	public ShowSheepsSubCommand(UltimateSheepWarsPlugin plugin) {
-		super("Display loaded sheeps", "This command allows developers to see which sheep has been loaded. You can display more informations on a sheep by adding its ID at the end of the command.", "/usw sheeps <id> <throw>", Permissions.USW_DEVELOPER, plugin, "sheeps");
+	public ShowSheepsSubCommand(SheepWarsPlugin plugin) {
+		super("Display loaded sheeps", "This command allows developers to see which sheep has been loaded. You can display more informations on a sheep by adding its ID at the end of the command. Moreover, you can throw a sheep by adding 'throw' after the id.", "/usw sheeps <id> <throw>", Permissions.USW_DEVELOPER, plugin, "sheeps");
 	}
 	
 	@Override
@@ -23,10 +23,10 @@ public class ShowSheepsSubCommand extends SubCommand {
 		int i = -1;
 		if (args.length > 1 && Utils.isInteger(args[1]))
 			i = Integer.parseInt(args[1]);
-		if (i >= 0 && USWSheep.getAvailableSheeps().size() > 0) {
-			USWSheep sheep = USWSheep.getAvailableSheeps().get(0);
-			if (i < USWSheep.getAvailableSheeps().size())
-				sheep = USWSheep.getAvailableSheeps().get(i);
+		if (i >= 0 && SheepWarsSheep.getAvailableSheeps().size() > 0) {
+			SheepWarsSheep sheep = SheepWarsSheep.getAvailableSheeps().get(0);
+			if (i < SheepWarsSheep.getAvailableSheeps().size())
+				sheep = SheepWarsSheep.getAvailableSheeps().get(i);
 			player.sendMessage("∙ " + ChatColor.GRAY + sheep.getName(player));
 			player.sendMessage("  ∙ " + ChatColor.GRAY + "Duration : " + ChatColor.YELLOW + (sheep.getDuration() <= 0 ? "∞" : sheep.getDuration() + " seconds"));
 			player.sendMessage("  ∙ " + ChatColor.GRAY + "Health : " + ChatColor.YELLOW + sheep.getHealth() + " half hearts");
@@ -45,7 +45,7 @@ public class ShowSheepsSubCommand extends SubCommand {
 		} else {
 			player.sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + "Loaded Sheeps :");
 			int x = 0;
-			for (USWSheep sheep : USWSheep.getAvailableSheeps()) {
+			for (SheepWarsSheep sheep : SheepWarsSheep.getAvailableSheeps()) {
 				player.sendMessage("∙ " + ChatColor.GRAY + sheep.getName(player) + ChatColor.GRAY + " (Id " + ChatColor.YELLOW + x + ChatColor.GRAY + ")");
 				x++;
 			}

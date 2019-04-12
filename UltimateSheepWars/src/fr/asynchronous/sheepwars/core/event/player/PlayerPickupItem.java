@@ -10,15 +10,15 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.material.Wool;
 
-import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
+import fr.asynchronous.sheepwars.core.SheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.event.UltimateSheepWarsEventListener;
 import fr.asynchronous.sheepwars.core.handler.Sounds;
-import fr.asynchronous.sheepwars.core.manager.SheepManager;
+import fr.asynchronous.sheepwars.core.sheep.SheepWarsSheep;
 import fr.asynchronous.sheepwars.core.util.RandomUtils;
 
 public class PlayerPickupItem extends UltimateSheepWarsEventListener {
 
-	public PlayerPickupItem(final UltimateSheepWarsPlugin plugin) {
+	public PlayerPickupItem(final SheepWarsPlugin plugin) {
 		super(plugin);
 	}
 
@@ -28,15 +28,15 @@ public class PlayerPickupItem extends UltimateSheepWarsEventListener {
 		if (event.getItem().getItemStack().getType() == Material.WOOL) {
 			Wool wool = (Wool) event.getItem().getItemStack().getData();
 			DyeColor color = wool.getColor();
-			List<SheepManager> correspondingSheeps = new ArrayList<>();
-			for (SheepManager sheep : SheepManager.getAvailableSheeps())
+			List<SheepWarsSheep> correspondingSheeps = new ArrayList<>();
+			for (SheepWarsSheep sheep : SheepWarsSheep.getAvailableSheeps())
 				if (sheep.getColor() == color)
 					correspondingSheeps.add(sheep);
 			if (!correspondingSheeps.isEmpty()) {
-				SheepManager sheep = RandomUtils.getRandom(correspondingSheeps);
+				SheepWarsSheep sheep = RandomUtils.getRandom(correspondingSheeps);
 				event.getItem().remove();
 				Sounds.playSound(event.getPlayer(), event.getPlayer().getLocation(), Sounds.ITEM_PICKUP, 1f, 1f);
-				SheepManager.giveSheep(event.getPlayer(), sheep, event.getItem().getItemStack().getAmount());
+				SheepWarsSheep.giveSheep(event.getPlayer(), sheep, event.getItem().getItemStack().getAmount());
 			}
 		}
 	}

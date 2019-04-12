@@ -3,7 +3,7 @@ package fr.asynchronous.sheepwars.core.task;
 import org.bukkit.ChatColor;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
+import fr.asynchronous.sheepwars.core.SheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.message.Language;
 
 public class ScoreboardTask extends BukkitRunnable
@@ -12,7 +12,7 @@ public class ScoreboardTask extends BukkitRunnable
     private String defaut;
     private Integer round;
     
-    public ScoreboardTask(String ip, UltimateSheepWarsPlugin plugin) {
+    public ScoreboardTask(String ip, SheepWarsPlugin plugin) {
     	this.round = -1;
         this.defaut = ip;
         this.runTaskTimer(plugin, 0, 1);
@@ -20,8 +20,10 @@ public class ScoreboardTask extends BukkitRunnable
     
     public void run() {
     	final String news = getPosition();
+    	
 		for (Language langs : Language.getLanguages())
 			langs.getScoreboardWrapper().setLine(1, news, true);
+		
 		this.round++;
     	if (this.round > this.defaut.length()+1) {
     		this.round = -31;

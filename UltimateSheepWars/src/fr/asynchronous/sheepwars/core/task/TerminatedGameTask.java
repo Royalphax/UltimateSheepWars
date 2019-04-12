@@ -5,7 +5,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
+import fr.asynchronous.sheepwars.core.SheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.data.PlayerData;
 import fr.asynchronous.sheepwars.core.handler.GameState;
 import fr.asynchronous.sheepwars.core.message.Language;
@@ -13,9 +13,9 @@ import fr.asynchronous.sheepwars.core.message.Message.MsgEnum;
 
 public class TerminatedGameTask extends BukkitRunnable {
 	private int timeUntilTeleporation;
-	private final UltimateSheepWarsPlugin plugin;
+	private final SheepWarsPlugin plugin;
 
-	public TerminatedGameTask(final UltimateSheepWarsPlugin plugin) {
+	public TerminatedGameTask(final SheepWarsPlugin plugin) {
 		GameState.setCurrentStep(GameState.TERMINATED);
 		this.timeUntilTeleporation = 15;
 		this.plugin = plugin;

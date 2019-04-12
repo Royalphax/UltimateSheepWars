@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
 import org.bukkit.Bukkit;
@@ -12,10 +13,14 @@ import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 
-import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
+import fr.asynchronous.sheepwars.core.SheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.data.PlayerData;
+import fr.asynchronous.sheepwars.core.event.usw.EquipSelectionItemsEvent;
 import fr.asynchronous.sheepwars.core.handler.GameState;
+import fr.asynchronous.sheepwars.core.handler.ItemBuilder;
 import fr.asynchronous.sheepwars.core.handler.MinecraftVersion;
 import fr.asynchronous.sheepwars.core.manager.ConfigManager;
 import fr.asynchronous.sheepwars.core.manager.ConfigManager.Field;
@@ -24,7 +29,11 @@ import fr.asynchronous.sheepwars.core.manager.ScoreboardManager;
 import fr.asynchronous.sheepwars.core.manager.TeamManager;
 import fr.asynchronous.sheepwars.core.message.Message.MsgEnum;
 import fr.asynchronous.sheepwars.core.util.ReflectionUtils;
+import fr.asynchronous.sheepwars.core.util.Utils;
 import fr.asynchronous.sheepwars.core.util.ReflectionUtils.PackageType;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 
 public class Language {
 
@@ -68,7 +77,7 @@ public class Language {
 		} catch (IOException ex) {
 			new ExceptionManager(ex).register(true);
 		}
-		final String title = ChatColor.DARK_GRAY + "- " + getMessage(MsgEnum.GAME_DISPLAY_NAME) + ChatColor.DARK_GRAY + " -";
+		final String title = getMessage(MsgEnum.SCOREBOARD_WAITING_TITLE);
 		this.scoreboard_wrapper = new ScoreboardManager(title, this.name);
 		this.scoreboard_wrapper.setLine(2, ChatColor.BLUE + "", true);
 		this.scoreboard_wrapper.setLine(5, ChatColor.WHITE + "", true);
@@ -119,7 +128,7 @@ public class Language {
 	}
 
 	private void initTeams() {
-		Boolean bool = UltimateSheepWarsPlugin.getVersionManager().getVersion().newerThan(MinecraftVersion.v1_9_R1);
+		Boolean bool = SheepWarsPlugin.getVersionManager().getVersion().newerThan(MinecraftVersion.v1_9_R1);
 		for (TeamManager team : TeamManager.values()) {
 			org.bukkit.scoreboard.Team bukkitTeam = this.scoreboard_wrapper.getScoreboard().getTeam(team.getName());
 			if (bukkitTeam == null) {
@@ -152,6 +161,28 @@ public class Language {
 				}
 			}
 		}
+	}
+	
+	public void equipPlayer(Player player) {
+		final PlayerData data = PlayerData.getPlayerData(player);
+		final Map<Integer, ItemStack> items = new HashMap<>();
+		items.put(0, TeamManager.RED.getIcon(player));
+		items.put(1, TeamManager.BLUE.getIcon(player));
+		if (SheepWarsPlugin.getWorldManager().isVoteModeEnable())
+			items.put(6, new ItemBuilder(ConfigManager.getItemStack(Field.VOTING_ITEM)).setName(this.getMessage(MsgEnum.VOTING_ITEM)).toItemStack());
+		items.put(7, new ItemBuilder(ConfigManager.getItemStack(Field.KIT_ITEM)).setName(this.getMessage(MsgEnum.KITS_ITEM)).toItemStack());
+		items.put(8, new ItemBuilder(ConfigManager.getItemStack(Field.RETURN_TO_HUB_ITEM)).setName(this.getMessage(MsgEnum.LEAVE_ITEM)).toItemStack());
+		if (data.getAllowedParticles()) {
+			items.put(4, new ItemBuilder(ConfigManager.getItemStack(Field.PARTICLES_ON_ITEM)).setName(this.getMessage(MsgEnum.PARTICLES_ON)).toItemStack());
+		} else {
+			items.put(4, new ItemBuilder(ConfigManager.getItemStack(Field.PARTICLES_ON_ITEM)).setName(this.getMessage(MsgEnum.PARTICLES_OFF)).toItemStack());
+		}
+		
+		final EquipSelectionItemsEvent event = new EquipSelectionItemsEvent(player, items);
+		Bukkit.getServer().getPluginManager().callEvent(event);
+		event.equip();
+		
+		player.setScoreboard(this.getScoreboardWrapper().getScoreboard());
 	}
 
 	public static boolean existLanguage(File f) {
@@ -224,11 +255,16 @@ public class Language {
 		Language lang = PlayerData.getPlayerData(player).getLanguage();
 		player.sendMessage(ChatColor.GRAY + lang.getIntro());
 		player.sendMessage(ChatColor.YELLOW + "Available languages :");
-		UltimateSheepWarsPlugin.getVersionManager().getNMSUtils().displayAvailableLanguages(player);
+		for (Language langs : Language.getLanguages()) {
+			TextComponent msg = new TextComponent(TextComponent.fromLegacyText(ChatColor.YELLOW + "- " + langs.getName() + " " + ChatColor.DARK_GRAY + "[" + ChatColor.GREEN + "➔" + ChatColor.DARK_GRAY + "]"));
+			msg.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/lang " + langs.getLocale().replace(".yml", "")));
+			msg.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText(ChatColor.YELLOW + "Click to select!")));
+			player.spigot().sendMessage(msg);
+		}
 		player.sendMessage(ChatColor.YELLOW + "Click on the wanted language to change");
 	}
 
-	public static void loadStartupConfiguration(UltimateSheepWarsPlugin plugin) {
+	public static void loadStartupConfiguration(SheepWarsPlugin plugin) {
 		DATA_FOLDER = new File(plugin.getDataFolder(), "languages/");
 		if (!DATA_FOLDER.exists())
 			DATA_FOLDER.mkdirs();

@@ -4,12 +4,12 @@ import org.bukkit.ChatColor;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.server.ServerCommandEvent;
 
-import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
+import fr.asynchronous.sheepwars.core.SheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.event.UltimateSheepWarsEventListener;
 
 public class ServerCommand extends UltimateSheepWarsEventListener
 {
-    public ServerCommand(final UltimateSheepWarsPlugin plugin) {
+    public ServerCommand(final SheepWarsPlugin plugin) {
         super(plugin);
     }
     

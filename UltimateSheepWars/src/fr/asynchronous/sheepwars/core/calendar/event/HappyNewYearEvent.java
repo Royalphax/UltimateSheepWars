@@ -15,7 +15,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
+import fr.asynchronous.sheepwars.core.SheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.calendar.CalendarEvent;
 import fr.asynchronous.sheepwars.core.util.RandomUtils;
 
@@ -81,11 +81,11 @@ public class HappyNewYearEvent extends CalendarEvent {
 					int z = 10 + rdm.nextInt(30);
 					z = (rdm.nextBoolean() ? -z : z);
 					FireworkEffect effect = FireworkEffect.builder().flicker(rdm.nextBoolean()).withColor(Color.YELLOW).withFade(RandomUtils.getRandomColor()).with(Type.BALL_LARGE).build();
-					UltimateSheepWarsPlugin.getVersionManager().getCustomEntities().spawnInstantExplodingFirework(player.getLocation().add(x, y, z), effect, playerList);
+					SheepWarsPlugin.getVersionManager().getCustomEntities().spawnInstantExplodingFirework(player.getLocation().add(x, y, z), effect, playerList);
 				}
 				if (this.timer <= 1 && this.ticks < -20) {
 					this.cancel();
-					UltimateSheepWarsPlugin.getVersionManager().getTitleUtils().titlePacket(player, 20, 60, 20, "", ChatColor.translateAlternateColorCodes('&', "&6Happy &enew &6year &e!"));
+					SheepWarsPlugin.getVersionManager().getTitleUtils().titlePacket(player, 20, 60, 20, "", ChatColor.translateAlternateColorCodes('&', "&6Happy &enew &6year &e!"));
 					letsDay(player);
 				}
 				ticks--;

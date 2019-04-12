@@ -3,7 +3,7 @@ package fr.asynchronous.sheepwars.core.event.usw;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
-import fr.asynchronous.sheepwars.core.UltimateSheepWarsPlugin;
+import fr.asynchronous.sheepwars.core.SheepWarsPlugin;
 
 /**
  * Event triggered when the game starts.
@@ -12,14 +12,14 @@ public class GameStartEvent extends Event {
 
 	private static final HandlerList handlers = new HandlerList();
 	private boolean cloudNetAPISupport;
-	private UltimateSheepWarsPlugin plugin;
+	private SheepWarsPlugin plugin;
 	
-	public GameStartEvent(UltimateSheepWarsPlugin plugin) {
+	public GameStartEvent(SheepWarsPlugin plugin) {
 		this.cloudNetAPISupport = true;
 		this.plugin = plugin;
 	}
 	
-	public UltimateSheepWarsPlugin getGameInstance() {
+	public SheepWarsPlugin getGameInstance() {
 		return this.plugin;
 	}
 	

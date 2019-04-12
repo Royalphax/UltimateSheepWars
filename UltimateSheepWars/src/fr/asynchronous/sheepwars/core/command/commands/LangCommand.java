@@ -6,14 +6,16 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import fr.asynchronous.sheepwars.core.SheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.data.PlayerData;
 import fr.asynchronous.sheepwars.core.message.Language;
-import fr.asynchronous.sheepwars.core.util.Utils;
 
 public class LangCommand implements CommandExecutor {
 
-	public LangCommand() {
-		// Do nothing
+	public SheepWarsPlugin plugin;
+	
+	public LangCommand(SheepWarsPlugin plugin) {
+		this.plugin = plugin;
 	}
 
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
@@ -21,7 +23,7 @@ public class LangCommand implements CommandExecutor {
             sender.sendMessage(ChatColor.RED + "Please connect on the server, then do this command again.");
             return true;
         }
-        if (!Utils.isPluginConfigured()) {
+        if (!plugin.isConfigured()) {
     		sender.sendMessage(ChatColor.RED + "You can't use this command until the plugin isn't fully configured.");
     		return true;
     	}
