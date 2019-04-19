@@ -90,6 +90,7 @@ public class NMSUtils implements INMSUtils {
 			if (!cancelMoveMap.containsKey(player)) {
 				final EntityCancelMove entity = new EntityCancelMove(player);
 				entity.spawnClientEntity();
+				entity.updateClientEntityLocation();
 				entity.rideClientEntity();
 				cancelMoveMap.put(player, entity);
 			}

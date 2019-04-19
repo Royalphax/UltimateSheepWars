@@ -23,13 +23,12 @@ import fr.asynchronous.sheepwars.core.handler.Sounds;
 import fr.asynchronous.sheepwars.core.kit.SheepWarsKit;
 import fr.asynchronous.sheepwars.core.kit.SheepWarsKit.KitLevel;
 import fr.asynchronous.sheepwars.core.manager.ConfigManager;
-import fr.asynchronous.sheepwars.core.manager.TeamManager;
 import fr.asynchronous.sheepwars.core.manager.ConfigManager.Field;
+import fr.asynchronous.sheepwars.core.manager.TeamManager;
 import fr.asynchronous.sheepwars.core.message.Language;
 import fr.asynchronous.sheepwars.core.message.Message;
 import fr.asynchronous.sheepwars.core.message.Message.MsgEnum;
 import fr.asynchronous.sheepwars.core.util.EntityUtils;
-import fr.asynchronous.sheepwars.core.version.ATitleUtils.Type;
 
 public class PreGameTask extends BukkitRunnable {
 	private final SheepWarsPlugin plugin;
@@ -44,25 +43,24 @@ public class PreGameTask extends BukkitRunnable {
 		if (seconds < 6) {
 			switch (seconds) {
 				case 5 :
-					Sounds.playSoundAll(null, Sounds.ORB_PICKUP, 1f, 0.4f);
+					Sounds.playSoundAll(null, Sounds.NOTE_STICKS, 1f, 1f);
 					break;
 				case 4 :
-					Sounds.playSoundAll(null, Sounds.ORB_PICKUP, 1f, 0.8f);
+					Sounds.playSoundAll(null, Sounds.NOTE_STICKS, 1f, 1f);
 					break;
 				case 3 :
-					Sounds.playSoundAll(null, Sounds.ORB_PICKUP, 1f, 1.2f);
+					Sounds.playSoundAll(null, Sounds.ORB_PICKUP, 1f, 0.5f);
 					break;
 				case 2 :
-					Sounds.playSoundAll(null, Sounds.ORB_PICKUP, 1f, 1.6f);
+					Sounds.playSoundAll(null, Sounds.ORB_PICKUP, 1f, 1f);
 					break;
 				case 1 :
-					Sounds.playSoundAll(null, Sounds.ORB_PICKUP, 1f, 2f);
+					Sounds.playSoundAll(null, Sounds.ORB_PICKUP, 1f, 1.5f);
 					break;
 			}
 			for (Player online : Bukkit.getOnlinePlayers())
-				SheepWarsPlugin.getVersionManager().getTitleUtils().titlePacket(online, 2, 25, 4, ChatColor.YELLOW + "" + seconds, Message.getMessage(online, ChatColor.AQUA.toString(), MsgEnum.PRE_START_SUBTITLE, ""));
+				SheepWarsPlugin.getVersionManager().getTitleUtils().titlePacket(online, 2, 25, 4, ChatColor.AQUA + "" + seconds, Message.getMessage(online, ChatColor.GOLD.toString(), MsgEnum.PRE_START_COUNTDOWN_SUBTITLE, ""));
 		}
-		this.seconds--;
 		if (this.seconds == 0) {
 			this.cancel();
 			/** Permet de stocker les listeners de kits déjà enregistrés **/
@@ -98,12 +96,13 @@ public class PreGameTask extends BukkitRunnable {
 				SheepWarsPlugin.getVersionManager().getNMSUtils().cancelMove(player, false);
 				/** On affiche le title **/
 				final PlayerData data = PlayerData.getPlayerData(player);
-				SheepWarsPlugin.getVersionManager().getTitleUtils().defaultTitle(Type.TITLE, player, data.getLanguage().getMessage(MsgEnum.GAME_START_TITLE), data.getLanguage().getMessage(MsgEnum.GAME_START_SUBTITLE).replace("%TIME%", ConfigManager.getInt(Field.GIVE_SHEEP_INTERVAL).toString()));
+				SheepWarsPlugin.getVersionManager().getTitleUtils().titlePacket(player, 5, 50, 20, data.getLanguage().getMessage(MsgEnum.GAME_START_TITLE), data.getLanguage().getMessage(MsgEnum.GAME_START_SUBTITLE).replace("%TIME%", ConfigManager.getInt(Field.GIVE_SHEEP_INTERVAL).toString()));
 			}
 			new GameTask(this.plugin);
 		}
+		this.seconds--;
 	}
-	
+
 	private void updateScoreboard() {
 		for (Language lang : Language.getLanguages()) {
 			lang.getScoreboardWrapper().setLine(8, ChatColor.RED + "", true);
@@ -121,8 +120,8 @@ public class PreGameTask extends BukkitRunnable {
 				kills.unregister();
 			}
 			board.registerNewObjective("kills", "playerKillCount").setDisplaySlot(DisplaySlot.PLAYER_LIST);
-			//for (Player player : Bukkit.getOnlinePlayers())
-			//	lang.getScoreboardWrapper().getScoreboard().getObjective("health").getScore(player.getName()).setScore((int) Math.round(player.getHealth()));
+			for (Player player : Bukkit.getOnlinePlayers())
+				lang.getScoreboardWrapper().getScoreboard().getObjective("health").getScore(player.getName()).setScore((int) Math.round(player.getHealth()));
 		}
 	}
 }

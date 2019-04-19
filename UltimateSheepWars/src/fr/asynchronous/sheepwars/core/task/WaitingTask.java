@@ -4,6 +4,8 @@ import java.io.IOException;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import fr.asynchronous.sheepwars.core.SheepWarsPlugin;
@@ -17,7 +19,6 @@ import fr.asynchronous.sheepwars.core.manager.ExceptionManager;
 import fr.asynchronous.sheepwars.core.manager.TeamManager;
 import fr.asynchronous.sheepwars.core.message.Message;
 import fr.asynchronous.sheepwars.core.message.Message.MsgEnum;
-import fr.asynchronous.sheepwars.core.version.ATitleUtils.Type;
 
 public class WaitingTask extends BukkitRunnable {
 	private boolean started = false;
@@ -49,8 +50,15 @@ public class WaitingTask extends BukkitRunnable {
 					final TeamManager team = data.getTeam();
 					player.setFallDistance(0.0f);
 					player.teleport(team.getNextSpawn());
+					final PlayerInventory inv = player.getInventory();
+					for (ItemStack item : inv.getContents()) {
+						if (item != null && item.getType() != ConfigManager.getItemStack(Field.KIT_ITEM).getType()) {
+							inv.remove(item);
+						}
+					}
 					SheepWarsPlugin.getVersionManager().getNMSUtils().cancelMove(player, true);
-					SheepWarsPlugin.getVersionManager().getTitleUtils().defaultTitle(Type.TITLE, player, data.getLanguage().getMessage(MsgEnum.GAME_START_TITLE), data.getLanguage().getMessage(MsgEnum.GAME_START_SUBTITLE).replace("%TIME%", ConfigManager.getInt(Field.GIVE_SHEEP_INTERVAL).toString()));
+					SheepWarsPlugin.getVersionManager().getTitleUtils().actionBarPacket(player, "");
+					SheepWarsPlugin.getVersionManager().getTitleUtils().titlePacket(player, 2, 70, 20, data.getLanguage().getMessage(MsgEnum.GAME_PRE_START_TITLE), data.getLanguage().getMessage(MsgEnum.GAME_PRE_START_SUBTITLE));
 				}
 				new PreGameTask(this.plugin);
 			} else {
@@ -71,7 +79,7 @@ public class WaitingTask extends BukkitRunnable {
 			online.setExp(progress);
 		if (this.timeUntilStart == 10 && SheepWarsPlugin.getWorldManager().isVoteModeEnable()) {
 			PlayableMap map = SheepWarsPlugin.getWorldManager().getVoteResult();
-			Message.broadcast(MsgEnum.VOTE_SUCCESS, "%MAP_NAME%", map.getName());
+			Message.broadcast(MsgEnum.VOTE_END, "%MAP_NAME%", map.getName());
 			try {
 				map.loadWorld();
 			} catch (IOException e) {
@@ -91,6 +99,10 @@ public class WaitingTask extends BukkitRunnable {
 		forceStarting();
 		if (this.timeUntilStart > 10)
 			this.timeUntilStart = 10;
+	}
+	
+	public int getRemainingSeconds() {
+		return this.timeUntilStart;
 	}
 
 	public void start() {
