@@ -14,7 +14,6 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.PlayerInventory;
 
 import fr.asynchronous.sheepwars.core.SheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.data.PlayerData;
@@ -29,7 +28,6 @@ import fr.asynchronous.sheepwars.core.manager.ScoreboardManager;
 import fr.asynchronous.sheepwars.core.manager.TeamManager;
 import fr.asynchronous.sheepwars.core.message.Message.MsgEnum;
 import fr.asynchronous.sheepwars.core.util.ReflectionUtils;
-import fr.asynchronous.sheepwars.core.util.Utils;
 import fr.asynchronous.sheepwars.core.util.ReflectionUtils.PackageType;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
@@ -168,14 +166,17 @@ public class Language {
 		final Map<Integer, ItemStack> items = new HashMap<>();
 		items.put(0, TeamManager.RED.getIcon(player));
 		items.put(1, TeamManager.BLUE.getIcon(player));
-		if (SheepWarsPlugin.getWorldManager().isVoteModeEnable())
-			items.put(6, new ItemBuilder(ConfigManager.getItemStack(Field.VOTING_ITEM)).setName(this.getMessage(MsgEnum.VOTING_ITEM)).toItemStack());
+		int particleSlot = 4;
+		if (SheepWarsPlugin.getWorldManager().isVoteModeEnable()) {
+			items.put(3, new ItemBuilder(ConfigManager.getItemStack(Field.VOTING_ITEM)).setName(this.getMessage(MsgEnum.VOTING_ITEM)).toItemStack());
+			particleSlot = 5;
+		}
 		items.put(7, new ItemBuilder(ConfigManager.getItemStack(Field.KIT_ITEM)).setName(this.getMessage(MsgEnum.KITS_ITEM)).toItemStack());
 		items.put(8, new ItemBuilder(ConfigManager.getItemStack(Field.RETURN_TO_HUB_ITEM)).setName(this.getMessage(MsgEnum.LEAVE_ITEM)).toItemStack());
 		if (data.getAllowedParticles()) {
-			items.put(4, new ItemBuilder(ConfigManager.getItemStack(Field.PARTICLES_ON_ITEM)).setName(this.getMessage(MsgEnum.PARTICLES_ON)).toItemStack());
+			items.put(particleSlot, new ItemBuilder(ConfigManager.getItemStack(Field.PARTICLES_ON_ITEM)).setName(this.getMessage(MsgEnum.PARTICLES_ON)).toItemStack());
 		} else {
-			items.put(4, new ItemBuilder(ConfigManager.getItemStack(Field.PARTICLES_ON_ITEM)).setName(this.getMessage(MsgEnum.PARTICLES_OFF)).toItemStack());
+			items.put(particleSlot, new ItemBuilder(ConfigManager.getItemStack(Field.PARTICLES_ON_ITEM)).setName(this.getMessage(MsgEnum.PARTICLES_OFF)).toItemStack());
 		}
 		
 		final EquipSelectionItemsEvent event = new EquipSelectionItemsEvent(player, items);
