@@ -29,7 +29,6 @@ import fr.asynchronous.sheepwars.core.message.Message;
 import fr.asynchronous.sheepwars.core.message.Message.MsgEnum;
 import fr.asynchronous.sheepwars.core.task.WaitingTask;
 import fr.asynchronous.sheepwars.core.util.EntityUtils;
-import fr.asynchronous.sheepwars.core.util.Utils;
 import fr.asynchronous.sheepwars.core.version.ATitleUtils.Type;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -123,7 +122,7 @@ public class PlayerJoin extends UltimateSheepWarsEventListener {
 			}
 			
 			/** S'il y a assez de joueurs, on lance le countdown **/
-			if ((Bukkit.getOnlinePlayers().size() >= ConfigManager.getInt(Field.MIN_PLAYERS)) && (!this.plugin.hasWaitingTaskStarted()) && (!ConfigManager.getLocations(Field.BOOSTERS).isEmpty())) {
+			if ((Bukkit.getOnlinePlayers().size() >= ConfigManager.getInt(Field.MIN_PLAYERS)) && (!this.plugin.hasWaitingTaskStarted())) {
 				new WaitingTask(this.plugin);
 			}
 			

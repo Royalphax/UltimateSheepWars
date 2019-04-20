@@ -1,6 +1,8 @@
 package fr.asynchronous.sheepwars.core.event.player;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -13,7 +15,9 @@ import org.bukkit.inventory.ItemStack;
 import fr.asynchronous.sheepwars.core.SheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.data.PlayerData;
 import fr.asynchronous.sheepwars.core.event.UltimateSheepWarsEventListener;
+import fr.asynchronous.sheepwars.core.event.usw.EquipSelectionItemsEvent;
 import fr.asynchronous.sheepwars.core.gui.GuiManager;
+import fr.asynchronous.sheepwars.core.gui.guis.VoteMapInventory;
 import fr.asynchronous.sheepwars.core.handler.Contributor;
 import fr.asynchronous.sheepwars.core.handler.GameState;
 import fr.asynchronous.sheepwars.core.handler.ItemBuilder;
@@ -74,40 +78,46 @@ public class PlayerInteract extends UltimateSheepWarsEventListener
         				player.updateInventory();
         			}
         		} else {
-        			Message.sendMessage(player, MsgEnum.PLAYER_CANT_LAUNCH_SHEEP);
+        			Sounds.playSound(player, Sounds.VILLAGER_NO, 1f, 1f);
+        			SheepWarsPlugin.getVersionManager().getTitleUtils().actionBarPacket(player, data.getLanguage().getMessage(MsgEnum.PLAYER_CANT_LAUNCH_SHEEP));
         		}
         		event.setCancelled(true);
         		
         	} else if (GameState.isStep(GameState.WAITING)) {
         		
-        		if (mat.equals(ConfigManager.getItemStack(Field.KIT_ITEM).getType())) {
-        			
-                    String inventoryName = data.getLanguage().getMessage(MsgEnum.KIT_INVENTORY_NAME).replaceAll("%KIT_NAME%", data.getKit().getName(player));
-                    if (data.getKit().getLevels().size() > 1 && data.getKitLevel() >= 0) {
-                    	inventoryName = inventoryName.replaceAll("%LEVEL_NAME%", data.getKit().getLevel(data.getKitLevel()).getName(data.getLanguage()));
-                    } else {
-                    	inventoryName = inventoryName.replaceAll("%LEVEL_NAME%", "");
-                    }
-                    if (inventoryName.length() > 32)
-                    	inventoryName = inventoryName.substring(0, 32);
-                    GuiManager.openGui(this.plugin, player, inventoryName, GuiManager.getKitsInventoryNewInstance());
-                    
-        		} else if (mat.equals(ConfigManager.getItemStack(Field.RETURN_TO_HUB_ITEM).getType())) {
+        		if (mat.equals(ConfigManager.getItemStack(Field.RETURN_TO_HUB_ITEM).getType())) {
         			
                 	player.chat("/hub");
                 	
+        		} else if (mat.equals(ConfigManager.getItemStack(Field.VOTING_ITEM).getType())) {
+        			
+                	if (plugin.getWaitingTask() == null || plugin.getWaitingTask().getRemainingSeconds() > 10) {
+                		GuiManager.openGui(plugin, player, data.getLanguage().getMessage(MsgEnum.VOTE_INVENTORY_NAME), new VoteMapInventory());
+                	} else {
+                		player.sendMessage(data.getLanguage().getMessage(MsgEnum.VOTE_CLOSED));
+                	}
+                	
         		} else if (mat.equals(ConfigManager.getItemStack(Field.PARTICLES_ON_ITEM).getType()) || mat.equals(ConfigManager.getItemStack(Field.PARTICLES_OFF_ITEM).getType())) {
+        			
+        			Map<Integer, ItemStack> items = new HashMap<>();
+        			int particleSlot = 4;
+        			if (SheepWarsPlugin.getWorldManager().isVoteModeEnable())
+        				particleSlot = 5;
         			
         			if (data.getAllowedParticles())
                     {
                     	data.setAllowParticles(false);
-                    	player.getInventory().setItem(4, new ItemBuilder(ConfigManager.getItemStack(Field.PARTICLES_OFF_ITEM)).setName(data.getLanguage().getMessage(MsgEnum.PARTICLES_OFF)).toItemStack());
+                    	items.put(particleSlot, new ItemBuilder(ConfigManager.getItemStack(Field.PARTICLES_OFF_ITEM)).setName(data.getLanguage().getMessage(MsgEnum.PARTICLES_OFF)).toItemStack());
                     } else {
                     	data.setAllowParticles(true);
-                    	player.getInventory().setItem(4, new ItemBuilder(ConfigManager.getItemStack(Field.PARTICLES_ON_ITEM)).setName(data.getLanguage().getMessage(MsgEnum.PARTICLES_ON)).toItemStack());
+                    	items.put(particleSlot, new ItemBuilder(ConfigManager.getItemStack(Field.PARTICLES_ON_ITEM)).setName(data.getLanguage().getMessage(MsgEnum.PARTICLES_ON)).toItemStack());
                     	SheepWarsPlugin.getVersionManager().getParticleFactory().playParticles(player, Particles.SPELL_INSTANT, player.getLocation().add(0, 1, 0), 1f, 0.5f, 1f, 10, 0.0f);
                     }
-        			player.updateInventory();
+        			
+        			final EquipSelectionItemsEvent equipEvent = new EquipSelectionItemsEvent(player, items);
+        			Bukkit.getServer().getPluginManager().callEvent(equipEvent);
+        			equipEvent.equip();
+        			
                     Sounds.playSound(player, player.getLocation(), Sounds.NOTE_STICKS, 1f, 1f);
                     
         		} else if (Utils.areSimilar(item, TeamManager.RED.getIcon(player)) || Utils.areSimilar(item, TeamManager.BLUE.getIcon(player))) {
@@ -133,6 +143,21 @@ public class PlayerInteract extends UltimateSheepWarsEventListener
                     player.updateInventory();
         		}
         	}
+        	
+        	// Le choix de Kit doit pouvoir s'effectuer meme si le jeu a commencé juste avant de lancer la partie.
+        	if (mat.equals(ConfigManager.getItemStack(Field.KIT_ITEM).getType())) {
+    			
+                String inventoryName = data.getLanguage().getMessage(MsgEnum.KIT_INVENTORY_NAME).replaceAll("%KIT_NAME%", data.getKit().getName(player));
+                if (data.getKit().getLevels().size() > 1 && data.getKitLevel() >= 0) {
+                	inventoryName = inventoryName.replaceAll("%LEVEL_NAME%", data.getKit().getLevel(data.getKitLevel()).getName(data.getLanguage()));
+                } else {
+                	inventoryName = inventoryName.replaceAll("%LEVEL_NAME%", "");
+                }
+                if (inventoryName.length() > 32)
+                	inventoryName = inventoryName.substring(0, 32);
+                GuiManager.openGui(this.plugin, player, inventoryName, GuiManager.getKitsInventoryNewInstance());
+                
+    		}
         }
     }
 	
