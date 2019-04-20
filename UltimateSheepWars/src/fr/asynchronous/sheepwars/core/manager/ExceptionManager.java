@@ -18,19 +18,41 @@ public class ExceptionManager {
 	
 	private Throwable throwable;
 
-	public ExceptionManager(java.lang.Exception ex) {
-		this.throwable = ex;
+	/**
+	 * This class is called "ExceptionManager" so it hasn't to be initialized that way.
+	 *
+	 * @deprecated use {@link #register(Throwable, boolean)} instead.  
+	 */
+	@Deprecated
+	public ExceptionManager(final java.lang.Exception ex) {
+		this((Throwable) ex);
 	}
 	
-	public ExceptionManager(Throwable th) {
+	/**
+	 * This class is called "ExceptionManager" so it hasn't to be initialized that way.
+	 *
+	 * @deprecated use {@link #register(Throwable, boolean)} instead.  
+	 */
+	@Deprecated
+	public ExceptionManager(final Throwable th) {
 		this.throwable = th;
 	}
 	
-	public boolean register(boolean cast) {
+	/**
+	 * This class is called "ExceptionManager" so it hasn't to be initialized that way.
+	 *
+	 * @deprecated use {@link #register(Throwable, boolean)} instead.  
+	 */
+	@Deprecated
+	public boolean register(final boolean cast) {
+		return register(this.throwable, cast);
+	}
+	
+	public static boolean register(final Throwable th, final boolean cast) {
 		if (cast) {
 			Logger logger = Bukkit.getLogger();
-			logger.warning("[UltimateSheepWars > ExceptionManager] An error occured: " + throwable.getMessage());
-			logger.info("[UltimateSheepWars > ExceptionManager] For more information or any help, please contact the developer.");
+			logger.warning("[UltimateSheepWars > ERROR] An error occured : " + th.getMessage());
+			logger.info("[UltimateSheepWars > ERROR] For more information or any help, please contact the developer.");
 		}
 		String timeLog = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(Calendar.getInstance().getTime());
         File folder = new File(SheepWarsPlugin.DATAFOLDER, "reports/");
@@ -39,7 +61,7 @@ public class ExceptionManager {
         File logFile = new File(SheepWarsPlugin.DATAFOLDER, "reports/" + timeLog + ".txt");
 
         StringWriter errors = new StringWriter();
-        throwable.printStackTrace(new PrintWriter(errors));
+        th.printStackTrace(new PrintWriter(errors));
         
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(logFile, true))) {
 			writer.write(errors.toString());
@@ -48,5 +70,9 @@ public class ExceptionManager {
 			return false;
 		}
         return true;
+	}
+	
+	public static boolean register(final Throwable th) {
+		return register(th, false);
 	}
 }

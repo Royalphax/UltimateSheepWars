@@ -17,7 +17,6 @@ import java.util.logging.Logger;
 import javax.annotation.Nullable;
 
 import org.bukkit.Bukkit;
-import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -25,7 +24,6 @@ import fr.asynchronous.sheepwars.core.SheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.data.PlayerData;
 import fr.asynchronous.sheepwars.core.exception.PlayableMapException;
 import fr.asynchronous.sheepwars.core.handler.PlayableMap;
-import fr.asynchronous.sheepwars.core.manager.ConfigManager.Field;
 import fr.asynchronous.sheepwars.core.util.FileUtils;
 import fr.asynchronous.sheepwars.core.util.RandomUtils;
 import fr.asynchronous.sheepwars.core.util.ReflectionUtils;
@@ -35,6 +33,8 @@ public class WorldManager {
 
 	public final SheepWarsPlugin plugin;
 
+	public static final String LOBBY_MAP_NAME = "sheepwars-lobby";
+	
 	public final File worldContainer, worldFolder, mapsFolder;
 
 	private boolean isVoteEnable = false;
@@ -62,39 +62,26 @@ public class WorldManager {
 		}
 		/** On gere les fichiers **/
 		final File copyFolder = new File(this.worldContainer, "sheepwars-backup");
-		final File world = new File(this.mapsFolder, "sheepwars-backup");
-		if (this.mapsFolder.listFiles().length <= 1) {
+		final File world = new File(this.mapsFolder, LOBBY_MAP_NAME);
+		if (this.mapsFolder.listFiles().length <= 1 || !world.exists()) {
 			if (copyFolder.exists()) {
 				logger.info("Moving 'sheepwars-backup' into the new 'sheepwars-maps' folder ...");
 				FileUtils.copyFolder(copyFolder, world);
 				FileUtils.delete(copyFolder);
 				logger.info("Move done !");
 			} else {
-				logger.info("Didn't found any world in the 'sheepwars-maps' folder, duplicating 'world' ...");
+				logger.info("Didn't found 'sheepwars-lobby' in the 'sheepwars-maps' folder, duplicating 'world' ...");
 				FileUtils.copyFolder(this.worldFolder, world);
 				logger.info("Duplication successful !");
 			}
 		}
-		/** On enregistre toutes les playable maps **/
-		for (File supposedMapFolder : this.mapsFolder.listFiles())
-			if (supposedMapFolder.isDirectory())
-				new PlayableMap(supposedMapFolder, logger);
-		/** Verifier qu'on a au moins une playable map **/
-		if (PlayableMap.getPlayableMaps().isEmpty()) {
-			throw new PlayableMapException("There's no playable map in the folder 'sheepwars-maps'. Please delete corrupted folders.");
-		}
-		/** On reset le world en prenant celui qui est désigné dans la config **/
-		PlayableMap map = PlayableMap.getPlayableMap(ConfigManager.getString(Field.LOBBY_MAP_NAME));
-		if (map == null) {
-			throw new PlayableMapException("The lobby map name in config.yml doesn't match with any playable map in 'sheepwars-maps'.");
-		}
 		try {
-			resetWorld(map.getFolder());
+			resetWorld(world);
 		} catch (Exception e) {
 			new ExceptionManager(e).register(true);
 		}
 	}
-
+	
 	private void resetWorld(File copyFolder) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException, Exception {
 		this.plugin.getLogger().info("Resetting world ...");
 		Bukkit.unloadWorld(this.worldFolder.getName(), true);
@@ -113,11 +100,11 @@ public class WorldManager {
 			writer.println("* If you put more than one world folder and you have setup them ingame, the plugin will automatically ask players to vote for the map to use.");
 			writer.println("(The display name for each map will be the name of the folder which contains it)");
 			writer.println("* Otherwise, the alone world will be automatically choosen.");
-			writer.println("NOTE : The 'sheepwars-backup' folder contains the world you used to play on before.");
+			writer.println("NOTE : The 'sheepwars-lobby' folder contains the world you used to play on before.");
 			writer.println("");
 			writer.println("--- Learn More ---");
 			writer.println("* When a map has been voted by the players, it will be copied to the superior folder (the same folder which contains the directory \"plugins/\").");
-			writer.print("Then, this map will be load to allow players to play on it. So, the folder \"sheepwars-worlds\" always contains the clean version of each map.");
+			writer.print("Then, this map will be load to allow players to play on it. So, the folder \"sheepwars-maps\" always contains the clean version of each map.");
 			writer.close();
 		}
 	}
@@ -139,24 +126,28 @@ public class WorldManager {
 			}
 			player.sendMessage(ChatColor.GREEN + "Teleporting to \"" + world + "\" ...");
 			player.teleport(map.getWorld().getSpawnLocation());
+			player.setAllowFlight(true);
+			player.setFlying(true);
 		}
 	}
 
 	public void checkVoteMode(@Nullable CommandSender sender) {
 		int readyCount = 0;
+		send(sender, "");
 		for (PlayableMap map : PlayableMap.getPlayableMaps()) {
 			int[] ints = map.checkReadyToPlay();
 			boolean ready = map.isReadyToPlay();
-			send(sender, ChatColor.WHITE + "∙ " + ChatColor.GRAY + map.getName() + " (" + (ready ? ChatColor.GREEN + "Ready" : ChatColor.RED + "Not Ready") + ChatColor.GRAY + ")");
+			send(sender, ChatColor.WHITE + "∙ " + ChatColor.YELLOW + map.getFolder().getName() + ChatColor.GRAY + " (" + (ready ? ChatColor.GREEN + "Ready" : ChatColor.RED + "Not Ready") + ChatColor.GRAY + ")");
 			String details = ChatColor.GRAY + " Red spawns: " + (ints[0] > 0 ? ChatColor.GREEN : ChatColor.RED) + ints[0];
-			details += ChatColor.GRAY + " / Blue spawns: " + (ints[1] > 0 ? ChatColor.GREEN : ChatColor.RED) + ints[1];
-			details += ChatColor.GRAY + " / Spec spawns: " + (ints[2] > 0 ? ChatColor.GREEN : ChatColor.RED) + ints[2];
-			details += ChatColor.GRAY + " / Boosters: " + (ints[3] > 0 ? ChatColor.GREEN : ChatColor.RED) + ints[3];
+			details += ChatColor.GRAY + "  Blue spawns: " + (ints[1] > 0 ? ChatColor.GREEN : ChatColor.RED) + ints[1];
+			details += ChatColor.GRAY + "  Spec spawns: " + (ints[2] > 0 ? ChatColor.GREEN : ChatColor.RED) + ints[2];
+			details += ChatColor.GRAY + "  Boosters: " + (ints[3] > 0 ? ChatColor.GREEN : ChatColor.RED) + ints[3];
 			send(sender, details);
 			if (ready)
 				readyCount++;
 		}
-		send(sender, ChatColor.WHITE + "∙ " + ChatColor.GRAY + "Vote Enable : " + (readyCount > 1 ? ChatColor.GREEN + "Yes" : ChatColor.RED + "No"));
+		send(sender, "");
+		send(sender, ChatColor.WHITE + "∙ " + ChatColor.GRAY + "Vote Mode : " + (readyCount > 1 ? ChatColor.GREEN + "Enabled" : ChatColor.RED + "Disabled"));
 		isVoteEnable = readyCount > 1;
 	}
 
@@ -208,5 +199,16 @@ public class WorldManager {
 	
 	public PlayableMap getVotedMap() {
 		return votedMap;
+	}
+	
+	public int getVoteCount(PlayableMap map) {
+		int result = 0;
+		for (Player online : Bukkit.getOnlinePlayers()) {
+			PlayerData data = PlayerData.getPlayerData(online);
+			if ((map != null && data.getVotedMap() != null && data.getVotedMap() == map) || (map == null && data.getVotedMap() == null)) {
+				result++;
+			}
+		}
+		return result;
 	}
 }

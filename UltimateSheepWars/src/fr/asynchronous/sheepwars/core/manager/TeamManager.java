@@ -156,7 +156,7 @@ public enum TeamManager {
 					method.setAccessible(true);
 					method.invoke(team, objOption, objOptionStatus);
 				} catch (Exception ex) {
-					new ExceptionManager(ex).register(true);
+					ExceptionManager.register(ex, true);
 				}
 			}
 		}
