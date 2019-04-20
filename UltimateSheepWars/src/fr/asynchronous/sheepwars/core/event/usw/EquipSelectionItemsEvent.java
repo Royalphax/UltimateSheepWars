@@ -49,6 +49,7 @@ public class EquipSelectionItemsEvent extends Event {
 				inv.setItem(slot, item);
 			}
 		}
+		player.updateInventory();
 	}
 	
 	@Override
