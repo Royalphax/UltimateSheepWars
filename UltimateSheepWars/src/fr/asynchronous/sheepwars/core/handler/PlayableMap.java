@@ -19,8 +19,11 @@ import org.bukkit.WorldCreator;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
+import fr.asynchronous.sheepwars.core.manager.ConfigManager;
+import fr.asynchronous.sheepwars.core.manager.ConfigManager.Field;
 import fr.asynchronous.sheepwars.core.manager.ExceptionManager;
 import fr.asynchronous.sheepwars.core.manager.TeamManager;
+import fr.asynchronous.sheepwars.core.manager.WorldManager;
 import fr.asynchronous.sheepwars.core.util.FileUtils;
 
 /**
@@ -45,15 +48,15 @@ public class PlayableMap {
 
 		if (isMinecraftMapDirectory()) {
 			if (getPlayableMap(folder) != null) {
-				log.info("- Map in folder 'sheepwars-maps/" + folder.getName() + "' already registred.");
+				log.info("- Map " + getName() + " already registred.");
 				return;
 			}
 			maps.add(this);
 			loadConfig();
 			loadData();
-			log.info("- Map in folder 'sheepwars-maps/" + folder.getName() + "' registred !");
+			log.info("- Map " + getName() + " registred! (path: " + folder.getPath() + ")");
 		} else {
-			log.info("- 'sheepwars-maps/" + folder.getName() + "' isn't a folder or doesn't contains all required files.");
+			log.info("- " + folder.getName() + " isn't a folder or doesn't contains all required files. (path: " + folder.getPath() + ")");
 		}
 	}
 
@@ -63,20 +66,36 @@ public class PlayableMap {
 			try {
 				file.createNewFile();
 			} catch (IOException e) {
-				new ExceptionManager(e).register(true);
+				ExceptionManager.register(e, true);
 			}
 		config = YamlConfiguration.loadConfiguration(file);
 	}
 
+	@SuppressWarnings("deprecation")
 	public void loadData() {
-		for (TeamManager team : Arrays.asList(TeamManager.RED, TeamManager.BLUE, TeamManager.SPEC)) {
-			List<String> positions = config.getStringList("team." + team.getName() + ".spawns");
+		if (!config.contains("team") && !config.contains("booster") && folder.getName().equals(WorldManager.LOBBY_MAP_NAME)) {
+			for (VirtualLocation loc : ConfigManager.getLocations(Field.BLUE_SPAWNS)) {
+				teamSpawns.put(loc, TeamManager.BLUE);
+			}
+			for (VirtualLocation loc : ConfigManager.getLocations(Field.RED_SPAWNS)) {
+				teamSpawns.put(loc, TeamManager.RED);
+			}
+			for (VirtualLocation loc : ConfigManager.getLocations(Field.SPEC_SPAWNS)) {
+				teamSpawns.put(loc, TeamManager.SPEC);
+			}
+			for (VirtualLocation loc : ConfigManager.getLocations(Field.BOOSTERS)) {
+				boosterSpawns.add(loc);
+			}
+		} else {
+			for (TeamManager team : Arrays.asList(TeamManager.RED, TeamManager.BLUE, TeamManager.SPEC)) {
+				List<String> positions = config.getStringList("team." + team.getName() + ".spawns");
+				for (String position : positions)
+					teamSpawns.put(VirtualLocation.fromString(this, position), team);
+			}
+			List<String> positions = config.getStringList("booster.spawns");
 			for (String position : positions)
-				teamSpawns.put(VirtualLocation.fromString(this, position), team);
+				boosterSpawns.add(VirtualLocation.fromString(this, position));
 		}
-		List<String> positions = config.getStringList("booster.spawns");
-		for (String position : positions)
-			boosterSpawns.add(VirtualLocation.fromString(this, position));
 	}
 
 	public void uploadData() {
@@ -95,10 +114,10 @@ public class PlayableMap {
 		try {
 			config.save(file);
 		} catch (IOException e) {
-			new ExceptionManager(e).register(true);
+			ExceptionManager.register(e, true);
 		}
 	}
-	
+
 	/* POSITION DES SPAWNS DE TEAM */
 
 	public VirtualLocationList getTeamSpawns(TeamManager team) {
@@ -109,38 +128,38 @@ public class PlayableMap {
 		}
 		return new VirtualLocationList(virtualList);
 	}
-	
+
 	public void addTeamSpawn(TeamManager team, Location loc) {
 		final VirtualLocation vLoc = VirtualLocation.fromBukkitLocation(loc);
 		if (teamSpawns.containsKey(vLoc))
 			teamSpawns.remove(vLoc);
 		teamSpawns.put(vLoc, team);
 	}
-	
+
 	public void clearTeamSpawns(TeamManager team) {
-		Map<VirtualLocation, TeamManager> map = new HashMap<>(teamSpawns); 
+		Map<VirtualLocation, TeamManager> map = new HashMap<>(teamSpawns);
 		for (VirtualLocation loc : map.keySet()) {
 			if (map.get(loc).equals(team))
 				teamSpawns.remove(loc);
 		}
 	}
-	
+
 	/* POSITIONS DES BOOSTERS */
 
 	public VirtualLocationList getBoosterSpawns() {
 		return new VirtualLocationList(boosterSpawns);
 	}
-	
+
 	public void addBoosterSpawn(Location loc) {
 		boosterSpawns.add(VirtualLocation.fromBukkitLocation(loc));
 	}
-	
+
 	public void clearBoosterSpawns() {
 		boosterSpawns.clear();
 	}
-	
+
 	/** FIN DE LA SECTION CONFIG **/
-	
+
 	public File getFolder() {
 		return folder;
 	}
@@ -150,7 +169,7 @@ public class PlayableMap {
 		final String cap = str.substring(0, 1).toUpperCase() + str.substring(1);
 		return cap;
 	}
-	
+
 	public boolean isMinecraftMapDirectory() {
 		if (!this.folder.isDirectory())
 			return false;
@@ -197,7 +216,7 @@ public class PlayableMap {
 		final WorldCreator worldCreator = new WorldCreator(this.folder.getName());
 		this.world = worldCreator.createWorld();
 	}
-	
+
 	public void loadWorld(World world) {
 		this.world = world;
 	}
@@ -209,24 +228,13 @@ public class PlayableMap {
 	public boolean isReadyToPlay() {
 		return this.readyToPlay;
 	}
-	
+
 	/**
 	 * Check if a playable map is ready to be used.
 	 * 
 	 * @return red team, blue team, spectators and boosters spawn counts
 	 */
 	public int[] checkReadyToPlay() {
-		/**
-		 * List<Field> fields = new ArrayList<>(); fields.add(TeamManager.RED.getSpawns()); fields.add(TeamManager.BLUE.getSpawns()); fields.add(TeamManager.SPEC.getSpawns()); fields.add(Field.BOOSTERS);
-		 * 
-		 * boolean readyToPlay = true;
-		 * 
-		 * List<Integer> outputList = new ArrayList<>(); for (Field field : fields) { List<VirtualLocation> locations = ConfigManager.getLocations(field); int count = 0; for (VirtualLocation location : locations) if (location.getWorld().equals(folder.getName())) count++; outputList.add(count); if (readyToPlay && count == 0) readyToPlay = false; }
-		 * 
-		 * this.readyToPlay = readyToPlay;
-		 * 
-		 * int[] output = {outputList.get(0), outputList.get(1), outputList.get(2), outputList.get(3)}; return output;
-		 **/
 		boolean readyToPlay = true;
 
 		List<Integer> outputList = new ArrayList<>();
@@ -256,7 +264,7 @@ public class PlayableMap {
 				return map;
 		return null;
 	}
-	
+
 	public static PlayableMap getPlayableMap(World world) {
 		for (PlayableMap map : maps)
 			if (map.isWorldLoaded() && map.getWorld().equals(world))
@@ -267,7 +275,7 @@ public class PlayableMap {
 	public static PlayableMap getPlayableMap(File folder) {
 		return getPlayableMap(folder.getName());
 	}
-	
+
 	public static List<PlayableMap> getReadyMaps() {
 		List<PlayableMap> output = new ArrayList<>(maps);
 		for (PlayableMap map : maps) {

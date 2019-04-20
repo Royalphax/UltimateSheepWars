@@ -33,6 +33,10 @@ public class VirtualLocation {
 		return world;
 	}
 	
+	public World getBukkitWorld() {
+		return world.equals("") || Bukkit.getWorld(world) == null ? Bukkit.getWorlds().get(0) : Bukkit.getWorld(world);
+	}
+	
 	/**
 	 * @return the x
 	 */
@@ -45,6 +49,13 @@ public class VirtualLocation {
 	 */
 	public double getY() {
 		return y;
+	}
+	
+	/**
+	 * @return the z
+	 */
+	public double getZ() {
+		return z;
 	}
 	
 	/**
@@ -62,7 +73,7 @@ public class VirtualLocation {
 	}
 	
 	public Location toBukkitLocation() {
-		return new Location(Bukkit.getWorld(world), x, y, z, yaw, pitch);
+		return new Location(getBukkitWorld(), x, y, z, yaw, pitch);
 	}
 	
 	public Location toBukkitLocation(World world) {
@@ -71,7 +82,7 @@ public class VirtualLocation {
 	
 	@Override
 	public String toString() {
-		return world.replaceAll("_", "%UNDERSCORE%") + "_" + x + "_" + y + "_" + z + "_" + yaw + "_" + pitch;
+		return getBukkitWorld().getName().replaceAll("_", "%UNDERSCORE%") + "_" + x + "_" + y + "_" + z + "_" + yaw + "_" + pitch;
 	}
 	
 	public String toPlayableMapConfigString() {
@@ -93,6 +104,6 @@ public class VirtualLocation {
 	}
 	
 	public static VirtualLocation getDefault() {
-		return new VirtualLocation(Bukkit.getWorlds().get(0).getName(), 0, 0, 0, 0, 0);
+		return new VirtualLocation("", 0, 0, 0, 0, 0);
 	}
 }

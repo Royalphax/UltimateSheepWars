@@ -228,7 +228,7 @@ public class ItemBuilder {
 		final Material type = this.is.getType();
         switch(type) {
             case INK_SACK:
-                this.is.setData(new Dye(color));
+                this.is.setData(new Dye(type, color.getData()));
                 break;
             case WOOL:
             	this.is.setData(new Wool(color));

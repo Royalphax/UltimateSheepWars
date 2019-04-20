@@ -8,15 +8,15 @@ import org.bukkit.Location;
 public class VirtualLocationList {
 
 	final List<VirtualLocation> list;
-	
+
 	public VirtualLocationList(List<VirtualLocation> list) {
 		this.list = list;
 	}
-	
+
 	public List<VirtualLocation> getVirtualLocations() {
 		return this.list;
 	}
-	
+
 	public List<Location> getBukkitLocations() {
 		List<Location> output = new ArrayList<>();
 		for (VirtualLocation loc : this.list) {
@@ -24,11 +24,11 @@ public class VirtualLocationList {
 		}
 		return output;
 	}
-	
+
 	public int size() {
 		return list.size();
 	}
-	
+
 	public static VirtualLocationList fromBukkitLocationList(List<Location> list) {
 		List<VirtualLocation> virtualList = new ArrayList<>();
 		for (Location loc : list) {
@@ -36,5 +36,5 @@ public class VirtualLocationList {
 		}
 		return new VirtualLocationList(virtualList);
 	}
-	
+
 }
