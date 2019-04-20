@@ -10,7 +10,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
-import fr.asynchronous.sheepwars.core.data.PlayerData;
+import fr.asynchronous.sheepwars.core.SheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.gui.base.GuiScreen;
 import fr.asynchronous.sheepwars.core.handler.ItemBuilder;
 import fr.asynchronous.sheepwars.core.handler.PlayableMap;
@@ -21,11 +21,9 @@ import fr.asynchronous.sheepwars.core.util.RandomUtils;
 public class VoteMapInventory extends GuiScreen {
 
 	public Map<Integer, PlayableMap> slotMap = new HashMap<>();
-	public final PlayerData data;
 
 	public VoteMapInventory() {
-		super(2, (int) Math.ceil((PlayableMap.getReadyMaps().size() + 1) / 9.0), false);
-		this.data = PlayerData.getPlayerData(this.player);
+		super(2, (int) Math.ceil((PlayableMap.getReadyMaps().size() + 1) / 9.0), true);
 	}
 
 	@Override
@@ -36,14 +34,15 @@ public class VoteMapInventory extends GuiScreen {
 		urls.add("http://textures.minecraft.net/texture/a4efb34417d95faa94f25769a21676a022d263346c8553eb5525658b34269");
 		urls.add("http://textures.minecraft.net/texture/915f7c313bca9c2f958e68ab14ab393867d67503affff8f20cb13fbe917fd31");
 		urls.add("http://textures.minecraft.net/texture/1c3cec68769fe9c971291edb7ef96a4e3b60462cfd5fb5baa1cbb3a71513e7b");
-		setItem(new ItemBuilder(Material.SKULL_ITEM).setSkullTexture(RandomUtils.getRandom(urls)).setName(data.getLanguage().getMessage(MsgEnum.RANDOM_MAP_NAME)).toItemStack(), 0);
-		
-		int i = 1;
+
+		int i = 0;
 		for (PlayableMap map : PlayableMap.getReadyMaps()) {
-			setItem(new ItemBuilder(Material.EMPTY_MAP).setName(data.getLanguage().getMessage(MsgEnum.RANDOM_MAP_NAME).replaceAll("%MAP_NAME%", map.getName())).toItemStack(), i);
+			setItem(new ItemBuilder(Material.PAPER).setName(playerData.getLanguage().getMessage(MsgEnum.VOTE_MAP_NAME).replaceAll("%MAP_NAME%", map.getName())).setLore(playerData.getLanguage().getMessage(MsgEnum.VOTE_MAP_LORE).replaceAll("%VOTE_COUNT%", String.valueOf(SheepWarsPlugin.getWorldManager().getVoteCount(map)))).toItemStack(), i);
 			slotMap.put(i, map);
 			i++;
 		}
+		
+		setItem(new ItemBuilder(Material.SKULL_ITEM).setSkullTexture(RandomUtils.getRandom(urls)).setName(playerData.getLanguage().getMessage(MsgEnum.VOTE_MAP_NAME).replaceAll("%MAP_NAME%", playerData.getLanguage().getMessage(MsgEnum.RANDOM_MAP_NAME))).setLore(playerData.getLanguage().getMessage(MsgEnum.VOTE_RANDOM_MAP_LORE).replaceAll("%VOTE_COUNT%", String.valueOf(SheepWarsPlugin.getWorldManager().getVoteCount(null)))).toItemStack(), i);
 	}
 
 	@Override
@@ -61,11 +60,11 @@ public class VoteMapInventory extends GuiScreen {
 	public void onClick(ItemStack item, InventoryClickEvent event) {
 		if (item != null && item.getItemMeta() != null && item.getItemMeta().hasDisplayName()) {
 			if (slotMap.containsKey(event.getSlot())) {
-				this.data.setVotedMap(slotMap.get(event.getSlot()));
+				this.playerData.setVotedMap(slotMap.get(event.getSlot()));
 			} else {
-				this.data.setVotedMap(null);
+				this.playerData.setVotedMap(null);
 			}
-			Sounds.WOOD_CLICK.playSound((Player) event.getWhoClicked(), 1f, 0.5f);
+			Sounds.CLICK.playSound((Player) event.getWhoClicked(), 1f, 0.5f);
 			event.getWhoClicked().closeInventory();
 		}
 		event.setCancelled(true);

@@ -37,7 +37,6 @@ import fr.asynchronous.sheepwars.core.util.Utils;
 
 public class KitsInventory extends GuiScreen {
 
-	private PlayerData playerData;
 	private boolean kitScreen = true;
 
 	public KitsInventory() {
@@ -46,7 +45,6 @@ public class KitsInventory extends GuiScreen {
 
 	@Override
 	public void drawScreen() {
-		this.playerData = PlayerData.getPlayerData(this.player);
 		decorateBorders();
 		drawKitsScreen();
 	}
