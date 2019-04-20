@@ -25,7 +25,7 @@ public class GuiManager {
 	public static GuiScreen openGui(SheepWarsPlugin plugin, Player player, String inventoryName, GuiScreen gui) {
 		openPlayer(player, gui);
 		if (gui.isUpdate())
-			new GuiTask(plugin, gui.getPlayer(), inventoryName, gui).runTaskTimer(plugin, 0, 20);
+			new GuiTask(plugin, player, inventoryName, gui).runTaskTimer(plugin, 0, 20);
 		else {
 			gui.open(plugin, player, inventoryName);
 		}

@@ -11,6 +11,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import fr.asynchronous.sheepwars.core.SheepWarsPlugin;
+import fr.asynchronous.sheepwars.core.data.PlayerData;
 import fr.asynchronous.sheepwars.core.gui.GuiManager;
 
 public abstract class GuiScreen implements Listener {
@@ -21,6 +22,7 @@ public abstract class GuiScreen implements Listener {
 	
 	public Inventory inventory;
 	public Player player;
+	public PlayerData playerData;
 	public SheepWarsPlugin plugin;
 
 	public GuiScreen(int id, int size, boolean update) {
@@ -46,6 +48,7 @@ public abstract class GuiScreen implements Listener {
 	public void open(SheepWarsPlugin plugin, Player player, String inventoryName) {
 		this.inventory = Bukkit.createInventory(null, size * 9, inventoryName);
 		this.player = player;
+		this.playerData = PlayerData.getPlayerData(player);
 		this.plugin = plugin;
 		player.openInventory(this.inventory);
 		drawScreen();
