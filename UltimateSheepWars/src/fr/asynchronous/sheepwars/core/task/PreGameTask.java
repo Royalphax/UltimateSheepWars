@@ -1,6 +1,7 @@
 package fr.asynchronous.sheepwars.core.task;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.bukkit.Bukkit;
@@ -11,6 +12,8 @@ import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
@@ -57,9 +60,17 @@ public class PreGameTask extends BukkitRunnable {
 				case 1 :
 					Sounds.playSoundAll(null, Sounds.ORB_PICKUP, 1f, 1.5f);
 					break;
+				case 0 :
+					Sounds.playSoundAll(null, Sounds.EXPLODE, 1f, 1.0f);
+					break;
 			}
-			for (Player online : Bukkit.getOnlinePlayers())
+			for (Player online : Bukkit.getOnlinePlayers()) {
+				if (seconds == 0) {
+					online.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 5, 1, false, false));
+					continue;
+				}
 				SheepWarsPlugin.getVersionManager().getTitleUtils().titlePacket(online, 2, 25, 4, ChatColor.AQUA + "" + seconds, Message.getMessage(online, ChatColor.GOLD.toString(), MsgEnum.PRE_START_COUNTDOWN_SUBTITLE, ""));
+			}
 		}
 		if (this.seconds == 0) {
 			this.cancel();
@@ -88,22 +99,23 @@ public class PreGameTask extends BukkitRunnable {
 					player.getInventory().addItem(new ItemBuilder(Material.WOOD_SWORD).setUnbreakable().toItemStack());
 					player.getInventory().setItem(9, new ItemStack(Material.ARROW));
 				}
-			}
-			/** Update le SB **/
-			updateScoreboard();
-			for (Player player : Bukkit.getOnlinePlayers()) {
+				/** Une partie de plus que le joueur joue **/
+				data.increaseGames(1);
 				/** On unfreeze le joueur **/
 				SheepWarsPlugin.getVersionManager().getNMSUtils().cancelMove(player, false);
 				/** On affiche le title **/
-				final PlayerData data = PlayerData.getPlayerData(player);
 				SheepWarsPlugin.getVersionManager().getTitleUtils().titlePacket(player, 5, 50, 20, data.getLanguage().getMessage(MsgEnum.GAME_START_TITLE), data.getLanguage().getMessage(MsgEnum.GAME_START_SUBTITLE).replace("%TIME%", ConfigManager.getInt(Field.GIVE_SHEEP_INTERVAL).toString()));
 			}
+			/** Update le score board **/
+			updateScoreboard();
 			new GameTask(this.plugin);
 		}
 		this.seconds--;
 	}
 
 	private void updateScoreboard() {
+		for (TeamManager team : Arrays.asList(TeamManager.RED, TeamManager.BLUE))
+			team.inGameRules();
 		for (Language lang : Language.getLanguages()) {
 			lang.getScoreboardWrapper().setLine(8, ChatColor.RED + "", true);
 			final Scoreboard board = lang.getScoreboardWrapper().getScoreboard();

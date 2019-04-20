@@ -49,16 +49,16 @@ public class WaitingTask extends BukkitRunnable {
 					/** On get sa team finale et on le TP en fonction **/
 					final TeamManager team = data.getTeam();
 					player.setFallDistance(0.0f);
-					player.teleport(team.getNextSpawn());
 					final PlayerInventory inv = player.getInventory();
 					for (ItemStack item : inv.getContents()) {
 						if (item != null && item.getType() != ConfigManager.getItemStack(Field.KIT_ITEM).getType()) {
 							inv.remove(item);
 						}
 					}
+					player.teleport(team.getNextSpawn());
 					SheepWarsPlugin.getVersionManager().getNMSUtils().cancelMove(player, true);
 					SheepWarsPlugin.getVersionManager().getTitleUtils().actionBarPacket(player, "");
-					SheepWarsPlugin.getVersionManager().getTitleUtils().titlePacket(player, 2, 70, 20, data.getLanguage().getMessage(MsgEnum.GAME_PRE_START_TITLE), data.getLanguage().getMessage(MsgEnum.GAME_PRE_START_SUBTITLE));
+					SheepWarsPlugin.getVersionManager().getTitleUtils().titlePacket(player, 2, 80, 20, data.getLanguage().getMessage(MsgEnum.GAME_PRE_START_TITLE), data.getLanguage().getMessage(MsgEnum.GAME_PRE_START_SUBTITLE));
 				}
 				new PreGameTask(this.plugin);
 			} else {
@@ -83,7 +83,7 @@ public class WaitingTask extends BukkitRunnable {
 			try {
 				map.loadWorld();
 			} catch (IOException e) {
-				new ExceptionManager(e).register(true);
+				ExceptionManager.register(e, true);
 			}
 		}
 		if (this.timeUntilStart % 30 == 0 || (remainingMins == 0 && (remainingSecs % 10 == 0 || remainingSecs < 10))) {

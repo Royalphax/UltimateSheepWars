@@ -99,7 +99,7 @@ public class GameTask extends BukkitRunnable {
 				try {
 					lang.getScoreboardWrapper().setTitle(lang.getMessage(MsgEnum.SCOREBOARD_INGAME_TITLE).replaceAll("%MINUTES%", remainingMinsDisplay).replaceAll("%SECONDS%", remainingSecsDisplay));
 				} catch (IllegalArgumentException ex) {
-					new ExceptionManager(ex).register(true);
+					ExceptionManager.register(ex, true);
 				}
 				lang.refreshSheepCountdown(giveSheepCountdown);
 				lang.refreshBoosterCountdown(boosterCountdown);
@@ -111,7 +111,7 @@ public class GameTask extends BukkitRunnable {
 			}
 			--remainingDurationInSecs;
 		} catch (Exception ex) {
-			new ExceptionManager(ex).register(true);
+			ExceptionManager.register(ex, true);
 		}
 		giveSheepCountdown--;
 		if (giveSheepCountdown <= 0) {
