@@ -10,9 +10,9 @@ import fr.asynchronous.sheepwars.core.handler.Particles.ParticleEffect;
 
 public enum Contributor {
 	
-	//ROYTREO28("Roytreo28", "711e5a53-14a1-409b-bf48-7e8c1cc22440", ChatColor.RED + "Développeur " + ChatColor.YELLOW, 4, ParticleEffect.FLAME_RINGS, "Effet actif: " + ChatColor.GREEN + "Flame Rings"),
-	DROLEUR("Droleur", "da6610cb-3f5b-4638-aaf7-e6bb8fa1c22a", ChatColor.LIGHT_PURPLE + "Contributeur " + ChatColor.YELLOW, 3, ParticleEffect.ENCHANT, "Effet actif: " + ChatColor.GREEN + "Witch Spiral"),
-	KINGRIDER26("KingRider26", "fb053956-f24e-4ef5-aa2a-747575701858", ChatColor.LIGHT_PURPLE + "Contributeur " + ChatColor.YELLOW, 3, ParticleEffect.SHADOW_WALK, "Salut KingRider! Etant un des rares developpeurs que j'apprécie et que j'aide, je t'offre l'effet anneaux de feu en jeu."),
+	//ROYALPHA("Royalpha", "711e5a53-14a1-409b-bf48-7e8c1cc22440", ChatColor.RED + "Lead-Developer " + ChatColor.YELLOW, 4, ParticleEffect.FLAME_RINGS, "Effet actif: " + ChatColor.GREEN + "Flame Rings"),
+	DROLEUR("Droleur", "da6610cb-3f5b-4638-aaf7-e6bb8fa1c22a", ChatColor.LIGHT_PURPLE + "Contributor " + ChatColor.YELLOW, 3, ParticleEffect.WITCH_SPIRAL, "Effet actif: " + ChatColor.GREEN + "Witch Spiral"),
+	KINGRIDER26("KingRider26", "fb053956-f24e-4ef5-aa2a-747575701858", ChatColor.RED + "Co-Developer " + ChatColor.YELLOW, 3, ParticleEffect.SHADOW_WALK, "Salut bg! Amuses-toi bien."),
 	FINOWAY("Finoway", "aa42d5e0-a244-4da8-84df-95138f8e7371", "", 1, ParticleEffect.FLAME_SPIRAL, "Salut Finoway! Tu m'as bien aidé pour le plugin, je te remercie en t'offrant un effet de particule."),
 	MILOWGAMING("milowgaming", "5c09ddc7-1186-4338-97eb-baf9c11da551", "", 1, ParticleEffect.ENCHANT, "Salut milowgaming, merci pour ton aide d'un soir. Je t'offre l'effet enchanteur !"),
 	THE_GUNTH("TheGunth", "aa8f4b05-808e-4bbf-a844-6ce7bc7afe2c", "", 1, ParticleEffect.ENCHANT, "Salut TheGunth, merci pour ton aide d'un soir. Je t'offre l'effet enchanteur !"),
@@ -20,7 +20,7 @@ public enum Contributor {
 	SHIKA258("shika258", "f053b7b3-40d9-4edf-b4b6-c2f0ba4a0f93", "", 1, ParticleEffect.SHADOW_WALK, "Salut Shika! Merci pour tes rapports de bugs. En échange, je t'offre le Shadow Walk effet, amuses-toi bien !"),
 	HAKOGAMING("Hakogaming", "107bb14a-f394-4581-aaa2-33feffebb420", "", 1, ParticleEffect.FLAME_CIRCLE, "Hey Hako! Merci pour toute ton aide. En échange, je t'offre le Flame Circle effet, amuses-toi bien !"),
 	LUMINATI_MC("NovaXCIV", "ce320d7a-2ed3-4fdf-8241-7e07b1a3ac73", "", 1, ParticleEffect.FLAME_CIRCLE, "Hi NovaXCIV! Thanks for all your help since the begining. I give you the Flame Circle effect. Enjoy !"),
-	COCTLE("Coctle", "b9c67c2f-2008-45d8-ba9c-1798b8bf52b0", ChatColor.LIGHT_PURPLE + "Contributeur " + ChatColor.YELLOW, 3, ParticleEffect.WITCH_SPIRAL, "Effet actif: " + ChatColor.GREEN + "Witch Spiral");
+	COCTLE("Coctle", "b9c67c2f-2008-45d8-ba9c-1798b8bf52b0", "", 3, ParticleEffect.WITCH_SPIRAL, "Effet actif: " + ChatColor.GREEN + "Witch Spiral");
 
 	private String name;
 	private UUID uuid;

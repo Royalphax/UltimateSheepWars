@@ -3,7 +3,6 @@ package fr.asynchronous.sheepwars.core.gui.guis;
 import java.util.List;
 
 import org.bukkit.ChatColor;
-import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.SkullType;
 import org.bukkit.entity.Player;
@@ -31,7 +30,7 @@ public class ContributorsInventory extends GuiScreen {
 		List<String> justified = JustifyUtils.fullJustify(words, 40);
 		for (int i = 0; i < justified.size(); i++)
 			justified.set(i, ChatColor.WHITE + justified.get(i));
-		setItem(new ItemBuilder(Material.INK_SACK).setColor((this.contributor.isEffectActive() ? DyeColor.LIME : DyeColor.GRAY)).setName(ChatColor.YELLOW + "Contributor Particles: " + (this.contributor.isEffectActive() ? ChatColor.GREEN : ChatColor.RED) + ChatColor.BOLD + (this.contributor.getEffect().toString().replaceAll("_", " "))).setLore(ChatColor.GRAY + "Click to toggle it!").toItemStack(), 3);
+		setItem(new ItemBuilder((this.contributor.isEffectActive() ? Material.BLAZE_ROD : Material.STICK)).setName(ChatColor.YELLOW + "Contributor Particles: " + (this.contributor.isEffectActive() ? ChatColor.GREEN : ChatColor.RED) + ChatColor.BOLD + (this.contributor.getEffect().toString().replaceAll("_", " "))).setLore(ChatColor.GRAY + "Click to toggle it!").toItemStack(), 3);
 		setItem(new ItemBuilder(Material.ARROW).setName(ChatColor.RED + "Close").toItemStack(), 5);
 		setItem(new ItemBuilder(Material.SKULL_ITEM, 1, (byte) SkullType.PLAYER.ordinal()).setSkullOwner(this.player.getName()).setName(ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + "CONTRIBUTOR " + ChatColor.YELLOW + this.player.getName()).addLoreLine("", ChatColor.GRAY + "Developer's message:").addLoreLine(justified).toItemStack(), 4);
 	}
