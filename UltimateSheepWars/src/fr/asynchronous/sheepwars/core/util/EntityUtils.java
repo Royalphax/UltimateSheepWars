@@ -1,5 +1,7 @@
 package fr.asynchronous.sheepwars.core.util;
 
+import java.util.Arrays;
+
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -13,6 +15,7 @@ import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
 import fr.asynchronous.sheepwars.core.SheepWarsPlugin;
@@ -67,9 +70,7 @@ public class EntityUtils {
 		player.getInventory().clear();
 		player.getInventory().setArmorContents((ItemStack[]) null);
 		player.closeInventory();
-		for (final PotionEffect effect : player.getActivePotionEffects()) {
-			player.removePotionEffect(effect.getType());
-		}
+		clearPotionEffects(player);
 	}
 
 	public static void setWeatherPlayer(WeatherType weather, OfflinePlayer player) {
@@ -80,6 +81,19 @@ public class EntityUtils {
 		} else {
 			if (player.isOnline())
 				((Player) player).setPlayerWeather(weather);
+		}
+	}
+	
+	public static void clearPotionEffects(Player player) {
+		for (final PotionEffect effect : player.getActivePotionEffects()) {
+			player.removePotionEffect(effect.getType());
+		}
+	}
+	
+	public static void clearPotionEffects(Player player, PotionEffectType... types) {
+		for (final PotionEffect effect : player.getActivePotionEffects()) {
+			if (Arrays.asList(types).contains(effect.getType()))
+				player.removePotionEffect(effect.getType());
 		}
 	}
 }
