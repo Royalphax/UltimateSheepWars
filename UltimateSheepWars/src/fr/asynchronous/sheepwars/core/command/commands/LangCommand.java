@@ -20,7 +20,7 @@ public class LangCommand implements CommandExecutor {
 
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		if (!(sender instanceof Player)) {
-            sender.sendMessage(ChatColor.RED + "Please connect on the server, then do this command again.");
+			sender.sendMessage("This command is not allowed from console.");
             return true;
         }
         if (!plugin.isConfigured()) {

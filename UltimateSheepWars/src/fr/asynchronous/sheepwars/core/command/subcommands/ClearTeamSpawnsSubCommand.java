@@ -10,7 +10,7 @@ import fr.asynchronous.sheepwars.core.command.SubCommand;
 import fr.asynchronous.sheepwars.core.handler.Particles;
 import fr.asynchronous.sheepwars.core.handler.Permissions;
 import fr.asynchronous.sheepwars.core.handler.PlayableMap;
-import fr.asynchronous.sheepwars.core.manager.TeamManager;
+import fr.asynchronous.sheepwars.core.handler.SheepWarsTeam;
 
 public class ClearTeamSpawnsSubCommand extends SubCommand {
 	
@@ -27,7 +27,7 @@ public class ClearTeamSpawnsSubCommand extends SubCommand {
 		if (!args[1].equalsIgnoreCase("red") && !args[1].equalsIgnoreCase("blue") && !args[1].equalsIgnoreCase("spec")) {
 			player.sendMessage(PREFIX + ChatColor.RED + "Team " + ChatColor.DARK_RED + args[1] + ChatColor.RED + " doesn't exist (only blue, red or spec).");
 		} else {
-			final TeamManager team = TeamManager.getTeam(args[1]);
+			final SheepWarsTeam team = SheepWarsTeam.getTeam(args[1]);
 			final PlayableMap map = PlayableMap.getPlayableMap(player.getWorld());
 			for (Location loc : map.getTeamSpawns(team).getBukkitLocations())
 				SheepWarsPlugin.getVersionManager().getParticleFactory().playParticles(player, Particles.SMOKE_LARGE, loc, 0f, 0f, 0f, 5, 0.05f);

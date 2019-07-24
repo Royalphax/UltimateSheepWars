@@ -25,6 +25,7 @@ import fr.asynchronous.sheepwars.core.command.subcommands.ClearBoostersSubComman
 import fr.asynchronous.sheepwars.core.command.subcommands.ClearTeamSpawnsSubCommand;
 import fr.asynchronous.sheepwars.core.command.subcommands.GiveSheepSubCommand;
 import fr.asynchronous.sheepwars.core.command.subcommands.GoToWorldSubCommand;
+import fr.asynchronous.sheepwars.core.command.subcommands.SetMapDisplayNameSubCommand;
 import fr.asynchronous.sheepwars.core.command.subcommands.SetLobbySubCommand;
 import fr.asynchronous.sheepwars.core.command.subcommands.ShowBoostersSubCommand;
 import fr.asynchronous.sheepwars.core.command.subcommands.ShowKitsSubCommand;
@@ -74,13 +75,14 @@ public class CommandManager implements CommandExecutor {
 
 	public void showHelp(CommandSender commandSender, int page) {
 		final boolean isPlayer = commandSender instanceof Player;
+		final List<SubCommand> commands = getAllowedCommands(commandSender);
 		if (isPlayer) {
 			commandSender.sendMessage("");
 			commandSender.sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + ChatColor.STRIKETHROUGH + "============" + ChatColor.RESET + " " + ChatColor.YELLOW + ChatColor.BOLD + "ULTIMATE SHEEP WARS " + ChatColor.GREEN + "" + ChatColor.BOLD + ChatColor.STRIKETHROUGH + "=============");
 			commandSender.sendMessage(ChatColor.ITALIC + "Hover commands for more informations, click to suggest.");
 			commandSender.sendMessage("");
 		} else {
-			commandSender.sendMessage(ChatColor.RED + "UltimateSheepWars help menu (page " + page + "/" + getMaxPages() + ")");
+			commandSender.sendMessage(ChatColor.RED + "UltimateSheepWars help menu (page " + page + "/" + getMaxPages(commands.size()) + ")");
 		}
 		int from = 1;
 		if (page > 1)
@@ -101,8 +103,11 @@ public class CommandManager implements CommandExecutor {
 				commandSender.sendMessage(line);
 			}
 		}
+		if (commands.isEmpty()) {
+			commandSender.sendMessage(ChatColor.RED + "There's no command that you're allowed to do.");
+		}
 		if (isPlayer)
-			commandSender.sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + ChatColor.STRIKETHROUGH + "================" + ChatColor.RESET + " " + ChatColor.YELLOW + ChatColor.BOLD + "PAGE " + ChatColor.WHITE + ChatColor.BOLD + page + ChatColor.YELLOW + ChatColor.BOLD + " ON " + ChatColor.WHITE + ChatColor.BOLD + getMaxPages() + ChatColor.GREEN + " " + ChatColor.BOLD + ChatColor.STRIKETHROUGH + "=================");
+			commandSender.sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + ChatColor.STRIKETHROUGH + "================" + ChatColor.RESET + " " + ChatColor.YELLOW + ChatColor.BOLD + "PAGE " + ChatColor.WHITE + ChatColor.BOLD + page + ChatColor.YELLOW + ChatColor.BOLD + " ON " + ChatColor.WHITE + ChatColor.BOLD + getMaxPages(commands.size()) + ChatColor.GREEN + " " + ChatColor.BOLD + ChatColor.STRIKETHROUGH + "=================");
 	}
 
 	public void showCredits(CommandSender commandSender) {
@@ -136,13 +141,29 @@ public class CommandManager implements CommandExecutor {
 	 *
 	 * @return the maximum amount of pages.
 	 */
-	private int getMaxPages() {
-		int i = commands.size();
+	private int getMaxPages(int commandsSize) {
+		int i = Math.max(1, commandsSize);
 		if (i % MAX_COMMANDS == 0)
 			return i / MAX_COMMANDS;
 		double j = i / MAX_COMMANDS;
 		int h = (int) Math.floor(j * 100) / 100;
 		return h + 1;
+	}
+	
+	private List<SubCommand> getAllowedCommands(CommandSender sender) {
+		List<SubCommand> output = new ArrayList<>();
+		for (SubCommand subC : this.commands) {
+			boolean isAllowed = false;
+			for (Permissions perm : subC.getPermissions())
+				if (perm.hasPermission(sender)) {
+					isAllowed = true;
+					break;
+				}
+			if (isAllowed) {
+				output.add(subC);
+			}
+		}
+		return output;
 	}
 
 	@Override
@@ -163,7 +184,7 @@ public class CommandManager implements CommandExecutor {
 				return true;
 			}
 			if (Utils.isInteger(arguments[0])) {
-				showHelp(sender, Math.max(1, Math.min(Integer.parseInt(arguments[0]), getMaxPages())));
+				showHelp(sender, Math.max(1, Math.min(Integer.parseInt(arguments[0]), getMaxPages(getAllowedCommands(sender).size()))));
 				return true;
 			}
 		}
@@ -173,12 +194,13 @@ public class CommandManager implements CommandExecutor {
 
 				Iterator<Permissions> it = comm.getPermissions().iterator();
 				while (true) {
+					Permissions perm = Permissions.USW_ADMIN;
 					if (it.hasNext()) {
-						Permissions perm = it.next();
+						perm = it.next();
 						if (perm.hasPermission(sender))
 							break;
 					} else {
-						Permissions.warn(sender);
+						perm.warn(sender);
 						return true;
 					}
 				}
@@ -205,6 +227,7 @@ public class CommandManager implements CommandExecutor {
 		registerCommand(new AddBoosterSubCommand(ultimateSheepWars));
 		registerCommand(new ClearBoostersSubCommand(ultimateSheepWars));
 		registerCommand(new CheckSetupSubCommand(ultimateSheepWars));
+		registerCommand(new SetMapDisplayNameSubCommand(ultimateSheepWars));
 		registerCommand(new GoToWorldSubCommand(ultimateSheepWars));
 		registerCommand(new StartGameSubCommand(ultimateSheepWars));
 		registerCommand(new GiveSheepSubCommand(ultimateSheepWars));

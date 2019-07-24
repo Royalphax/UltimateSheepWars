@@ -1,6 +1,5 @@
 package fr.asynchronous.sheepwars.core.command.commands;
 
-import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -21,7 +20,7 @@ public class ContributorCommand implements CommandExecutor {
 
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		if (!(sender instanceof Player)) {
-            sender.sendMessage(ChatColor.RED + "Please connect on the server, then do this command again.");
+			sender.sendMessage("This command is not allowed from console.");
             return true;
         }
         final Player player = (Player)sender;

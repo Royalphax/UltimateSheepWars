@@ -10,7 +10,7 @@ import fr.asynchronous.sheepwars.core.data.PlayerData;
 import fr.asynchronous.sheepwars.core.handler.Permissions;
 import fr.asynchronous.sheepwars.core.handler.Sounds;
 import fr.asynchronous.sheepwars.core.kit.SheepWarsKit;
-import fr.asynchronous.sheepwars.core.kit.SheepWarsKit.KitLevel;
+import fr.asynchronous.sheepwars.core.kit.SheepWarsKit.SheepWarsKitLevel;
 import fr.asynchronous.sheepwars.core.message.Language;
 import fr.asynchronous.sheepwars.core.util.Utils;
 
@@ -33,8 +33,8 @@ public class ShowKitsSubCommand extends SubCommand {
 			player.sendMessage("∙ " + ChatColor.GRAY + kit.getName(player) + ChatColor.GRAY + " (Id " + ChatColor.YELLOW + kit.getId() + ChatColor.GRAY + ")");
 			player.sendMessage("  ∙ " + ChatColor.GRAY + "Icon : " + ChatColor.YELLOW + kit.getIcon().toItemStack().getType().toString().replaceAll("_", " "));
 			final Language lang = PlayerData.getPlayerData(player).getLanguage();
-			for (KitLevel level : kit.getLevels()) {
-				player.sendMessage("  ∙ " + ChatColor.GOLD + "Level " + ChatColor.YELLOW + level.getId());
+			for (SheepWarsKitLevel level : kit.getLevels()) {
+				player.sendMessage("  ∙ " + ChatColor.GOLD + "Level " + ChatColor.YELLOW + level.getLevelId());
 				player.sendMessage("    ∙ " + ChatColor.GRAY + "Required wins : " + ChatColor.YELLOW + level.getRequiredWins());
 				player.sendMessage("    ∙ " + ChatColor.GRAY + "Permission : " + ChatColor.YELLOW + level.getPermission());
 				player.sendMessage("    ∙ " + ChatColor.GRAY + "Price : " + ChatColor.YELLOW + level.getPrice());

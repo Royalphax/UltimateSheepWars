@@ -1,6 +1,5 @@
 package fr.asynchronous.sheepwars.core.command.commands;
 
-import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -18,7 +17,7 @@ import fr.asynchronous.sheepwars.core.handler.Sounds;
 import fr.asynchronous.sheepwars.core.manager.ConfigManager;
 import fr.asynchronous.sheepwars.core.manager.ConfigManager.Field;
 import fr.asynchronous.sheepwars.core.message.Message;
-import fr.asynchronous.sheepwars.core.message.Message.MsgEnum;
+import fr.asynchronous.sheepwars.core.message.Message.Messages;
 
 public class HubCommand implements CommandExecutor {
 
@@ -30,13 +29,13 @@ public class HubCommand implements CommandExecutor {
 
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		if (!(sender instanceof Player)) {
-			sender.sendMessage(ChatColor.RED + "Please connect on the server, then do this command again.");
+			sender.sendMessage("This command is not allowed from console.");
 			return true;
 		}
 		final Player player = (Player) sender;
 		player.addPotionEffect(new PotionEffect(PotionEffectType.CONFUSION, 100, 5, false, false));
 		Sounds.playSound(player, player.getLocation(), Sounds.PORTAL_TRAVEL, 1f, 1f);
-		Message.sendMessage(player, MsgEnum.HUB_TELEPORTATION);
+		Message.sendMessage(player, Messages.HUB_TELEPORTATION);
 		final ByteArrayDataOutput out = ByteStreams.newDataOutput();
 		out.writeUTF("Connect");
 		out.writeUTF(ConfigManager.getString(Field.FALLBACK_SERVER));
@@ -44,7 +43,7 @@ public class HubCommand implements CommandExecutor {
 		new BukkitRunnable() {
 			public void run() {
 				if (player.isOnline())
-					Message.sendMessage(player, MsgEnum.CONNECTION_FAILED);
+					Message.sendMessage(player, Messages.CONNECTION_FAILED);
 			}
 		}.runTaskLater(this.plugin, 100);
 		return false;

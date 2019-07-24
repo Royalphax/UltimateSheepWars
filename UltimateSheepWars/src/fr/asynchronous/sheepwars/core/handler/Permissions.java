@@ -7,6 +7,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 
 public enum Permissions {
 
@@ -16,6 +18,7 @@ public enum Permissions {
 	USW_BYPASS_LOGIN(makeList("usw.login.bypass", "sheepwars.login.bypass"), USW_ADMIN, USW_VIP),
 	USW_BYPASS_TEAMS(makeList("usw.teams.bypass", "sheepwars.teams.bypass"), USW_ADMIN),
 	USW_DEVELOPER(makeList("usw.developer"), USW_ADMIN),
+	USW_BUILDER(makeList("usw.builder"), USW_ADMIN),
 	USW_GIVE_X(makeList("usw.give.*"), USW_ADMIN),
 	USW_GIVE_SELF(makeList("usw.give.self"), USW_ADMIN, USW_DEVELOPER, USW_GIVE_X),
 	USW_GIVE_OTHER(makeList("usw.give.other", "usw.give"), USW_ADMIN, USW_GIVE_X),
@@ -35,15 +38,15 @@ public enum Permissions {
 			}
 		}
 	}
-	
+
 	public List<String> getPermissions() {
 		return this.permissions;
 	}
-	
+
 	public List<Permissions> getParents() {
 		return parents;
 	}
-	
+
 	public List<String> getAllPermissions() {
 		return allPermissions;
 	}
@@ -70,8 +73,13 @@ public enum Permissions {
 		}
 	}
 
-	public static void warn(CommandSender sender) {
-		sender.sendMessage(ChatColor.RED + "Sorry, but you don't have the permission to do that.");
+	public void warn(CommandSender sender) {
+		if (sender instanceof Player) {
+			TextComponent txt = new TextComponent("Sorry, but you don't have the permission to do that.");
+			txt.setColor(ChatColor.RED);
+			txt.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText(ChatColor.RED + this.allPermissions.toString())));
+			((Player) sender).spigot().sendMessage(txt);
+		}
 	}
 
 	@SafeVarargs
