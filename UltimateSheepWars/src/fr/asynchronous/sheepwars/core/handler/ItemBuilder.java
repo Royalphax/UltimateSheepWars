@@ -21,9 +21,7 @@ import org.bukkit.inventory.meta.BannerMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.inventory.meta.SkullMeta;
-import org.bukkit.material.Dye;
 import org.bukkit.material.MaterialData;
-import org.bukkit.material.Wool;
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
@@ -145,7 +143,7 @@ public class ItemBuilder {
 	}
 
 	public ItemBuilder setUnbreakable() {
-		is.getItemMeta().spigot().setUnbreakable(true);
+		SheepWarsPlugin.getVersionManager().getNMSUtils().setUnbreakable(this.is.getItemMeta(), true);
 		return this;
 	}
 	
@@ -227,23 +225,23 @@ public class ItemBuilder {
 	public ItemBuilder setColor(DyeColor color) {
 		final Material type = this.is.getType();
         switch(type) {
-            case INK_SACK:
-                this.is.setData(new Dye(type, color.getData()));
-                break;
-            case WOOL:
-            	this.is.setData(new Wool(color));
-                break;
             case BANNER:
             	BannerMeta bannerMeta = (BannerMeta) this.is.getItemMeta();
         		bannerMeta.setBaseColor(color);
-        		bannerMeta.setPatterns(Arrays.asList(new Pattern(DyeColor.WHITE, PatternType.CREEPER))); // Easteregg
+        		if (color == DyeColor.RED || color == DyeColor.BLUE) {
+        			final DyeColor fadedColor = (color == DyeColor.RED ? DyeColor.PINK : DyeColor.LIGHT_BLUE);
+        			bannerMeta.setPatterns(Arrays.asList(new Pattern(fadedColor, PatternType.DIAGONAL_RIGHT), 
+        					new Pattern(color, PatternType.SQUARE_BOTTOM_RIGHT), 
+        					new Pattern(fadedColor, PatternType.SQUARE_TOP_LEFT), 
+        					new Pattern(fadedColor, PatternType.GRADIENT_UP), 
+        					new Pattern(color, PatternType.GRADIENT)));
+        		}
         		this.is.setItemMeta(bannerMeta);
             	break;
             default:
-            	this.is.setData(new MaterialData(type, color.getWoolData()));
+            	this.is = SheepWarsPlugin.getVersionManager().getNMSUtils().color(this.is, color);
                 break;
         }
-        this.is.setDurability(this.is.getData().getData());
         return this;
 	}
 
