@@ -9,14 +9,14 @@ import org.bukkit.plugin.Plugin;
 import fr.asynchronous.sheepwars.core.SheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.data.PlayerData;
 import fr.asynchronous.sheepwars.core.handler.SheepAbility;
-import fr.asynchronous.sheepwars.core.manager.TeamManager;
-import fr.asynchronous.sheepwars.core.message.Message.MsgEnum;
+import fr.asynchronous.sheepwars.core.handler.SheepWarsTeam;
+import fr.asynchronous.sheepwars.core.message.Message.Messages;
 import fr.asynchronous.sheepwars.core.sheep.SheepWarsSheep;
 
 public class SeekerSheep extends SheepWarsSheep
 {
     public SeekerSheep() {
-		super(MsgEnum.SEEKER_SHEEP_NAME, DyeColor.LIME, 30, false, true, 0.5f, SheepAbility.SEEK_PLAYERS);
+		super(Messages.SEEKER_SHEEP_NAME, DyeColor.LIME, 30, false, true, 0.5f, SheepAbility.SEEK_PLAYERS);
 	}
 
 	@Override
@@ -35,12 +35,12 @@ public class SeekerSheep extends SheepWarsSheep
             if (ticks <= 60L) {
             	bukkitSheep.setColor((bukkitSheep.getColor() == DyeColor.WHITE) ? DyeColor.LIME : DyeColor.WHITE);
             }
-            final TeamManager playerTeam = PlayerData.getPlayerData(player).getTeam();
+            final SheepWarsTeam playerTeam = PlayerData.getPlayerData(player).getTeam();
             for (final Entity entity : bukkitSheep.getNearbyEntities(2, 0.5, 2)) {
                 if (entity instanceof Player) {
                     final Player nearby = (Player)entity;
-                    final TeamManager team = PlayerData.getPlayerData(nearby).getTeam();
-                    if (team != playerTeam && team != TeamManager.SPEC) {
+                    final SheepWarsTeam team = PlayerData.getPlayerData(nearby).getTeam();
+                    if (team != playerTeam && team != SheepWarsTeam.SPEC) {
                         return true;
                     }
                     continue;

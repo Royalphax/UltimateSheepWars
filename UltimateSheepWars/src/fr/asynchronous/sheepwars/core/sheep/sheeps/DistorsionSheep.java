@@ -15,7 +15,7 @@ import fr.asynchronous.sheepwars.core.SheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.data.PlayerData;
 import fr.asynchronous.sheepwars.core.handler.Particles;
 import fr.asynchronous.sheepwars.core.handler.Sounds;
-import fr.asynchronous.sheepwars.core.message.Message.MsgEnum;
+import fr.asynchronous.sheepwars.core.message.Message.Messages;
 import fr.asynchronous.sheepwars.core.sheep.SheepWarsSheep;
 import fr.asynchronous.sheepwars.core.util.EntityUtils;
 import fr.asynchronous.sheepwars.core.util.MathUtils;
@@ -25,7 +25,7 @@ public class DistorsionSheep extends SheepWarsSheep
 	private static final int RADIUS = 4;
     
 	public DistorsionSheep() {
-		super(MsgEnum.DISTORSION_SHEEP_NAME, DyeColor.MAGENTA, 5, false, true, 0.8f);
+		super(Messages.DISTORSION_SHEEP_NAME, DyeColor.MAGENTA, 5, false, true, 0.8f);
 	}
 	
 	@Override

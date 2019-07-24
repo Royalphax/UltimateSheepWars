@@ -18,7 +18,6 @@ import org.bukkit.entity.Sheep;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.util.Vector;
 
 import fr.asynchronous.sheepwars.core.SheepWarsAPI;
 import fr.asynchronous.sheepwars.core.SheepWarsPlugin;
@@ -27,18 +26,17 @@ import fr.asynchronous.sheepwars.core.event.usw.SheepGiveEvent;
 import fr.asynchronous.sheepwars.core.event.usw.SheepLaunchEvent;
 import fr.asynchronous.sheepwars.core.handler.ItemBuilder;
 import fr.asynchronous.sheepwars.core.handler.SheepAbility;
+import fr.asynchronous.sheepwars.core.handler.SheepWarsTeam;
 import fr.asynchronous.sheepwars.core.handler.Sounds;
 import fr.asynchronous.sheepwars.core.manager.ConfigManager;
-import fr.asynchronous.sheepwars.core.manager.ExceptionManager;
-import fr.asynchronous.sheepwars.core.manager.TeamManager;
 import fr.asynchronous.sheepwars.core.manager.ConfigManager.Field;
+import fr.asynchronous.sheepwars.core.manager.ExceptionManager;
 import fr.asynchronous.sheepwars.core.message.Message;
-import fr.asynchronous.sheepwars.core.message.Message.MsgEnum;
+import fr.asynchronous.sheepwars.core.message.Message.Messages;
 import fr.asynchronous.sheepwars.core.util.MathUtils;
 
 public abstract class SheepWarsSheep {
 
-	private static final double SHEEP_DEFAULT_HEALTH = 8.0;
 	private static List<SheepWarsSheep> availableSheeps = new ArrayList<>();
 	private static List<SheepWarsSheep> waitingSheeps = new ArrayList<>();
 	private static File configFile;
@@ -70,7 +68,7 @@ public abstract class SheepWarsSheep {
 
 	public static void giveSheep(final Player player, final SheepWarsSheep sheep, final int amount) {
 		PlayerData playerData = PlayerData.getPlayerData(player);
-		if (playerData.getTeam() != TeamManager.SPEC) {
+		if (playerData.getTeam() != SheepWarsTeam.SPEC) {
 			if (sheep.onGive(player)) {
 				SheepGiveEvent event = new SheepGiveEvent(player, sheep);
 				Bukkit.getPluginManager().callEvent(event);
@@ -78,9 +76,9 @@ public abstract class SheepWarsSheep {
 					for (int i = 0; i < amount; i++) 
 						player.getInventory().addItem(sheep.getIcon(player));
 					if (amount > 1) {
-						player.sendMessage(Message.getMessage(player, MsgEnum.SEVERAL_SHEEP_RECEIVED).replaceAll("%SHEEP_NAME%", sheep.getName(player)).replaceAll("%AMOUNT%", String.valueOf(amount)));
+						player.sendMessage(Message.getMessage(player, Messages.SEVERAL_SHEEP_RECEIVED).replaceAll("%SHEEP_NAME%", sheep.getName(player)).replaceAll("%AMOUNT%", String.valueOf(amount)));
 					} else {
-						player.sendMessage(Message.getMessage(player, MsgEnum.SHEEP_RECEIVED).replaceAll("%SHEEP_NAME%", sheep.getName(player)));
+						player.sendMessage(Message.getMessage(player, Messages.SHEEP_RECEIVED).replaceAll("%SHEEP_NAME%", sheep.getName(player)));
 					}
 				}
 			} else {
@@ -108,15 +106,15 @@ public abstract class SheepWarsSheep {
 	/**
 	 * Use {@link #SheepManager(String, DyeColor, int, boolean, double, boolean, float, SheepAbility...) this constructor} instead.
 	 */
-	public SheepWarsSheep(final MsgEnum name, final DyeColor color, final int duration, final boolean friendly, final boolean drop, final float random, final SheepAbility... sheepAbilities) {
-		this(Message.getMessage(name), name.toString().replaceAll("_NAME", ""), color, duration, friendly, SHEEP_DEFAULT_HEALTH, drop, random, sheepAbilities);
+	public SheepWarsSheep(final Messages name, final DyeColor color, final int duration, final boolean friendly, final boolean drop, final float random, final SheepAbility... sheepAbilities) {
+		this(Message.getMessage(name), name.toString().replaceAll("_NAME", ""), color, duration, friendly, 8.0, drop, random, sheepAbilities);
 	}
 
 	/**
 	 * Use {@link #SheepManager(String, DyeColor, int, boolean, double, boolean, float, SheepAbility...) this constructor} instead.
 	 */
-	public SheepWarsSheep(final MsgEnum name, final DyeColor color, final int duration, final boolean friendly, final boolean drop, final SheepAbility... sheepAbilities) {
-		this(Message.getMessage(name), name.toString().replaceAll("_NAME", ""), color, duration, friendly, SHEEP_DEFAULT_HEALTH, drop, 1.0f, sheepAbilities);
+	public SheepWarsSheep(final Messages name, final DyeColor color, final int duration, final boolean friendly, final boolean drop, final SheepAbility... sheepAbilities) {
+		this(Message.getMessage(name), name.toString().replaceAll("_NAME", ""), color, duration, friendly, 8.0, drop, 1.0f, sheepAbilities);
 	}
 
 	/**
@@ -136,6 +134,13 @@ public abstract class SheepWarsSheep {
 
 	private org.bukkit.entity.Sheep spawnSheep(final Location location, final Player player, Plugin plugin) {
 		return SheepWarsPlugin.getVersionManager().getSheepFactory().spawnSheep(location, player, this, plugin);
+	}
+	
+	/**
+	 * Get the sheep id managed by the plugin.
+	 */
+	public int getId() {
+		return availableSheeps.indexOf(this);
 	}
 
 	/**
@@ -269,8 +274,9 @@ public abstract class SheepWarsSheep {
 		Sheep entity = spawnSheep(location, launcher, plugin);
 		entity.setAdult();
 
-		SheepWarsPlugin.getVersionManager().getNMSUtils().setHealth(entity, this.health);
-		entity.setMetadata(SheepWarsAPI.SHEEPWARS_SHEEP_METADATA, new FixedMetadataValue(plugin, true));
+		SheepWarsPlugin.getVersionManager().getNMSUtils().setHealth(entity, getHealth());
+		entity.setMetadata(SheepWarsAPI.SHEEPWARS_SHEEP_ID_METADATA, new FixedMetadataValue(plugin, this.getId()));
+		entity.setMetadata(SheepWarsAPI.SHEEPWARS_SHEEP_LAUNCHER_METADATA, new FixedMetadataValue(plugin, launcher));
 
 		SheepLaunchEvent event = new SheepLaunchEvent(launcher, entity, this);
 		Bukkit.getPluginManager().callEvent(event);
@@ -296,7 +302,7 @@ public abstract class SheepWarsSheep {
 			return false;
 		}
 		SheepWarsSheep other = (SheepWarsSheep) obj;
-		return this.msgName == other.msgName && this.color == other.color && this.duration == other.duration && this.friendly == other.friendly && this.health == other.health && this.drop == other.drop && this.random == other.random && this.sheepAbilities == other.sheepAbilities;
+		return this.configPath.equals(other.configPath);
 	}
 
 	public static SheepWarsSheep getCorrespondingSheep(ItemStack item, Player player) {
@@ -306,7 +312,7 @@ public abstract class SheepWarsSheep {
 		}
 		return null;
 	}
-
+	
 	/**
 	 * Get registered sheeps.
 	 */
@@ -376,7 +382,7 @@ public abstract class SheepWarsSheep {
 				plugin.getLogger().info("Custom Sheep : " + sheep.getClass().getName() + " fully registred!");
 			} catch (IOException e) {
 				plugin.getLogger().info("Can't register custom sheep " + sheep.getClass().getName() + ", an error occured!");
-				new ExceptionManager(e).register(true);
+				ExceptionManager.register(e, true);
 			}
 		waitingSheeps.clear();
 	}

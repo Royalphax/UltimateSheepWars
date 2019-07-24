@@ -7,14 +7,14 @@ import org.bukkit.plugin.Plugin;
 
 import fr.asynchronous.sheepwars.core.SheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.handler.Sounds;
-import fr.asynchronous.sheepwars.core.message.Message.MsgEnum;
+import fr.asynchronous.sheepwars.core.message.Message.Messages;
 import fr.asynchronous.sheepwars.core.sheep.SheepWarsSheep;
 
 public class IncendiarySheep extends SheepWarsSheep
 {
     
     public IncendiarySheep() {
-		super(MsgEnum.INCENDIARY_SHEEP_NAME, DyeColor.ORANGE, 5, false, true, 0.8f);
+		super(Messages.INCENDIARY_SHEEP_NAME, DyeColor.ORANGE, 5, false, true, 0.8f);
 	}
 
 	@Override

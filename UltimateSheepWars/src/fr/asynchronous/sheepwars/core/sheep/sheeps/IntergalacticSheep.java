@@ -18,21 +18,21 @@ import fr.asynchronous.sheepwars.core.handler.Particles;
 import fr.asynchronous.sheepwars.core.handler.SheepAbility;
 import fr.asynchronous.sheepwars.core.handler.Sounds;
 import fr.asynchronous.sheepwars.core.message.Message;
-import fr.asynchronous.sheepwars.core.message.Message.MsgEnum;
+import fr.asynchronous.sheepwars.core.message.Message.Messages;
 import fr.asynchronous.sheepwars.core.sheep.SheepWarsSheep;
 import fr.asynchronous.sheepwars.core.util.EntityUtils;
 import fr.asynchronous.sheepwars.core.util.MathUtils;
 
 public class IntergalacticSheep extends SheepWarsSheep {
-	
-	public static boolean inUse;
-	
+
+	public static int IN_USE;
+
 	static {
-		inUse = false;
+		IN_USE = 0;
 	}
-	
+
 	public IntergalacticSheep() {
-		super(MsgEnum.INTERGALACTIC_SHEEP_NAME, DyeColor.BLUE, 10, false, false, 0.15f, SheepAbility.FIRE_PROOF);
+		super(Messages.INTERGALACTIC_SHEEP_NAME, DyeColor.BLUE, 10, false, false, 0.15f, SheepAbility.FIRE_PROOF);
 	}
 
 	@Override
@@ -42,20 +42,24 @@ public class IntergalacticSheep extends SheepWarsSheep {
 
 	@Override
 	public void onSpawn(Player player, Sheep bukkitSheep, Plugin plugin) {
+		IN_USE++;
 		final PlayerData playerData = PlayerData.getPlayerData(player);
-		final boolean animation = !inUse;
-		if (animation)
+		Sounds.playSoundAll(null, Sounds.WITHER_SPAWN, 1.0f, 0.5f);
+		if (IN_USE == 1)
 			letsNight(bukkitSheep.getWorld(), plugin);
 		for (Player online : Bukkit.getOnlinePlayers()) {
 			final PlayerData data = PlayerData.getPlayerData(online);
-			online.sendMessage(data.getLanguage().getMessage(MsgEnum.INTERGALACTIC_SHEEP_LAUNCHED).replace("%PLAYER%", playerData.getTeam().getColor() + player.getName()).replace("%SHEEP%", Message.getDecoration() + " " + data.getLanguage().getMessage(MsgEnum.INTERGALACTIC_SHEEP_NAME) + " " + Message.getDecoration()));
+			online.sendMessage(data.getLanguage().getMessage(Messages.INTERGALACTIC_SHEEP_LAUNCHED).replace("%PLAYER%", playerData.getTeam().getColor() + player.getName()).replace("%SHEEP%", Message.getDecoration() + " " + data.getLanguage().getMessage(Messages.INTERGALACTIC_SHEEP_NAME) + " " + Message.getDecoration()));
 		}
-		if (animation)
-			new BukkitRunnable() {
-				public void run() {
+		new BukkitRunnable() {
+			public void run() {
+				if (IN_USE == 1) {
 					letsDay(bukkitSheep.getWorld(), plugin);
+				} else {
+					IN_USE--;
 				}
-			}.runTaskLater(plugin, (20 * 15));
+			}
+		}.runTaskLater(plugin, (20 * 15));
 	}
 
 	@Override
@@ -92,8 +96,6 @@ public class IntergalacticSheep extends SheepWarsSheep {
 	}
 
 	public void letsNight(final World world, Plugin plugin) {
-		inUse = true;
-		Sounds.playSoundAll(null, Sounds.WITHER_SPAWN, 5.0f, 0.5f);
 		new BukkitRunnable() {
 			long i = 6000;
 			public void run() {
@@ -114,7 +116,7 @@ public class IntergalacticSheep extends SheepWarsSheep {
 				world.setTime(i);
 				if (i >= 30000) {
 					cancel();
-					inUse = false;
+					IN_USE--;
 				}
 			}
 		}.runTaskTimer(plugin, 0, 0);

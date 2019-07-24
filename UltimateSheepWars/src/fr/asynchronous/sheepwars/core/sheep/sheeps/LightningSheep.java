@@ -19,7 +19,7 @@ import fr.asynchronous.sheepwars.core.SheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.data.PlayerData;
 import fr.asynchronous.sheepwars.core.handler.Particles;
 import fr.asynchronous.sheepwars.core.handler.SheepAbility;
-import fr.asynchronous.sheepwars.core.message.Message.MsgEnum;
+import fr.asynchronous.sheepwars.core.message.Message.Messages;
 import fr.asynchronous.sheepwars.core.sheep.SheepWarsSheep;
 import fr.asynchronous.sheepwars.core.util.MathUtils;
 
@@ -28,7 +28,7 @@ public class LightningSheep extends SheepWarsSheep
     private static final int RADIUS = 6;
     
     public LightningSheep() {
-		super(MsgEnum.LIGHTNING_SHEEP_NAME, DyeColor.YELLOW, 5, false, true, 0.5f, SheepAbility.FIRE_PROOF);
+		super(Messages.LIGHTNING_SHEEP_NAME, DyeColor.YELLOW, 5, false, true, 0.5f, SheepAbility.FIRE_PROOF);
 	}
 
 	@Override

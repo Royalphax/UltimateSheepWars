@@ -16,9 +16,9 @@ import org.bukkit.potion.PotionEffectType;
 import fr.asynchronous.sheepwars.core.SheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.data.PlayerData;
 import fr.asynchronous.sheepwars.core.handler.Particles;
+import fr.asynchronous.sheepwars.core.handler.SheepWarsTeam;
 import fr.asynchronous.sheepwars.core.handler.Sounds;
-import fr.asynchronous.sheepwars.core.manager.TeamManager;
-import fr.asynchronous.sheepwars.core.message.Message.MsgEnum;
+import fr.asynchronous.sheepwars.core.message.Message.Messages;
 import fr.asynchronous.sheepwars.core.sheep.SheepWarsSheep;
 import fr.asynchronous.sheepwars.core.util.MathUtils;
 
@@ -27,7 +27,7 @@ public class GlowingSheep extends SheepWarsSheep
     private static final int RADIUS = 8;
     
     public GlowingSheep() {
-		super(MsgEnum.GLOWING_SHEEP_NAME, DyeColor.SILVER, 10, false, true);
+		super(Messages.GLOWING_SHEEP_NAME, DyeColor.SILVER, 10, false, true);
 	}
 	
 	@Override
@@ -45,7 +45,7 @@ public class GlowingSheep extends SheepWarsSheep
 		if (ticks % 20L == 0L && !bukkitSheep.isDead()) {
             Location location = bukkitSheep.getLocation();
             World world = bukkitSheep.getWorld();
-            TeamManager playerTeam = PlayerData.getPlayerData(player).getTeam();
+            SheepWarsTeam playerTeam = PlayerData.getPlayerData(player).getTeam();
             Sounds.playSoundAll(location, Sounds.BLOCK_BREWING_STAND_BREW, 1.0f, 0.0f);
             /**new BukkitRunnable(){
             	Location loc = sheep.getLocation().clone();
@@ -92,9 +92,9 @@ public class GlowingSheep extends SheepWarsSheep
                 }
             }**/
             for (final Entity entity : bukkitSheep.getNearbyEntities(RADIUS, RADIUS, RADIUS)) {
-                if (entity instanceof Player && PlayerData.getPlayerData((Player)entity).getTeam() != TeamManager.SPEC) {
+                if (entity instanceof Player && PlayerData.getPlayerData((Player)entity).getTeam() != SheepWarsTeam.SPEC) {
                     Player victim = (Player)entity;
-                    TeamManager team = PlayerData.getPlayerData(victim).getTeam();
+                    SheepWarsTeam team = PlayerData.getPlayerData(victim).getTeam();
                     if (team != playerTeam) {
                     	victim.addPotionEffect(new PotionEffect(PotionEffectType.getByName("GLOWING"), 100, 1));
                     }

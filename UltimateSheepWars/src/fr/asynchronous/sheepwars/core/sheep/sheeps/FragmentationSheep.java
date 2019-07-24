@@ -10,14 +10,14 @@ import org.bukkit.util.Vector;
 
 import fr.asynchronous.sheepwars.core.SheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.handler.Sounds;
-import fr.asynchronous.sheepwars.core.message.Message.MsgEnum;
+import fr.asynchronous.sheepwars.core.message.Message.Messages;
 import fr.asynchronous.sheepwars.core.sheep.SheepWarsSheep;
 import fr.asynchronous.sheepwars.core.util.MathUtils;
 
 public class FragmentationSheep extends SheepWarsSheep
 {
 	public FragmentationSheep() {
-		super(MsgEnum.FRAGMENTATION_SHEEP_NAME, DyeColor.GRAY, 5, false, true, 0.8f);
+		super(Messages.FRAGMENTATION_SHEEP_NAME, DyeColor.GRAY, 5, false, true, 0.8f);
 	}
     
     @Override

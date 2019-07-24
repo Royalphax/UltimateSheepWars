@@ -15,8 +15,8 @@ import org.bukkit.potion.PotionEffectType;
 import fr.asynchronous.sheepwars.core.SheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.data.PlayerData;
 import fr.asynchronous.sheepwars.core.handler.Particles;
-import fr.asynchronous.sheepwars.core.manager.TeamManager;
-import fr.asynchronous.sheepwars.core.message.Message.MsgEnum;
+import fr.asynchronous.sheepwars.core.handler.SheepWarsTeam;
+import fr.asynchronous.sheepwars.core.message.Message.Messages;
 import fr.asynchronous.sheepwars.core.sheep.SheepWarsSheep;
 import fr.asynchronous.sheepwars.core.util.RandomUtils;
 
@@ -24,7 +24,7 @@ public class FrozenSheep extends SheepWarsSheep {
 	private static final int RADIUS = 6;
 
 	public FrozenSheep() {
-		super(MsgEnum.FROZEN_SHEEP_NAME, DyeColor.LIGHT_BLUE, 10, false, true);
+		super(Messages.FROZEN_SHEEP_NAME, DyeColor.LIGHT_BLUE, 10, false, true);
 	}
 
 	@Override
@@ -59,12 +59,12 @@ public class FrozenSheep extends SheepWarsSheep {
 					}
 				}
 			}
-			final TeamManager playerTeam = PlayerData.getPlayerData(player).getTeam();
+			final SheepWarsTeam playerTeam = PlayerData.getPlayerData(player).getTeam();
 			for (final Entity entity : bukkitSheep.getNearbyEntities(RADIUS, RADIUS, RADIUS)) {
 				if (entity instanceof Player) {
 					final Player nearby = (Player) entity;
-					final TeamManager team = PlayerData.getPlayerData(nearby).getTeam();
-					if (team == playerTeam || team == TeamManager.SPEC) {
+					final SheepWarsTeam team = PlayerData.getPlayerData(nearby).getTeam();
+					if (team == playerTeam || team == SheepWarsTeam.SPEC) {
 						continue;
 					}
 					nearby.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 80, 1));

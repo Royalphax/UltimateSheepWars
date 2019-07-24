@@ -11,9 +11,9 @@ import org.bukkit.potion.PotionEffectType;
 import fr.asynchronous.sheepwars.core.SheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.data.PlayerData;
 import fr.asynchronous.sheepwars.core.handler.Particles;
+import fr.asynchronous.sheepwars.core.handler.SheepWarsTeam;
 import fr.asynchronous.sheepwars.core.handler.Sounds;
-import fr.asynchronous.sheepwars.core.manager.TeamManager;
-import fr.asynchronous.sheepwars.core.message.Message.MsgEnum;
+import fr.asynchronous.sheepwars.core.message.Message.Messages;
 import fr.asynchronous.sheepwars.core.sheep.SheepWarsSheep;
 
 public class DarkSheep extends SheepWarsSheep
@@ -21,7 +21,7 @@ public class DarkSheep extends SheepWarsSheep
     private static final int RADIUS = 8;
     
 	public DarkSheep() {
-		super(MsgEnum.DARK_SHEEP_NAME, DyeColor.BLACK, 5, false, true);
+		super(Messages.DARK_SHEEP_NAME, DyeColor.BLACK, 5, false, true);
 	}
     
 	@Override
@@ -37,12 +37,12 @@ public class DarkSheep extends SheepWarsSheep
 	@Override
 	public boolean onTicking(Player player, long ticks, Sheep bukkitSheep, Plugin plugin) {
 		if (ticks % 20L == 0L && !bukkitSheep.isDead()) {
-			final TeamManager playerTeam = PlayerData.getPlayerData(player).getTeam();
+			final SheepWarsTeam playerTeam = PlayerData.getPlayerData(player).getTeam();
 			for (final Entity entity : bukkitSheep.getNearbyEntities(RADIUS, RADIUS, RADIUS)) {
 				if (entity instanceof Player) {
 					final Player nearby = (Player) entity;
-					final TeamManager team = PlayerData.getPlayerData(nearby).getTeam();
-					if (team == playerTeam || team == TeamManager.SPEC) {
+					final SheepWarsTeam team = PlayerData.getPlayerData(nearby).getTeam();
+					if (team == playerTeam || team == SheepWarsTeam.SPEC) {
 						continue;
 					}
 					nearby.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 40, 1));

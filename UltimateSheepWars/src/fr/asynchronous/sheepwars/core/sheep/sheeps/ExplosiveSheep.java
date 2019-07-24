@@ -8,13 +8,13 @@ import org.bukkit.plugin.Plugin;
 import fr.asynchronous.sheepwars.core.SheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.handler.SheepAbility;
 import fr.asynchronous.sheepwars.core.handler.Sounds;
-import fr.asynchronous.sheepwars.core.message.Message.MsgEnum;
+import fr.asynchronous.sheepwars.core.message.Message.Messages;
 import fr.asynchronous.sheepwars.core.sheep.SheepWarsSheep;
 
 public class ExplosiveSheep extends SheepWarsSheep 
 {
 	public ExplosiveSheep() {
-		super(MsgEnum.EXPLOSIVE_SHEEP_NAME, DyeColor.RED, 5, false, true, SheepAbility.DISABLE_SLIDE);
+		super(Messages.EXPLOSIVE_SHEEP_NAME, DyeColor.RED, 5, false, true, SheepAbility.DISABLE_SLIDE);
 	}
 
 	@Override
