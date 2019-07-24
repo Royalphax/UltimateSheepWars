@@ -22,9 +22,9 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import fr.asynchronous.sheepwars.core.manager.ConfigManager;
 import fr.asynchronous.sheepwars.core.manager.ConfigManager.Field;
 import fr.asynchronous.sheepwars.core.manager.ExceptionManager;
-import fr.asynchronous.sheepwars.core.manager.TeamManager;
 import fr.asynchronous.sheepwars.core.manager.WorldManager;
 import fr.asynchronous.sheepwars.core.util.FileUtils;
+import net.md_5.bungee.api.ChatColor;
 
 /**
  * @author Therence
@@ -37,7 +37,8 @@ public class PlayableMap {
 	private World world = null;
 	private boolean readyToPlay = false;
 
-	private Map<VirtualLocation, TeamManager> teamSpawns = new HashMap<>();
+	private String displayName = "";
+	private Map<VirtualLocation, SheepWarsTeam> teamSpawns = new HashMap<>();
 	private List<VirtualLocation> boosterSpawns = new ArrayList<>();
 
 	private File file;
@@ -48,13 +49,13 @@ public class PlayableMap {
 
 		if (isMinecraftMapDirectory()) {
 			if (getPlayableMap(folder) != null) {
-				log.info("- Map " + getName() + " already registred.");
+				log.info("- Map " + getDisplayName() + " already registred.");
 				return;
 			}
 			maps.add(this);
 			loadConfig();
 			loadData();
-			log.info("- Map " + getName() + " registred! (path: " + folder.getPath() + ")");
+			log.info("- Map " + getDisplayName() + " registred (path: " + folder.getPath() + ")");
 		} else {
 			log.info("- " + folder.getName() + " isn't a folder or doesn't contains all required files. (path: " + folder.getPath() + ")");
 		}
@@ -75,19 +76,19 @@ public class PlayableMap {
 	public void loadData() {
 		if (!config.contains("team") && !config.contains("booster") && folder.getName().equals(WorldManager.LOBBY_MAP_NAME)) {
 			for (VirtualLocation loc : ConfigManager.getLocations(Field.BLUE_SPAWNS)) {
-				teamSpawns.put(loc, TeamManager.BLUE);
+				teamSpawns.put(loc, SheepWarsTeam.BLUE);
 			}
 			for (VirtualLocation loc : ConfigManager.getLocations(Field.RED_SPAWNS)) {
-				teamSpawns.put(loc, TeamManager.RED);
+				teamSpawns.put(loc, SheepWarsTeam.RED);
 			}
 			for (VirtualLocation loc : ConfigManager.getLocations(Field.SPEC_SPAWNS)) {
-				teamSpawns.put(loc, TeamManager.SPEC);
+				teamSpawns.put(loc, SheepWarsTeam.SPEC);
 			}
 			for (VirtualLocation loc : ConfigManager.getLocations(Field.BOOSTERS)) {
 				boosterSpawns.add(loc);
 			}
 		} else {
-			for (TeamManager team : Arrays.asList(TeamManager.RED, TeamManager.BLUE, TeamManager.SPEC)) {
+			for (SheepWarsTeam team : Arrays.asList(SheepWarsTeam.RED, SheepWarsTeam.BLUE, SheepWarsTeam.SPEC)) {
 				List<String> positions = config.getStringList("team." + team.getName() + ".spawns");
 				for (String position : positions)
 					teamSpawns.put(VirtualLocation.fromString(this, position), team);
@@ -95,11 +96,12 @@ public class PlayableMap {
 			List<String> positions = config.getStringList("booster.spawns");
 			for (String position : positions)
 				boosterSpawns.add(VirtualLocation.fromString(this, position));
+			this.displayName = config.getString("display-name", "");
 		}
 	}
 
 	public void uploadData() {
-		for (TeamManager team : Arrays.asList(TeamManager.RED, TeamManager.BLUE, TeamManager.SPEC)) {
+		for (SheepWarsTeam team : Arrays.asList(SheepWarsTeam.RED, SheepWarsTeam.BLUE, SheepWarsTeam.SPEC)) {
 			List<String> positions = new ArrayList<>();
 			for (VirtualLocation position : teamSpawns.keySet()) {
 				if (teamSpawns.get(position) == team)
@@ -111,6 +113,8 @@ public class PlayableMap {
 		for (VirtualLocation position : boosterSpawns)
 			positions.add(position.toPlayableMapConfigString());
 		config.set("booster.spawns", (List<String>) positions);
+		if (!this.displayName.equals(""))
+			config.set("display-name", this.displayName);
 		try {
 			config.save(file);
 		} catch (IOException e) {
@@ -120,7 +124,7 @@ public class PlayableMap {
 
 	/* POSITION DES SPAWNS DE TEAM */
 
-	public VirtualLocationList getTeamSpawns(TeamManager team) {
+	public VirtualLocationList getTeamSpawns(SheepWarsTeam team) {
 		List<VirtualLocation> virtualList = new ArrayList<>();
 		for (VirtualLocation position : teamSpawns.keySet()) {
 			if (teamSpawns.get(position) == team)
@@ -129,15 +133,15 @@ public class PlayableMap {
 		return new VirtualLocationList(virtualList);
 	}
 
-	public void addTeamSpawn(TeamManager team, Location loc) {
+	public void addTeamSpawn(SheepWarsTeam team, Location loc) {
 		final VirtualLocation vLoc = VirtualLocation.fromBukkitLocation(loc);
 		if (teamSpawns.containsKey(vLoc))
 			teamSpawns.remove(vLoc);
 		teamSpawns.put(vLoc, team);
 	}
 
-	public void clearTeamSpawns(TeamManager team) {
-		Map<VirtualLocation, TeamManager> map = new HashMap<>(teamSpawns);
+	public void clearTeamSpawns(SheepWarsTeam team) {
+		Map<VirtualLocation, SheepWarsTeam> map = new HashMap<>(teamSpawns);
 		for (VirtualLocation loc : map.keySet()) {
 			if (map.get(loc).equals(team))
 				teamSpawns.remove(loc);
@@ -164,10 +168,20 @@ public class PlayableMap {
 		return folder;
 	}
 
-	public String getName() {
+	public String getDisplayName() {
+		if (!this.displayName.equals(""))
+			return ChatColor.translateAlternateColorCodes('&', this.displayName);
+		return getRawName();
+	}
+	
+	public String getRawName() {
 		final String str = folder.getName().replaceAll("-", " ");
 		final String cap = str.substring(0, 1).toUpperCase() + str.substring(1);
 		return cap;
+	}
+	
+	public void setDisplayName(final String displayName) {
+		this.displayName = displayName;
 	}
 
 	public boolean isMinecraftMapDirectory() {
@@ -178,6 +192,9 @@ public class PlayableMap {
 			return false;
 		final File playerdata = new File(this.folder, "playerdata");
 		if (!playerdata.exists())
+			return false;
+		final File stats = new File(this.folder, "stats");
+		if (!stats.exists())
 			return false;
 		final File region = new File(this.folder, "region");
 		if (!region.exists()) {
@@ -194,14 +211,8 @@ public class PlayableMap {
 		final File sessionlock = new File(this.folder, "session.lock");
 		if (!sessionlock.exists())
 			return false;
-		final File uid = new File(this.folder, "uid.dat");
-		if (!uid.exists())
-			return false;
 		final File leveldat = new File(this.folder, "level.dat");
 		if (!leveldat.exists())
-			return false;
-		final File leveldatold = new File(this.folder, "level.dat_old");
-		if (!leveldatold.exists())
 			return false;
 		return true;
 	}
@@ -215,6 +226,20 @@ public class PlayableMap {
 		FileUtils.copyFolder(this.folder, destination);
 		final WorldCreator worldCreator = new WorldCreator(this.folder.getName());
 		this.world = worldCreator.createWorld();
+		Bukkit.getLogger().info("[UltimateSheepWars > WorldManager] World \"" + getRawName() + "\" loaded.");
+	}
+	
+	public void unloadWorld() {
+		if (this.world == null)
+			return;
+		if (!this.world.getPlayers().isEmpty())
+			return;
+		Bukkit.unloadWorld(this.world, false);
+		final File world = new File(Bukkit.getWorldContainer(), this.folder.getName());
+		if (world.exists())
+			FileUtils.delete(world);
+		this.world = null;
+		Bukkit.getLogger().info("[UltimateSheepWars > WorldManager] World \"" + getRawName() + "\" unloaded.");
 	}
 
 	public void loadWorld(World world) {
@@ -238,7 +263,7 @@ public class PlayableMap {
 		boolean readyToPlay = true;
 
 		List<Integer> outputList = new ArrayList<>();
-		for (TeamManager team : Arrays.asList(TeamManager.RED, TeamManager.BLUE, TeamManager.SPEC)) {
+		for (SheepWarsTeam team : Arrays.asList(SheepWarsTeam.RED, SheepWarsTeam.BLUE, SheepWarsTeam.SPEC)) {
 			int count = getTeamSpawns(team).size();
 			if (count == 0)
 				readyToPlay = false;

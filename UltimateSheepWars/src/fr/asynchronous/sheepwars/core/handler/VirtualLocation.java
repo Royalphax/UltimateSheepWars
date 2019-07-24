@@ -34,7 +34,7 @@ public class VirtualLocation {
 	}
 	
 	public World getBukkitWorld() {
-		return world.equals("") || Bukkit.getWorld(world) == null ? Bukkit.getWorlds().get(0) : Bukkit.getWorld(world);
+		return (world.equals("") || Bukkit.getWorld(world) == null) ? Bukkit.getWorlds().get(0) : Bukkit.getWorld(world);
 	}
 	
 	/**

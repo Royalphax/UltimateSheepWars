@@ -17,6 +17,8 @@ import java.util.logging.Logger;
 import javax.annotation.Nullable;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -34,7 +36,7 @@ public class WorldManager {
 	public final SheepWarsPlugin plugin;
 
 	public static final String LOBBY_MAP_NAME = "sheepwars-lobby";
-	
+
 	public final File worldContainer, worldFolder, mapsFolder;
 
 	private boolean isVoteEnable = false;
@@ -48,7 +50,7 @@ public class WorldManager {
 		try {
 			init(plugin.getLogger());
 		} catch (IOException ex) {
-			new ExceptionManager(ex).register(true);
+			ExceptionManager.register(ex, true);
 		} catch (PlayableMapException e) {
 			plugin.disablePlugin(Level.WARNING, e.getMessage());
 		}
@@ -78,10 +80,10 @@ public class WorldManager {
 		try {
 			resetWorld(world);
 		} catch (Exception e) {
-			new ExceptionManager(e).register(true);
+			ExceptionManager.register(e, true);
 		}
 	}
-	
+
 	private void resetWorld(File copyFolder) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException, Exception {
 		this.plugin.getLogger().info("Resetting world ...");
 		Bukkit.unloadWorld(this.worldFolder.getName(), true);
@@ -120,14 +122,18 @@ public class WorldManager {
 					map.loadWorld();
 				} catch (IOException e) {
 					player.sendMessage(ChatColor.RED + "An error occured while loading the world. Please contact the developer.");
-					new ExceptionManager(e).register(true);
+					ExceptionManager.register(e, true);
 					return;
 				}
 			}
 			player.sendMessage(ChatColor.GREEN + "Teleporting to \"" + world + "\" ...");
-			player.teleport(map.getWorld().getSpawnLocation());
-			player.setAllowFlight(true);
-			player.setFlying(true);
+			final Location loc = map.getWorld().getSpawnLocation();
+			final Block block = loc.subtract(0, 1, 0).getBlock();
+			if (block.isLiquid() || block.isEmpty()) {
+				player.teleport(map.getWorld().getSpawnLocation());
+				player.setAllowFlight(true);
+				player.setFlying(true);
+			}
 		}
 	}
 
@@ -137,7 +143,7 @@ public class WorldManager {
 		for (PlayableMap map : PlayableMap.getPlayableMaps()) {
 			int[] ints = map.checkReadyToPlay();
 			boolean ready = map.isReadyToPlay();
-			send(sender, ChatColor.WHITE + "∙ " + ChatColor.YELLOW + map.getFolder().getName() + ChatColor.GRAY + " (" + (ready ? ChatColor.GREEN + "Ready" : ChatColor.RED + "Not Ready") + ChatColor.GRAY + ")");
+			send(sender, ChatColor.WHITE + "∙ " + ChatColor.YELLOW + map.getFolder().getName() + ChatColor.GRAY + " (" + (ready ? ChatColor.GREEN + "Ready To Play" : ChatColor.RED + "Not Ready To Play") + ChatColor.GRAY + ")");
 			String details = ChatColor.GRAY + " Red spawns: " + (ints[0] > 0 ? ChatColor.GREEN : ChatColor.RED) + ints[0];
 			details += ChatColor.GRAY + "  Blue spawns: " + (ints[1] > 0 ? ChatColor.GREEN : ChatColor.RED) + ints[1];
 			details += ChatColor.GRAY + "  Spec spawns: " + (ints[2] > 0 ? ChatColor.GREEN : ChatColor.RED) + ints[2];
@@ -157,38 +163,40 @@ public class WorldManager {
 	}
 
 	public PlayableMap getVoteResult() {
-		if (isVoteEnable) { // Plusieurs maps valides
-			List<PlayableMap> maps = new ArrayList<>(PlayableMap.getReadyMaps());
+		if (votedMap == null) {
+			if (isVoteEnable) { // Plusieurs maps valides
+				List<PlayableMap> maps = new ArrayList<>(PlayableMap.getReadyMaps());
 
-			Map<PlayableMap, Integer> votes = new HashMap<>();
-			for (PlayableMap map : maps) {
-				votes.put(map, 0);
-			}
-			for (Player online : Bukkit.getOnlinePlayers()) {
-				PlayerData data = PlayerData.getPlayerData(online);
-				if (data.getVotedMap() != null && maps.contains(data.getVotedMap())) {
-					int currentVote = votes.get(data.getVotedMap());
-					currentVote += 1;
-					votes.remove(data.getVotedMap());
-					votes.put(data.getVotedMap(), currentVote);
+				Map<PlayableMap, Integer> votes = new HashMap<>();
+				for (PlayableMap map : maps) {
+					votes.put(map, 0);
 				}
-			}
-			int max = 0;
-			List<PlayableMap> finalRandom = new ArrayList<>();
-			for (Entry<PlayableMap, Integer> map : votes.entrySet()) {
-				PlayableMap pMap = map.getKey();
-				Integer voteCount = map.getValue();
-				if (voteCount > max) {
-					max = voteCount;
-					finalRandom.clear();
-					finalRandom.add(pMap);
-				} else if (voteCount == max) {
-					finalRandom.add(pMap);
+				for (Player online : Bukkit.getOnlinePlayers()) {
+					PlayerData data = PlayerData.getPlayerData(online);
+					if (data.getVotedMap() != null && maps.contains(data.getVotedMap())) {
+						int currentVote = votes.get(data.getVotedMap());
+						currentVote += 1;
+						votes.remove(data.getVotedMap());
+						votes.put(data.getVotedMap(), currentVote);
+					}
 				}
+				int max = 0;
+				List<PlayableMap> finalRandom = new ArrayList<>();
+				for (Entry<PlayableMap, Integer> map : votes.entrySet()) {
+					PlayableMap pMap = map.getKey();
+					Integer voteCount = map.getValue();
+					if (voteCount > max) {
+						max = voteCount;
+						finalRandom.clear();
+						finalRandom.add(pMap);
+					} else if (voteCount == max && pMap.isReadyToPlay()) {
+						finalRandom.add(pMap);
+					}
+				}
+				votedMap = RandomUtils.getRandom(finalRandom);
+			} else { // Si le vote n'est pas activé, ça veut dire que de toute façon il n'y a qu'une seule map de valide
+				votedMap = PlayableMap.getPlayableMaps().get(0);
 			}
-			votedMap = RandomUtils.getRandom(finalRandom);
-		} else { // Si le vote n'est pas activé, ça veut dire que de toute façon il n'y a qu'une seule map de valide
-			votedMap = PlayableMap.getPlayableMaps().get(0);
 		}
 		return votedMap;
 	}
@@ -196,11 +204,16 @@ public class WorldManager {
 	public boolean isVoteModeEnable() {
 		return isVoteEnable;
 	}
-	
+
 	public PlayableMap getVotedMap() {
 		return votedMap;
 	}
 	
+	public void unloadVotedMap() {
+		votedMap.unloadWorld();
+		votedMap = null;
+	}
+
 	public int getVoteCount(PlayableMap map) {
 		int result = 0;
 		for (Player online : Bukkit.getOnlinePlayers()) {
