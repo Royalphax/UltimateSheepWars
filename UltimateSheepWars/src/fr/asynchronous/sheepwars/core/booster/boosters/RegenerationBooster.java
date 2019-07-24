@@ -6,17 +6,17 @@ import org.bukkit.potion.PotionEffectType;
 
 import fr.asynchronous.sheepwars.core.booster.SheepWarsBooster;
 import fr.asynchronous.sheepwars.core.handler.DisplayColor;
-import fr.asynchronous.sheepwars.core.manager.TeamManager;
-import fr.asynchronous.sheepwars.core.message.Message.MsgEnum;
+import fr.asynchronous.sheepwars.core.handler.SheepWarsTeam;
+import fr.asynchronous.sheepwars.core.message.Message.Messages;
 
 public class RegenerationBooster extends SheepWarsBooster
 {
     public RegenerationBooster() {
-		super(MsgEnum.BOOSTER_REGENERATION, DisplayColor.PINK, 7);
+		super(Messages.BOOSTER_REGENERATION, DisplayColor.PINK, 7);
 	}
 
 	@Override
-    public boolean onStart(final Player player, final TeamManager team) {
+    public boolean onStart(final Player player, final SheepWarsTeam team) {
         for (final Player teamPlayer : team.getOnlinePlayers()) {
             teamPlayer.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 140, 1));
         }

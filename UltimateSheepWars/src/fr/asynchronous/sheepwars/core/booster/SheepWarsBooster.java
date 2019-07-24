@@ -15,10 +15,10 @@ import org.bukkit.plugin.Plugin;
 
 import fr.asynchronous.sheepwars.core.SheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.handler.DisplayColor;
+import fr.asynchronous.sheepwars.core.handler.SheepWarsTeam;
 import fr.asynchronous.sheepwars.core.manager.ExceptionManager;
-import fr.asynchronous.sheepwars.core.manager.TeamManager;
 import fr.asynchronous.sheepwars.core.message.Message;
-import fr.asynchronous.sheepwars.core.message.Message.MsgEnum;
+import fr.asynchronous.sheepwars.core.message.Message.Messages;
 import fr.asynchronous.sheepwars.core.task.BoosterDisplayTask;
 import fr.asynchronous.sheepwars.core.util.RandomUtils;
 
@@ -61,14 +61,14 @@ public abstract class SheepWarsBooster implements Listener {
 	/**
 	 * Use {@link #BoosterManager(String, DisplayColor, int) this constructor} instead.
 	 */
-	public SheepWarsBooster(final MsgEnum name, final DisplayColor displayColor, final int duration) {
+	public SheepWarsBooster(final Messages name, final DisplayColor displayColor, final int duration) {
 		this(name, displayColor, displayColor.getColor(), duration);
 	}
 	
 	/**
 	 * Use {@link #BoosterManager(String, DisplayColor, int) this constructor} instead.
 	 */
-	public SheepWarsBooster(final MsgEnum name, final DisplayColor displayColor, DyeColor woolColor, final int duration) {
+	public SheepWarsBooster(final Messages name, final DisplayColor displayColor, DyeColor woolColor, final int duration) {
 		this(Message.getMessage(name), name.toString().replaceAll("BOOSTER_", ""), displayColor, woolColor, duration);
 	}
 	
@@ -132,7 +132,7 @@ public abstract class SheepWarsBooster implements Listener {
 	 * @param team Player's team.
 	 * @return Boolean value not used yet.
 	 */
-	public abstract boolean onStart(final Player player, final TeamManager team);
+	public abstract boolean onStart(final Player player, final SheepWarsTeam team);
 
 	/**
 	 * Triggered on deactivation of the booster.
@@ -232,7 +232,7 @@ public abstract class SheepWarsBooster implements Listener {
 				plugin.getLogger().info("Custom Booster : " + booster.getClass().getName() + " fully registred!");
 			} catch (IOException e) {
 				plugin.getLogger().info("Can't register custom booster " + booster.getClass().getName() + ", an error occured!");
-				new ExceptionManager(e).register(true);
+				ExceptionManager.register(e, true);
 			}
     	waitingBoosters.clear();
     }

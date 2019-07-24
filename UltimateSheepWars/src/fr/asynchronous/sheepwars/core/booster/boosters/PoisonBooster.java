@@ -6,18 +6,18 @@ import org.bukkit.potion.PotionEffectType;
 
 import fr.asynchronous.sheepwars.core.booster.SheepWarsBooster;
 import fr.asynchronous.sheepwars.core.handler.DisplayColor;
-import fr.asynchronous.sheepwars.core.manager.TeamManager;
-import fr.asynchronous.sheepwars.core.message.Message.MsgEnum;
+import fr.asynchronous.sheepwars.core.handler.SheepWarsTeam;
+import fr.asynchronous.sheepwars.core.message.Message.Messages;
 
 public class PoisonBooster extends SheepWarsBooster
 {
     public PoisonBooster() {
-		super(MsgEnum.BOOSTER_POISON, DisplayColor.GREEN, 5);
+		super(Messages.BOOSTER_POISON, DisplayColor.GREEN, 5);
 	}
 
 	@Override
-    public boolean onStart(final Player player, final TeamManager team) {
-        final TeamManager opponents = (team == TeamManager.BLUE) ? TeamManager.RED : TeamManager.BLUE;
+    public boolean onStart(final Player player, final SheepWarsTeam team) {
+        final SheepWarsTeam opponents = (team == SheepWarsTeam.BLUE) ? SheepWarsTeam.RED : SheepWarsTeam.BLUE;
         for (final Player opponent : opponents.getOnlinePlayers()) {
             opponent.addPotionEffect(new PotionEffect(PotionEffectType.POISON, 100, 1));
         }

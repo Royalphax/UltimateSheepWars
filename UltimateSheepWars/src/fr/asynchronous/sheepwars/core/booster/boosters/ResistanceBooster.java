@@ -6,17 +6,17 @@ import org.bukkit.potion.PotionEffectType;
 
 import fr.asynchronous.sheepwars.core.booster.SheepWarsBooster;
 import fr.asynchronous.sheepwars.core.handler.DisplayColor;
-import fr.asynchronous.sheepwars.core.manager.TeamManager;
-import fr.asynchronous.sheepwars.core.message.Message.MsgEnum;
+import fr.asynchronous.sheepwars.core.handler.SheepWarsTeam;
+import fr.asynchronous.sheepwars.core.message.Message.Messages;
 
 public class ResistanceBooster extends SheepWarsBooster
 {
     public ResistanceBooster() {
-		super(MsgEnum.BOOSTER_RESISTANCE, DisplayColor.WHITE, 30);
+		super(Messages.BOOSTER_RESISTANCE, DisplayColor.WHITE, 30);
 	}
 
 	@Override
-    public boolean onStart(final Player player, final TeamManager team) {
+    public boolean onStart(final Player player, final SheepWarsTeam team) {
         for (final Player teamPlayer : team.getOnlinePlayers()) {
             teamPlayer.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 600, 0));
         }
