@@ -21,12 +21,12 @@ import fr.asynchronous.sheepwars.core.event.usw.EquipSelectionItemsEvent;
 import fr.asynchronous.sheepwars.core.handler.GameState;
 import fr.asynchronous.sheepwars.core.handler.ItemBuilder;
 import fr.asynchronous.sheepwars.core.handler.MinecraftVersion;
+import fr.asynchronous.sheepwars.core.handler.SheepWarsTeam;
 import fr.asynchronous.sheepwars.core.manager.ConfigManager;
 import fr.asynchronous.sheepwars.core.manager.ConfigManager.Field;
 import fr.asynchronous.sheepwars.core.manager.ExceptionManager;
 import fr.asynchronous.sheepwars.core.manager.ScoreboardManager;
-import fr.asynchronous.sheepwars.core.manager.TeamManager;
-import fr.asynchronous.sheepwars.core.message.Message.MsgEnum;
+import fr.asynchronous.sheepwars.core.message.Message.Messages;
 import fr.asynchronous.sheepwars.core.util.ReflectionUtils;
 import fr.asynchronous.sheepwars.core.util.ReflectionUtils.PackageType;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -73,9 +73,9 @@ public class Language {
 		try {
 			this.config.save(this.file);
 		} catch (IOException ex) {
-			new ExceptionManager(ex).register(true);
+			ExceptionManager.register(ex, true);
 		}
-		final String title = getMessage(MsgEnum.SCOREBOARD_WAITING_TITLE);
+		final String title = getMessage(Messages.SCOREBOARD_WAITING_TITLE);
 		this.scoreboard_wrapper = new ScoreboardManager(title, this.name);
 		this.scoreboard_wrapper.setLine(2, ChatColor.BLUE + "", true);
 		this.scoreboard_wrapper.setLine(5, ChatColor.WHITE + "", true);
@@ -85,8 +85,8 @@ public class Language {
 		languages.add(this);
 		
 		// Don't forget to init scoreboard teams count
-		TeamManager.RED.updateScoreboardTeamCount();
-        TeamManager.BLUE.updateScoreboardTeamCount();
+		SheepWarsTeam.RED.updateScoreboardTeamCount();
+        SheepWarsTeam.BLUE.updateScoreboardTeamCount();
 	}
 
 	public String getName() {
@@ -110,11 +110,11 @@ public class Language {
 	}
 
 	public void refreshSheepCountdown(int countdown) {
-		this.scoreboard_wrapper.setLine(3, getMessage(Message.getMessage(MsgEnum.SCOREBOARD_NEXT_SHEEP_COUNTDOWN)).replace("%TIME%", countdown + ""), true);
+		this.scoreboard_wrapper.setLine(3, getMessage(Message.getMessage(Messages.SCOREBOARD_NEXT_SHEEP_COUNTDOWN)).replace("%TIME%", countdown + ""), true);
 	}
 
 	public void refreshBoosterCountdown(int countdown) {
-		this.scoreboard_wrapper.setLine(4, getMessage(Message.getMessage(MsgEnum.SCOREBOARD_NEXT_BOOSTER_COUNTDOWN)).replace("%TIME%", countdown + ""), true);
+		this.scoreboard_wrapper.setLine(4, getMessage(Message.getMessage(Messages.SCOREBOARD_NEXT_BOOSTER_COUNTDOWN)).replace("%TIME%", countdown + ""), true);
 	}
 
 	public org.bukkit.scoreboard.Team getTeam(String name) {
@@ -127,7 +127,7 @@ public class Language {
 
 	private void initTeams() {
 		Boolean bool = SheepWarsPlugin.getVersionManager().getVersion().newerThan(MinecraftVersion.v1_9_R1);
-		for (TeamManager team : TeamManager.values()) {
+		for (SheepWarsTeam team : SheepWarsTeam.values()) {
 			org.bukkit.scoreboard.Team bukkitTeam = this.scoreboard_wrapper.getScoreboard().getTeam(team.getName());
 			if (bukkitTeam == null) {
 				bukkitTeam = this.scoreboard_wrapper.getScoreboard().registerNewTeam(team.getName());
@@ -155,7 +155,7 @@ public class Language {
 					method.setAccessible(true);
 					method.invoke(bukkitTeam, objOption, objOptionStatus);
 				} catch (Exception ex) {
-					new ExceptionManager(ex).register(false);
+					ExceptionManager.register(ex, false);
 				}
 			}
 		}
@@ -164,19 +164,19 @@ public class Language {
 	public void equipPlayer(Player player) {
 		final PlayerData data = PlayerData.getPlayerData(player);
 		final Map<Integer, ItemStack> items = new HashMap<>();
-		items.put(0, TeamManager.RED.getIcon(player));
-		items.put(1, TeamManager.BLUE.getIcon(player));
+		items.put(0, SheepWarsTeam.RED.getIcon(player));
+		items.put(1, SheepWarsTeam.BLUE.getIcon(player));
 		int particleSlot = 4;
 		if (SheepWarsPlugin.getWorldManager().isVoteModeEnable()) {
-			items.put(3, new ItemBuilder(ConfigManager.getItemStack(Field.VOTING_ITEM)).setName(this.getMessage(MsgEnum.VOTING_ITEM)).toItemStack());
+			items.put(3, new ItemBuilder(ConfigManager.getItemStack(Field.VOTING_ITEM)).setName(this.getMessage(Messages.VOTING_ITEM)).toItemStack());
 			particleSlot = 5;
 		}
-		items.put(7, new ItemBuilder(ConfigManager.getItemStack(Field.KIT_ITEM)).setName(this.getMessage(MsgEnum.KITS_ITEM)).toItemStack());
-		items.put(8, new ItemBuilder(ConfigManager.getItemStack(Field.RETURN_TO_HUB_ITEM)).setName(this.getMessage(MsgEnum.LEAVE_ITEM)).toItemStack());
+		items.put(7, new ItemBuilder(ConfigManager.getItemStack(Field.KIT_ITEM)).setName(this.getMessage(Messages.KITS_ITEM)).toItemStack());
+		items.put(8, new ItemBuilder(ConfigManager.getItemStack(Field.RETURN_TO_HUB_ITEM)).setName(this.getMessage(Messages.LEAVE_ITEM)).toItemStack());
 		if (data.getAllowedParticles()) {
-			items.put(particleSlot, new ItemBuilder(ConfigManager.getItemStack(Field.PARTICLES_ON_ITEM)).setName(this.getMessage(MsgEnum.PARTICLES_ON)).toItemStack());
+			items.put(particleSlot, new ItemBuilder(ConfigManager.getItemStack(Field.PARTICLES_ON_ITEM)).setName(this.getMessage(Messages.PARTICLES_ON)).toItemStack());
 		} else {
-			items.put(particleSlot, new ItemBuilder(ConfigManager.getItemStack(Field.PARTICLES_ON_ITEM)).setName(this.getMessage(MsgEnum.PARTICLES_OFF)).toItemStack());
+			items.put(particleSlot, new ItemBuilder(ConfigManager.getItemStack(Field.PARTICLES_ON_ITEM)).setName(this.getMessage(Messages.PARTICLES_OFF)).toItemStack());
 		}
 		
 		final EquipSelectionItemsEvent event = new EquipSelectionItemsEvent(player, items);
@@ -220,13 +220,13 @@ public class Language {
 			try {
 				this.config.save(this.file);
 			} catch (IOException ex) {
-				new ExceptionManager(ex).register(true);
+				ExceptionManager.register(ex, true);
 			}
 		}
 		return this.messages.get(m);
 	}
 	
-	public String getMessage(MsgEnum en) {
+	public String getMessage(Messages en) {
 		Message m = Message.getMessage(en);
 		return getMessage(m);
 	}
@@ -274,15 +274,15 @@ public class Language {
 			try {
 				DEFAULT_LANGUAGE_FILE.createNewFile();
 				FileConfiguration config = YamlConfiguration.loadConfiguration(DEFAULT_LANGUAGE_FILE);
-				config.set("language-name", "Default - English");
+				config.set("language-name", "English (default)");
 				config.set("language-intro", "Current language: &aEnglish &7(default)");
 				try {
 					config.save(DEFAULT_LANGUAGE_FILE);
 				} catch (IOException ex) {
-					new ExceptionManager(ex).register(true);
+					ExceptionManager.register(ex, true);
 				}
 			} catch (IOException ex) {
-				new ExceptionManager(ex).register(true);
+				ExceptionManager.register(ex, true);
 			}
 		}
 		if (ConfigManager.getBoolean(Field.AUTO_GENERATE_LANGUAGES))
@@ -307,11 +307,11 @@ public class Language {
 				try {
 					config.save(newLanguage);
 				} catch (IOException ex) {
-					new ExceptionManager(ex).register(true);
+					ExceptionManager.register(ex, true);
 				}
 				Bukkit.getLogger().info("[UltimateSheepWars > Multi-Language Manager] A new language file has been created: " + newLanguage.getAbsolutePath());
 			} catch (IOException ex) {
-				new ExceptionManager(ex).register(true);
+				ExceptionManager.register(ex, true);
 			}
 		}
 		return (createNewInstance ? new Language(newLanguage) : null);

@@ -21,7 +21,7 @@ public class Message {
 	private String strId;
 	private String msg;
 
-	public Message(MsgEnum msgEnum) {
+	public Message(Messages msgEnum) {
 		this(getRaw(msgEnum.toString()), msgEnum.getMessage());
 	}
 
@@ -81,35 +81,39 @@ public class Message {
 		return output;
 	}
 
-	public static void broadcast(MsgEnum message) {
+	public static void broadcast(Messages message) {
 		for (Player online : Bukkit.getOnlinePlayers())
 			sendMessage(online, "", message, "");
 	}
 
-	public static void broadcast(String prefix, MsgEnum message, String suffix) {
+	public static void broadcast(String prefix, Messages message, String suffix) {
 		for (Player online : Bukkit.getOnlinePlayers())
 			sendMessage(online, prefix, message, suffix);
 	}
 
-	public static void sendMessage(Player player, MsgEnum message) {
+	public static void sendMessage(Player player, Messages message) {
 		sendMessage(player, "", message, "");
 	}
 
-	public static void sendMessage(Player player, String prefix, MsgEnum message, String suffix) {
+	public static void sendMessage(Player player, String prefix, Messages message, String suffix) {
 		player.sendMessage(prefix + getMessage(player, message) + suffix);
 	}
 	
-	public static void broadcast(MsgEnum message, String regex, String replacement) {
-		for (Player online : Bukkit.getOnlinePlayers())
-			sendMessage(online, message, Arrays.asList(regex), Arrays.asList(replacement));
-	}
-	
-	public static void broadcast(MsgEnum message, List<String> regex, List<String> replacement) {
+	public static void broadcast(Messages message, String regex, String replacement) {
 		for (Player online : Bukkit.getOnlinePlayers())
 			sendMessage(online, message, regex, replacement);
 	}
 	
-	public static void sendMessage(Player player, MsgEnum message, List<String> regex, List<String> replacement) {
+	public static void broadcast(Messages message, List<String> regex, List<String> replacement) {
+		for (Player online : Bukkit.getOnlinePlayers())
+			sendMessage(online, message, regex, replacement);
+	}
+	
+	public static void sendMessage(Player player, Messages message, String regex, String replacement) {
+		sendMessage(player, message, Arrays.asList(regex), Arrays.asList(replacement));
+	}
+	
+	public static void sendMessage(Player player, Messages message, List<String> regex, List<String> replacement) {
 		String msg = getMessage(player, message);
 		int size = (regex.size() > replacement.size() ? replacement.size() : regex.size());
 		for (int i = 0; i < size; i++) {
@@ -118,43 +122,43 @@ public class Message {
 		player.sendMessage(msg);
 	}
 
-	public static void broadcastTitle(MsgEnum title, MsgEnum subtitle) {
+	public static void broadcastTitle(Messages title, Messages subtitle) {
 		broadcastTitle("", title, "", "", subtitle, "");
 	}
 
-	public static void broadcastTitle(String prefix1, MsgEnum title, String suffix1, String prefix2, MsgEnum subtitle, String suffix2) {
+	public static void broadcastTitle(String prefix1, Messages title, String suffix1, String prefix2, Messages subtitle, String suffix2) {
 		for (Player online : Bukkit.getOnlinePlayers())
 			sendTitle(online, prefix1, title, suffix1, prefix2, subtitle, suffix2);
 	}
 
-	public static void sendTitle(Player player, String prefix1, MsgEnum title, String suffix1, String prefix2, MsgEnum subtitle, String suffix2) {
+	public static void sendTitle(Player player, String prefix1, Messages title, String suffix1, String prefix2, Messages subtitle, String suffix2) {
 		SheepWarsPlugin.getVersionManager().getTitleUtils().defaultTitle(Type.TITLE, player, prefix1 + getMessage(player, title) + suffix1, prefix2 + getMessage(player, subtitle) + suffix2);
 	}
 
-	public static void broadcastAction(MsgEnum action) {
+	public static void broadcastAction(Messages action) {
 		broadcastAction("", action, "");
 	}
 
-	public static void broadcastAction(String prefix, MsgEnum action, String suffix) {
+	public static void broadcastAction(String prefix, Messages action, String suffix) {
 		for (Player online : Bukkit.getOnlinePlayers())
 			sendAction(online, prefix, action, suffix);
 	}
 
-	public static void sendAction(Player player, String prefix, MsgEnum action, String suffix) {
+	public static void sendAction(Player player, String prefix, Messages action, String suffix) {
 		SheepWarsPlugin.getVersionManager().getTitleUtils().actionBarPacket(player, prefix + getMessage(player, action) + suffix);
 	}
 
-	public static String getMessage(Player player, String prefix, MsgEnum msg, String suffix) {
+	public static String getMessage(Player player, String prefix, Messages msg, String suffix) {
 		return prefix + getMessage(player, msg) + suffix;
 	}
 
-	public static String getMessage(Player player, MsgEnum msgEnum) {
+	public static String getMessage(Player player, Messages msgEnum) {
 		PlayerData data = PlayerData.getPlayerData(player);
 		Message msg = getMessage(msgEnum);
 		return (msg != null ? data.getLanguage().getMessage(msg) : "ERROR MESSAGE NOT LOAD - PLEASE CONTACT THE DEVELOPER");
 	}
 
-	public static Message getMessage(MsgEnum msgEnum) {
+	public static Message getMessage(Messages msgEnum) {
 		String strId = msgEnum.toString().toLowerCase().replaceAll("_", "-");
 		return getMessageByStringId(strId);
 	}
@@ -175,11 +179,11 @@ public class Message {
 	}
 
 	public static void initMessages() {
-		for (MsgEnum msgEnum : MsgEnum.values())
+		for (Messages msgEnum : Messages.values())
 			new Message(msgEnum);
 	}
 
-	public enum MsgEnum {
+	public enum Messages {
 
 		JOIN_TITLE("&6UltimateSheepWars&8: &e%ONLINE_PLAYERS%&7/&e%MAX_PLAYERS%"),
 		JOIN_SUBTITLE("&aChoose your team and kit"),
@@ -194,7 +198,7 @@ public class Message {
 		STATS_KD_RATIO("&dKills/Deaths Ratio"),
 		STATS_KILL("&bEnemies Killed"),
 		STATS_TOTAL_TIME("&dTotal Time"),
-		STATS_TOTAL_TIME_FORMAT("&e%HOURS%&a, &e%MINUTES%&a, &e%SECONDS%"),
+		STATS_TOTAL_TIME_FORMAT("&e%HOURS%h&a, &e%MINUTES%m&a, &e%SECONDS%s"),
 		STATS_SHEEP_THROWN("&bSheep Thrown"),
 		STATS_SHEEP_KILLED("&bSheep Killed"),
 		STATS_DEATH("&bTotal Deaths"),
@@ -214,7 +218,7 @@ public class Message {
 		MINUTE("minute"),
 		DAYS("days"),
 		DAY("day"),
-		LESS_THAN_ONE_MINUTE("less than one minute"),
+		LESS_THAN_ONE_MINUTE("Less than one minute"),
 		BLUE_NAME("&9Blue"),
 		RED_NAME("&cRed"),
 		SPEC_NAME("&7Spectator"),
@@ -242,11 +246,12 @@ public class Message {
 		KITS_ITEM("&6Kits & Stats &7(Right-Click)"),
 		VOTING_ITEM("&6Vote for a Map &7(Right-Click)"),
 		VOTE_MAP_NAME("&eVote for &a&l%MAP_NAME%"),
-		VOTE_MAP_LORE("&7This map has &b%VOTE_COUNT% &7votes"),
-		VOTE_RANDOM_MAP_LORE("&b%VOTE_COUNT% &7players did not vote for a map"),
+		VOTE_MAP_LORE("&7This map has &b%VOTE_COUNT% &7vote(s)"),
+		VOTE_RANDOM_MAP_LORE("&b%VOTE_COUNT% &7player(s) didn't vote or want a random map"),
 		VOTE_END("&a&lVoting has ended ! &eThe map &6%MAP_NAME% &ehas won."),
-		VOTE_SUCCESS("&a&lVote received &7(%MAP_NAME% has now &b%VOTE_COUNT% &7votes)"),
-		VOTE_CLOSED("&cVotes are now closed"),
+		VOTE_SUCCESS("&a&lVote received. &eYour map has now &6%VOTE_COUNT% &evotes."),
+		VOTE_CLOSED("&cVotes are currently closed."),
+		VOTE_ACTION_BAR_BROADCAST("&e%PLAYER% &7voted for &a%MAP_NAME% &7!"),
 		VOTE_INVENTORY_NAME("&8Choose a map"),
 		RANDOM_MAP_NAME("Random map"),
 		KIT_BETTER_BOW_NAME("&6Better bow"),
@@ -264,9 +269,9 @@ public class Message {
 		KIT_BETTER_BOW_DESCRIPTION("&b+20%&7 chance to punch\n&b+10% &7chance to critical"),
 		KIT_MORE_HEALTH_DESCRIPTION("&7Increases health by &b2 &7hearts"),
 		KIT_BETTER_SWORD_DESCRIPTION("&b+5% &7chance to critical"),
-		KIT_MOBILITY_DESCRIPTION("&7Swiftness &bI\n&7Feather falling &bI"),
+		KIT_MOBILITY_DESCRIPTION("&7Speed &bI\n&7Jump &bI\n&7Feather falling &bII"),
 		KIT_BUILDER_DESCRIPTION("&bx5 &7anvil\n&bx5 &7bricks\n&bx5 &7sand blocks"),
-		KIT_DESTROYER_DESCRIPTION("&bx3 &7TNT blocks\n&b+5% &7chance to throw fire arrows"),
+		KIT_DESTROYER_DESCRIPTION("&bx2 &7TNT blocks\n&b+5% &7chance to throw fire arrows"),
 		KIT_ARMORED_SHEEP_DESCRIPTION("&7Sheeps health increased by &b+50%"),
 		KIT_RANDOM_DESCRIPTION("&7Choose a kit randomly from those you have."),
 		KIT_NULL_DESCRIPTION("&7Do nothing."),
@@ -275,13 +280,18 @@ public class Message {
 		KIT_NOT_UNLOCKED_MESSAGE("&cYou don't have unlocked this %KIT_OR_LEVEL% yet."),
 		KIT_BOUGHT("&aYou have successfully unlocked this %KIT_OR_LEVEL% !"),
 		KIT_CANT_BUY("&aYou can't buy this %KIT_OR_LEVEL%."),
-		KIT_LORE_BUY_IT("&7Price: &e%COST%\n&eRight-click &7to buy this %KIT_OR_LEVEL%."),
-		KIT_LORE_TOO_EXPENSIVE("&7&mPrice: &e&m%COST%\n&cYou can't buy this %KIT_OR_LEVEL%.\n&cYou need &e%NEEDED% more."),
+		KIT_PRICE("&7Price: &e%COST%"),
+		KIT_REQUIRED_WINS("&7Required wins: &e%REQUIRED_WINS%"),
+		KIT_PERMISSION("&7Permission: &e%PERMISSION%"),
+		KIT_LORE_BUY_IT("&eRight-click &7to buy this %KIT_OR_LEVEL%"),
+		KIT_LORE_WHEEL_CLICK_DISPLAY_LEVELS("&eWheel-click &7to display levels"),
+		KIT_LORE_TOO_EXPENSIVE("&7&mPrice: &e&m%COST%\n&cYou can't buy this %KIT_OR_LEVEL%.\n&cYou need &e%NEEDED% &cmore."),
 		KIT_LORE_NOT_PERMISSION("&cYou have not the permission\n&crequired to use this %KIT_OR_LEVEL%."),
 		KIT_LORE_NEED_WINS("&cYou need &e%VICTORIES% &cvictory more\n&cto use this %KIT_OR_LEVEL%."),
 		KIT_NEXT_LEVEL_INCLUDES("&aNext level includes :"),
 		KIT_LEFT_CLICK_TO_SELECT("&eLeft-click &7to select this %KIT_OR_LEVEL%"),
 		KIT_LEVEL_DEFAULT_NAME("&e%LEVEL_ID%"),
+		RETURN_TO_KIT_INVENTORY("&cBack to Kits & Stats inventory"),
 		SHEEP_GET_DOWN("Sneak to exit the sheep"),
 		BOARDING_SHEEP_NAME("&fBoarding sheep"),
 		DARK_SHEEP_NAME("&8Dark sheep"),
@@ -332,10 +342,11 @@ public class Message {
 		USER_DATA_LOADING("&2Data loading ..."),
 		USER_DATA_LOADED("&aData loaded!"),
 		USER_DATA_UNREACHABLE("&cData unreachable."),
-		DATABASE_NOT_CONNECTED("&cNo database connection.");
+		DATABASE_NOT_CONNECTED("&cNo database connection."),
+		PLAYER_NOT_CONNECTED("&cThere's no \"%PLAYER%\" on this server.");
 
 		private String msg;
-		private MsgEnum(String msg) {
+		private Messages(String msg) {
 			this.msg = msg;
 		}
 
