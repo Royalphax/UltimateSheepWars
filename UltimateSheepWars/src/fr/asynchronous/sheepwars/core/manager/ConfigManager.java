@@ -45,9 +45,9 @@ public class ConfigManager {
 		ENABLE_JOIN_FOR_SPECTATORS("enable-join-for-spectate", FieldType.BOOLEAN, true),
 		SCOREBOARD_DECORATION("scoreboard-decoration", FieldType.STRING, "my.server.com"),
 		AUTO_GENERATE_LANGUAGES("auto-generate-language", FieldType.BOOLEAN, true),
-		SHEEP_COUNTDOWN_TO_EXPLODE("sheep-countdown-before-explosion", FieldType.INT, 5),
-		SHEEP_VELOCITY("sheep-launch-velocity", FieldType.DOUBLE, 2.2d),
-		SHEEP_HEALTH("sheep-health", FieldType.INT, 8),
+		MAX_INTERGALACTIC_SHEEPS("max-intergalactic-sheeps", FieldType.INT, 5),
+		SHEEP_VELOCITY("sheep-launch-velocity", FieldType.DOUBLE, 3.0d),
+		ENABLE_SHEEP_PLAYER_COLLISION("sheep-player-collision", FieldType.BOOLEAN, true),
 		KIT_ITEM("item.kit-id", FieldType.ITEMSTACK, "ENDER_CHEST"),
 		RETURN_TO_HUB_ITEM("item.return-to-hub-id", FieldType.ITEMSTACK, "BED"),
 		PARTICLES_ON_ITEM("item.particles-on-id", FieldType.ITEMSTACK, "BLAZE_ROD"),
@@ -75,6 +75,7 @@ public class ConfigManager {
 		RESTARTING_GAME_STATE_MOTD("game-state.restarting", FieldType.STRING, "&5\\u26A0 &dRestarting &5\\u26A0"),
 		
 		LOBBY("lobby", FieldType.VIRTUAL_LOCATION, VirtualLocation.getDefault(), SETTINGS_FILE),
+		//OFFLINE_UUID("offline-mode-db-uuid", FieldType.STRING, UUID.randomUUID().toString().replace("-", ""), SETTINGS_FILE),
 		OWNER("owner", FieldType.STRING, "null", SETTINGS_FILE),
 		@Deprecated
 		BOOSTERS("boosters", FieldType.VIRTUAL_LOCATION_LIST, new ArrayList<VirtualLocation>(), SETTINGS_FILE),
@@ -146,7 +147,7 @@ public class ConfigManager {
 			try (InputStream in = plugin.getResource(CONFIG_FILE)) {
 				Files.copy(in, file.toPath());
 			} catch (IOException e) {
-				new ExceptionManager(e).register(true);
+				ExceptionManager.register(e, true);
 				plugin.getLogger().warning("Error when generating configuration file !");
 			} finally {
 				plugin.getLogger().info("Configuration file was generated with success !");
@@ -208,7 +209,7 @@ public class ConfigManager {
         try {
         	plugin.getSettingsConfig().save(plugin.getSettingsFile());
 		} catch (IOException e) {
-			new ExceptionManager(e).register(true);
+			ExceptionManager.register(e, true);
 		}
     }
 

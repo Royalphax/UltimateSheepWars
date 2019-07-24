@@ -36,7 +36,7 @@ public class ScoreboardManager {
 		try {
 			objective.setDisplayName(title);
 		} catch (IllegalArgumentException ex) {
-			new ExceptionManager(ex).register(true);
+			ExceptionManager.register(ex, true);
 		}
 		objective.setDisplaySlot(DisplaySlot.SIDEBAR);
 		for (int i = 0; i < colors.size(); i++) {
@@ -89,11 +89,11 @@ public class ScoreboardManager {
 	private boolean validate(int line, String value)
 	{
 		if (Math.abs(line) > 15) {
-			new ExceptionManager(new IndexOutOfBoundsException("The received line number is higher than maximum allowed (" + line + " > 15)")).register(true);
+			ExceptionManager.register(new IndexOutOfBoundsException("The received line number is higher than maximum allowed (" + line + " > 15)"), true);
 			return false;
 		}
 		if (value.length() > 32) {
-			new ExceptionManager(new IndexOutOfBoundsException("The received string length is longer than maximum allowed (" + value.length() + " > 32)")).register(true);
+			ExceptionManager.register(new IndexOutOfBoundsException("The received string length is longer than maximum allowed (" + value.length() + " > 32)"), true);
 			return false;
 		}
 		return true;
