@@ -14,8 +14,7 @@ import fr.asynchronous.sheepwars.core.data.PlayerData;
 import fr.asynchronous.sheepwars.core.handler.ItemBuilder;
 import fr.asynchronous.sheepwars.core.handler.Particles;
 import fr.asynchronous.sheepwars.core.kit.SheepWarsKit;
-import fr.asynchronous.sheepwars.core.kit.SheepWarsKit.KitLevel;
-import fr.asynchronous.sheepwars.core.message.Message.MsgEnum;
+import fr.asynchronous.sheepwars.core.message.Message.Messages;
 import fr.asynchronous.sheepwars.core.util.RandomUtils;
 
 public class BetterBowKit extends SheepWarsKit {
@@ -24,13 +23,13 @@ public class BetterBowKit extends SheepWarsKit {
 	public static final int PERCENT_TO_CRITICAL = 10;
 
 	public BetterBowKit() {
-		super(1, MsgEnum.KIT_BETTER_BOW_NAME, new ItemBuilder(Material.BOW), new BetterBowKitLevel());
+		super(1, Messages.KIT_BETTER_BOW_NAME, new ItemBuilder(Material.BOW), new BetterBowKitLevel());
 	}
 
-	public static class BetterBowKitLevel extends KitLevel {
+	public static class BetterBowKitLevel extends SheepWarsKitLevel {
 
 		public BetterBowKitLevel() {
-			super(MsgEnum.KIT_BETTER_BOW_DESCRIPTION, "sheepwars.kit.betterbow", 10, 10);
+			super(Messages.KIT_BETTER_BOW_DESCRIPTION, "sheepwars.kit.betterbow", 10, 10);
 		}
 		
 		@Override
@@ -44,7 +43,7 @@ public class BetterBowKit extends SheepWarsKit {
 				final Arrow arrow = (Arrow) event.getEntity();
 				final Player player = (Player) arrow.getShooter();
 				final PlayerData data = PlayerData.getPlayerData(player);
-				if (data.getKit().getId() == this.getId()) {
+				if (data.getKit().getId() == this.getKitId()) {
 					boolean boostedArrow = false;
 					if (RandomUtils.getRandomByPercent(PERCENT_TO_KNOCKBACK)) {
 						arrow.setKnockbackStrength(2);

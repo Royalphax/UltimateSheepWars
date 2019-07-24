@@ -12,10 +12,9 @@ import org.bukkit.inventory.ItemStack;
 
 import fr.asynchronous.sheepwars.core.data.PlayerData;
 import fr.asynchronous.sheepwars.core.handler.ItemBuilder;
+import fr.asynchronous.sheepwars.core.handler.SheepWarsTeam;
 import fr.asynchronous.sheepwars.core.kit.SheepWarsKit;
-import fr.asynchronous.sheepwars.core.kit.SheepWarsKit.KitLevel;
-import fr.asynchronous.sheepwars.core.manager.TeamManager;
-import fr.asynchronous.sheepwars.core.message.Message.MsgEnum;
+import fr.asynchronous.sheepwars.core.message.Message.Messages;
 import fr.asynchronous.sheepwars.core.util.RandomUtils;
 
 public class BetterSwordKit extends SheepWarsKit {
@@ -23,19 +22,19 @@ public class BetterSwordKit extends SheepWarsKit {
 	public static final int PERCENT_TO_DO_MORE_DAMAGE = 5;
 
 	public BetterSwordKit() {
-		super(2, MsgEnum.KIT_BETTER_SWORD_NAME, new ItemBuilder(Material.STONE_SWORD).hideAttributes(), new BetterSwordKitLevel());
+		super(2, Messages.KIT_BETTER_SWORD_NAME, new ItemBuilder(Material.STONE_SWORD).hideAttributes(), new BetterSwordKitLevel());
 	}
 
-	public static class BetterSwordKitLevel extends KitLevel {
+	public static class BetterSwordKitLevel extends SheepWarsKitLevel {
 
 		public BetterSwordKitLevel() {
-			super(MsgEnum.KIT_BETTER_SWORD_DESCRIPTION, "sheepwars.kit.bettersword", 10, 10);
+			super(Messages.KIT_BETTER_SWORD_DESCRIPTION, "sheepwars.kit.bettersword", 10, 10);
 		}
 
 		@Override
 		public boolean onEquip(Player player) {
 			final PlayerData data = PlayerData.getPlayerData(player);
-			TeamManager team = data.getTeam();
+			SheepWarsTeam team = data.getTeam();
 			Color color = team.getLeatherColor();
 
 			player.getInventory().setHelmet(new ItemBuilder(Material.LEATHER_HELMET).setLeatherArmorColor(color).addEnchant(Enchantment.PROTECTION_PROJECTILE, 2).setUnbreakable().toItemStack());
@@ -55,7 +54,7 @@ public class BetterSwordKit extends SheepWarsKit {
 			if (event.getDamager() instanceof Player) {
 				final Player player = (Player) event.getDamager();
 				final PlayerData data = PlayerData.getPlayerData(player);
-				if (RandomUtils.getRandomByPercent(PERCENT_TO_DO_MORE_DAMAGE) && data.getKit().getId() == this.getId()) {
+				if (RandomUtils.getRandomByPercent(PERCENT_TO_DO_MORE_DAMAGE) && data.getKit().getId() == this.getKitId()) {
 					event.setCancelled(true);
 					if (event.getEntity() instanceof Damageable)
 						((Damageable) event.getEntity()).damage(event.getFinalDamage() * 1.5, player);

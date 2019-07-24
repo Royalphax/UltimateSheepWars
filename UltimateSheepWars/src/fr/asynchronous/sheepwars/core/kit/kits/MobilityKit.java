@@ -11,29 +11,28 @@ import org.bukkit.potion.PotionEffectType;
 
 import fr.asynchronous.sheepwars.core.data.PlayerData;
 import fr.asynchronous.sheepwars.core.handler.ItemBuilder;
+import fr.asynchronous.sheepwars.core.handler.SheepWarsTeam;
 import fr.asynchronous.sheepwars.core.kit.SheepWarsKit;
-import fr.asynchronous.sheepwars.core.kit.SheepWarsKit.KitLevel;
-import fr.asynchronous.sheepwars.core.manager.TeamManager;
-import fr.asynchronous.sheepwars.core.message.Message.MsgEnum;
+import fr.asynchronous.sheepwars.core.message.Message.Messages;
 
 public class MobilityKit extends SheepWarsKit {
 
 	public static final Integer PROTECTION_FALL = 2;
 
 	public MobilityKit() {
-		super(5, MsgEnum.KIT_MOBILITY_NAME, new ItemBuilder(Material.LEATHER_BOOTS), new MobilityKitLevel());
+		super(5, Messages.KIT_MOBILITY_NAME, new ItemBuilder(Material.LEATHER_BOOTS), new MobilityKitLevel());
 	}
 
-	public static class MobilityKitLevel extends KitLevel {
+	public static class MobilityKitLevel extends SheepWarsKitLevel {
 
 		public MobilityKitLevel() {
-			super(MsgEnum.KIT_MOBILITY_DESCRIPTION, "sheepwars.kit.mobility", 10, 10);
+			super(Messages.KIT_MOBILITY_DESCRIPTION, "sheepwars.kit.mobility", 10, 10);
 		}
 
 		@Override
 		public boolean onEquip(Player player) {
 			final PlayerData data = PlayerData.getPlayerData(player);
-			TeamManager team = data.getTeam();
+			SheepWarsTeam team = data.getTeam();
 			Color color = team.getLeatherColor();
 
 			player.getInventory().setHelmet(new ItemBuilder(Material.LEATHER_HELMET).setLeatherArmorColor(color).addEnchant(Enchantment.PROTECTION_PROJECTILE, 2).setUnbreakable().toItemStack());

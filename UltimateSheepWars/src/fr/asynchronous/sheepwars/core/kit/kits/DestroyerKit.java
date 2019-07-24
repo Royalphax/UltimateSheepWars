@@ -21,22 +21,23 @@ import fr.asynchronous.sheepwars.core.handler.Sounds;
 import fr.asynchronous.sheepwars.core.kit.SheepWarsKit;
 import fr.asynchronous.sheepwars.core.manager.ConfigManager;
 import fr.asynchronous.sheepwars.core.manager.ConfigManager.Field;
-import fr.asynchronous.sheepwars.core.message.Message.MsgEnum;
+import fr.asynchronous.sheepwars.core.message.Message.Messages;
 import fr.asynchronous.sheepwars.core.util.RandomUtils;
 
 public class DestroyerKit extends SheepWarsKit {
 
 	public static final Integer ID = 4;
-	public static final Integer TNT_COUNT = 1;
+	public static final Integer TNT_COUNT = 2;
+	public static final Integer PERCENTAGE_TO_FIRE = 50;
 
 	public DestroyerKit() {
-		super(ID, MsgEnum.KIT_DESTROYER_NAME, new ItemBuilder(Material.TNT), new DestroyerKitLevel());
+		super(ID, Messages.KIT_DESTROYER_NAME, new ItemBuilder(Material.TNT), new DestroyerKitLevel());
 	}
 
-	public static class DestroyerKitLevel extends KitLevel {
+	public static class DestroyerKitLevel extends SheepWarsKitLevel {
 
 		public DestroyerKitLevel() {
-			super(MsgEnum.KIT_DESTROYER_DESCRIPTION, "sheepwars.kit.destroyer", 10, 10);
+			super(Messages.KIT_DESTROYER_DESCRIPTION, "sheepwars.kit.destroyer", 10, 10);
 		}
 
 		@Override
@@ -52,7 +53,7 @@ public class DestroyerKit extends SheepWarsKit {
 				if (arrow.getShooter() instanceof Player) {
 					final Player player = (Player) arrow.getShooter();
 					final PlayerData data = PlayerData.getPlayerData(player);
-					if (data.getKit().getId() == this.getId() && RandomUtils.getRandomByPercent(5))
+					if (data.getKit().getId() == this.getKitId() && RandomUtils.getRandomByPercent(PERCENTAGE_TO_FIRE))
 						arrow.setFireTicks(Integer.MAX_VALUE);
 				}
 			}
@@ -62,7 +63,7 @@ public class DestroyerKit extends SheepWarsKit {
 		public void onPlayerInteract(final PlayerInteractEvent event) {
 			final Player player = event.getPlayer();
 			final PlayerData data = PlayerData.getPlayerData(player);
-			if (event.hasItem() && event.getItem().getType() == Material.TNT && data.getKit().getId() == this.getId()) {
+			if (event.hasItem() && event.getItem().getType() == Material.TNT && data.getKit().getId() == this.getKitId()) {
 				ItemStack item = event.getItem();
 				ItemStack newItem = item.clone();
 				final int amount = item.getAmount() - 1;
@@ -73,7 +74,7 @@ public class DestroyerKit extends SheepWarsKit {
 				}
 				SheepWarsPlugin.getVersionManager().getNMSUtils().setItemInHand(newItem, player);
 				final org.bukkit.entity.TNTPrimed tnt = player.getWorld().spawn(player.getLocation().add(0, 2.0, 0), TNTPrimed.class);
-				final Double velocity = ConfigManager.getDouble(Field.SHEEP_VELOCITY);
+				final Double velocity = ConfigManager.getDouble(Field.SHEEP_VELOCITY) / 1.5;
 
 				tnt.setMetadata("no-damage-team-" + data.getTeam().getName(), new FixedMetadataValue(getPlugin(), true));
 				Sounds.playSound(player, null, Sounds.HORSE_SADDLE, 1f, 1f);

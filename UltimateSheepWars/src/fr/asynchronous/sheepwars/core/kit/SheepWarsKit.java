@@ -19,14 +19,14 @@ import fr.asynchronous.sheepwars.core.exception.UnknownKitException;
 import fr.asynchronous.sheepwars.core.handler.Contributor;
 import fr.asynchronous.sheepwars.core.handler.ItemBuilder;
 import fr.asynchronous.sheepwars.core.kit.kits.NoneKit;
-import fr.asynchronous.sheepwars.core.kit.kits.RandomKit;
 import fr.asynchronous.sheepwars.core.kit.kits.NoneKit.NullKitLevel;
+import fr.asynchronous.sheepwars.core.kit.kits.RandomKit;
 import fr.asynchronous.sheepwars.core.manager.ConfigManager;
 import fr.asynchronous.sheepwars.core.manager.ConfigManager.Field;
 import fr.asynchronous.sheepwars.core.manager.ExceptionManager;
 import fr.asynchronous.sheepwars.core.message.Language;
 import fr.asynchronous.sheepwars.core.message.Message;
-import fr.asynchronous.sheepwars.core.message.Message.MsgEnum;
+import fr.asynchronous.sheepwars.core.message.Message.Messages;
 
 public abstract class SheepWarsKit {
 	private static ArrayList<SheepWarsKit> availableKits = new ArrayList<>();
@@ -41,7 +41,7 @@ public abstract class SheepWarsKit {
 	private boolean freeKit;
 	private Plugin plugin;
 
-	private LinkedList<KitLevel> levels = new LinkedList<>();
+	private LinkedList<SheepWarsKitLevel> levels = new LinkedList<>();
 
 	/**
 	 * Initialize a new Kit !
@@ -61,17 +61,17 @@ public abstract class SheepWarsKit {
 	 * @param levels
 	 *            Amount of different levels the kit has.
 	 */
-	public SheepWarsKit(final int id, final String name, final ItemBuilder icon, final KitLevel... levels) {
+	public SheepWarsKit(final int id, final String name, final ItemBuilder icon, final SheepWarsKitLevel... levels) {
 		this(id, name, new Message(name), false, icon, levels);
 	}
 
 	/**
 	 * Use {@link #KitManager(int, String, String, String, double, int, ItemBuilder) this constructor} instead.
 	 */
-	public SheepWarsKit(final int id, final MsgEnum name, final ItemBuilder icon, final KitLevel... levels) {
+	public SheepWarsKit(final int id, final Messages name, final ItemBuilder icon, final SheepWarsKitLevel... levels) {
 		this(id, name.toString().replaceAll("KIT_", "").replaceAll("_NAME", ""), Message.getMessage(name), false, icon, levels);
 	}
-	
+
 	/**
 	 * Initialize a new Kit !
 	 * 
@@ -86,27 +86,27 @@ public abstract class SheepWarsKit {
 	 * @param requiredWins
 	 *            Required wins to use this Kit.
 	 * @param freeKit
-	 * 			  Is this kit free or not a kit ?
+	 *            Is this kit free or not a kit ?
 	 * @param icon
 	 *            Icon of this Kit.
 	 * @param levels
 	 *            Amount of different levels the kit has.
 	 */
-	public SheepWarsKit(final int id, final String name, final boolean freeKit, final ItemBuilder icon, final KitLevel... levels) {
+	public SheepWarsKit(final int id, final String name, final boolean freeKit, final ItemBuilder icon, final SheepWarsKitLevel... levels) {
 		this(id, name, new Message(name), freeKit, icon, levels);
 	}
 
 	/**
 	 * Use {@link #KitManager(int, String, String, String, double, int, ItemBuilder) this constructor} instead.
 	 */
-	public SheepWarsKit(final int id, final MsgEnum name, final boolean freeKit, final ItemBuilder icon, final KitLevel... levels) {
+	public SheepWarsKit(final int id, final Messages name, final boolean freeKit, final ItemBuilder icon, final SheepWarsKitLevel... levels) {
 		this(id, name.toString().replaceAll("KIT_", "").replaceAll("_NAME", ""), Message.getMessage(name), freeKit, icon, levels);
 	}
 
 	/**
 	 * Use {@link #KitManager(int, String, String, String, double, int, ItemBuilder) this constructor} instead.
 	 */
-	public SheepWarsKit(final int id, final String configPath, final Message name, final boolean freeKit, final ItemBuilder icon, final KitLevel... levels) {
+	public SheepWarsKit(final int id, final String configPath, final Message name, final boolean freeKit, final ItemBuilder icon, final SheepWarsKitLevel... levels) {
 		this.id = id;
 		this.configPath = "kit." + Message.getRaw(configPath);
 		this.name = name;
@@ -137,11 +137,11 @@ public abstract class SheepWarsKit {
 		final ItemBuilder iconBis = new ItemBuilder(this.icon);
 		return iconBis;
 	}
-	
-	public KitLevel getLevel(final Player player) {
-		KitLevel current = new NullKitLevel();
+
+	public SheepWarsKitLevel getLevel(final Player player) {
+		SheepWarsKitLevel current = new NullKitLevel();
 		for (int i = 0; i < this.levels.size(); i++) {
-			final KitLevel level = this.levels.get(i);
+			final SheepWarsKitLevel level = this.levels.get(i);
 			if (level.canUseLevel(player).contains(KitResult.ALREADY_OWNED))
 				current = level;
 		}
@@ -151,7 +151,7 @@ public abstract class SheepWarsKit {
 	/**
 	 * Get the level classes of this kit.
 	 */
-	public LinkedList<KitLevel> getLevels() {
+	public LinkedList<SheepWarsKitLevel> getLevels() {
 		return new LinkedList<>(this.levels);
 	}
 
@@ -175,7 +175,7 @@ public abstract class SheepWarsKit {
 		return true;
 	}
 
-	public KitLevel getLevel(int level) {
+	public SheepWarsKitLevel getLevel(int level) {
 		if (level >= this.levels.size())
 			throw new IndexOutOfBoundsException("The input level is too high for this kit (" + level + " > " + (this.levels.size() - 1) + ").");
 		return this.levels.get(level);
@@ -187,7 +187,7 @@ public abstract class SheepWarsKit {
 	public int getId() {
 		return this.id;
 	}
-	
+
 	/**
 	 * Is this kit free or not a kit ?
 	 */
@@ -221,15 +221,15 @@ public abstract class SheepWarsKit {
 
 	/**
 	 * Get the same instance of a Kit.
+	 * @throws UnknownKitException 
 	 */
-	public static SheepWarsKit getInstanceKit(SheepWarsKit kit) {
+	public static SheepWarsKit getInstanceKit(SheepWarsKit kit) throws UnknownKitException {
 		for (SheepWarsKit k : availableKits) {
 			if (k.getId() == kit.getId()) {
 				return k;
 			}
 		}
-		new UnknownKitException("Class " + kit.getClass().getName() + " has to be registred as a kit first.").printStackTrace();
-		return null;
+		throw new UnknownKitException("No instance was declared for the input kit before.");
 	}
 
 	/**
@@ -260,10 +260,10 @@ public abstract class SheepWarsKit {
 			boolean hasntToBeRegistred = (kit.isKit(new RandomKit()) || kit.isKit(new NoneKit()));
 			boolean edited = false;
 			for (int id = 0; id < kit.levels.size(); id++) {
-				KitLevel level = kit.levels.get(id);
+				SheepWarsKitLevel level = kit.levels.get(id);
 				level.parentKit = kit;
 				level.id = id;
-				if (hasntToBeRegistred) {
+				if (!hasntToBeRegistred) {
 					String subpath = "level-" + id + ".";
 					double price = config.getDouble(kit.getConfigFieldPath(subpath + "price"), -1.0);
 					int requiredWins = config.getInt(kit.getConfigFieldPath(subpath + "required-wins"), -1);
@@ -285,6 +285,9 @@ public abstract class SheepWarsKit {
 			if (!enable)
 				return false;
 			kit.plugin = plugin;
+			/*
+			 * for (KitLevel lvl : kit.getLevels()) { Bukkit.getPluginManager().registerEvents(lvl, plugin); // Déjà fait au lancement du jeu dans la PreGameTask }
+			 */
 			availableKits.add(kit);
 			return true;
 		}
@@ -318,7 +321,7 @@ public abstract class SheepWarsKit {
 				plugin.getLogger().info("Custom Kit : " + kit.getClass().getName() + " fully registred!");
 			} catch (IOException e) {
 				plugin.getLogger().info("Can't register custom kit " + kit.getClass().getName() + ", an error occured!");
-				new ExceptionManager(e).register(true);
+				ExceptionManager.register(e, true);
 			}
 		waitingKits.clear();
 	}
@@ -338,7 +341,7 @@ public abstract class SheepWarsKit {
 	 * 
 	 * @author Roytreo28
 	 */
-	public static abstract class KitLevel implements Listener {
+	public static abstract class SheepWarsKitLevel implements Listener {
 
 		private int id;
 		private SheepWarsKit parentKit;
@@ -351,37 +354,37 @@ public abstract class SheepWarsKit {
 
 		// LE CAS OU NAME ET DESC SON STRING
 
-		public KitLevel(final String description, final String permission, final double price, final int requiredWins) {
-			this(Message.getMessage(MsgEnum.KIT_LEVEL_DEFAULT_NAME), new Message(description), permission, price, requiredWins);
+		public SheepWarsKitLevel(final String description, final String permission, final double price, final int requiredWins) {
+			this(Message.getMessage(Messages.KIT_LEVEL_DEFAULT_NAME), new Message(description), permission, price, requiredWins);
 		}
 
-		public KitLevel(final String levelName, final String description, final String permission, final double price, final int requiredWins) {
+		public SheepWarsKitLevel(final String levelName, final String description, final String permission, final double price, final int requiredWins) {
 			this(new Message(levelName), new Message(description), permission, price, requiredWins);
 		}
 
 		// LE CAS OU NAME EST STRING ET DESC EST MSGENUM
 
-		public KitLevel(final String levelName, final MsgEnum description, final String permission, final double price, final int requiredWins) {
+		public SheepWarsKitLevel(final String levelName, final Messages description, final String permission, final double price, final int requiredWins) {
 			this(new Message(levelName), Message.getMessage(description), permission, price, requiredWins);
 		}
 
 		// LE CAS OU NAME EST MSGENUM ET DESC EST STRING
 
-		public KitLevel(final MsgEnum levelName, final String description, final String permission, final double price, final int requiredWins) {
+		public SheepWarsKitLevel(final Messages levelName, final String description, final String permission, final double price, final int requiredWins) {
 			this(Message.getMessage(levelName), new Message(description), permission, price, requiredWins);
 		}
 
 		// LE CAS OU NAME ET DESC SON MSGENUM
 
-		public KitLevel(final MsgEnum description, final String permission, final double price, final int requiredWins) {
-			this(MsgEnum.KIT_LEVEL_DEFAULT_NAME, description, permission, price, requiredWins);
+		public SheepWarsKitLevel(final Messages description, final String permission, final double price, final int requiredWins) {
+			this(Messages.KIT_LEVEL_DEFAULT_NAME, description, permission, price, requiredWins);
 		}
 
-		public KitLevel(final MsgEnum levelName, final MsgEnum description, final String permission, final double price, final int requiredWins) {
+		public SheepWarsKitLevel(final Messages levelName, final Messages description, final String permission, final double price, final int requiredWins) {
 			this(Message.getMessage(levelName), Message.getMessage(description), permission, price, requiredWins);
 		}
 
-		public KitLevel(final Message levelName, final Message description, final String permission, final double price, final int requiredWins) {
+		public SheepWarsKitLevel(final Message levelName, final Message description, final String permission, final double price, final int requiredWins) {
 			this.name = levelName;
 			this.description = description;
 			this.permission = permission;
@@ -457,7 +460,7 @@ public abstract class SheepWarsKit {
 		/**
 		 * Get kit level.
 		 */
-		public int getId() {
+		public int getLevelId() {
 			return this.id;
 		}
 
@@ -476,7 +479,7 @@ public abstract class SheepWarsKit {
 		public List<KitResult> canUseLevel(Player player) {
 			List<KitResult> output = new ArrayList<>();
 			PlayerData data = PlayerData.getPlayerData(player);
-			if (this.parentKit.isFreeKit() /**|| data.getKitLevel(this.parentKit) >= this.id**/ || (ConfigManager.getBoolean(Field.ENABLE_KIT_REQUIRED_WINS) && data.getWins() >= this.wins) || (ConfigManager.getBoolean(Field.ENABLE_KIT_PERMISSIONS) && player.hasPermission(this.permission)) || ConfigManager.getBoolean(Field.ENABLE_ALL_KITS) || (Contributor.isDeveloper(player))) {
+			if (this.parentKit.isFreeKit() || data.getKitLevel(this.parentKit) >= this.id || (ConfigManager.getBoolean(Field.ENABLE_KIT_REQUIRED_WINS) && data.getWins() >= this.wins) || (ConfigManager.getBoolean(Field.ENABLE_KIT_PERMISSIONS) && player.hasPermission(this.permission)) || ConfigManager.getBoolean(Field.ENABLE_ALL_KITS) || (Contributor.isDeveloper(player))) {
 				output.add(KitResult.ALREADY_OWNED);
 				if (data.getKitLevel(this.parentKit) < this.id) {
 					data.addKit(this.parentKit, this.id);
@@ -490,9 +493,6 @@ public abstract class SheepWarsKit {
 					output.add(diff >= 0 ? KitResult.FAILURE_NEXT_LEVEL_NOT_PURCHASED : KitResult.FAILURE_NEXT_LEVEL_TOO_EXPENSIVE);
 				} else {
 					output.add(KitResult.FAILURE_NOT_ALLOWED);
-				}
-				if (data.getKitLevel(this.parentKit) >= this.id) {
-					data.removeKit(this.parentKit);
 				}
 			}
 			return output;

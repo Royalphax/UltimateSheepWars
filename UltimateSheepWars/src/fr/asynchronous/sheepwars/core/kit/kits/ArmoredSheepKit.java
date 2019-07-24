@@ -10,21 +10,18 @@ import fr.asynchronous.sheepwars.core.data.PlayerData;
 import fr.asynchronous.sheepwars.core.event.usw.SheepLaunchEvent;
 import fr.asynchronous.sheepwars.core.handler.ItemBuilder;
 import fr.asynchronous.sheepwars.core.kit.SheepWarsKit;
-import fr.asynchronous.sheepwars.core.kit.SheepWarsKit.KitLevel;
-import fr.asynchronous.sheepwars.core.manager.ConfigManager;
-import fr.asynchronous.sheepwars.core.manager.ConfigManager.Field;
-import fr.asynchronous.sheepwars.core.message.Message.MsgEnum;
+import fr.asynchronous.sheepwars.core.message.Message.Messages;
 
 public class ArmoredSheepKit extends SheepWarsKit {
 
 	public ArmoredSheepKit() {
-		super(0, MsgEnum.KIT_ARMORED_SHEEP_NAME, new ItemBuilder(Material.CHAINMAIL_CHESTPLATE), new ArmoredSheepKitLevel());
+		super(0, Messages.KIT_ARMORED_SHEEP_NAME, new ItemBuilder(Material.CHAINMAIL_CHESTPLATE), new ArmoredSheepKitLevel());
 	}
 	
-	public static class ArmoredSheepKitLevel extends KitLevel {
+	public static class ArmoredSheepKitLevel extends SheepWarsKitLevel {
 
 		public ArmoredSheepKitLevel() {
-			super(MsgEnum.KIT_ARMORED_SHEEP_DESCRIPTION, "sheepwars.kit.armoredsheep", 10, 10);
+			super(Messages.KIT_ARMORED_SHEEP_DESCRIPTION, "sheepwars.kit.armoredsheep", 10, 10);
 		}
 
 		@Override
@@ -36,7 +33,7 @@ public class ArmoredSheepKit extends SheepWarsKit {
 		public void onSheepLaunch(final SheepLaunchEvent event) {
 			final PlayerData data = PlayerData.getPlayerData(event.getLauncher());
 			if (data.getKit().getId() == this.getKitId() && data.getKitLevel() == 0) {
-				SheepWarsPlugin.getVersionManager().getNMSUtils().setHealth(event.getEntity(), ConfigManager.getInteger(Field.SHEEP_HEALTH) + 6.0);
+				SheepWarsPlugin.getVersionManager().getNMSUtils().setHealth(event.getEntity(), event.getSheep().getHealth() + (event.getSheep().getHealth() / 2.0));
 				event.getEntity().setMetadata("armored_sheep", new FixedMetadataValue(getPlugin(), true));
 			}
 		}
