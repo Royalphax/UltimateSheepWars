@@ -19,6 +19,7 @@ public class EntityDamage extends UltimateSheepWarsEventListener
         {
         	if (event.getCause() == EntityDamageEvent.DamageCause.FALL
             		|| event.getCause() == EntityDamageEvent.DamageCause.LIGHTNING
+            		|| event.getCause() == EntityDamageEvent.DamageCause.FIRE_TICK
             		|| event.getCause() == EntityDamageEvent.DamageCause.BLOCK_EXPLOSION
             		|| event.getCause() == EntityDamageEvent.DamageCause.ENTITY_EXPLOSION
             		|| event.getCause() == EntityDamageEvent.DamageCause.SUFFOCATION)

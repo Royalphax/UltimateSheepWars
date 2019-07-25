@@ -1,19 +1,12 @@
 package fr.asynchronous.sheepwars.core.event.entity;
 
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.EntityEffect;
-import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Sheep;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 
 import fr.asynchronous.sheepwars.core.SheepWarsAPI;
 import fr.asynchronous.sheepwars.core.SheepWarsPlugin;
-import fr.asynchronous.sheepwars.core.data.PlayerData;
 import fr.asynchronous.sheepwars.core.event.UltimateSheepWarsEventListener;
 import fr.asynchronous.sheepwars.core.handler.Sounds;
 import fr.asynchronous.sheepwars.core.util.MathUtils;
@@ -26,7 +19,7 @@ public class EntityDamageByPlayer extends UltimateSheepWarsEventListener
     
     @EventHandler
     public void onEntityDamageByPlayer(final EntityDamageByEntityEvent event) {
-        if (event.getEntity() instanceof ArmorStand)
+        /*if (event.getEntity() instanceof ArmorStand) -- CODE POUR REMOTE SHEEP --
         {
         	final ArmorStand armor = (ArmorStand) event.getEntity();
         	if (Bukkit.getPlayer(ChatColor.stripColor(armor.getCustomName())) != null)
@@ -52,10 +45,10 @@ public class EntityDamageByPlayer extends UltimateSheepWarsEventListener
                 	}
                 }
         	}
-        } else if (event.getEntity() instanceof Sheep)
+        } else */if (event.getEntity() instanceof Sheep)
         {
         	Sheep sheep = (Sheep) event.getEntity();
-        	if (!sheep.hasMetadata(SheepWarsAPI.SHEEPWARS_SHEEP_METADATA))
+        	if (!sheep.hasMetadata(SheepWarsAPI.SHEEPWARS_SHEEP_ID_METADATA))
         	{
         		event.setCancelled(true);
         	} else {

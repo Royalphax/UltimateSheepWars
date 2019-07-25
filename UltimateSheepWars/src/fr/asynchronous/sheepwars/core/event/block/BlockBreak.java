@@ -1,27 +1,22 @@
 package fr.asynchronous.sheepwars.core.event.block;
 
-import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockBreakEvent;
 
 import fr.asynchronous.sheepwars.core.SheepWarsPlugin;
-import fr.asynchronous.sheepwars.core.data.PlayerData;
 import fr.asynchronous.sheepwars.core.event.UltimateSheepWarsEventListener;
 import fr.asynchronous.sheepwars.core.handler.GameState;
-import fr.asynchronous.sheepwars.core.manager.TeamManager;
+import fr.asynchronous.sheepwars.core.handler.Permissions;
 
-public class BlockBreak extends UltimateSheepWarsEventListener
-{
-    public BlockBreak(final SheepWarsPlugin plugin) {
-        super(plugin);
-    }
-    
-    @EventHandler
-    public void onBlockBreak(final BlockBreakEvent event) {
-        if ((!GameState.isStep(GameState.WAITING) && PlayerData.getPlayerData(event.getPlayer()).getTeam() != TeamManager.SPEC && !event.getPlayer().isInsideVehicle()) || event.getPlayer().isOp()) {
-            event.getBlock().setType(Material.AIR);
-        } else {
-        	event.setCancelled(true);
-        }
-    }
+public class BlockBreak extends UltimateSheepWarsEventListener {
+	public BlockBreak(final SheepWarsPlugin plugin) {
+		super(plugin);
+	}
+
+	@EventHandler
+	public void onBlockBreak(final BlockBreakEvent event) {
+		if (GameState.isStep(GameState.WAITING) && !Permissions.USW_BUILDER.hasPermission(event.getPlayer(), true)) {
+			event.setCancelled(true);
+		}
+	}
 }
