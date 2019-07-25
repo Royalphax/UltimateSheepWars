@@ -18,7 +18,7 @@ import fr.asynchronous.sheepwars.core.handler.Sounds;
 import fr.asynchronous.sheepwars.core.manager.ConfigManager;
 import fr.asynchronous.sheepwars.core.manager.ConfigManager.Field;
 import fr.asynchronous.sheepwars.core.message.Message;
-import fr.asynchronous.sheepwars.core.message.Message.MsgEnum;
+import fr.asynchronous.sheepwars.core.message.Message.Messages;
 import fr.asynchronous.sheepwars.core.util.RandomUtils;
 
 public class BoosterWoolTask extends BukkitRunnable {
@@ -56,7 +56,7 @@ public class BoosterWoolTask extends BukkitRunnable {
 				this.time = this.maxWait;
 				if (this.firstTime) {
 					this.firstTime = false;
-					Message.broadcast(MsgEnum.BOOSTERS_MESSAGE);
+					Message.broadcast(Messages.BOOSTERS_MESSAGE);
 				}
 				this.magicBlockLocation = RandomUtils.getRandom(SheepWarsPlugin.getWorldManager().getVotedMap().getBoosterSpawns().getBukkitLocations());
 				this.magicBlock = this.magicBlockLocation.getBlock();

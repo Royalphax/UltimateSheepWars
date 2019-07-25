@@ -15,19 +15,18 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import fr.asynchronous.sheepwars.core.SheepWarsPlugin;
-import fr.asynchronous.sheepwars.core.data.DataManager;
 import fr.asynchronous.sheepwars.core.data.PlayerData;
 import fr.asynchronous.sheepwars.core.event.usw.GameEndEvent;
 import fr.asynchronous.sheepwars.core.event.usw.GameStartEvent;
 import fr.asynchronous.sheepwars.core.handler.GameState;
+import fr.asynchronous.sheepwars.core.handler.SheepWarsTeam;
 import fr.asynchronous.sheepwars.core.manager.ConfigManager;
 import fr.asynchronous.sheepwars.core.manager.ConfigManager.Field;
 import fr.asynchronous.sheepwars.core.manager.ExceptionManager;
 import fr.asynchronous.sheepwars.core.manager.RewardsManager.Events;
-import fr.asynchronous.sheepwars.core.manager.TeamManager;
 import fr.asynchronous.sheepwars.core.message.Language;
 import fr.asynchronous.sheepwars.core.message.Message;
-import fr.asynchronous.sheepwars.core.message.Message.MsgEnum;
+import fr.asynchronous.sheepwars.core.message.Message.Messages;
 import fr.asynchronous.sheepwars.core.sheep.SheepWarsSheep;
 import fr.asynchronous.sheepwars.core.sheep.sheeps.BoardingSheep;
 import fr.asynchronous.sheepwars.core.util.EntityUtils;
@@ -73,9 +72,9 @@ public class GameTask extends BukkitRunnable {
 		try {
 			for (Player online : Bukkit.getOnlinePlayers()) {
 				final PlayerData data = PlayerData.getPlayerData(online);
-				if (data.getTeam() != TeamManager.SPEC) {
+				if (data.getTeam() != SheepWarsTeam.SPEC) {
 					data.increaseTotalTime(1);
-					SheepWarsPlugin.getVersionManager().getTitleUtils().actionBarPacket(online, data.getLanguage().getMessage(MsgEnum.ACTION_KILLS_STATS).replace("%KILLS%", data.getActualKills() + ""));
+					SheepWarsPlugin.getVersionManager().getTitleUtils().actionBarPacket(online, data.getLanguage().getMessage(Messages.ACTION_KILLS_STATS).replace("%KILLS%", data.getActualKills() + ""));
 				}
 			}
 			/** Fin du jeu ou arret brutal (se traduit par changement d'etape du jeu) **/
@@ -84,7 +83,7 @@ public class GameTask extends BukkitRunnable {
 				if (GameState.isStep(GameState.INGAME)) {
 					for (Player online : Bukkit.getOnlinePlayers()) {
 						final Language lang = PlayerData.getPlayerData(online).getLanguage();
-						SheepWarsPlugin.getVersionManager().getTitleUtils().titlePacket(online, 5, 10 * 20, 20, lang.getMessage(MsgEnum.FINISH_EQUALITY), lang.getMessage(MsgEnum.GAME_END_EQUALITY_DESCRIPTION));
+						SheepWarsPlugin.getVersionManager().getTitleUtils().titlePacket(online, 5, 10 * 20, 20, lang.getMessage(Messages.FINISH_EQUALITY), lang.getMessage(Messages.GAME_END_EQUALITY_DESCRIPTION));
 					}
 					this.stopGame(null);
 					return;
@@ -97,7 +96,7 @@ public class GameTask extends BukkitRunnable {
 			final String remainingSecsDisplay = ((remainingSecs < 10) ? "0" : "") + remainingSecs;
 			for (Language lang : Language.getLanguages()) {
 				try {
-					lang.getScoreboardWrapper().setTitle(lang.getMessage(MsgEnum.SCOREBOARD_INGAME_TITLE).replaceAll("%MINUTES%", remainingMinsDisplay).replaceAll("%SECONDS%", remainingSecsDisplay));
+					lang.getScoreboardWrapper().setTitle(lang.getMessage(Messages.SCOREBOARD_INGAME_TITLE).replaceAll("%MINUTES%", remainingMinsDisplay).replaceAll("%SECONDS%", remainingSecsDisplay));
 				} catch (IllegalArgumentException ex) {
 					ExceptionManager.register(ex, true);
 				}
@@ -105,7 +104,7 @@ public class GameTask extends BukkitRunnable {
 				lang.refreshBoosterCountdown(boosterCountdown);
 			}
 			if (remainingDurationInSecs == (this.boardingTime * 60)) {
-				Message.broadcastTitle(MsgEnum.BOARDING_TITLE, MsgEnum.BOARDING_SUBTITLE);
+				Message.broadcastTitle(Messages.BOARDING_TITLE, Messages.BOARDING_SUBTITLE);
 				new GiveSheepTask(new BoardingSheep()).runTaskTimer(this.plugin, 0, (20*60));
 				
 			}
@@ -132,20 +131,20 @@ public class GameTask extends BukkitRunnable {
 				this.removePlayer(player);
 				data.increaseDeaths(1);
 			}
-			data.setTeam(TeamManager.SPEC);
+			data.setTeam(SheepWarsTeam.SPEC);
 		}
 		EntityUtils.resetPlayer(player, GameMode.SPECTATOR);
 	}
 
 	public void removePlayer(final Player player) {
 		final PlayerData data = PlayerData.getPlayerData(player);
-		final TeamManager team = data.getTeam();
+		final SheepWarsTeam team = data.getTeam();
 		if (!data.isSpectator()) {
-			data.setTeam(TeamManager.NULL);
+			data.setTeam(SheepWarsTeam.NULL);
 			if (GameState.isStep(GameState.WAITING)) {
 				PlayerData.getPlayers().remove(player);
 			} else if (GameState.isStep(GameState.INGAME) && team.getOnlinePlayers().isEmpty()) {
-				TeamManager winnerTeam = team == TeamManager.BLUE ? TeamManager.RED : TeamManager.BLUE;
+				SheepWarsTeam winnerTeam = team == SheepWarsTeam.BLUE ? SheepWarsTeam.RED : SheepWarsTeam.BLUE;
 				stopGame(winnerTeam);
 				new BukkitRunnable() {
 					private int ticks = 30;
@@ -169,17 +168,22 @@ public class GameTask extends BukkitRunnable {
 		}
 	}
 
-	public void stopGame(TeamManager winnerTeam) {
+	public void stopGame(SheepWarsTeam winnerTeam) {
 		GameEndEvent event = new GameEndEvent(winnerTeam);
 		Bukkit.getPluginManager().callEvent(event);
+		for (Player online : Bukkit.getOnlinePlayers()) {
+			online.setAllowFlight(true);
+			online.setFlying(true);
+			online.setGameMode(GameMode.CREATIVE);
+		}
 		if (winnerTeam != event.getWinnerTeam()) {
 			winnerTeam = event.getWinnerTeam();
 		}
 		new TerminatedGameTask(this.plugin);
-		for (Entry<OfflinePlayer, PlayerData> entry : PlayerData.getData()) {
+		for (Entry<OfflinePlayer, PlayerData> entry : PlayerData.getEntries()) {
 			final OfflinePlayer offPlayer = entry.getKey();
 			final PlayerData data = entry.getValue();
-			if (winnerTeam != null && winnerTeam != TeamManager.SPEC && offPlayer.isOnline()) {
+			if (winnerTeam != null && winnerTeam != SheepWarsTeam.SPEC && offPlayer.isOnline()) {
 				Player player = (Player) offPlayer;
 				if (data.getTeam() == winnerTeam) {
 					data.increaseWins(1);
@@ -187,11 +191,9 @@ public class GameTask extends BukkitRunnable {
 				} else {
 					this.plugin.getRewardsManager().rewardPlayer(Events.ON_LOOSE, data.getPlayer());
 				}
-				player.sendMessage(ChatColor.GOLD.toString() + ChatColor.BOLD + data.getLanguage().getMessage(MsgEnum.VICTORY).replaceAll("%WINNER%", winnerTeam.getColor() + winnerTeam.getDisplayName(player)) + " " + Message.getDecoration() + ChatColor.AQUA + " " + ChatColor.BOLD + data.getLanguage().getMessage(MsgEnum.CONGRATULATIONS) + " " + Message.getDecoration());
-				SheepWarsPlugin.getVersionManager().getTitleUtils().titlePacket(player, 5, 10 * 20, 20, ChatColor.YELLOW + "" + data.getLanguage().getMessage(MsgEnum.GAME_END_TITLE), Message.getDecoration() + "" + ChatColor.GOLD + " " + ChatColor.BOLD + data.getLanguage().getMessage(MsgEnum.VICTORY).replaceAll("%WINNER%", winnerTeam.getColor() + winnerTeam.getDisplayName(player)) + " " + Message.getDecoration());
+				player.sendMessage(ChatColor.GOLD.toString() + ChatColor.BOLD + data.getLanguage().getMessage(Messages.VICTORY).replaceAll("%WINNER%", winnerTeam.getColor() + winnerTeam.getDisplayName(player)) + " " + Message.getDecoration() + ChatColor.AQUA + " " + ChatColor.BOLD + data.getLanguage().getMessage(Messages.CONGRATULATIONS) + " " + Message.getDecoration());
+				SheepWarsPlugin.getVersionManager().getTitleUtils().titlePacket(player, 5, 10 * 20, 20, ChatColor.YELLOW + "" + data.getLanguage().getMessage(Messages.GAME_END_TITLE), Message.getDecoration() + "" + ChatColor.GOLD + " " + ChatColor.BOLD + data.getLanguage().getMessage(Messages.VICTORY).replaceAll("%WINNER%", winnerTeam.getColor() + winnerTeam.getDisplayName(player)) + " " + Message.getDecoration());
 			}
-			if (DataManager.isConnected())
-				data.uploadData(offPlayer);
 		}
 	}
 }

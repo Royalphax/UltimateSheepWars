@@ -9,7 +9,7 @@ import fr.asynchronous.sheepwars.core.SheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.data.PlayerData;
 import fr.asynchronous.sheepwars.core.handler.GameState;
 import fr.asynchronous.sheepwars.core.message.Language;
-import fr.asynchronous.sheepwars.core.message.Message.MsgEnum;
+import fr.asynchronous.sheepwars.core.message.Message.Messages;
 
 public class TerminatedGameTask extends BukkitRunnable {
 	private int timeUntilTeleporation;
@@ -31,7 +31,7 @@ public class TerminatedGameTask extends BukkitRunnable {
 			this.cancel();
 			for (Player player : Bukkit.getOnlinePlayers()) {
 				final Language lang = PlayerData.getPlayerData(player).getLanguage();
-				player.kickPlayer(lang.getMessage(MsgEnum.HUB_TELEPORTATION) + "\n\n" + lang.getMessage(MsgEnum.CONNECTION_FAILED));
+				player.kickPlayer(lang.getMessage(Messages.HUB_TELEPORTATION) + "\n\n" + lang.getMessage(Messages.CONNECTION_FAILED));
 			}
 			this.plugin.stop();
 		}
