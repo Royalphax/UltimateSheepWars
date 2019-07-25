@@ -71,14 +71,14 @@ auto-generate-language: true
 #
 #===============# Sheep settings #===============#
 #
-#Countdown before a sheep explode (in seconds) (useful only for explosive, incendiary and fragmentation sheep)
-sheep-countdown-before-explosion: 5
-#
 #The power when you launch sheep (depending on your map size to launch the sheep from one side to another)
 sheep-launch-velocity: 3.0
 #
-#The default health of sheeps (half-hearts)
-sheep-health: 8
+#How many intergalactic sheeps are allowed to be summoned at the same time (put 0 to disable this limitation)
+max-intergalactic-sheeps: 5
+#
+#Enable or not a sheep to collide with a player when he is launched
+sheep-player-collision: true
 #
 #===============# Item settings #===============#
 #You can configure the item
