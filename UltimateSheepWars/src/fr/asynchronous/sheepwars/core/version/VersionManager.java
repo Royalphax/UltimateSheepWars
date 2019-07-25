@@ -58,7 +58,7 @@ public class VersionManager {
 		try {
 			return anvilGUIConstructor.newInstance(player, plugin, handler, itemName, itemLore);
 		} catch (ReflectiveOperationException ex) {
-			new ExceptionManager(ex).register(true);
+			ExceptionManager.register(ex, true);
 			return null;
 		}
 	}

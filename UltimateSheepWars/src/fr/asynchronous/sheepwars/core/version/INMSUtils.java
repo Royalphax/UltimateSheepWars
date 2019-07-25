@@ -6,7 +6,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.material.MaterialData;
 
 public interface INMSUtils {
 	
@@ -22,7 +21,7 @@ public interface INMSUtils {
 	
 	public void displayRedScreen(final Player player, final boolean activate);
 	
-	public MaterialData getDye(final DyeColor color);
+	public ItemStack color(final ItemStack current, DyeColor color);
 	
 	public void cancelMove(final Player player, final boolean bool);
 	

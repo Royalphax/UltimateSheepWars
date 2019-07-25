@@ -28,7 +28,7 @@ public abstract class ATitleUtils {
 				break;
 			}
 		} catch (Exception ex) {
-			new ExceptionManager(ex).register(true);
+			ExceptionManager.register(ex, true);
 			return;
 		}
 	}
