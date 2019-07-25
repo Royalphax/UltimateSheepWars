@@ -17,7 +17,7 @@ import fr.asynchronous.sheepwars.core.booster.SheepWarsBooster;
 import fr.asynchronous.sheepwars.core.data.PlayerData;
 import fr.asynchronous.sheepwars.core.event.UltimateSheepWarsEventListener;
 import fr.asynchronous.sheepwars.core.handler.Sounds;
-import fr.asynchronous.sheepwars.core.message.Message.MsgEnum;
+import fr.asynchronous.sheepwars.core.message.Message.Messages;
 import fr.asynchronous.sheepwars.core.task.BoosterWoolTask;
 import fr.asynchronous.sheepwars.core.util.BlockUtils;
 
@@ -50,7 +50,7 @@ public class ProjectileHit extends UltimateSheepWarsEventListener {
 							final SheepWarsBooster booster = SheepWarsBooster.activateBooster(player, wool.getColor(), plugin);
 							for (Player online : Bukkit.getOnlinePlayers()) {
 								PlayerData onlineData = PlayerData.getPlayerData(online);
-								online.sendMessage(onlineData.getLanguage().getMessage(MsgEnum.BOOSTER_ACTION).replaceAll("%PLAYER%", data.getTeam().getColor() + player.getName()).replaceAll("%BOOSTER%", onlineData.getLanguage().getMessage(booster.getName())));
+								online.sendMessage(onlineData.getLanguage().getMessage(Messages.BOOSTER_ACTION).replaceAll("%PLAYER%", data.getTeam().getColor() + player.getName()).replaceAll("%BOOSTER%", onlineData.getLanguage().getMessage(booster.getName())));
 							}
 						}
 					}

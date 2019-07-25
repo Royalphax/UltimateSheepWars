@@ -6,7 +6,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
-import fr.asynchronous.sheepwars.core.manager.TeamManager;
+import fr.asynchronous.sheepwars.core.handler.SheepWarsTeam;
 
 /**
  * Event triggered when the game starts.
@@ -14,13 +14,13 @@ import fr.asynchronous.sheepwars.core.manager.TeamManager;
 public class GameEndEvent extends Event {
 
 	private static final HandlerList handlers = new HandlerList();
-	private TeamManager winnerTeam;
+	private SheepWarsTeam winnerTeam;
 	
-	public GameEndEvent(TeamManager winnerTeam) {
+	public GameEndEvent(SheepWarsTeam winnerTeam) {
 		this.winnerTeam = winnerTeam;
 	}
 	
-	public TeamManager getWinnerTeam() {
+	public SheepWarsTeam getWinnerTeam() {
 		return this.winnerTeam;
 	}
 	
@@ -28,7 +28,7 @@ public class GameEndEvent extends Event {
 		return this.winnerTeam.getOnlinePlayers();
 	}
 	
-	public void setWinnerTeam(TeamManager winnerTeam) {
+	public void setWinnerTeam(SheepWarsTeam winnerTeam) {
 		this.winnerTeam = winnerTeam;
 	}
 	
