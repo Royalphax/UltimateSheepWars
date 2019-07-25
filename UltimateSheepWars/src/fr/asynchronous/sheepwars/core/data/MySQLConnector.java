@@ -30,7 +30,7 @@ public class MySQLConnector extends Database {
 			return this.connection;
 		}
 		Class.forName("com.mysql.jdbc.Driver");
-		this.connection = DriverManager.getConnection("jdbc:mysql://" + this.hostname + ":" + this.port + "/" + this.database + "?useSSL=false", this.user, this.password);
+		this.connection = DriverManager.getConnection("jdbc:mysql://" + this.hostname + ":" + this.port + "/" + this.database + "?useSSL=false&autoReconnect=true", this.user, this.password);
 		return this.connection;
 	}
 }

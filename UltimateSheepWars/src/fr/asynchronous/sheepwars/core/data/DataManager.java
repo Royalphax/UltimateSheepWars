@@ -28,7 +28,7 @@ public abstract class DataManager {
 	
 	public abstract void loadData(OfflinePlayer player);
 	
-	public abstract void uploadData(OfflinePlayer player);
+	public abstract void uploadData(OfflinePlayer player, boolean closeConnection);
 	
 	public static void initDatabaseConnections(SheepWarsPlugin plugin) {
 		final boolean localhost = plugin.isLocalhostConnection();
@@ -66,7 +66,7 @@ public abstract class DataManager {
 				plugin.getLogger().log(Level.INFO, "Connected to Database (" + stop + "s)!");
 				connectedToDatabase = true;
 			} catch (ClassNotFoundException | SQLException ex) {
-				new ExceptionManager(ex).register(true);
+				ExceptionManager.register(ex, true);
 				Double stop = (double) (System.currentTimeMillis() - start) / 1000.0;
 				plugin.getLogger().log(Level.INFO, "Database unreachable (" + stop + "s)!");
 				connectedToDatabase = false;
@@ -133,7 +133,7 @@ public abstract class DataManager {
 		try {
 			return database.closeConnection();
 		} catch (SQLException e) {
-			new ExceptionManager(e).register(true);
+			ExceptionManager.register(e, true);
 			return false;
 		}
 	}

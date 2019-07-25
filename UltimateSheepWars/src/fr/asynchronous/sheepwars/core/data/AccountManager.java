@@ -92,7 +92,7 @@ public class AccountManager {
 		try {
 			plugin.getSettingsConfig().save(plugin.getSettingsFile());
 		} catch (IOException e) {
-			new ExceptionManager(e).register(true);
+			ExceptionManager.register(e, true);
 		}
 		askForOwnerName = false;
 		new DataRegister(this.plugin, this.plugin.isLocalhostConnection(), false);
