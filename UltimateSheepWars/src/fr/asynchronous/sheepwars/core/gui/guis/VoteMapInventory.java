@@ -1,10 +1,12 @@
 package fr.asynchronous.sheepwars.core.gui.guis;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -15,8 +17,10 @@ import fr.asynchronous.sheepwars.core.gui.base.GuiScreen;
 import fr.asynchronous.sheepwars.core.handler.ItemBuilder;
 import fr.asynchronous.sheepwars.core.handler.PlayableMap;
 import fr.asynchronous.sheepwars.core.handler.Sounds;
-import fr.asynchronous.sheepwars.core.message.Message.MsgEnum;
+import fr.asynchronous.sheepwars.core.message.Message;
+import fr.asynchronous.sheepwars.core.message.Message.Messages;
 import fr.asynchronous.sheepwars.core.util.RandomUtils;
+import net.md_5.bungee.api.ChatColor;
 
 public class VoteMapInventory extends GuiScreen {
 
@@ -37,35 +41,40 @@ public class VoteMapInventory extends GuiScreen {
 
 		int i = 0;
 		for (PlayableMap map : PlayableMap.getReadyMaps()) {
-			setItem(new ItemBuilder(Material.PAPER).setName(playerData.getLanguage().getMessage(MsgEnum.VOTE_MAP_NAME).replaceAll("%MAP_NAME%", map.getName())).setLore(playerData.getLanguage().getMessage(MsgEnum.VOTE_MAP_LORE).replaceAll("%VOTE_COUNT%", String.valueOf(SheepWarsPlugin.getWorldManager().getVoteCount(map)))).toItemStack(), i);
+			setItem(new ItemBuilder(Material.PAPER).setName(playerData.getLanguage().getMessage(Messages.VOTE_MAP_NAME).replaceAll("%MAP_NAME%", map.getDisplayName())).setLore(playerData.getLanguage().getMessage(Messages.VOTE_MAP_LORE).replaceAll("%VOTE_COUNT%", String.valueOf(SheepWarsPlugin.getWorldManager().getVoteCount(map)))).toItemStack(), i);
 			slotMap.put(i, map);
 			i++;
 		}
 		
-		setItem(new ItemBuilder(Material.SKULL_ITEM).setSkullTexture(RandomUtils.getRandom(urls)).setName(playerData.getLanguage().getMessage(MsgEnum.VOTE_MAP_NAME).replaceAll("%MAP_NAME%", playerData.getLanguage().getMessage(MsgEnum.RANDOM_MAP_NAME))).setLore(playerData.getLanguage().getMessage(MsgEnum.VOTE_RANDOM_MAP_LORE).replaceAll("%VOTE_COUNT%", String.valueOf(SheepWarsPlugin.getWorldManager().getVoteCount(null)))).toItemStack(), i);
+		setItem(new ItemBuilder(Material.SKULL_ITEM).setSkullTexture(RandomUtils.getRandom(urls)).setName(playerData.getLanguage().getMessage(Messages.VOTE_MAP_NAME).replaceAll("%MAP_NAME%", playerData.getLanguage().getMessage(Messages.RANDOM_MAP_NAME))).setLore(playerData.getLanguage().getMessage(Messages.VOTE_RANDOM_MAP_LORE).replaceAll("%VOTE_COUNT%", String.valueOf(SheepWarsPlugin.getWorldManager().getVoteCount(null)))).toItemStack(), i);
 	}
 
 	@Override
 	public void onOpen() {
-		Sounds.playSound(this.player, this.player.getLocation(), Sounds.CHEST_OPEN, 2.0f, 0.0f);
+		Sounds.playSound(this.player, this.player.getLocation(), Sounds.CHICKEN_EGG_POP, 2.0f, 2.0f);
 	}
 
 	@Override
 	public void onClose() {
 		slotMap.clear();
-		Sounds.playSound(this.player, this.player.getLocation(), Sounds.CHEST_CLOSE, 2.0f, 0.0f);
 	}
 
 	@Override
 	public void onClick(ItemStack item, InventoryClickEvent event) {
 		if (item != null && item.getItemMeta() != null && item.getItemMeta().hasDisplayName()) {
+			PlayableMap map = null;
 			if (slotMap.containsKey(event.getSlot())) {
-				this.playerData.setVotedMap(slotMap.get(event.getSlot()));
-			} else {
-				this.playerData.setVotedMap(null);
+				map = slotMap.get(event.getSlot());
 			}
-			Sounds.CLICK.playSound((Player) event.getWhoClicked(), 1f, 0.5f);
+			Sounds.DIG_WOOD.playSound((Player) event.getWhoClicked(), 1f, 1.5f);
 			event.getWhoClicked().closeInventory();
+			if ((this.playerData.getVotedMap() == null && map != null) || (this.playerData.getVotedMap() != null && map == null) || (this.playerData.getVotedMap() != map)) {
+				this.playerData.setVotedMap(map);
+				for (Player online : Bukkit.getOnlinePlayers()) {
+					SheepWarsPlugin.getVersionManager().getTitleUtils().actionBarPacket(online, Message.getMessage(online, Messages.VOTE_ACTION_BAR_BROADCAST).replaceAll("%PLAYER%", this.player.getName()).replaceAll("%MAP_NAME%", ChatColor.stripColor(map == null ? Message.getMessage(online, Messages.RANDOM_MAP_NAME) : map.getDisplayName())));
+				}
+				Message.sendMessage(this.player, Messages.VOTE_SUCCESS, Arrays.asList("%MAP_NAME%", "%VOTE_COUNT%"), Arrays.asList(ChatColor.stripColor(map == null ? Message.getMessage(this.player, Messages.RANDOM_MAP_NAME) : map.getDisplayName()), String.valueOf(SheepWarsPlugin.getWorldManager().getVoteCount(map))));
+			}
 		}
 		event.setCancelled(true);
 	}

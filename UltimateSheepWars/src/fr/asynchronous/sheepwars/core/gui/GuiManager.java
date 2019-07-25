@@ -5,11 +5,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 
 import fr.asynchronous.sheepwars.core.SheepWarsPlugin;
+import fr.asynchronous.sheepwars.core.data.PlayerData;
 import fr.asynchronous.sheepwars.core.gui.base.GuiScreen;
 import fr.asynchronous.sheepwars.core.gui.task.GuiTask;
 import fr.asynchronous.sheepwars.core.manager.ExceptionManager;
+import fr.asynchronous.sheepwars.core.message.Message.Messages;
 import fr.asynchronous.sheepwars.core.util.ReflectionUtils;
 
 public class GuiManager {
@@ -65,8 +68,21 @@ public class GuiManager {
 		try {
 			return (GuiScreen) ReflectionUtils.instantiateObject(kitsInventoryClass);
 		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException e) {
-			new ExceptionManager(e).register(true);
+			ExceptionManager.register(e, true);
 		}
 		return null;
+	}
+	
+	public static void openKitsInventory(Player player, SheepWarsPlugin plugin) {
+		final PlayerData data = PlayerData.getPlayerData(player);
+		String inventoryName = data.getLanguage().getMessage(Messages.KIT_INVENTORY_NAME).replaceAll("%KIT_NAME%", data.getKit().getName(player));
+		if (data.getKit().getLevels().size() > 1 && data.getKitLevel() >= 0) {
+			inventoryName = inventoryName.replaceAll("%LEVEL_NAME%", data.getKit().getLevel(data.getKitLevel()).getName(data.getLanguage()));
+		} else {
+			inventoryName = inventoryName.replaceAll("%LEVEL_NAME%", "");
+		}
+		if (inventoryName.length() > 32)
+			inventoryName = inventoryName.substring(0, 32);
+		GuiManager.openGui(plugin, player, inventoryName, getKitsInventoryNewInstance());
 	}
 }
