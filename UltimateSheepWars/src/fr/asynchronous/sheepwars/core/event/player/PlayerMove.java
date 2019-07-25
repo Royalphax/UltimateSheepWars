@@ -13,11 +13,11 @@ import fr.asynchronous.sheepwars.core.SheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.data.PlayerData;
 import fr.asynchronous.sheepwars.core.event.UltimateSheepWarsEventListener;
 import fr.asynchronous.sheepwars.core.handler.GameState;
+import fr.asynchronous.sheepwars.core.handler.SheepWarsTeam;
 import fr.asynchronous.sheepwars.core.handler.Sounds;
 import fr.asynchronous.sheepwars.core.manager.ConfigManager;
 import fr.asynchronous.sheepwars.core.manager.ConfigManager.Field;
-import fr.asynchronous.sheepwars.core.manager.TeamManager;
-import fr.asynchronous.sheepwars.core.message.Message.MsgEnum;
+import fr.asynchronous.sheepwars.core.message.Message.Messages;
 import fr.asynchronous.sheepwars.core.task.ParticleTask;
 import fr.asynchronous.sheepwars.core.util.RandomUtils;
 import fr.asynchronous.sheepwars.core.version.ATitleUtils.Type;
@@ -61,8 +61,8 @@ public class PlayerMove extends UltimateSheepWarsEventListener
             	SheepWarsPlugin.getVersionManager().getTitleUtils().titlePacket(player, 5, 10, 5, "", "Plof!");
                 Sounds.playSound(player, player.getLocation(), Sounds.ENDERMAN_TELEPORT, 1f, 1f);
             
-        	} else if (data.getTeam() == TeamManager.SPEC) {
-        		player.teleport(RandomUtils.getRandom(SheepWarsPlugin.getWorldManager().getVotedMap().getTeamSpawns(TeamManager.SPEC).getBukkitLocations()));
+        	} else if (data.getTeam() == SheepWarsTeam.SPEC) {
+        		player.teleport(RandomUtils.getRandom(SheepWarsPlugin.getWorldManager().getVotedMap().getTeamSpawns(SheepWarsTeam.SPEC).getBukkitLocations()));
         		
         	} else if (!GameState.isStep(GameState.INGAME))
             {
@@ -75,7 +75,7 @@ public class PlayerMove extends UltimateSheepWarsEventListener
                     if (!player.hasMetadata(FALLING_METADATA))
                     	Sounds.playSound(player, to, Sounds.BLAZE_HIT, 1f, 2.0f);
                     player.setMetadata(FALLING_METADATA, new FixedMetadataValue(this.plugin, System.currentTimeMillis()));
-                    SheepWarsPlugin.getVersionManager().getTitleUtils().defaultTitle(Type.TITLE, player, "", ChatColor.RED + data.getLanguage().getMessage(MsgEnum.OUT_OF_THE_GAME));
+                    SheepWarsPlugin.getVersionManager().getTitleUtils().defaultTitle(Type.TITLE, player, "", ChatColor.RED + data.getLanguage().getMessage(Messages.OUT_OF_THE_GAME));
                 }
                 player.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, 60, 1));
             }

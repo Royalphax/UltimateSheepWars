@@ -15,7 +15,7 @@ import fr.asynchronous.sheepwars.core.data.PlayerData;
 import fr.asynchronous.sheepwars.core.event.UltimateSheepWarsEventListener;
 import fr.asynchronous.sheepwars.core.handler.GameState;
 import fr.asynchronous.sheepwars.core.handler.Particles;
-import fr.asynchronous.sheepwars.core.manager.TeamManager;
+import fr.asynchronous.sheepwars.core.handler.SheepWarsTeam;
 
 public class PlayerDamage extends UltimateSheepWarsEventListener {
 	private ArrayList<OfflinePlayer> redScreeners; 
@@ -30,8 +30,8 @@ public class PlayerDamage extends UltimateSheepWarsEventListener {
 		if (event.getEntity() instanceof Player) {
 			boolean cancelled = false;
 			final Player player = (Player) event.getEntity();
-			final TeamManager playerTeam = PlayerData.getPlayerData(player).getTeam();
-			if (GameState.isStep(GameState.WAITING) || GameState.isStep(GameState.TERMINATED) || playerTeam == TeamManager.SPEC)
+			final SheepWarsTeam playerTeam = PlayerData.getPlayerData(player).getTeam();
+			if (GameState.isStep(GameState.WAITING) || GameState.isStep(GameState.TERMINATED) || playerTeam == SheepWarsTeam.SPEC)
 			{
 				cancelled = true;
 			} else if (GameState.isStep(GameState.INGAME))

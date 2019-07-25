@@ -16,8 +16,8 @@ import fr.asynchronous.sheepwars.core.data.PlayerData;
 import fr.asynchronous.sheepwars.core.event.UltimateSheepWarsEventListener;
 import fr.asynchronous.sheepwars.core.handler.DisplayStyle;
 import fr.asynchronous.sheepwars.core.handler.GameState;
-import fr.asynchronous.sheepwars.core.manager.TeamManager;
-import fr.asynchronous.sheepwars.core.message.Message.MsgEnum;
+import fr.asynchronous.sheepwars.core.handler.SheepWarsTeam;
+import fr.asynchronous.sheepwars.core.message.Message.Messages;
 import fr.asynchronous.sheepwars.core.util.Utils;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.HoverEvent.Action;
@@ -35,7 +35,7 @@ public class AsyncPlayerChat extends UltimateSheepWarsEventListener {
 		
 		event.setCancelled(true);
 		final Player player = event.getPlayer();
-		final TeamManager playerTeam = PlayerData.getPlayerData(player).getTeam();
+		final SheepWarsTeam playerTeam = PlayerData.getPlayerData(player).getTeam();
 		final PlayerData data = PlayerData.getPlayerData(player);
 		TextComponent message = new TextComponent(event.getMessage());
 		
@@ -51,14 +51,16 @@ public class AsyncPlayerChat extends UltimateSheepWarsEventListener {
 		
 		boolean global = true;
 		List<Player> audience = new ArrayList<>(Bukkit.getOnlinePlayers());
-		if (data.isSpectator()) {
-			audience = TeamManager.SPEC.getOnlinePlayers();
-		} else if (GameState.isStep(GameState.INGAME)) {
-			if (!event.getMessage().startsWith("!")) {
-				audience = playerTeam.getOnlinePlayers();
-				global = false;
+		if (GameState.isStep(GameState.INGAME)) {
+			if (data.isSpectator()) {
+				audience = SheepWarsTeam.SPEC.getOnlinePlayers();
 			} else {
-				message = new TextComponent(event.getMessage().replaceFirst("!", ""));
+				if (!event.getMessage().startsWith("!")) {
+					audience = playerTeam.getOnlinePlayers();
+					global = false;
+				} else {
+					message = new TextComponent(event.getMessage().replaceFirst("!", ""));
+				}
 			}
 		}
 		
@@ -74,7 +76,7 @@ public class AsyncPlayerChat extends UltimateSheepWarsEventListener {
 			final PlayerData listenerData = PlayerData.getPlayerData(listener);
 			TextComponent name = new TextComponent(player.getName());
 			name.setColor(playerTeam.getBungeeColor());
-			String hover = playerTeam.getColor() + listenerData.getLanguage().getMessage(MsgEnum.RECORDS).replaceAll("%PLAYER%", playerTeam.getColor() + "" + ChatColor.BOLD + player.getName()) + "\n\n" + ChatColor.GRAY + listenerData.getLanguage().getMessage(MsgEnum.DATABASE_NOT_CONNECTED);
+			String hover = playerTeam.getColor() + listenerData.getLanguage().getMessage(Messages.RECORDS).replaceAll("%PLAYER%", playerTeam.getColor() + "" + ChatColor.BOLD + player.getName()) + "\n\n" + ChatColor.GRAY + listenerData.getLanguage().getMessage(Messages.DATABASE_NOT_CONNECTED);
 			if (DataManager.isConnected())
 				hover = Utils.assignArrayToString(Utils.getPlayerStats(data, listenerData.getLanguage(), DisplayStyle.HOVER));
 			name.setHoverEvent(new HoverEvent(Action.SHOW_TEXT, TextComponent.fromLegacyText(hover)));

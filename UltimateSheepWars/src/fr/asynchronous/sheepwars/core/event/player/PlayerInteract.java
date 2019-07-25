@@ -23,144 +23,139 @@ import fr.asynchronous.sheepwars.core.handler.GameState;
 import fr.asynchronous.sheepwars.core.handler.ItemBuilder;
 import fr.asynchronous.sheepwars.core.handler.Particles;
 import fr.asynchronous.sheepwars.core.handler.Permissions;
+import fr.asynchronous.sheepwars.core.handler.SheepWarsTeam;
 import fr.asynchronous.sheepwars.core.handler.Sounds;
 import fr.asynchronous.sheepwars.core.manager.ConfigManager;
 import fr.asynchronous.sheepwars.core.manager.ConfigManager.Field;
-import fr.asynchronous.sheepwars.core.manager.TeamManager;
 import fr.asynchronous.sheepwars.core.message.Message;
-import fr.asynchronous.sheepwars.core.message.Message.MsgEnum;
+import fr.asynchronous.sheepwars.core.message.Message.Messages;
 import fr.asynchronous.sheepwars.core.sheep.SheepWarsSheep;
+import fr.asynchronous.sheepwars.core.sheep.sheeps.IntergalacticSheep;
 import fr.asynchronous.sheepwars.core.util.MathUtils;
 import fr.asynchronous.sheepwars.core.util.Utils;
 
-public class PlayerInteract extends UltimateSheepWarsEventListener
-{
-	
-    public PlayerInteract(final SheepWarsPlugin plugin) {
-        super(plugin);
-    }
-    
+public class PlayerInteract extends UltimateSheepWarsEventListener {
+
+	public PlayerInteract(final SheepWarsPlugin plugin) {
+		super(plugin);
+	}
+
 	@EventHandler
-    public void onPlayerInteract(final PlayerInteractEvent event) {
-        final Player player = event.getPlayer();
-        final PlayerData data = PlayerData.getPlayerData(player);
-        
-        if (event.getAction() == null || event.getPlayer() == null)
-        	return;
-        
-        if (!GameState.isStep(GameState.INGAME) || data.isSpectator())
-            event.setCancelled(true);
-        
-        if ((event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK)
-        		&& event.hasItem() && event.getItem().hasItemMeta() && !data.isSpectator()) {
-        	final ItemStack item = event.getItem();
-        	final Material mat = item.getType();
-        	
-        	if (GameState.isStep(GameState.INGAME) && mat.equals(Material.WOOL)) {
-        		if (!data.getTeam().isBlocked() && !player.isInsideVehicle()) {
-        			SheepWarsSheep sheep = SheepWarsSheep.getCorrespondingSheep(item, player);
-        			if (sheep != null) {
-        				ItemStack newItem = item.clone();
-        				final int amount = item.getAmount() - 1;
-        				if (amount <= 0) {
-        					newItem = new ItemStack(Material.AIR);
-        				} else {
-        					newItem.setAmount(amount);
-        				}
-        				setItemInHand(newItem, player);
-        				boolean launch = sheep.throwSheep(player, this.plugin);
-        				if (launch) {
-        					data.increaseSheepThrown(1);
-        				} else {
-        					newItem.setAmount(amount + 1);
-        					setItemInHand(newItem, player);
-        				}
-        				player.updateInventory();
-        			}
-        		} else {
-        			Sounds.playSound(player, Sounds.VILLAGER_NO, 1f, 1f);
-        			SheepWarsPlugin.getVersionManager().getTitleUtils().actionBarPacket(player, data.getLanguage().getMessage(MsgEnum.PLAYER_CANT_LAUNCH_SHEEP));
-        		}
-        		event.setCancelled(true);
-        		
-        	} else if (GameState.isStep(GameState.WAITING)) {
-        		
-        		if (mat.equals(ConfigManager.getItemStack(Field.RETURN_TO_HUB_ITEM).getType())) {
-        			
-                	player.chat("/hub");
-                	
-        		} else if (mat.equals(ConfigManager.getItemStack(Field.VOTING_ITEM).getType())) {
-        			
-                	if (plugin.getWaitingTask() == null || plugin.getWaitingTask().getRemainingSeconds() > 10) {
-                		GuiManager.openGui(plugin, player, data.getLanguage().getMessage(MsgEnum.VOTE_INVENTORY_NAME), new VoteMapInventory());
-                	} else {
-                		player.sendMessage(data.getLanguage().getMessage(MsgEnum.VOTE_CLOSED));
-                	}
-                	
-        		} else if (mat.equals(ConfigManager.getItemStack(Field.PARTICLES_ON_ITEM).getType()) || mat.equals(ConfigManager.getItemStack(Field.PARTICLES_OFF_ITEM).getType())) {
-        			
-        			Map<Integer, ItemStack> items = new HashMap<>();
-        			int particleSlot = 4;
-        			if (SheepWarsPlugin.getWorldManager().isVoteModeEnable())
-        				particleSlot = 5;
-        			
-        			if (data.getAllowedParticles())
-                    {
-                    	data.setAllowParticles(false);
-                    	items.put(particleSlot, new ItemBuilder(ConfigManager.getItemStack(Field.PARTICLES_OFF_ITEM)).setName(data.getLanguage().getMessage(MsgEnum.PARTICLES_OFF)).toItemStack());
-                    } else {
-                    	data.setAllowParticles(true);
-                    	items.put(particleSlot, new ItemBuilder(ConfigManager.getItemStack(Field.PARTICLES_ON_ITEM)).setName(data.getLanguage().getMessage(MsgEnum.PARTICLES_ON)).toItemStack());
-                    	SheepWarsPlugin.getVersionManager().getParticleFactory().playParticles(player, Particles.SPELL_INSTANT, player.getLocation().add(0, 1, 0), 1f, 0.5f, 1f, 10, 0.0f);
-                    }
-        			
-        			final EquipSelectionItemsEvent equipEvent = new EquipSelectionItemsEvent(player, items);
-        			Bukkit.getServer().getPluginManager().callEvent(equipEvent);
-        			equipEvent.equip();
-        			
-                    Sounds.playSound(player, player.getLocation(), Sounds.NOTE_STICKS, 1f, 1f);
-                    
-        		} else if (Utils.areSimilar(item, TeamManager.RED.getIcon(player)) || Utils.areSimilar(item, TeamManager.BLUE.getIcon(player))) {
-        			for (TeamManager team : Arrays.asList(TeamManager.RED, TeamManager.BLUE)) {
-                        if (Utils.areSimilar(item, team.getIcon(player))) {
-                            final String displayName = team.getDisplayName(player);
-                            final TeamManager playerTeam = data.getTeam();
-                            if (playerTeam == team) {
-                        		Message.sendMessage(player, MsgEnum.ALREADY_IN_THIS_TEAM);
-                                break;
-                            }
-                            if (!Permissions.USW_BYPASS_TEAMS.hasPermission(player) && !Contributor.isImportant(player) && Bukkit.getOnlinePlayers().size() > 1 && team.getOnlinePlayers().size() >= MathUtils.ceil((Bukkit.getOnlinePlayers().size() / 2)))
-                            {
-								Message.sendMessage(player, MsgEnum.CANT_JOIN_FULL_TEAM);
+	public void onPlayerInteract(final PlayerInteractEvent event) {
+		final Player player = event.getPlayer();
+		final PlayerData data = PlayerData.getPlayerData(player);
+
+		if (event.getAction() == null || event.getPlayer() == null)
+			return;
+
+		if ((!GameState.isStep(GameState.INGAME) || data.isSpectator()) && !Permissions.USW_BUILDER.hasPermission(player))
+			event.setCancelled(true);
+
+		if ((event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) && event.hasItem() && event.getItem().hasItemMeta() && !data.isSpectator()) {
+			final ItemStack item = event.getItem();
+			final Material mat = item.getType();
+
+			if (GameState.isStep(GameState.INGAME) && mat.equals(Material.WOOL)) {
+				
+				SheepWarsSheep sheep = SheepWarsSheep.getCorrespondingSheep(item, player);
+				int maxIntergalactic = ConfigManager.getInt(Field.MAX_INTERGALACTIC_SHEEPS);
+				boolean isIntergalactic = (sheep.equals(new IntergalacticSheep()));
+				if (sheep != null && !data.getTeam().isBlocked() && !player.isInsideVehicle() && (!isIntergalactic || maxIntergalactic <= 0 || isIntergalactic && IntergalacticSheep.IN_USE < maxIntergalactic)) {
+					ItemStack newItem = item.clone();
+					final int amount = item.getAmount() - 1;
+					if (amount <= 0) {
+						newItem = new ItemStack(Material.AIR);
+					} else {
+						newItem.setAmount(amount);
+					}
+					setItemInHand(newItem, player);
+					boolean launch = sheep.throwSheep(player, this.plugin);
+					if (launch) {
+						data.increaseSheepThrown(1);
+					} else {
+						newItem.setAmount(amount + 1);
+						setItemInHand(newItem, player);
+					}
+					player.updateInventory();
+				} else {
+					Sounds.playSound(player, Sounds.VILLAGER_NO, 1f, 1f);
+					SheepWarsPlugin.getVersionManager().getTitleUtils().actionBarPacket(player, data.getLanguage().getMessage(Messages.PLAYER_CANT_LAUNCH_SHEEP));
+				}
+				event.setCancelled(true);
+
+			} else if (GameState.isStep(GameState.WAITING)) {
+
+				if (mat.equals(ConfigManager.getItemStack(Field.RETURN_TO_HUB_ITEM).getType())) {
+
+					player.chat("/hub");
+					event.setCancelled(true);
+
+				} else if (mat.equals(ConfigManager.getItemStack(Field.VOTING_ITEM).getType())) {
+
+					if (plugin.getWaitingTask() == null || plugin.getWaitingTask().getRemainingSeconds() > 10) {
+						GuiManager.openGui(plugin, player, data.getLanguage().getMessage(Messages.VOTE_INVENTORY_NAME), new VoteMapInventory());
+					} else {
+						player.sendMessage(data.getLanguage().getMessage(Messages.VOTE_CLOSED));
+					}
+					event.setCancelled(true);
+
+				} else if (mat.equals(ConfigManager.getItemStack(Field.PARTICLES_ON_ITEM).getType()) || mat.equals(ConfigManager.getItemStack(Field.PARTICLES_OFF_ITEM).getType())) {
+
+					Map<Integer, ItemStack> items = new HashMap<>();
+					int particleSlot = 4;
+					if (SheepWarsPlugin.getWorldManager().isVoteModeEnable())
+						particleSlot = 5;
+
+					if (data.getAllowedParticles()) {
+						data.setAllowParticles(false);
+						items.put(particleSlot, new ItemBuilder(ConfigManager.getItemStack(Field.PARTICLES_OFF_ITEM)).setName(data.getLanguage().getMessage(Messages.PARTICLES_OFF)).toItemStack());
+					} else {
+						data.setAllowParticles(true);
+						items.put(particleSlot, new ItemBuilder(ConfigManager.getItemStack(Field.PARTICLES_ON_ITEM)).setName(data.getLanguage().getMessage(Messages.PARTICLES_ON)).toItemStack());
+						SheepWarsPlugin.getVersionManager().getParticleFactory().playParticles(player, Particles.SPELL_INSTANT, player.getLocation().add(0, 1, 0), 1f, 0.5f, 1f, 10, 0.0f);
+					}
+
+					final EquipSelectionItemsEvent equipEvent = new EquipSelectionItemsEvent(player, items);
+					Bukkit.getServer().getPluginManager().callEvent(equipEvent);
+					equipEvent.equip();
+
+					Sounds.playSound(player, player.getLocation(), Sounds.NOTE_STICKS, 1f, 1f);
+					event.setCancelled(true);
+
+				} else if (Utils.areSimilar(item, SheepWarsTeam.RED.getIcon(player)) || Utils.areSimilar(item, SheepWarsTeam.BLUE.getIcon(player))) {
+					for (SheepWarsTeam team : Arrays.asList(SheepWarsTeam.RED, SheepWarsTeam.BLUE)) {
+						if (Utils.areSimilar(item, team.getIcon(player))) {
+							final String displayName = team.getDisplayName(player);
+							final SheepWarsTeam playerTeam = data.getTeam();
+							if (playerTeam == team) {
+								Message.sendMessage(player, Messages.ALREADY_IN_THIS_TEAM);
 								break;
-                            }
-                            data.setTeam(team);
-                            player.sendMessage(data.getLanguage().getMessage(MsgEnum.TEAM_JOIN_MESSAGE).replaceAll("%TEAM%", team.getColor() + displayName));
-                            Sounds.playSound(player, player.getLocation(), Sounds.CLICK, 1f, 1f);
-                            break;
-                        }
-                    }
-                    player.updateInventory();
-        		}
-        	}
-        	
-        	// Le choix de Kit doit pouvoir s'effectuer meme si le jeu a commencé juste avant de lancer la partie.
-        	if (mat.equals(ConfigManager.getItemStack(Field.KIT_ITEM).getType())) {
-    			
-                String inventoryName = data.getLanguage().getMessage(MsgEnum.KIT_INVENTORY_NAME).replaceAll("%KIT_NAME%", data.getKit().getName(player));
-                if (data.getKit().getLevels().size() > 1 && data.getKitLevel() >= 0) {
-                	inventoryName = inventoryName.replaceAll("%LEVEL_NAME%", data.getKit().getLevel(data.getKitLevel()).getName(data.getLanguage()));
-                } else {
-                	inventoryName = inventoryName.replaceAll("%LEVEL_NAME%", "");
-                }
-                if (inventoryName.length() > 32)
-                	inventoryName = inventoryName.substring(0, 32);
-                GuiManager.openGui(this.plugin, player, inventoryName, GuiManager.getKitsInventoryNewInstance());
-                
-    		}
-        }
-    }
-	
+							}
+							if (!Permissions.USW_BYPASS_TEAMS.hasPermission(player) && !Contributor.isImportant(player) && Bukkit.getOnlinePlayers().size() > 1 && team.getOnlinePlayers().size() >= MathUtils.ceil((Bukkit.getOnlinePlayers().size() / 2))) {
+								Message.sendMessage(player, Messages.CANT_JOIN_FULL_TEAM);
+								break;
+							}
+							data.setTeam(team);
+							player.sendMessage(data.getLanguage().getMessage(Messages.TEAM_JOIN_MESSAGE).replaceAll("%TEAM%", team.getColor() + displayName));
+							Sounds.playSound(player, player.getLocation(), Sounds.CLICK, 1f, 1f);
+							break;
+						}
+					}
+					player.updateInventory();
+					event.setCancelled(true);
+				}
+			}
+
+			// Le choix de Kit doit pouvoir s'effectuer meme si le jeu a commencé juste avant de lancer la partie.
+			if (mat.equals(ConfigManager.getItemStack(Field.KIT_ITEM).getType())) {
+
+				GuiManager.openKitsInventory(player, this.plugin);
+				event.setCancelled(true);
+
+			}
+		}
+	}
+
 	public void setItemInHand(final ItemStack item, final Player player) {
 		SheepWarsPlugin.getVersionManager().getNMSUtils().setItemInHand(item, player);
 	}

@@ -9,9 +9,9 @@ import fr.asynchronous.sheepwars.core.SheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.data.PlayerData;
 import fr.asynchronous.sheepwars.core.event.UltimateSheepWarsEventListener;
 import fr.asynchronous.sheepwars.core.handler.GameState;
-import fr.asynchronous.sheepwars.core.manager.TeamManager;
+import fr.asynchronous.sheepwars.core.handler.SheepWarsTeam;
 import fr.asynchronous.sheepwars.core.message.Message;
-import fr.asynchronous.sheepwars.core.message.Message.MsgEnum;
+import fr.asynchronous.sheepwars.core.message.Message.Messages;
 
 public class PlayerQuit extends UltimateSheepWarsEventListener
 {
@@ -27,11 +27,11 @@ public class PlayerQuit extends UltimateSheepWarsEventListener
         
         if (data.hasTeam()) {
         	if (GameState.isStep(GameState.WAITING)) {
-        		data.setTeam(TeamManager.NULL);
+        		data.setTeam(SheepWarsTeam.NULL);
         	} else if (GameState.isStep(GameState.INGAME)) {
         		player.getWorld().strikeLightning(player.getLocation().add(0,5,0));
             	for (Player online : Bukkit.getOnlinePlayers())
-            		online.sendMessage(Message.getMessage(online, MsgEnum.DIED_MESSAGE).replace("%VICTIM%", data.getTeam().getColor() + player.getName()));
+            		online.sendMessage(Message.getMessage(online, Messages.DIED_MESSAGE).replace("%VICTIM%", data.getTeam().getColor() + player.getName()));
         	}
         }
         
