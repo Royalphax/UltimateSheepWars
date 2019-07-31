@@ -480,30 +480,32 @@ public class PlayerData extends DataManager {
 						setSheepKilled(res.getInt("sheep_killed"));
 						setTotalTime(res.getInt("total_time"));
 						final String kits = res.getString("kits");
-						if (kits.contains("-")) {
-							String[] availableKits = kits.split("-");
-							for (int i = 0; i < availableKits.length - 1; i++) {
-								String kitString = availableKits[i];
-								String[] kitStringSplitted = kitString.split((kitString.contains(",") ? "," : ""));
-								final int kitId = Integer.parseInt(kitStringSplitted[0]);
-								final int kitLevel = Integer.parseInt(kitStringSplitted[1]);
-								if (SheepWarsKit.existKit(kitId)) {
-									addKit(SheepWarsKit.getFromId(kitId), kitLevel);
+						if (!kits.trim().equals("")) {
+							if (kits.contains("-")) {
+								String[] availableKits = kits.split("-");
+								for (int i = 0; i < availableKits.length - 1; i++) {
+									String kitString = availableKits[i];
+									String[] kitStringSplitted = kitString.split((kitString.contains(",") ? "," : ""));
+									final int kitId = Integer.parseInt(kitStringSplitted[0]);
+									final int kitLevel = Integer.parseInt(kitStringSplitted[1]);
+									if (SheepWarsKit.existKit(kitId)) {
+										addKit(SheepWarsKit.getFromId(kitId), kitLevel);
+									}
 								}
+								String[] lastKit = availableKits[availableKits.length - 1].split((availableKits[availableKits.length - 1].contains(",") ? "," : ""));
+								setKit(SheepWarsKit.getFromId(Integer.parseInt(lastKit[0])), Integer.parseInt(lastKit[1]), true);
+							} else if (kits.contains(",")) {
+								String[] kit = kits.split(",");
+								if (SheepWarsKit.existKit(Integer.parseInt(kit[0]))) {
+									addKit(SheepWarsKit.getFromId(Integer.parseInt(kit[0])), Integer.parseInt(kit[1]));
+								}
+							} else {
+								String[] availableKits = kits.split("");
+								for (String kitId : availableKits)
+									if (SheepWarsKit.existKit(Integer.parseInt(kitId)))
+										addKit(SheepWarsKit.getFromId(Integer.parseInt(kitId)), 0);
+								setKit(SheepWarsKit.getFromId(Integer.parseInt(availableKits[availableKits.length - 1])), 0);
 							}
-							String[] lastKit = availableKits[availableKits.length - 1].split((availableKits[availableKits.length - 1].contains(",") ? "," : ""));
-							setKit(SheepWarsKit.getFromId(Integer.parseInt(lastKit[0])), Integer.parseInt(lastKit[1]), true);
-						} else if (kits.contains(",")) {
-							String[] kit = kits.split(",");
-							if (SheepWarsKit.existKit(Integer.parseInt(kit[0]))) {
-								addKit(SheepWarsKit.getFromId(Integer.parseInt(kit[0])), Integer.parseInt(kit[1]));
-							}
-						} else {
-							String[] availableKits = kits.split("");
-							for (String kitId : availableKits)
-								if (SheepWarsKit.existKit(Integer.parseInt(kitId)))
-									addKit(SheepWarsKit.getFromId(Integer.parseInt(kitId)), 0);
-							setKit(SheepWarsKit.getFromId(Integer.parseInt(availableKits[availableKits.length - 1])), 0);
 						}
 						setUpdatedAt(res.getDate("updated_at"));
 						setCreatedAt(res.getDate("created_at"));
