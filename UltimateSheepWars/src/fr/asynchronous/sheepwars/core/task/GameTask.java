@@ -1,36 +1,22 @@
 package fr.asynchronous.sheepwars.core.task;
 
-import java.util.ArrayList;
-import java.util.Map.Entry;
-import java.util.Random;
-
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.FireworkEffect;
-import org.bukkit.FireworkEffect.Type;
-import org.bukkit.GameMode;
-import org.bukkit.Location;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import fr.asynchronous.sheepwars.core.SheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.data.PlayerData;
-import fr.asynchronous.sheepwars.core.event.usw.GameEndEvent;
 import fr.asynchronous.sheepwars.core.event.usw.GameStartEvent;
 import fr.asynchronous.sheepwars.core.handler.GameState;
 import fr.asynchronous.sheepwars.core.handler.SheepWarsTeam;
 import fr.asynchronous.sheepwars.core.manager.ConfigManager;
 import fr.asynchronous.sheepwars.core.manager.ConfigManager.Field;
 import fr.asynchronous.sheepwars.core.manager.ExceptionManager;
-import fr.asynchronous.sheepwars.core.manager.RewardsManager.Events;
 import fr.asynchronous.sheepwars.core.message.Language;
 import fr.asynchronous.sheepwars.core.message.Message;
 import fr.asynchronous.sheepwars.core.message.Message.Messages;
 import fr.asynchronous.sheepwars.core.sheep.SheepWarsSheep;
 import fr.asynchronous.sheepwars.core.sheep.sheeps.BoardingSheep;
-import fr.asynchronous.sheepwars.core.util.EntityUtils;
-import fr.asynchronous.sheepwars.core.util.RandomUtils;
 
 public class GameTask extends BukkitRunnable {
 	public final SheepWarsPlugin plugin;
@@ -85,7 +71,7 @@ public class GameTask extends BukkitRunnable {
 						final Language lang = PlayerData.getPlayerData(online).getLanguage();
 						SheepWarsPlugin.getVersionManager().getTitleUtils().titlePacket(online, 5, 10 * 20, 20, lang.getMessage(Messages.FINISH_EQUALITY), lang.getMessage(Messages.GAME_END_EQUALITY_DESCRIPTION));
 					}
-					this.stopGame(null);
+					this.plugin.stopGame(null);
 					return;
 				}
 			}
@@ -122,78 +108,5 @@ public class GameTask extends BukkitRunnable {
 	
 	public void setBoosterCountdown(int i) {
 		this.boosterCountdown = i;
-	}
-
-	public void setSpectator(final Player player, final boolean lose) {
-		final PlayerData data = PlayerData.getPlayerData(player);
-		if (!data.isSpectator()) {
-			if (lose) {
-				this.removePlayer(player);
-				data.increaseDeaths(1);
-			}
-			data.setTeam(SheepWarsTeam.SPEC);
-		}
-		EntityUtils.resetPlayer(player, GameMode.SPECTATOR);
-	}
-
-	public void removePlayer(final Player player) {
-		final PlayerData data = PlayerData.getPlayerData(player);
-		final SheepWarsTeam team = data.getTeam();
-		if (!data.isSpectator()) {
-			data.setTeam(SheepWarsTeam.NULL);
-			if (GameState.isStep(GameState.WAITING)) {
-				PlayerData.getPlayers().remove(player);
-			} else if (GameState.isStep(GameState.INGAME) && team.getOnlinePlayers().isEmpty()) {
-				SheepWarsTeam winnerTeam = team == SheepWarsTeam.BLUE ? SheepWarsTeam.RED : SheepWarsTeam.BLUE;
-				stopGame(winnerTeam);
-				new BukkitRunnable() {
-					private int ticks = 30;
-					public void run() {
-						if (this.ticks == 0) {
-							this.cancel();
-							return;
-						}
-						Location location = RandomUtils.getRandom(SheepWarsPlugin.getWorldManager().getVotedMap().getBoosterSpawns().getBukkitLocations());
-						location.add(RandomUtils.random.nextInt(11) - 5, RandomUtils.random.nextInt(11) - 5, RandomUtils.random.nextInt(11) - 5);
-						ArrayList<Player> onlines = new ArrayList<>();
-						for (Player online : Bukkit.getOnlinePlayers())
-							onlines.add(online);
-						Random rdm = new Random();
-						FireworkEffect effect = FireworkEffect.builder().flicker(rdm.nextBoolean()).withColor(RandomUtils.getRandomColor()).withFade(RandomUtils.getRandomColor()).with(Type.BALL_LARGE).build();
-						SheepWarsPlugin.getVersionManager().getCustomEntities().spawnInstantExplodingFirework(location, effect, onlines);
-						this.ticks--;
-					}
-				}.runTaskTimer(plugin, 0, 10);
-			}
-		}
-	}
-
-	public void stopGame(SheepWarsTeam winnerTeam) {
-		GameEndEvent event = new GameEndEvent(winnerTeam);
-		Bukkit.getPluginManager().callEvent(event);
-		for (Player online : Bukkit.getOnlinePlayers()) {
-			online.setAllowFlight(true);
-			online.setFlying(true);
-			online.setGameMode(GameMode.CREATIVE);
-		}
-		if (winnerTeam != event.getWinnerTeam()) {
-			winnerTeam = event.getWinnerTeam();
-		}
-		new TerminatedGameTask(this.plugin);
-		for (Entry<OfflinePlayer, PlayerData> entry : PlayerData.getEntries()) {
-			final OfflinePlayer offPlayer = entry.getKey();
-			final PlayerData data = entry.getValue();
-			if (winnerTeam != null && winnerTeam != SheepWarsTeam.SPEC && offPlayer.isOnline()) {
-				Player player = (Player) offPlayer;
-				if (data.getTeam() == winnerTeam) {
-					data.increaseWins(1);
-					this.plugin.getRewardsManager().rewardPlayer(Events.ON_WIN, data.getPlayer());
-				} else {
-					this.plugin.getRewardsManager().rewardPlayer(Events.ON_LOOSE, data.getPlayer());
-				}
-				player.sendMessage(ChatColor.GOLD.toString() + ChatColor.BOLD + data.getLanguage().getMessage(Messages.VICTORY).replaceAll("%WINNER%", winnerTeam.getColor() + winnerTeam.getDisplayName(player)) + " " + Message.getDecoration() + ChatColor.AQUA + " " + ChatColor.BOLD + data.getLanguage().getMessage(Messages.CONGRATULATIONS) + " " + Message.getDecoration());
-				SheepWarsPlugin.getVersionManager().getTitleUtils().titlePacket(player, 5, 10 * 20, 20, ChatColor.YELLOW + "" + data.getLanguage().getMessage(Messages.GAME_END_TITLE), Message.getDecoration() + "" + ChatColor.GOLD + " " + ChatColor.BOLD + data.getLanguage().getMessage(Messages.VICTORY).replaceAll("%WINNER%", winnerTeam.getColor() + winnerTeam.getDisplayName(player)) + " " + Message.getDecoration());
-			}
-		}
 	}
 }

@@ -9,9 +9,16 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map.Entry;
+import java.util.Random;
 import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
+import org.bukkit.FireworkEffect;
+import org.bukkit.FireworkEffect.Type;
+import org.bukkit.GameMode;
+import org.bukkit.Location;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -78,6 +85,7 @@ import fr.asynchronous.sheepwars.core.event.projectile.ProjectileHit;
 import fr.asynchronous.sheepwars.core.event.projectile.ProjectileLaunch;
 import fr.asynchronous.sheepwars.core.event.server.ServerCommand;
 import fr.asynchronous.sheepwars.core.event.server.ServerListPing;
+import fr.asynchronous.sheepwars.core.event.usw.GameEndEvent;
 import fr.asynchronous.sheepwars.core.event.usw.UltimateSheepWarsLoadedEvent;
 import fr.asynchronous.sheepwars.core.event.weather.WeatherChange;
 import fr.asynchronous.sheepwars.core.exception.PlayableMapException;
@@ -85,6 +93,7 @@ import fr.asynchronous.sheepwars.core.gui.guis.KitsInventory;
 import fr.asynchronous.sheepwars.core.handler.GameState;
 import fr.asynchronous.sheepwars.core.handler.MinecraftVersion;
 import fr.asynchronous.sheepwars.core.handler.PlayableMap;
+import fr.asynchronous.sheepwars.core.handler.SheepWarsTeam;
 import fr.asynchronous.sheepwars.core.handler.VirtualLocation;
 import fr.asynchronous.sheepwars.core.kit.SheepWarsKit;
 import fr.asynchronous.sheepwars.core.kit.kits.ArmoredSheepKit;
@@ -101,10 +110,12 @@ import fr.asynchronous.sheepwars.core.manager.ConfigManager;
 import fr.asynchronous.sheepwars.core.manager.ConfigManager.Field;
 import fr.asynchronous.sheepwars.core.manager.ExceptionManager;
 import fr.asynchronous.sheepwars.core.manager.RewardsManager;
+import fr.asynchronous.sheepwars.core.manager.RewardsManager.Events;
 import fr.asynchronous.sheepwars.core.manager.URLManager;
 import fr.asynchronous.sheepwars.core.manager.WorldManager;
 import fr.asynchronous.sheepwars.core.message.Language;
 import fr.asynchronous.sheepwars.core.message.Message;
+import fr.asynchronous.sheepwars.core.message.Message.Messages;
 import fr.asynchronous.sheepwars.core.sheep.SheepWarsSheep;
 import fr.asynchronous.sheepwars.core.sheep.sheeps.BoardingSheep;
 import fr.asynchronous.sheepwars.core.sheep.sheeps.DarkSheep;
@@ -123,7 +134,10 @@ import fr.asynchronous.sheepwars.core.sheep.sheeps.SeekerSheep;
 import fr.asynchronous.sheepwars.core.sheep.sheeps.SwapSheep;
 import fr.asynchronous.sheepwars.core.task.GameTask;
 import fr.asynchronous.sheepwars.core.task.ScoreboardTask;
+import fr.asynchronous.sheepwars.core.task.TerminatedGameTask;
 import fr.asynchronous.sheepwars.core.task.WaitingTask;
+import fr.asynchronous.sheepwars.core.util.EntityUtils;
+import fr.asynchronous.sheepwars.core.util.RandomUtils;
 import fr.asynchronous.sheepwars.core.util.ReflectionUtils;
 import fr.asynchronous.sheepwars.core.version.VersionManager;
 import net.md_5.bungee.api.ChatColor;
@@ -558,6 +572,80 @@ public class SheepWarsPlugin extends JavaPlugin {
 		} else {
 			Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), commd);
 		}
+	}
+	
+	public void setSpectator(final Player player, final boolean lose) {
+		final PlayerData data = PlayerData.getPlayerData(player);
+		if (!data.isSpectator()) {
+			if (lose) {
+				removePlayer(player);
+				data.increaseDeaths(1);
+			}
+			data.setTeam(SheepWarsTeam.SPEC);
+		}
+		EntityUtils.resetPlayer(player, GameMode.SPECTATOR);
+	}
+	
+	public void removePlayer(final Player player) {
+		final PlayerData data = PlayerData.getPlayerData(player);
+		final SheepWarsTeam team = data.getTeam();
+		if (!data.isSpectator()) {
+			data.setTeam(SheepWarsTeam.NULL);
+			if (GameState.isStep(GameState.WAITING)) {
+				PlayerData.getPlayers().remove(player);
+			} else if (GameState.isStep(GameState.INGAME) && team.getOnlinePlayers().isEmpty()) {
+				final SheepWarsTeam winnerTeam = team == SheepWarsTeam.BLUE ? SheepWarsTeam.RED : SheepWarsTeam.BLUE;
+				final SheepWarsTeam winnerSureTeam = stopGame(winnerTeam);
+				new BukkitRunnable() {
+					private int ticks = 30;
+					public void run() {
+						if (this.ticks == 0) {
+							this.cancel();
+							return;
+						}
+						Location location = RandomUtils.getRandom(SheepWarsPlugin.getWorldManager().getVotedMap().getBoosterSpawns().getBukkitLocations());
+						location.add(RandomUtils.random.nextInt(11) - 5, RandomUtils.random.nextInt(11) - 5, RandomUtils.random.nextInt(11) - 5);
+						ArrayList<Player> onlines = new ArrayList<>();
+						for (Player online : Bukkit.getOnlinePlayers())
+							onlines.add(online);
+						Random rdm = new Random();
+						FireworkEffect effect = FireworkEffect.builder().flicker(rdm.nextBoolean()).withColor(winnerSureTeam.getLeatherColor()).with(Type.BALL_LARGE).build();
+						SheepWarsPlugin.getVersionManager().getCustomEntities().spawnInstantExplodingFirework(location, effect, onlines);
+						this.ticks--;
+					}
+				}.runTaskTimer(this, 0, 10);
+			}
+		}
+	}
+
+	public SheepWarsTeam stopGame(SheepWarsTeam winnerTeam) {
+		GameEndEvent event = new GameEndEvent(winnerTeam);
+		Bukkit.getPluginManager().callEvent(event);
+		for (Player online : Bukkit.getOnlinePlayers()) {
+			online.setAllowFlight(true);
+			online.setFlying(true);
+			online.setGameMode(GameMode.CREATIVE);
+		}
+		if (winnerTeam != event.getWinnerTeam()) {
+			winnerTeam = event.getWinnerTeam();
+		}
+		new TerminatedGameTask(this);
+		for (Entry<OfflinePlayer, PlayerData> entry : PlayerData.getEntries()) {
+			final OfflinePlayer offPlayer = entry.getKey();
+			final PlayerData data = entry.getValue();
+			if (winnerTeam != null && winnerTeam != SheepWarsTeam.SPEC && offPlayer.isOnline()) {
+				Player player = (Player) offPlayer;
+				if (data.getTeam() == winnerTeam) {
+					data.increaseWins(1);
+					this.getRewardsManager().rewardPlayer(Events.ON_WIN, data.getPlayer());
+				} else {
+					this.getRewardsManager().rewardPlayer(Events.ON_LOOSE, data.getPlayer());
+				}
+				player.sendMessage(ChatColor.GOLD.toString() + ChatColor.BOLD + data.getLanguage().getMessage(Messages.VICTORY).replaceAll("%WINNER%", winnerTeam.getColor() + winnerTeam.getDisplayName(player)) + " " + Message.getDecoration() + ChatColor.AQUA + " " + ChatColor.BOLD + data.getLanguage().getMessage(Messages.CONGRATULATIONS) + " " + Message.getDecoration());
+				SheepWarsPlugin.getVersionManager().getTitleUtils().titlePacket(player, 5, 10 * 20, 20, ChatColor.YELLOW + "" + data.getLanguage().getMessage(Messages.GAME_END_TITLE), Message.getDecoration() + "" + ChatColor.GOLD + " " + ChatColor.BOLD + data.getLanguage().getMessage(Messages.VICTORY).replaceAll("%WINNER%", winnerTeam.getColor() + winnerTeam.getDisplayName(player)) + " " + Message.getDecoration());
+			}
+		}
+		return winnerTeam;
 	}
 
 	public File getPluginJar() {

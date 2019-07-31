@@ -4,6 +4,7 @@ import java.util.Random;
 
 import org.bukkit.Bukkit;
 import org.bukkit.DyeColor;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -69,7 +70,7 @@ public class PlayerDeath extends UltimateSheepWarsEventListener
             this.plugin.getRewardsManager().rewardPlayer(Events.ON_DEATH, player);
             Message.sendMessage(player, Messages.GHOST_DESCRIPTION);
             SheepWarsPlugin.getVersionManager().getTitleUtils().titlePacket(player, 0, 60, 20, playerData.getLanguage().getMessage(Messages.ELIMINATED), subtitle);
-            this.plugin.getGameTask().setSpectator(event.getEntity(), true);
+            this.plugin.setSpectator(event.getEntity(), true);
             Location loc = player.getLocation().add(0,1,0);
             World w = loc.getWorld();
             final Random rdm = new Random();
@@ -88,7 +89,7 @@ public class PlayerDeath extends UltimateSheepWarsEventListener
             		}
             	}.runTaskLater(this.plugin, (20 + (rdm.nextInt(90))));
             }
-            if (countdown > 0) {
+            if (countdown > 0 && player.getGameMode() == GameMode.SPECTATOR) {
             	new BukkitRunnable()
             	{
             		int i = countdown * 20;
@@ -97,7 +98,8 @@ public class PlayerDeath extends UltimateSheepWarsEventListener
             			player.setSpectatorTarget(killer);
             			if (i <= 0) {
             				cancel();
-            				player.setSpectatorTarget(null);
+            				if (player.getGameMode() == GameMode.SPECTATOR)
+            					player.setSpectatorTarget(null);
             			}
             			i--;
             		}

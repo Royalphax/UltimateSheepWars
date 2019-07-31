@@ -13,13 +13,12 @@ import fr.asynchronous.sheepwars.core.handler.SheepWarsTeam;
 import fr.asynchronous.sheepwars.core.message.Message;
 import fr.asynchronous.sheepwars.core.message.Message.Messages;
 
-public class PlayerQuit extends UltimateSheepWarsEventListener
-{
-    public PlayerQuit(final SheepWarsPlugin plugin) {
-        super(plugin);
-    }
-    
-    @EventHandler
+public class PlayerQuit extends UltimateSheepWarsEventListener {
+	public PlayerQuit(final SheepWarsPlugin plugin) {
+		super(plugin);
+	}
+
+	@EventHandler
     public void onPlayerQuit(final PlayerQuitEvent event) {
         event.setQuitMessage((String)null);
         final Player player = event.getPlayer();
@@ -36,9 +35,7 @@ public class PlayerQuit extends UltimateSheepWarsEventListener
         }
         
         /** On supprime le joueur **/
-        if (this.plugin.getGameTask() != null) {
-        	this.plugin.getGameTask().setSpectator(player, true);
-        	this.plugin.getGameTask().removePlayer(player);
-        }
+        this.plugin.setSpectator(player, true);
+        this.plugin.removePlayer(player);
     }
 }

@@ -86,7 +86,7 @@ public class PlayerJoin extends UltimateSheepWarsEventListener {
 		/** On fonctionne par gamestate **/
 		if (!GameState.isStep(GameState.WAITING)) {
 			/** On le met en spec **/
-			this.plugin.getGameTask().setSpectator(player, false);
+			this.plugin.setSpectator(player, false);
 			EntityUtils.resetPlayer(player, GameMode.SPECTATOR);
 			
 			/** On le tp + fly **/ 
