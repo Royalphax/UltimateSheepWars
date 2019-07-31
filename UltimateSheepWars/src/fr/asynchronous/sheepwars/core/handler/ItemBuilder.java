@@ -143,7 +143,7 @@ public class ItemBuilder {
 	}
 
 	public ItemBuilder setUnbreakable() {
-		SheepWarsPlugin.getVersionManager().getNMSUtils().setUnbreakable(this.is.getItemMeta(), true);
+		this.is.setItemMeta(SheepWarsPlugin.getVersionManager().getNMSUtils().setUnbreakable(this.is.getItemMeta(), true));
 		return this;
 	}
 	

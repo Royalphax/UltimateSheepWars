@@ -1,6 +1,6 @@
 name: UltimateSheepWars
 author: Asynchronous
-version: 4.7.6
+version: 4.8.1
 main: fr.asynchronous.sheepwars.core.SheepWarsPlugin
 softdepend: [Vault]
 website: http://roytreo28.ddns.net/asynchronous
