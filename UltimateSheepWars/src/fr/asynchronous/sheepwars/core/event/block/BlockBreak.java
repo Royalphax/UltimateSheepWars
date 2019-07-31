@@ -1,5 +1,6 @@
 package fr.asynchronous.sheepwars.core.event.block;
 
+import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockBreakEvent;
 
@@ -17,6 +18,9 @@ public class BlockBreak extends UltimateSheepWarsEventListener {
 	public void onBlockBreak(final BlockBreakEvent event) {
 		if (GameState.isStep(GameState.WAITING) && !Permissions.USW_BUILDER.hasPermission(event.getPlayer(), true)) {
 			event.setCancelled(true);
+			return;
 		}
+		event.setCancelled(true);
+		event.getBlock().setType(Material.AIR);
 	}
 }

@@ -28,7 +28,7 @@ public class DestroyerKit extends SheepWarsKit {
 
 	public static final Integer ID = 4;
 	public static final Integer TNT_COUNT = 2;
-	public static final Integer PERCENTAGE_TO_FIRE = 50;
+	public static final Integer PERCENTAGE_TO_FIRE = 5;
 
 	public DestroyerKit() {
 		super(ID, Messages.KIT_DESTROYER_NAME, new ItemBuilder(Material.TNT), new DestroyerKitLevel());
