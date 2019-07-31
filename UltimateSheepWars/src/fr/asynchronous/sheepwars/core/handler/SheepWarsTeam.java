@@ -129,7 +129,7 @@ public enum SheepWarsTeam {
 		List<Location> spawns = SheepWarsPlugin.getWorldManager().getVoteResult().getTeamSpawns(this).getBukkitLocations();
 		if (spawns.isEmpty())
 			return ConfigManager.getLocation(Field.LOBBY).toBukkitLocation();
-		if (spawns.size() >= this.lastSpawn)
+		if (this.lastSpawn >= spawns.size())
 			this.lastSpawn = 0;
 		return spawns.get(this.lastSpawn++);
 	}
