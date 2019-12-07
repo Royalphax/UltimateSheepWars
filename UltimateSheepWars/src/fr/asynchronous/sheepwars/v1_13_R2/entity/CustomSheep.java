@@ -115,7 +115,7 @@ public class CustomSheep extends EntitySheep {
 	 */
 	@Override
 	public void a(float sideMot, float forMot, float f2) {
-		if (this.sheep != null && this.sheep.getAbilities().contains(SheepAbility.RIDEABLE) && this.onGround && this.passengers.size() == 1) {
+		if (this.sheep != null && this.sheep.getAbilities().contains(SheepAbility.CONTROLLABLE) && this.onGround && this.passengers.size() == 1) {
 			final Entity passenger = this.passengers.get(0);
 			if (passenger == null || !(passenger instanceof EntityHuman)) {
 				super.a(sideMot, forMot, f2);

@@ -31,7 +31,7 @@ public class ParticleSpawner implements IParticleSpawner {
 			} catch (Exception ex) {
 				if (!reportedError) {
 					reportedError = true;
-					new ExceptionManager(ex).register(true);
+					ExceptionManager.register(ex, true);
 				}
 				// Do nothing
 			}
@@ -46,7 +46,7 @@ public class ParticleSpawner implements IParticleSpawner {
 		} catch (Exception ex) {
 			if (!reportedError) {
 				reportedError = true;
-				new ExceptionManager(ex).register(true);
+				ExceptionManager.register(ex, true);
 			}
 			// Do nothing
 		}

@@ -151,6 +151,7 @@ mysql:
   host: localhost
   port: 3306
   database: sheepwars
+  table: players
   user: root
   pass: root
 #If database was enabled, put the amount of players to show in the ranking.

@@ -10,7 +10,7 @@ import fr.asynchronous.sheepwars.core.handler.Particles.ParticleEffect;
 
 public enum Contributor {
 	
-	//ROYALPHA("Royalpha", "711e5a53-14a1-409b-bf48-7e8c1cc22440", ChatColor.RED + "Lead-Developer " + ChatColor.YELLOW, 4, ParticleEffect.FLAME_RINGS, "Effet actif: " + ChatColor.GREEN + "Flame Rings"),
+	ROYALPHA("Royalpha", "711e5a53-14a1-409b-bf48-7e8c1cc22440", ChatColor.RED + "Lead-Developer " + ChatColor.YELLOW, 4, ParticleEffect.FLAME_RINGS, "Effet actif: " + ChatColor.GREEN + "Flame Rings"),
 	DROLEUR("Droleur", "da6610cb-3f5b-4638-aaf7-e6bb8fa1c22a", ChatColor.LIGHT_PURPLE + "Contributor " + ChatColor.YELLOW, 3, ParticleEffect.WITCH_SPIRAL, "Effet actif: " + ChatColor.GREEN + "Witch Spiral"),
 	KINGRIDER26("KingRider26", "fb053956-f24e-4ef5-aa2a-747575701858", ChatColor.RED + "Co-Developer " + ChatColor.YELLOW, 3, ParticleEffect.SHADOW_WALK, "Salut bg! Amuses-toi bien."),
 	FINOWAY("Finoway", "aa42d5e0-a244-4da8-84df-95138f8e7371", "", 1, ParticleEffect.FLAME_SPIRAL, "Salut Finoway! Tu m'as bien aidé pour le plugin, je te remercie en t'offrant un effet de particule."),
@@ -81,21 +81,7 @@ public enum Contributor {
 	
 	public static Boolean isContributor(Player player)
 	{
-		if (Bukkit.getServer().getOnlineMode())
-		{
-			for (Contributor c : values())
-			{
-				if ((c.getUUID().toString().equals(player.getUniqueId().toString())))
-					return true;
-			}
-		} else {
-			for (Contributor c : values())
-			{
-				if ((c.getName().equals(player.getName())))
-					return true;
-			}
-		}
-		return false;
+		return getContributor(player) != null;
 	}
 	
 	public static Boolean isImportant(Player player)

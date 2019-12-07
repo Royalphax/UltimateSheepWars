@@ -32,7 +32,7 @@ public class EntityMeteor extends EntityFireball
     }
     
     public void t_() {
-        if (this.inWater) {
+        if (this.inWater || this.ticksLived > (15 * 20)) {
             this.world.createExplosion((Entity)this.shooter, this.locX, this.locY, this.locZ, impactPower, true, true);
             this.die();
         }
@@ -43,6 +43,8 @@ public class EntityMeteor extends EntityFireball
             this.motZ *= speedModifier;
             playParticles(Particles.EXPLOSION_NORMAL, this.getBukkitEntity().getLocation(), 0.0f, 0.0f, 0.0f, 1, 0.1f);
             playParticles(Particles.SMOKE_NORMAL, this.getBukkitEntity().getLocation(), 0.0f, 0.0f, 0.0f, 1, 0.2f);
+            playParticles(Particles.FLAME, this.getBukkitEntity().getLocation(), 0.0f, 0.0f, 0.0f, 1, 0.2f);
+            playParticles(Particles.CLOUD, this.getBukkitEntity().getLocation(), 0.0f, 0.0f, 0.0f, 1, 0.0f);
         }
     }
     

@@ -451,25 +451,15 @@ public class PlayerData extends DataManager {
 	@Override
 	public void loadData(final OfflinePlayer player) {
 		if (connectedToDatabase) {
+			final String table = ConfigManager.getString(Field.MYSQL_TABLE);
 			new Thread(() -> {
+				// Check validity
+				checkConnection();
 				// Select identifier
-				String identifier = "name='" + this.name + "'";
-				if (Bukkit.getServer().getOnlineMode()) {
-					try {
-						ResultSet resIdentifier = database.querySQL("SELECT * FROM players WHERE " + identifier);
-						if (resIdentifier.first()) {
-							byte[] uuidBin = resIdentifier.getBytes("uuid");
-							if (!Utils.bytesToHex(uuidBin).split("")[12].equals("3")) { // Online UUID
-								identifier = "uuid=UNHEX('" + this.uid + "')"; // Dans ce cas on peut se baser sur l'UUID
-							}
-						}
-					} catch (ClassNotFoundException | SQLException e) {
-						e.printStackTrace();
-					}
-				}
+				String identifier = getIdentifier();
 				// Manage data
 				try {
-					ResultSet res = database.querySQL("SELECT * FROM players WHERE " + identifier);
+					ResultSet res = database.querySQL("SELECT * FROM " + table + " WHERE " + identifier);
 					if (res.first()) {
 						setDeaths(res.getInt("deaths"));
 						setGames(res.getInt("games"));
@@ -524,44 +514,54 @@ public class PlayerData extends DataManager {
 	}
 
 	@Override
-	public void uploadData(final OfflinePlayer player, final boolean closeConnection) {
+	public void uploadData(final OfflinePlayer player) {
 		if (connectedToDatabase) {
+			final String table = ConfigManager.getString(Field.MYSQL_TABLE);
 			Bukkit.getLogger().info("[UltimateSheepWars] Uploading data for " + player.getName() + " ...");
+			if (!uploadingData.contains(this))
+				uploadingData.add(this);
 			new Thread(() -> {
+				// Check validity
+				checkConnection();
 				// Select identifier
-				String identifier = "name='" + this.name + "'";
+				String identifier = getIdentifier();
 				String uuid = "UNHEX('" + this.uid + "')";
-				if (Bukkit.getServer().getOnlineMode()) {
-					try {
-						ResultSet resIdentifier = database.querySQL("SELECT * FROM players WHERE " + identifier);
-						if (resIdentifier.first()) {
-							byte[] uuidBin = resIdentifier.getBytes("uuid");
-							if (!Utils.bytesToHex(uuidBin).split("")[12].equals("3")) { // Online UUID
-								identifier = "uuid=UNHEX('" + this.uid + "')"; // Dans ce cas on peut se baser sur l'UUID
-							}
-						}
-					} catch (ClassNotFoundException | SQLException e) {
-						e.printStackTrace();
-					}
-				}
 				// Manage data
 				try {
-					ResultSet res = database.querySQL("SELECT * FROM players WHERE " + identifier);
+					ResultSet res = database.querySQL("SELECT * FROM " + table + " WHERE " + identifier);
 					if (res.first()) {
-						database.updateSQL("UPDATE players SET uuid=" + uuid + ", name='" + this.name + "', wins=" + this.wins + ", kills=" + this.kills + ", deaths=" + this.deaths + ", games=" + this.games + ", sheep_thrown=" + this.sheepThrown + ", sheep_killed=" + this.sheepKilled + ", total_time=" + this.totalTime + ", particles=" + (this.particle ? "1" : "0") + (ConfigManager.getBoolean(Field.ENABLE_ALL_KITS) ? "" : ", kits='" + getKitsString() + "'") + ", updated_at=NOW() WHERE " + identifier);
+						database.updateSQL("UPDATE " + table + " SET uuid='" + uuid + "', name='" + this.name + "', wins=" + this.wins + ", kills=" + this.kills + ", deaths=" + this.deaths + ", games=" + this.games + ", sheep_thrown=" + this.sheepThrown + ", sheep_killed=" + this.sheepKilled + ", total_time=" + this.totalTime + ", particles=" + (this.particle ? "1" : "0") + (ConfigManager.getBoolean(Field.ENABLE_ALL_KITS) ? "" : ", kits='" + getKitsString() + "'") + ", updated_at=NOW() WHERE " + identifier);
 					} else {
-						database.updateSQL("INSERT INTO players(name, uuid, wins, kills, deaths, games, sheep_thrown, sheep_killed, total_time, particles, kits, created_at, updated_at) VALUES('" + this.name + "', " + uuid + ", " + this.wins + ", " + this.kills + ", " + this.deaths + ", " + this.games + ", " + this.sheepThrown + ", " + this.sheepKilled + ", " + this.totalTime + ", " + (this.particle ? "1" : "0") + ", '" + (ConfigManager.getBoolean(Field.ENABLE_ALL_KITS) ? "" : getKitsString()) + "', NOW(), NOW())");
+						database.updateSQL("INSERT INTO " + table + "(name, uuid, wins, kills, deaths, games, sheep_thrown, sheep_killed, total_time, particles, kits, created_at, updated_at) VALUES('" + this.name + "', '" + uuid + "', " + this.wins + ", " + this.kills + ", " + this.deaths + ", " + this.games + ", " + this.sheepThrown + ", " + this.sheepKilled + ", " + this.totalTime + ", " + (this.particle ? "1" : "0") + ", '" + (ConfigManager.getBoolean(Field.ENABLE_ALL_KITS) ? "" : getKitsString()) + "', NOW(), NOW())");
 					}
 					res.close();
 				} catch (ClassNotFoundException | SQLException ex) {
 					ExceptionManager.register(ex, true);
 				} finally {
-					if (closeConnection) {
-						closeConnection();
-					}
+					if (uploadingData.contains(this))
+						uploadingData.remove(this);
 				}
 			}).start();
 		}
+	}
+	
+	public String getIdentifier() {
+		String identifier = "name='" + this.name + "'";
+		if (Bukkit.getServer().getOnlineMode()) {
+			try {
+				ResultSet resIdentifier = database.querySQL("SELECT * FROM players WHERE " + identifier);
+				if (resIdentifier.first()) {
+					String uuidStr = resIdentifier.getString("uuid");
+					if (!uuidStr.split("")[12].equals("3")) { // Online UUID
+						identifier = "uuid='" + uuidStr + "'"; // Dans ce cas on peut se baser sur l'UUID
+					}
+				}
+				resIdentifier.close();
+			} catch (ClassNotFoundException | SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		return identifier;
 	}
 
 	public static List<OfflinePlayer> getParticlePlayers() {

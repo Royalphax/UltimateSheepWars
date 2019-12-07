@@ -15,7 +15,7 @@ public interface INMSUtils {
 	
 	public ItemStack setIllegallyGlowing(final ItemStack item, boolean activate);
 	
-	public void setUnbreakable(final ItemMeta meta, final boolean bool);
+	public ItemMeta setUnbreakable(final ItemMeta meta, final boolean bool);
 	
 	public void setHealth(final LivingEntity ent, final Double health);
 	

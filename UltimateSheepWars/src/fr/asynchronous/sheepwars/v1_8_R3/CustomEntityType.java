@@ -12,6 +12,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Fireball;
 import org.bukkit.entity.Player;
 
+import fr.asynchronous.sheepwars.core.manager.ExceptionManager;
 import fr.asynchronous.sheepwars.core.util.MathUtils;
 import fr.asynchronous.sheepwars.core.util.ReflectionUtils;
 import fr.asynchronous.sheepwars.core.version.ICustomEntityType;
@@ -104,7 +105,7 @@ public enum CustomEntityType {
 								if (entity.getNMSClass().equals(meta.b))
 									meta.b = entity.getCustomClass();
 					} catch (Exception e) {
-						e.printStackTrace();
+						ExceptionManager.register(e, true);
 					}
 			}
 		}
@@ -118,13 +119,13 @@ public enum CustomEntityType {
 				try {
 					((Map) getPrivateStatic(EntityTypes.class, "c")).remove(entity.getCustomClass());
 				} catch (Exception e) {
-					e.printStackTrace();
+					ExceptionManager.register(e, true);
 				}
 
 				try {
 					((Map) getPrivateStatic(EntityTypes.class, "e")).remove(entity.getCustomClass());
 				} catch (Exception e) {
-					e.printStackTrace();
+					ExceptionManager.register(e, true);
 				}
 			}
 
@@ -132,7 +133,7 @@ public enum CustomEntityType {
 				try {
 					a(entity.getNMSClass(), entity.getName(), entity.getID());
 				} catch (Exception e) {
-					e.printStackTrace();
+					ExceptionManager.register(e, true);
 				}
 
 			BiomeBase[] biomes;
@@ -160,7 +161,7 @@ public enum CustomEntityType {
 								if (entity.getCustomClass().equals(meta.b))
 									meta.b = entity.getNMSClass();
 					} catch (Exception e) {
-						e.printStackTrace();
+						ExceptionManager.register(e, true);
 					}
 			}
 		}
@@ -193,7 +194,7 @@ public enum CustomEntityType {
 			((Map<Class<?>, Integer>) getPrivateStatic(EntityTypes.class, "f")).put(paramClass, paramInt);
 			((Map<String, Integer>) getPrivateStatic(EntityTypes.class, "g")).put(paramString, paramInt);
 		} catch (Exception e) {
-			e.printStackTrace();
+			ExceptionManager.register(e, true);
 		}
 	}
 }

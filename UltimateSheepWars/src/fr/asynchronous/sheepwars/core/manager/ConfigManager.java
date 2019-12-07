@@ -65,6 +65,7 @@ public class ConfigManager {
 		MYSQL_HOST("mysql.host", FieldType.STRING, "localhost"),
 		MYSQL_PORT("mysql.port", FieldType.INT, 3306),
 		MYSQL_DATABASE("mysql.database", FieldType.STRING, "sheepwars"),
+		MYSQL_TABLE("mysql.table", FieldType.STRING, "players"),
 		MYSQL_USER("mysql.user", FieldType.STRING, "root"),
 		MYSQL_PASSWORD("mysql.pass", FieldType.STRING, "root"),
 		RANKING_TOP("ranking-top", FieldType.INT, 10),

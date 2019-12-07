@@ -6,6 +6,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 import fr.asynchronous.sheepwars.core.SheepWarsPlugin;
+import fr.asynchronous.sheepwars.core.data.DataManager;
 import fr.asynchronous.sheepwars.core.data.PlayerData;
 import fr.asynchronous.sheepwars.core.event.UltimateSheepWarsEventListener;
 import fr.asynchronous.sheepwars.core.handler.GameState;
@@ -32,6 +33,10 @@ public class PlayerQuit extends UltimateSheepWarsEventListener {
             	for (Player online : Bukkit.getOnlinePlayers())
             		online.sendMessage(Message.getMessage(online, Messages.DIED_MESSAGE).replace("%VICTIM%", data.getTeam().getColor() + player.getName()));
         	}
+        }
+        
+        if (DataManager.isConnected()) {
+        	data.uploadData(data.getOfflinePlayer());
         }
         
         /** On supprime le joueur **/

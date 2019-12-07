@@ -19,8 +19,10 @@ import fr.asynchronous.sheepwars.core.version.ICustomEntityType;
 import fr.asynchronous.sheepwars.v1_10_R1.entity.CustomSheep;
 import fr.asynchronous.sheepwars.v1_10_R1.entity.EntityMeteor;
 import fr.asynchronous.sheepwars.v1_10_R1.entity.firework.FireworkSpawner;
+import fr.asynchronous.sheepwars.v1_10_R1.entity.EntityCancelMove;
 import net.minecraft.server.v1_10_R1.BiomeBase;
 import net.minecraft.server.v1_10_R1.BiomeBase.BiomeMeta;
+import net.minecraft.server.v1_10_R1.EntityArmorStand;
 import net.minecraft.server.v1_10_R1.Biomes;
 import net.minecraft.server.v1_10_R1.EntityFireball;
 import net.minecraft.server.v1_10_R1.EntityInsentient;
@@ -29,10 +31,12 @@ import net.minecraft.server.v1_10_R1.EntityTypes;
 
 public enum CustomEntityType
 {
-    @SuppressWarnings({ "unchecked", "rawtypes" })
-	SHEEP("Sheep", 91, EntityType.SHEEP, (Class)EntitySheep.class, (Class)CustomSheep.class),
-    @SuppressWarnings({ "unchecked", "rawtypes" })
-	METEOR("Fireball", 12, EntityType.FIREBALL, (Class)EntityFireball.class, (Class)EntityMeteor.class);
+	@SuppressWarnings({"unchecked", "rawtypes"})
+	SHEEP("Sheep", 91, EntityType.SHEEP, (Class) EntitySheep.class, (Class) CustomSheep.class),
+	@SuppressWarnings({"unchecked", "rawtypes"})
+	CANCEL_MOVE("ArmorStand", 30, EntityType.ARMOR_STAND, (Class) EntityArmorStand.class, (Class) EntityCancelMove.class),
+	@SuppressWarnings({"unchecked", "rawtypes"})
+	METEOR("Fireball", 12, EntityType.FIREBALL, (Class) EntityFireball.class, (Class) EntityMeteor.class);
     
     private String name;
     private int id;
@@ -80,7 +84,7 @@ public enum CustomEntityType
             try {
 				biomes = new BiomeBase[] { Biomes.a, Biomes.c, Biomes.d, Biomes.e, Biomes.f, Biomes.g, Biomes.h, Biomes.i, Biomes.j, Biomes.k, Biomes.l, Biomes.m, Biomes.n, Biomes.o, Biomes.p, Biomes.q, Biomes.r, Biomes.s, Biomes.t, Biomes.u, Biomes.v, Biomes.w, Biomes.x, Biomes.y, Biomes.z, Biomes.A, Biomes.B, Biomes.C, Biomes.D, Biomes.E, Biomes.F, Biomes.G, Biomes.H, Biomes.I, Biomes.J, Biomes.K, Biomes.L, Biomes.M, Biomes.N, Biomes.O, Biomes.P, Biomes.Q, Biomes.R, Biomes.S, Biomes.T, Biomes.U, Biomes.V, Biomes.W, Biomes.X, Biomes.Y, Biomes.Z, Biomes.aa, Biomes.ab, Biomes.ac, Biomes.ad, Biomes.ae, Biomes.af, Biomes.ag, Biomes.ah, Biomes.ai, Biomes.aj, Biomes.ak};
 	        } catch (Exception e) {
-	        	new ExceptionManager(e).register(true);
+	        	ExceptionManager.register(e, true);
 				return;
 			}
             for (BiomeBase biomeBase : biomes) {
@@ -101,7 +105,7 @@ public enum CustomEntityType
                                 if (entity.getNMSClass().equals(meta.b))
                                     meta.b = entity.getCustomClass();
                     } catch (Exception e) {
-                    	new ExceptionManager(e).register(true);
+                    	ExceptionManager.register(e, true);
                     }
             }
         }
@@ -112,13 +116,13 @@ public enum CustomEntityType
                 try {
                     ((Map) getPrivateStatic(EntityTypes.class, "c")).remove(entity.getCustomClass());
                 } catch (Exception e) {
-                	new ExceptionManager(e).register(true);
+                	ExceptionManager.register(e, true);
                 }
 
                 try {
                     ((Map) getPrivateStatic(EntityTypes.class, "e")).remove(entity.getCustomClass());
                 } catch (Exception e) {
-                	new ExceptionManager(e).register(true);
+                	ExceptionManager.register(e, true);
                 }
             }
 
@@ -126,14 +130,14 @@ public enum CustomEntityType
                 try {
                     a(entity.getNMSClass(), entity.getName(), entity.getID());
                 } catch (Exception e) {
-                	new ExceptionManager(e).register(true);
+                	ExceptionManager.register(e, true);
                 }
 
             BiomeBase[] biomes;
             try {
 				biomes = new BiomeBase[] { Biomes.a, Biomes.c, Biomes.d, Biomes.e, Biomes.f, Biomes.g, Biomes.h, Biomes.i, Biomes.j, Biomes.k, Biomes.l, Biomes.m, Biomes.n, Biomes.o, Biomes.p, Biomes.q, Biomes.r, Biomes.s, Biomes.t, Biomes.u, Biomes.v, Biomes.w, Biomes.x, Biomes.y, Biomes.z, Biomes.A, Biomes.B, Biomes.C, Biomes.D, Biomes.E, Biomes.F, Biomes.G, Biomes.H, Biomes.I, Biomes.J, Biomes.K, Biomes.L, Biomes.M, Biomes.N, Biomes.O, Biomes.P, Biomes.Q, Biomes.R, Biomes.S, Biomes.T, Biomes.U, Biomes.V, Biomes.W, Biomes.X, Biomes.Y, Biomes.Z, Biomes.aa, Biomes.ab, Biomes.ac, Biomes.ad, Biomes.ae, Biomes.af, Biomes.ag, Biomes.ah, Biomes.ai, Biomes.aj, Biomes.ak};
 	        } catch (Exception e) {
-	        	new ExceptionManager(e).register(true);
+	        	ExceptionManager.register(e, true);
 				return;
 			}
             for (BiomeBase biomeBase : biomes) {
@@ -155,7 +159,7 @@ public enum CustomEntityType
                                 if (entity.getCustomClass().equals(meta.b))
                                     meta.b = entity.getNMSClass();
                     } catch (Exception e) {
-                    	new ExceptionManager(e).register(true);
+                    	ExceptionManager.register(e, true);
                     }
             }
         }
@@ -188,7 +192,7 @@ public enum CustomEntityType
             ((Map<Class<?>, Integer>) getPrivateStatic(EntityTypes.class, "f")).put(paramClass, paramInt);
             ((Map<String, Integer>) getPrivateStatic(EntityTypes.class, "g")).put(paramString, paramInt);
         } catch (Exception e) {
-        	new ExceptionManager(e).register(true);
+        	ExceptionManager.register(e, true);
         }
     }
 }

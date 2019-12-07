@@ -5,12 +5,11 @@ import java.lang.reflect.Field;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
+import org.bukkit.craftbukkit.v1_12_R1.util.UnsafeList;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.util.Vector;
-
-import com.google.common.collect.Sets;
 
 import fr.asynchronous.sheepwars.core.SheepWarsPlugin;
 import fr.asynchronous.sheepwars.core.data.PlayerData;
@@ -36,10 +35,9 @@ public class CustomSheep extends EntitySheep {
 
 	private SheepWarsSheep sheep;
 	private Player player;
-	private net.minecraft.server.v1_12_R1.World world;
 	private boolean ground = false;
-	private boolean isDead = false;
 	private boolean upComingCollision = false;
+	private boolean isDead = false;
 	private long ticks;
 	private Plugin plugin;
 
@@ -57,6 +55,8 @@ public class CustomSheep extends EntitySheep {
 	@SuppressWarnings({"unchecked", "rawtypes"})
 	public CustomSheep(net.minecraft.server.v1_12_R1.World world, Player player, SheepWarsSheep sheep, Plugin plugin) {
 		this(world, player, plugin);
+		getNavigation();
+		a(0.9F, 1.3F);
 
 		this.sheep = sheep;
 		this.ticks = sheep.getDuration() <= 0 ? Long.MAX_VALUE : sheep.getDuration() * 20;
@@ -64,20 +64,20 @@ public class CustomSheep extends EntitySheep {
 		setColor(EnumColor.valueOf(sheep.getColor().toString()));
 		sheep.onSpawn(player, getBukkitSheep(), plugin);
 
-		if (sheep.getAbilities().contains(SheepAbility.FIRE_PROOF))
+		if (sheep.hasAbility(SheepAbility.FIRE_PROOF))
 			this.fireProof = true;
-		if (sheep.getAbilities().contains(SheepAbility.SEEK_PLAYERS)) {
+		if (sheep.hasAbility(SheepAbility.SEEK_PLAYERS)) {
 			try {
 				Field bField = PathfinderGoalSelector.class.getDeclaredField("b");
 				bField.setAccessible(true);
 				Field cField = PathfinderGoalSelector.class.getDeclaredField("c");
 				cField.setAccessible(true);
-				bField.set(this.goalSelector, Sets.newLinkedHashSet());
-				bField.set(this.targetSelector, Sets.newLinkedHashSet());
-				cField.set(this.goalSelector, Sets.newLinkedHashSet());
-				cField.set(this.targetSelector, Sets.newLinkedHashSet());
+				bField.set(this.goalSelector, new UnsafeList<>());
+				bField.set(this.targetSelector, new UnsafeList<>());
+				cField.set(this.goalSelector, new UnsafeList<>());
+				cField.set(this.targetSelector, new UnsafeList<>());
 			} catch (Exception e) {
-				new ExceptionManager(e).register(true);
+				ExceptionManager.register(e, true);
 			}
 			this.getNavigation();
 			this.goalSelector.a(2, new PathfinderGoalMeleeAttack(this, 1.0D, false));
@@ -138,7 +138,7 @@ public class CustomSheep extends EntitySheep {
 	 */
 	@Override
 	public void a(float sideMot, float forMot, float f2) {
-		if (this.sheep != null && this.sheep.getAbilities().contains(SheepAbility.RIDEABLE) && this.onGround && this.passengers.size() == 1) {
+		if (this.sheep != null && this.sheep.getAbilities().contains(SheepAbility.CONTROLLABLE) && this.onGround && this.passengers.size() == 1) {
 			final Entity passenger = this.passengers.get(0);
 			if (passenger == null || !(passenger instanceof EntityHuman)) {
 				super.a(sideMot, forMot, f2);
@@ -214,9 +214,8 @@ public class CustomSheep extends EntitySheep {
 						this.isDead = true;
 						boolean death = true;
 						if (!this.passengers.isEmpty())
-							for (Entity ent : this.passengers) {
+							for (Entity ent : this.passengers)
 								ent.getBukkitEntity().eject();
-							}
 						if (isAlive()) {
 							die();
 							death = false;

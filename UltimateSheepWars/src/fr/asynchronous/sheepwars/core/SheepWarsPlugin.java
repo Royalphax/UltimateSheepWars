@@ -7,7 +7,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Random;
@@ -152,10 +151,11 @@ public class SheepWarsPlugin extends JavaPlugin {
 	public static final File DATAFOLDER = new File("plugins/UltimateSheepWars/");
 
 	/** Spigot premium placeholders **/
-	public static String user_id = "%%__USER__%%";
+	public static String user_id = "83974";
 	public static String download_id = "%%__NONCE__%%";
 
 	/** Instance variables **/
+	private static SheepWarsPlugin instance;
 	private static CommandManager commandManager;
 	private static VersionManager versionManager;
 	private static AccountManager accountManager;
@@ -185,6 +185,7 @@ public class SheepWarsPlugin extends JavaPlugin {
 	private World world;
 
 	public SheepWarsPlugin() {
+		instance = this;
 		this.enablePlugin = true;
 		this.isConfigured = false;
 		this.disableMessage = "";
@@ -466,15 +467,11 @@ public class SheepWarsPlugin extends JavaPlugin {
 	@Override
 	public void onDisable() {
 		if (DataManager.isConnected()) {
-			Iterator<PlayerData> iterator = PlayerData.getDatas().iterator();
-			while (iterator.hasNext()) {
-				final PlayerData data = iterator.next();
-				boolean closeConn = !iterator.hasNext();
-				data.uploadData(data.getOfflinePlayer(), closeConn);
-				if (closeConn) {
-					getLogger().info("Everything done! Database connection closed.");
-				}
+			while (DataManager.isUploadingData()) {
+				// DO nothing
 			}
+			DataManager.closeConnection();
+			getLogger().info("Database connection closed.");
 		}
 		if (this.enablePlugin) {
 			for (PlayableMap map : PlayableMap.getPlayableMaps())
@@ -728,5 +725,9 @@ public class SheepWarsPlugin extends JavaPlugin {
 
 	public void setGameTask(GameTask task) {
 		this.gameTask = task;
+	}
+	
+	public static SheepWarsPlugin getInstance() {
+		return instance;
 	}
 }
