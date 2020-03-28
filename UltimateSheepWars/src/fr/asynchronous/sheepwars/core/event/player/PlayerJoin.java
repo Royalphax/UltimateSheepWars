@@ -137,13 +137,12 @@ public class PlayerJoin extends UltimateSheepWarsEventListener {
 							sendAction(player, data.getLanguage().getMessage(Messages.DATABASE_NOT_CONNECTED));
 						}
 						String locale = event.getPlayer().spigot().getLocale();
-						if (ConfigManager.getBoolean(Field.AUTO_GENERATE_LANGUAGES)) {
+						if (ConfigManager.getBoolean(Field.AUTO_GENERATE_LANGUAGES) && plugin.isConfigured()) {
 							data.setLanguage(Language.getLanguage(locale));
 						} else {
 							player.sendMessage(ChatColor.GRAY + data.getLanguage().getIntro());
-						}
-						if (plugin.isConfigured())
 							data.getLanguage().equipPlayer(player);
+						}
 						sendTitle(player, data.getLanguage().getMessage(Messages.JOIN_TITLE).replace("%ONLINE_PLAYERS%", Bukkit.getOnlinePlayers().size() + "").replace("%MAX_PLAYERS%", Bukkit.getMaxPlayers() + ""), data.getLanguage().getMessage(Messages.JOIN_SUBTITLE));
 					}
 				}

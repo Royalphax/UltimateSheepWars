@@ -43,6 +43,7 @@ public class EquipSelectionItemsEvent extends Event {
 	public void equip() {
 		if (!this.isCancelled) {
 			final PlayerInventory inv = this.player.getInventory();
+			inv.clear();
 			for (Entry<Integer, ItemStack> items : this.items.entrySet()) {
 				Integer slot = items.getKey();
 				ItemStack item = items.getValue();

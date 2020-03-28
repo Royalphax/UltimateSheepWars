@@ -65,7 +65,7 @@ public class Message {
 	}
 
 	public String uncolorized() {
-		return this.msg.replaceAll("§", "&");
+		return this.msg.replaceAll("Â§", "&");
 	}
 
 	public static String getRaw(String input) {
@@ -155,7 +155,7 @@ public class Message {
 	public static String getMessage(Player player, Messages msgEnum) {
 		PlayerData data = PlayerData.getPlayerData(player);
 		Message msg = getMessage(msgEnum);
-		return (msg != null ? data.getLanguage().getMessage(msg) : "ERROR MESSAGE NOT LOAD - PLEASE CONTACT THE DEVELOPER");
+		return (msg != null ? data.getLanguage().getMessage(msg) : "MESSAGE NOT LOADED");
 	}
 
 	public static Message getMessage(Messages msgEnum) {
@@ -187,7 +187,7 @@ public class Message {
 
 		JOIN_TITLE("&6UltimateSheepWars&8: &e%ONLINE_PLAYERS%&7/&e%MAX_PLAYERS%"),
 		JOIN_SUBTITLE("&aChoose your team and kit"),
-		BOARDING_TITLE("&5☠ &fAway boarders &5☠"),
+		BOARDING_TITLE("&5☠ &fAway boarders &5☠"),
 		BOARDING_SUBTITLE("&6One boarding sheep every minute !"),
 		BOOSTERS_MESSAGE("&5&k||&a Bonus Wool &5&k||&6 Hit magical blocks !"),
 		FINISH_EQUALITY(getDecoration() + ChatColor.AQUA + ChatColor.BOLD + " Equality " + getDecoration()),
@@ -325,8 +325,8 @@ public class Message {
 		GAME_START_TITLE("&bThe game is starting !"),
 		GAME_START_SUBTITLE("&6One sheep every &a%TIME% &6seconds"),
 		GHOST_MESSAGE("&7You're a &fghost"),
-		PARTICLES_ON("&6Particles » &aActivated &7(Right-Click)"),
-		PARTICLES_OFF("&6Particles » &cDeactivated &7(Right-Click)"),
+		PARTICLES_ON("&6Particles Â» &aActivated &7(Right-Click)"),
+		PARTICLES_OFF("&6Particles Â» &cDeactivated &7(Right-Click)"),
 		CANT_JOIN_FULL_TEAM("&cUnable to join this team, too many players!"),
 		PLAYERS_DEFICIT("&cThere's not enough players."),
 		LEAVE_ITEM("&6Back to Hub &7(Right-Click)"),

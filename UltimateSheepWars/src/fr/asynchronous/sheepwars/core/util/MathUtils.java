@@ -122,6 +122,15 @@ public final class MathUtils {
 	public static boolean isPowerOfTwo(final int value) {
 		return value != 0 && (value & value - 1) == 0x0;
 	}
+	
+	public static boolean isInteger(String s) {
+		try {
+			Integer.parseInt(s);
+		} catch (NumberFormatException | NullPointerException e) {
+			return false;
+		}
+		return true;
+	}
 
 	public static int clamp(final int value, final int min, final int max) {
 		if (value < min) {

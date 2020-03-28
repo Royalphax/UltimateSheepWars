@@ -119,14 +119,14 @@ public class CommandManager implements CommandExecutor {
 		if (commandSender instanceof Player) {
 			final Player player = (Player) commandSender;
 			TextComponent message1 = new TextComponent(TextComponent.fromLegacyText("∙ " + ChatColor.GRAY + "Special thanks to all the following contributors : "));
-			TextComponent hover = new TextComponent("» hover «");
+			TextComponent hover = new TextComponent("Â» hover Â«");
 			hover.setColor(net.md_5.bungee.api.ChatColor.YELLOW);
 			hover.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText(ChatColor.GRAY + "- @Royalpha (" + ChatColor.RED + "Developer" + ChatColor.GRAY + ")\n" + ChatColor.GRAY + "- @KingRider26 (" + ChatColor.RED + "Co-Developer" + ChatColor.GRAY + ")\n" + ChatColor.GRAY + "- @6985jjorda (" + ChatColor.GOLD + "English Translation" + ChatColor.GRAY + ")\n" + ChatColor.GRAY + "- @felibouille (" + ChatColor.GOLD + "German Translation" + ChatColor.GRAY + ")\n" + ChatColor.GRAY + "- @jeussa (" + ChatColor.YELLOW + "Instant Explosion Firework Effect" + ChatColor.GRAY + ")")));
 			message1.addExtra(hover);
 			player.spigot().sendMessage(message1);
 
 			TextComponent message2 = new TextComponent(TextComponent.fromLegacyText("∙ " + ChatColor.GRAY + "If you encounter any issue, come and talk to us : "));
-			TextComponent click = new TextComponent("» click «");
+			TextComponent click = new TextComponent("Â» click Â«");
 			click.setColor(net.md_5.bungee.api.ChatColor.GOLD);
 			click.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://discord.gg/nZthcPh"));
 			message2.addExtra(click);

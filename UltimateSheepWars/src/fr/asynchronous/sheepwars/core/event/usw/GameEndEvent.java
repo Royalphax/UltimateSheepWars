@@ -9,7 +9,7 @@ import org.bukkit.event.HandlerList;
 import fr.asynchronous.sheepwars.core.handler.SheepWarsTeam;
 
 /**
- * Event triggered when the game starts.
+ * Event triggered when the game ends.
  */
 public class GameEndEvent extends Event {
 

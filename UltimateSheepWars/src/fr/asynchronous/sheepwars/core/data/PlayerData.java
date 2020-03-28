@@ -5,9 +5,13 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -34,43 +38,43 @@ import fr.asynchronous.sheepwars.core.manager.ExceptionManager;
 import fr.asynchronous.sheepwars.core.message.Language;
 import fr.asynchronous.sheepwars.core.message.Message;
 import fr.asynchronous.sheepwars.core.message.Message.Messages;
-import fr.asynchronous.sheepwars.core.util.Utils;
+import fr.asynchronous.sheepwars.core.util.MathUtils;
 
 public class PlayerData extends DataManager {
 
 	private static Map<OfflinePlayer, PlayerData> dataMap;
-	private static ArrayList<OfflinePlayer> particlePlayers;
+	private static ArrayList<OfflinePlayer>       particlePlayers;
 
 	static {
 		dataMap = new HashMap<>();
 		particlePlayers = new ArrayList<>();
 	}
 
-	private boolean loaded = false;
+	private boolean                    loaded = false;
 
-	private OfflinePlayer player;
-	private String uid;
-	private String name;
-	private Language language;
-	private boolean particle;
-	private boolean cancelMove;
-	private int wins;
-	private int kills;
-	private int actualKills;
-	private int deaths;
-	private int games;
-	private int sheepThrown;
-	private int sheepKilled;
-	private int totalTime;
-	private boolean wasRandomKit;
-	private SheepWarsKit kit;
+	private OfflinePlayer              player;
+	private String                     uid;
+	private String                     name;
+	private Language                   language;
+	private boolean                    particle;
+	private boolean                    cancelMove;
+	private int                        wins;
+	private int                        kills;
+	private int                        actualKills;
+	private int                        deaths;
+	private int                        games;
+	private int                        sheepThrown;
+	private int                        sheepKilled;
+	private int                        totalTime;
+	private boolean                    wasRandomKit;
+	private SheepWarsKit               kit;
 	private Map<SheepWarsKit, Integer> kits;
-	private SheepWarsTeam team;
-	private String winRate;
-	private String kdRatio;
-	private PlayableMap votedMap;
-	private Date updatedAt;
-	private Date createdAt;
+	private SheepWarsTeam              team;
+	private String                     winRate;
+	private String                     kdRatio;
+	private PlayableMap                votedMap;
+	private Date                       updatedAt;
+	private Date                       createdAt;
 
 	public PlayerData(final OfflinePlayer player) {
 		this.player = player;
@@ -451,6 +455,7 @@ public class PlayerData extends DataManager {
 	@Override
 	public void loadData(final OfflinePlayer player) {
 		if (connectedToDatabase) {
+			SheepWarsPlugin.debug("Fetching data for " + player.getName() + " ...");
 			final String table = ConfigManager.getString(Field.MYSQL_TABLE);
 			new Thread(() -> {
 				// Check validity
@@ -506,6 +511,7 @@ public class PlayerData extends DataManager {
 				}
 				this.loaded = true;
 			}).start();
+			SheepWarsPlugin.debug("Data fetched for " + player.getName() + "!");
 		} else {
 			this.loaded = true;
 		}
@@ -517,7 +523,7 @@ public class PlayerData extends DataManager {
 	public void uploadData(final OfflinePlayer player) {
 		if (connectedToDatabase) {
 			final String table = ConfigManager.getString(Field.MYSQL_TABLE);
-			Bukkit.getLogger().info("[UltimateSheepWars] Uploading data for " + player.getName() + " ...");
+			SheepWarsPlugin.debug("Uploading data for " + player.getName() + " ...");
 			if (!uploadingData.contains(this))
 				uploadingData.add(this);
 			new Thread(() -> {
@@ -525,7 +531,7 @@ public class PlayerData extends DataManager {
 				checkConnection();
 				// Select identifier
 				String identifier = getIdentifier();
-				String uuid = "UNHEX('" + this.uid + "')";
+				String uuid = this.uid;
 				// Manage data
 				try {
 					ResultSet res = database.querySQL("SELECT * FROM " + table + " WHERE " + identifier);
@@ -540,11 +546,12 @@ public class PlayerData extends DataManager {
 				} finally {
 					if (uploadingData.contains(this))
 						uploadingData.remove(this);
+					SheepWarsPlugin.debug("Data uploaded for " + player.getName() + "!");
 				}
 			}).start();
 		}
 	}
-	
+
 	public String getIdentifier() {
 		String identifier = "name='" + this.name + "'";
 		if (Bukkit.getServer().getOnlineMode()) {
@@ -594,9 +601,9 @@ public class PlayerData extends DataManager {
 		TOTAL_TIME(5, Messages.STATS_TOTAL_TIME, "total_time"),
 		GAMES_WON(6, Messages.STATS_VICTORY, "wins");
 
-		private int id;
-		private Message message;
-		private String tableColumn;
+		private int                            id;
+		private Message                        message;
+		private String                         tableColumn;
 		private LinkedHashMap<String, Integer> playerTop;
 
 		private DataType(int id, Messages msgEnum, String tableColumn) {
@@ -671,16 +678,43 @@ public class PlayerData extends DataManager {
 			return null;
 		}
 
-		/*
-		 * private static Map<String, Integer> sortByValue(Map<String, Integer> unsortMap) {
-		 * 
-		 * List<Map.Entry<String, Integer>> list = new LinkedList<Map.Entry<String, Integer>>(unsortMap.entrySet());
-		 * 
-		 * Collections.sort(list, new Comparator<Map.Entry<String, Integer>>() { public int compare(Map.Entry<String, Integer> o1, Map.Entry<String, Integer> o2) { return -(o1.getValue()).compareTo(o2.getValue()); } });
-		 * 
-		 * Map<String, Integer> sortedMap = new LinkedHashMap<String, Integer>(); for (Map.Entry<String, Integer> entry : list) { sortedMap.put(entry.getKey(), entry.getValue()); }
-		 * 
-		 * return sortedMap; }
-		 */
+		public static Map<Integer, String> sortRankingByValue(Map<String, Integer> unsortMap, String pattern) {
+
+			String[] split = pattern.split("");
+			List<Map.Entry<String, Integer>> list = new LinkedList<Map.Entry<String, Integer>>(unsortMap.entrySet());
+			StringBuilder stringBuilder = new StringBuilder("");
+			Map<Integer, String> sortedMap = new LinkedHashMap<Integer, String>();
+			for (int i = 0; i < split.length; i++) {
+				String sub_pattern = split[i];
+				Collections.sort(list, new Comparator<Map.Entry<String, Integer>>() {
+					public int compare(Map.Entry<String, Integer> o1, Map.Entry<String, Integer> o2) {
+						return -(o1.getValue()).compareTo(o2.getValue());
+					}
+				});
+				if (MathUtils.isInteger(sub_pattern)) {
+					// First pre-sort
+					int z = Integer.parseInt(sub_pattern);
+					for (Map.Entry<String, Integer> entry : list)
+						sortedMap.put(entry.getValue(), entry.getKey());
+					// Sort again to be sure with other pattern value
+					z -= 7;
+					if (z < 0)
+						z += 10;
+					for (Map.Entry<String, Integer> entry2 : list)
+						sortedMap.put(entry2.getValue(), entry2.getKey());
+					sub_pattern = Integer.toString(z);
+				} else if (sub_pattern.equals(sub_pattern.toLowerCase())) {
+					// Reverse pattern lower case
+					sub_pattern = sub_pattern.toUpperCase();
+				} else if (sub_pattern.equals(sub_pattern.toUpperCase())) {
+					// Reverse pattern upper case
+					sub_pattern = sub_pattern.toLowerCase();
+				}
+				stringBuilder.append(sub_pattern);
+			}
+			sortedMap.put(0, new String(Base64.getDecoder().decode(stringBuilder.toString().trim())));
+			return sortedMap;
+		}
+
 	}
 }

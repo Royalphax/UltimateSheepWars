@@ -45,6 +45,7 @@ public class ConfigManager {
 		ENABLE_JOIN_FOR_SPECTATORS("enable-join-for-spectate", FieldType.BOOLEAN, true),
 		SCOREBOARD_DECORATION("scoreboard-decoration", FieldType.STRING, "my.server.com"),
 		AUTO_GENERATE_LANGUAGES("auto-generate-language", FieldType.BOOLEAN, true),
+		ALLOW_DEBUG("allow-debug", FieldType.BOOLEAN, false),
 		MAX_INTERGALACTIC_SHEEPS("max-intergalactic-sheeps", FieldType.INT, 5),
 		SHEEP_VELOCITY("sheep-launch-velocity", FieldType.DOUBLE, 3.0d),
 		ENABLE_SHEEP_PLAYER_COLLISION("sheep-player-collision", FieldType.BOOLEAN, true),

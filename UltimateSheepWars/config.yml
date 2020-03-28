@@ -69,6 +69,10 @@ scoreboard-decoration: 'my.server.com'
 #it will create a new one.
 auto-generate-language: true
 #
+#Do you want to show any activity of the plugin in the logs ?
+#Useful if you found a bug and want to report it to the developer.
+allow-debug: false
+#
 #===============# Sheep settings #===============#
 #
 #The power when you launch sheep (depending on your map size to launch the sheep from one side to another)

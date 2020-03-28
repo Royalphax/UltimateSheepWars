@@ -730,4 +730,9 @@ public class SheepWarsPlugin extends JavaPlugin {
 	public static SheepWarsPlugin getInstance() {
 		return instance;
 	}
+	
+	public static void debug(String message) {
+		if (ConfigManager.getBoolean(Field.ALLOW_DEBUG))
+			getInstance().getLogger().info("[Debug] " + message);
+	}
 }

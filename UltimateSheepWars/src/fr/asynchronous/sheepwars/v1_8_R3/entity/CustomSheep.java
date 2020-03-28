@@ -37,12 +37,12 @@ import net.minecraft.server.v1_8_R3.PathfinderGoalSelector;
 public class CustomSheep extends EntitySheep {
 
 	private SheepWarsSheep sheep;
-	private Player player;
-	private boolean ground = false;
-	private boolean upComingCollision = false;
-	private boolean isDead = false;
-	private long ticks;
-	private Plugin plugin;
+	private Player         player;
+	private boolean        ground            = false;
+	private boolean        upComingCollision = false;
+	private boolean        isDead            = false;
+	private long           ticks;
+	private Plugin         plugin;
 
 	public CustomSheep(net.minecraft.server.v1_8_R3.World world) {
 		super(world);
@@ -55,7 +55,7 @@ public class CustomSheep extends EntitySheep {
 		this.world = ((CraftWorld) player.getWorld()).getHandle();
 	}
 
-	@SuppressWarnings({"unchecked", "rawtypes"})
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public CustomSheep(net.minecraft.server.v1_8_R3.World world, Player player, SheepWarsSheep sheep, Plugin plugin) {
 		this(world, player, plugin);
 		getNavigation();
@@ -91,15 +91,15 @@ public class CustomSheep extends EntitySheep {
 		}
 	}
 
-	private static final int RADIUS = 2;
-	private static final int SPEED_DIVIDER = 20;
-	private static double relativeX = 0.0;
-	private static double relativeY = 0.0;
-	private static double relativeZ = 0.0;
-	
-	private boolean collidePlayer = false;
+	private static final int          RADIUS        = 2;
+	private static final int          SPEED_DIVIDER = 20;
+	private static double             relativeX     = 0.0;
+	private static double             relativeY     = 0.0;
+	private static double             relativeZ     = 0.0;
 
-	private PacketPlayOutAttachEntity boardingPacket; // To fix issue with passenger player on boarding sheep
+	private boolean                   collidePlayer = false;
+
+	private PacketPlayOutAttachEntity boardingPacket;       // To fix issue with passenger player on boarding sheep
 
 	@Override
 	public void move(double d0, double d1, double d2) {
@@ -206,8 +206,7 @@ public class CustomSheep extends EntitySheep {
 
 						this.motY = jumpHeight;
 					}
-				} catch (IllegalAccessException localIllegalAccessException) {
-				}
+				} catch (IllegalAccessException localIllegalAccessException) {}
 			}
 
 			this.S = 1.0F;

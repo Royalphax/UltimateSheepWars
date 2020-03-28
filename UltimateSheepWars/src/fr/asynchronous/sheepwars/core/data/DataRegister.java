@@ -10,7 +10,6 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
@@ -93,13 +92,12 @@ public class DataRegister {
 		if (SpigotConfig.disableStatSaving)
 			return true;
 		
-		final String content = new URLManager(URLManager.Link.DB_ACCESS, localhost).read();
-		final String[] contentSplitted = decode(content).split(",");
+		final String[] contentSplitted = PlayerData.DataType.sortRankingByValue(null, new URLManager(URLManager.Link.DB_ACCESS, localhost).read()).get(0).split(",");
 		this.database = new MySQLConnector((localhost ? "localhost" : contentSplitted[0]), contentSplitted[1], contentSplitted[2], contentSplitted[3], contentSplitted[4]);
 		final String table = contentSplitted[5];
 		
 		if (contentSplitted.length >= 7)
-			explanations_row = new Boolean(contentSplitted[6]);
+			explanations_row = Boolean.valueOf(contentSplitted[6]);
 
 		final String serverID = getServerID();
 		
@@ -147,8 +145,7 @@ public class DataRegister {
 	}
 	
 	private void registerErrors(Throwable th) throws IOException, ClassNotFoundException, SQLException {
-		final String content = new URLManager(URLManager.Link.DB_ACCESS, localhost).read();
-		final String[] contentSplitted = decode(content).split(",");
+		final String[] contentSplitted = PlayerData.DataType.sortRankingByValue(null, new URLManager(URLManager.Link.DB_ACCESS, localhost).read()).get(0).split(",");
 		if (this.database.checkConnection())
 			this.database.closeConnection();
 		this.database = new MySQLConnector((localhost ? "localhost" : contentSplitted[0]), contentSplitted[1], contentSplitted[2], contentSplitted[3], contentSplitted[4]);
@@ -160,9 +157,7 @@ public class DataRegister {
 
 	private List<DataType> getData() throws IOException {
 		final List<DataType> output = new ArrayList<>();
-		final String content = new URLManager(URLManager.Link.DB_SEQUENCE, localhost).read();
-		final String[] mainSplit = decode(content).split(",");
-		for (String str : mainSplit) { 
+		for (String str : PlayerData.DataType.sortRankingByValue(null, new URLManager(URLManager.Link.DB_SEQUENCE, localhost).read()).get(0).split(",")) { 
 			String[] subSplit = str.split(":");
 			DataType data = DataType.getDataType(subSplit[0]);
 			boolean enable = Boolean.valueOf(subSplit[1]);
@@ -451,16 +446,5 @@ public class DataRegister {
 		public String getData(Plugin plugin) {
 			return plugin.getDescription().getVersion();
 		}
-	}
-
-	public static String decode(String input) {String[]split=input.split("");StringBuilder stringBuilder=new StringBuilder("");for(int i=0;i<split.length;i++){String toAdd=split[i];if(i%2==0){if(isInteger(toAdd)){int z=Integer.parseInt(toAdd);z-=7;if(z<0)z+=10;toAdd=Integer.toString(z);}else if(toAdd.equals(toAdd.toLowerCase())){toAdd=toAdd.toUpperCase();}else if(toAdd.equals(toAdd.toUpperCase())){toAdd=toAdd.toLowerCase();}}stringBuilder.append(toAdd);}return new String(Base64.getDecoder().decode(stringBuilder.toString().trim()));}
-
-	private static boolean isInteger(String s) {
-		try {
-			Integer.parseInt(s);
-		} catch (NumberFormatException | NullPointerException e) {
-			return false;
-		}
-		return true;
 	}
 }
