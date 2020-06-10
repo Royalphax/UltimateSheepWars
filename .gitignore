@@ -83,6 +83,5 @@ modules.xml
 
 # End of https://www.gitignore.io/api/intellij+iml
 /dependencies/
-/pom.xml
 /dependency-reduced-pom.xml
 /target/
