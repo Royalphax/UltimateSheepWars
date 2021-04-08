@@ -58,60 +58,69 @@
         <!-- Spigot  -->
         <dependency>
             <groupId>org.spigotmc</groupId>
+            <artifactId>spigot1.12.2-api</artifactId>
+            <version>1.12.2-R0.1-SNAPSHOT</version>
+            <scope>system</scope>
+            <systemPath>C:/Users/Therence/gitlab/dependencies/spigot/spigot-1.12.2-R1.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>org.spigotmc</groupId>
+            <artifactId>spigot1.15.2-api</artifactId>
+            <version>1.15.2-R0.1-SNAPSHOT</version>
+            <scope>system</scope>
+            <systemPath>C:/Users/Therence/gitlab/dependencies/spigot/spigot-1.15.2-R1.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>org.spigotmc</groupId>
             <artifactId>spigot1.9.4-api</artifactId>
             <version>1.9.4-R0.1-SNAPSHOT</version>
             <scope>system</scope>
-            <systemPath>C:/Users/Therence/gitlab/ultimate-sheep-wars/dependencies/spigot-1.9.4-R0.1-SNAPSHOT-latest.jar</systemPath>
+            <systemPath>C:/Users/Therence/gitlab/dependencies/spigot/spigot-1.9.4-R2.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot1.9.2-api</artifactId>
             <version>1.9.2-R0.1-SNAPSHOT</version>
             <scope>system</scope>
-            <systemPath>C:/Users/Therence/gitlab/ultimate-sheep-wars/dependencies/spigot-1.9.2-R0.1-SNAPSHOT-latest.jar</systemPath>
+            <systemPath>C:/Users/Therence/gitlab/dependencies/spigot/spigot-1.9.2-R1.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot1.8.8-api</artifactId>
             <version>1.8.8-R0.1-SNAPSHOT</version>
             <scope>system</scope>
-            <systemPath>C:/Users/Therence/gitlab/ultimate-sheep-wars/dependencies/spigot-1.8.8-R0.1-SNAPSHOT-latest.jar</systemPath>
+            <systemPath>C:/Users/Therence/gitlab/dependencies/spigot/spigot-1.8.8-R3.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot1.10.2-api</artifactId>
             <version>1.10.2-R0.1-SNAPSHOT</version>
             <scope>system</scope>
-            <systemPath>C:/Users/Therence/gitlab/ultimate-sheep-wars/dependencies/spigot-1.10.2-R0.1-SNAPSHOT-latest.jar</systemPath>
+            <systemPath>C:/Users/Therence/gitlab/dependencies/spigot/spigot-1.10.2-R1.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot1.11.2-api</artifactId>
             <version>1.11.2-R0.1-SNAPSHOT</version>
             <scope>system</scope>
-            <systemPath>C:/Users/Therence/gitlab/ultimate-sheep-wars/dependencies/spigot-1.11.2.jar</systemPath>
+            <systemPath>C:/Users/Therence/gitlab/dependencies/spigot/spigot-1.11.2-R1.jar</systemPath>
         </dependency>
-        <dependency>
-            <groupId>org.spigotmc</groupId>
-            <artifactId>spigot1.12.2-api</artifactId>
-            <version>1.12.2-R0.1-SNAPSHOT</version>
-            <scope>system</scope>
-            <systemPath>C:/Users/Therence/gitlab/ultimate-sheep-wars/dependencies/spigot-1.12.2.jar</systemPath>
-        </dependency>
+
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot1.13.2-api</artifactId>
             <version>1.13.2-R0.1-SNAPSHOT</version>
             <scope>system</scope>
-            <systemPath>C:/Users/Therence/gitlab/ultimate-sheep-wars/dependencies/spigot-1.13.2.jar</systemPath>
+            <systemPath>C:/Users/Therence/gitlab/dependencies/spigot/spigot-1.13.2-R2.jar</systemPath>
         </dependency>
+
         <!-- LeaderHeadsAPI -->
         <dependency>
             <groupId>me.robin</groupId>
             <artifactId>leaderheads-api</artifactId>
             <version>1.0-SNAPSHOT</version>
             <scope>system</scope>
-            <systemPath>C:/Users/Therence/gitlab/ultimate-sheep-wars/dependencies/LeaderHeadsAPI.jar</systemPath>
+            <systemPath>C:/Users/Therence/gitlab/dependencies/leaderheads/LeaderHeadsAPI.jar</systemPath>
         </dependency>
 
         <!-- Vault -->

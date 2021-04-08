@@ -1,7 +1,7 @@
 name: UltimateSheepWars
 author: Royalpha
-version: 5.0.0
-main: fr.asynchronous.sheepwars.core.SheepWarsPlugin
+version: 5.0.7
+main: fr.royalpha.sheepwars.core.SheepWarsPlugin
 softdepend: [Vault]
 website: https://therenceforot.fr/ultimate-sheep-wars
 commands:
