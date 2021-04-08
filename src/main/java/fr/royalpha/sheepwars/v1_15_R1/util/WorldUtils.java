@@ -1,12 +1,12 @@
-package fr.asynchronous.sheepwars.v1_9_R2.util;
+package fr.royalpha.sheepwars.v1_15_R1.util;
 
+import fr.royalpha.sheepwars.core.version.IWorldUtils;
+import net.minecraft.server.v1_15_R1.Explosion;
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.bukkit.craftbukkit.v1_9_R2.CraftWorld;
-import org.bukkit.craftbukkit.v1_9_R2.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_15_R1.CraftWorld;
+import org.bukkit.craftbukkit.v1_15_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
-
-import fr.asynchronous.sheepwars.core.version.IWorldUtils;
 
 public class WorldUtils implements IWorldUtils
 {
@@ -23,6 +23,6 @@ public class WorldUtils implements IWorldUtils
     }
     
     public void createExplosion(final Player player, final World world, final double x, final double y, final double z, final float power, final boolean breakBlocks, final boolean fire) {
-    	((CraftWorld)world).getHandle().createExplosion(((CraftPlayer)player).getHandle(), x, y, z, power, fire, breakBlocks);
+    	((CraftWorld)world).getHandle().createExplosion(((CraftPlayer)player).getHandle(), x, y, z, power, fire, breakBlocks ? Explosion.Effect.BREAK : Explosion.Effect.NONE);
     }
 }
