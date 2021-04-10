@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>UltimateSheepWars — Javadocs</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="author" content="Royalphax">
+        <meta name="description" content="Explore UltimateSheepWars's Javadoc">
+        <!-- Twitter -->
+        <meta name="twitter:card" content="summary">
+        <meta property="og:title" content="UltimateSheepWars — Javadoc / by Royalphax">
+        <meta property="og:site_name" content="Github">
+        <meta property="og:description" content="Explore UltimateSheepWars's Javadoc">
+        <meta property="og:type" content="website">
+        <!-- MOBILE -->
+        <meta name="application-name" content="UltimateSheepWars — Javadoc / by Royalphax">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="blue">
+        <link rel="icon" type="image/png" href="assets/img/icon.png" />
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Rancho&effect=3d">
+        <link href="assets/css/theme.css" rel="stylesheet" media="screen">
+        <style>
+            body{
+            padding-top:50px;
+            }
+        </style>
+        <noscript>
+            <h1 align="center"><u><b>This page needs JavaScript activated to work.</b></u></h1>
+            <style>div { display:none; }</style>
+        </noscript>
+    </head>
+    <body>
+        <nav class="navbar navbar-fixed-top navbar-inverse" role="navigation">
+            <div class="container">
+                <!-- Brand and toggle get grouped for better mobile display -->
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="#"><b>Ultimate Sheep Wars</b></a>
+                </div>
+                <!-- Collect the nav links, forms, and other content for toggling -->
+                <div class="collapse navbar-collapse navbar-ex1-collapse">
+                    <ul class="nav navbar-nav">
+                        <li class="dropdown active">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Javadocs <b class="caret"></b></a>
+                            <ul class="dropdown-menu">
+                                <li class="dropdown-header">Spigot plugins</li>
+                                <li><a href='https://royalphax.github.io/SonarHearing/'>Sonar Hearing</a></li>
+                                <li><a href='https://royalphax.github.io/BungeeAnnounce/'>Bungee Announce</a></li>
+                                <li><a href='https://royalphax.github.io/Revenge/'>Revenge</a></li>
+                            </ul>
+                        </li>
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Other projects <b class="caret"></b></a>
+                            <ul class="dropdown-menu">
+                                <li><a target="_blank" href='http://gitlab.therenceforot.fr/explore'>Gitlab repository</a></li>
+								<li><a target="_blank" href='http://github.com/Royalphax?tab=repositories'>Github repository</a></li>
+                            </ul>
+                        </li>
+                        <!--<li><a href="http://royalphax.ddns.net/me">About</a></li>-->
+                    </ul>
+                    <form class="navbar-form navbar-right visible-lg" role="search">
+                        <div class="form-group">
+                            <a href="https://github.com/Royalphax/UltimateSheepWars" class="btn btn-danger">Back to <b>Github</b></a>
+                        </div>
+                    </form>
+                </div>
+                <!-- /.navbar-collapse --> 
+            </div>
+        </nav>
+        <section>
+            <iframe id="iFrame" class="searchFrame" src="javadoc/index.html" width="100%" frameborder="0"></iframe>
+        </section>
+    </body>
+    <script src="https://code.jquery.com/jquery.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript">
+        var viewportwidth;
+        var viewportheight;
+        
+        //On inialise les adaptateurs d'ecran
+        if (typeof window.innerWidth != 'undefined') {
+            viewportwidth = window.innerWidth,
+                viewportheight = window.innerHeight
+        }
+        
+        // Compatibilité IE6
+        else if (typeof document.documentElement != 'undefined' &&
+            typeof document.documentElement.clientWidth !=
+            'undefined' && document.documentElement.clientWidth != 0) {
+            viewportwidth = document.documentElement.clientWidth,
+                viewportheight = document.documentElement.clientHeight
+        }
+        // Compatibilité toute version de IE
+        else {
+            viewportwidth = document.getElementsByTagName('body')[0].clientWidth,
+                viewportheight = document.getElementsByTagName('body')[0].clientHeight
+        }
+        
+        //document.getElementById("frameShared").width = viewportwidth;
+        document.getElementById("iFrame").height = viewportheight;
+        //-->
+    </script>
+</html>

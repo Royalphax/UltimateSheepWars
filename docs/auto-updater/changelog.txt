@@ -1,0 +1,135 @@
+#4.3.2
+- Fixed sheeps movements
+- Fixed bug : arrow touch booster block but not activate it
+- Updated Account Manager system
+
+#4.3.3
+- Fixed of team balancing
+- Updated main '/sw' command
+- Code fixes
+
+#4.3.4
+- Supported but not tested yet 1.8.8 to 1.10 (be aware of issues and please report them)
+- You can now edit language files
+- The plugin (UltimateSheepWars.jar) will be automatically deleted for people who hadn't bought the plugin
+
+#4.3.5
+- Fixed 'NoSuchMethodError' in 1.8.8
+- Supported but not tested yet 1.11 ! (be aware of issues and please report them)
+- Removed slow effect for sheeps between 1.9 and 1.11
+- Updated Anti-Piracy system 
+
+#4.3.6
+- Avoid block drops on explosion
+- Fixed 1.11 invisible sheeps & other bugs
+- 1.11 is now fully supported !
+
+#4.3.7
+- CraftBukkit servers are now supported 
+- Updated version detection
+- Comment useful class for developers
+
+#4.3.8
+- Fixed wrong ghost message
+- Added support for 1.12
+- 1.12 support tested and working well !
+
+#4.3.9
+- Updated javadocs comments available on github
+- Fixed duplicating language issue
+- Removed some old & unused code
+- Updated interact & language methods
+- Fixed click detection in 1.12
+- Updated default boosters
+
+#4.4.0
+- Updated Armored sheep kit description (which was wrong)
+- Updated developers API classes to avoid ConfigFileNotSet exception
+
+#4.4.3
+- The plugin will now surprise you for annual events like Halloween, Christmas, etc.
+- Added command /sw give <Player>
+- Added commands /sw kits, sheeps, boosters & listmsg
+- Fixed the get lucky rate of default sheeps
+
+#4.4.6
+- CloudNet support added !
+- You can now disable the default /hub command created by the plugin via config file
+- 1.8.8 : bug about boosters was fixed
+- 1.8.8 : boosters duration will be now display in exp. bar
+- Developers API : new event GameStartEvent added
+
+#4.4.7
+- Updated hub redirection system to fit more with the CloudNet API
+- Fixed bug about scoreboard team count initialization
+
+#4.4.9
+- Updated game task 
+- Lot of code fixes
+- Updated calendar events (including the one for the new year)
+- Developers API : new GameEndEvent added
+
+#4.5.2
+- Updated javadocs
+- Updated code structure
+- Updated commands (descriptions are now cleaner)
+- Updated permission system (now consistent and much more detailed)
+- Update API, auto-updater notification & particles systems
+
+#4.5.3
+- Removed an unnecessary debug message !
+
+#4.5.5
+- 1.9.4 : Removed another unnecessary debug message
+- Updated main command display
+- Updated GUI (Graphical User Interface) managment system
+- Updated packet system in order to prevent NullPointerExceptions
+
+#4.5.6
+- Updated API (get available things is now a clone of the real list)
+- Added a message when you get several sheeps (in order to avoid spam)
+- Updated /usw give command : ability to specify which sheeps & how many you want to give
+
+#5.0.0
+- Support map vote
+- You can combine health sheeps to increase level of regeneration
+- Swap sheep animation improved
+- Your choice to keep the random kit is now saved in database
+- Fixed kits.yml config bug (only random & null kits were shown)
+- Show commands according to viewer's permissions
+- Improve stats command
+- Add new command to set map display name in vote GUI
+- Add new messages (on voting)
+- Introduce new config field : enable sheep with player collisions
+- Calendar events are now activating & deactivating in real time & not
+only when the server starts
+- Prevent sheeps to die from fire or explosions
+- Allow players with permission 'usw.admin' to place/destroy blocks at
+each game state
+- Remove RemoteSheep
+- Improve the team/global chat operation (start your message with '!' to
+speak in global)
+- Add new config setting allowing to set the maximum amount of
+intergalactic sheeps which can be in operation at the same time
+- After having been teleported to the arena, you have 10 seconds to
+choose your kit before the game starts
+- Create a new interface to see all the levels of a kit
+- Update kits inventory
+- Improve vote map inventory
+- Close connection with DB on last player update
+- Add autoReconnect to MySQL connection string
+- Update DB identifing method (if you're using your server in
+online or offline mode)
+- Fixed ranking wrong order !
+- Remove config field 'sheep-countdown-before-explosion' which wasn't used since it
+is in sheeps.yml
+- Huge improvement of developers API
+
+#5.0.7
+- Added support for 1.9.2 and 1.9.4
+- Added pregame countdown customization to config
+- Boarding sheep will now disappear on land
+- Prevent users from voting after votes closed
+- Fixed bug with multi-world management when using the plugin for the first time
+- Fixed error when doing /usw setsheepvelocity without arguments
+- Deobfuscate API for developers *bad mistake*
