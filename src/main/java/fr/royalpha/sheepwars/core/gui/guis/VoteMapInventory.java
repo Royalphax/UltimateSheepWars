@@ -2,7 +2,7 @@ package fr.royalpha.sheepwars.core.gui.guis;
 
 import fr.royalpha.sheepwars.api.util.ItemBuilder;
 import fr.royalpha.sheepwars.core.SheepWarsPlugin;
-import fr.royalpha.sheepwars.core.gui.base.GuiScreen;
+import fr.royalpha.sheepwars.api.gui.base.GuiScreen;
 import fr.royalpha.sheepwars.core.handler.PlayableMap;
 import fr.royalpha.sheepwars.core.handler.Sounds;
 import fr.royalpha.sheepwars.core.message.Message;

@@ -12,7 +12,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
-import fr.royalpha.sheepwars.core.gui.base.GuiScreen;
+import fr.royalpha.sheepwars.api.gui.base.GuiScreen;
 
 public class ContributorsInventory extends GuiScreen {
 

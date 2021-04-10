@@ -4,7 +4,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
-import fr.royalpha.sheepwars.core.gui.base.GuiScreen;
+import fr.royalpha.sheepwars.api.gui.base.GuiScreen;
 
 public class GuiUpdateEvent extends Event {
 

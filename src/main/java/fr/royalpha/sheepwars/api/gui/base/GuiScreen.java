@@ -1,4 +1,4 @@
-package fr.royalpha.sheepwars.core.gui.base;
+package fr.royalpha.sheepwars.api.gui.base;
 
 import fr.royalpha.sheepwars.api.PlayerData;
 import org.bukkit.Bukkit;

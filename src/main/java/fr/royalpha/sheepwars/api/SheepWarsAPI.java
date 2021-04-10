@@ -4,7 +4,7 @@ import java.io.IOException;
 
 import fr.royalpha.sheepwars.core.exception.ConfigFileNotSet;
 import fr.royalpha.sheepwars.core.gui.GuiManager;
-import fr.royalpha.sheepwars.core.gui.base.GuiScreen;
+import fr.royalpha.sheepwars.api.gui.base.GuiScreen;
 import org.bukkit.plugin.Plugin;
 
 /**

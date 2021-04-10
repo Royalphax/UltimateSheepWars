@@ -5,7 +5,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import fr.royalpha.sheepwars.core.SheepWarsPlugin;
-import fr.royalpha.sheepwars.core.gui.base.GuiScreen;
+import fr.royalpha.sheepwars.api.gui.base.GuiScreen;
 
 public class GuiTask extends BukkitRunnable {
 

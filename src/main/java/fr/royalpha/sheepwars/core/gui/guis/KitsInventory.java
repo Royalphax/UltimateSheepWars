@@ -11,7 +11,7 @@ import fr.royalpha.sheepwars.api.PlayerData;
 import fr.royalpha.sheepwars.api.SheepWarsKit;
 import fr.royalpha.sheepwars.api.util.ItemBuilder;
 import fr.royalpha.sheepwars.core.data.DataManager;
-import fr.royalpha.sheepwars.core.gui.base.GuiScreen;
+import fr.royalpha.sheepwars.api.gui.base.GuiScreen;
 import fr.royalpha.sheepwars.core.handler.InventoryOrganizer;
 import fr.royalpha.sheepwars.core.handler.Sounds;
 import fr.royalpha.sheepwars.core.kit.NoneKit;

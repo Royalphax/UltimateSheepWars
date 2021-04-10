@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import fr.royalpha.sheepwars.api.PlayerData;
-import fr.royalpha.sheepwars.core.gui.base.GuiScreen;
+import fr.royalpha.sheepwars.api.gui.base.GuiScreen;
 import fr.royalpha.sheepwars.core.gui.task.GuiTask;
 import fr.royalpha.sheepwars.core.manager.ExceptionManager;
 import fr.royalpha.sheepwars.core.message.Message;
