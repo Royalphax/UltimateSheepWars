@@ -1,1 +1,1 @@
-packageSearchIndex = [{"l":"All Packages","url":"allpackages-index.html"},{"l":"fr.royalpha.sheepwars.api"},{"l":"fr.royalpha.sheepwars.api.event"},{"l":"fr.royalpha.sheepwars.api.util"}]
+packageSearchIndex = [{"l":"All Packages","url":"allpackages-index.html"},{"l":"fr.royalpha.sheepwars.api"},{"l":"fr.royalpha.sheepwars.api.event"},{"l":"fr.royalpha.sheepwars.api.gui.base"},{"l":"fr.royalpha.sheepwars.api.util"}]
