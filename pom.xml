@@ -57,7 +57,7 @@
     <dependencies>
         <!-- Spigot
             DISCLAIMER :
-            I know it's a totally unrelevant way to do multiple version support but it's the only way I found until I learn how to use maven modules !
+            I know it's a totally unrelevant way to do multiple version support but it's the only way I found until I learn how to use gradle !
             When working on the plugin, you will have to edit the <systemPath> for each spigot & LeaderHeadsAPI dependencies.
         -->
         <dependency>
@@ -148,6 +148,13 @@
             <artifactId>cloudnet-core</artifactId>
             <version>2.1.17</version>
             <scope>provided</scope>
+        </dependency>
+        <!-- bStats -->
+        <dependency>
+            <groupId>org.bstats</groupId>
+            <artifactId>bstats-bukkit</artifactId>
+            <version>1.7</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 </project>

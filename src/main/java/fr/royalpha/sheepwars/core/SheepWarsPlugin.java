@@ -6,7 +6,6 @@ import fr.royalpha.sheepwars.api.event.UltimateSheepWarsLoadedEvent;
 import fr.royalpha.sheepwars.core.boosters.*;
 import fr.royalpha.sheepwars.core.calendar.event.*;
 import fr.royalpha.sheepwars.core.command.CommandManager;
-import fr.royalpha.sheepwars.core.data.AccountManager;
 import fr.royalpha.sheepwars.core.data.DataManager;
 import fr.royalpha.sheepwars.core.event.UltimateSheepWarsEventListener;
 import fr.royalpha.sheepwars.core.event.block.BlockBreak;
@@ -42,6 +41,7 @@ import net.md_5.bungee.api.ChatColor;
 import net.milkbowl.vault.chat.Chat;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.permission.Permission;
+import org.bstats.bukkit.Metrics;
 import org.bukkit.*;
 import org.bukkit.FireworkEffect.Type;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -72,18 +72,11 @@ public class SheepWarsPlugin extends JavaPlugin {
     public static final File DATAFOLDER = new File("plugins/UltimateSheepWars/");
 
     /**
-     * Spigot premium placeholders
-     **/
-    public static String user_id = "%%__USER__%%"; //261723
-    public static String download_id = "%%__NONCE__%%"; //-1837944251
-
-    /**
      * Instance variables
      **/
     private static SheepWarsPlugin instance;
     private static CommandManager commandManager;
     private static VersionManager versionManager;
-    private static AccountManager accountManager;
     private static ConfigManager configManager;
     private static WorldManager worldManager;
     private RewardsManager rewardManager;
@@ -254,7 +247,13 @@ public class SheepWarsPlugin extends JavaPlugin {
         /** Check if plugin is up-to-date **/
         UpdateManager.checkAsync(this);
 
-        accountManager = new AccountManager(this, user_id);
+        /** bStats **/
+        try {
+            Class.forName("com.google.gson.JsonElement");
+            Metrics metrics = new Metrics(this, 11020);
+        } catch( ClassNotFoundException e ) {
+            // Do nothing
+        }
     }
 
     private void register(@SuppressWarnings("unchecked") final Class<? extends UltimateSheepWarsEventListener>... classes) {
@@ -578,10 +577,6 @@ public class SheepWarsPlugin extends JavaPlugin {
 
     public File getPluginJar() {
         return this.getFile();
-    }
-
-    public static AccountManager getAccount() {
-        return accountManager;
     }
 
     public RewardsManager getRewardsManager() {

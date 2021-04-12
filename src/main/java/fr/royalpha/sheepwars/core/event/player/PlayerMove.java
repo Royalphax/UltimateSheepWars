@@ -35,17 +35,6 @@ public class PlayerMove extends UltimateSheepWarsEventListener
         final Location from = event.getFrom();
         final Location to = event.getTo();
         
-        /** On verifie que monsieur a deja rentre ses identifiants **/
-        if (SheepWarsPlugin.getAccount().askForOwnerName())
-        {
-        	/**if (!player.isFlying() && player.getLocation().subtract(0,1,0).getBlock().getType() == Material.AIR) {
-        		player.setAllowFlight(true);
-        		player.setFlying(true);
-        	}**/
-        	SheepWarsPlugin.getAccount().openGUI(player);
-        	
-        }
-        
         /** On fait bouger les particules **/
         if (((from.getX() != to.getX()) || (from.getY() != to.getY()) || (from.getZ() != to.getZ())))
         	ParticleTask.move(player);
