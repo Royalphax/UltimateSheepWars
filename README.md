@@ -1,5 +1,5 @@
 > ## WARNING
-> This plugin is no longer supported actively. It's here to allow you to contribute to it and take advantage of its strengths. But I know that some weaknesses need to be fixed (dependency integration, some repetitive bugs, etc.). 
+> This plugin is no longer supported by its main developer. It's here to allow you to contribute to it and take advantage of its strengths. But I know that some weaknesses need to be fixed (dependency integration, some repetitive bugs, etc.). 
 > I worked 6 years on this plugin, now I'm older, I've more responsabilities and I don't have time anymore for it... But I trust the plugin developers community and deeply hope that this plugin will be maintained. 
 
 > **Feel free to work directly on it as I will accept any relevant Pull Request.**
