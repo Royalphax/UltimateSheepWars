@@ -4,13 +4,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.UUID;
 
-import fr.royalpha.sheepwars.core.legacy.LegacyMaterial;
 import org.bukkit.FireworkEffect;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.FireworkMeta;
+
+import fr.royalpha.sheepwars.core.legacy.LegacyMaterial;
 
 public class FireworkSpawner {
 

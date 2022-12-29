@@ -5,20 +5,17 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Types;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 
 import fr.royalpha.sheepwars.api.PlayerData;
+import fr.royalpha.sheepwars.core.SheepWarsPlugin;
 import fr.royalpha.sheepwars.core.manager.ConfigManager;
 import fr.royalpha.sheepwars.core.manager.ExceptionManager;
 import fr.royalpha.sheepwars.core.manager.UpdateManager;
 import fr.royalpha.sheepwars.core.util.Utils;
-
-import fr.royalpha.sheepwars.core.SheepWarsPlugin;
 
 public abstract class DataManager {
 

@@ -28,7 +28,6 @@ public class PacketHandlerEntityDestroy extends AbstractPacketHandler {
 	/**
 	 * Build
 	 */
-	@SuppressWarnings("deprecation")
 	@Override
 	public Object build() {
 		try {

@@ -8,6 +8,7 @@ import org.bukkit.inventory.ItemStack;
 
 import fr.royalpha.sheepwars.api.SheepWarsKit;
 
+@SuppressWarnings("deprecation")
 public class BuilderKit extends SheepWarsKit {
 
 	public BuilderKit() {

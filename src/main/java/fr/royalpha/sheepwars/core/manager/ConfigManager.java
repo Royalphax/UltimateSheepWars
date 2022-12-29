@@ -256,7 +256,6 @@ public class ConfigManager {
         field.setValue(arg0);
     }
 
-    @SuppressWarnings("unchecked")
     public static void addLocation(Field field, Location arg0) {
         checkForException(field, FieldType.VIRTUAL_LOCATION_LIST);
         ((List<VirtualLocation>) field.getValue()).add(VirtualLocation.fromBukkitLocation(arg0));
@@ -267,7 +266,6 @@ public class ConfigManager {
         field.setValue(new ArrayList<VirtualLocation>());
     }
 
-    @SuppressWarnings("unchecked")
     public static void clearLocations(Field field, World filter) {
         checkForException(field, FieldType.VIRTUAL_LOCATION_LIST);
         List<VirtualLocation> locations = (List<VirtualLocation>) field.getValue();

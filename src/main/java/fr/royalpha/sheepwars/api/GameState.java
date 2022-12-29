@@ -2,7 +2,6 @@ package fr.royalpha.sheepwars.api;
 
 import fr.royalpha.sheepwars.core.SheepWarsPlugin;
 import fr.royalpha.sheepwars.core.manager.ConfigManager;
-import org.bukkit.entity.Sheep;
 
 public enum GameState {
 	

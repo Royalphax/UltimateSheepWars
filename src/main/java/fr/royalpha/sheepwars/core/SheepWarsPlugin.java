@@ -85,7 +85,6 @@ public class SheepWarsPlugin extends JavaPlugin {
      * Providers & Soft Dependencies
      **/
     private Boolean vaultInstalled;
-    private Boolean leaderHeadsInstalled;
 
     private static Permission permissionProvider = null;
     private static Economy economyProvider = null;
@@ -173,7 +172,6 @@ public class SheepWarsPlugin extends JavaPlugin {
         worldManager = new WorldManager(this);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public void onEnable() {
         getLogger().info("Anti-piracy checking ... (depends on your internet speed)");
@@ -250,13 +248,13 @@ public class SheepWarsPlugin extends JavaPlugin {
         /** bStats **/
         try {
             Class.forName("com.google.gson.JsonElement");
-            Metrics metrics = new Metrics(this, 11020);
+            new Metrics(this, 11020);
         } catch( ClassNotFoundException e ) {
             // Do nothing
         }
     }
 
-    private void register(@SuppressWarnings("unchecked") final Class<? extends UltimateSheepWarsEventListener>... classes) {
+    private void register(final Class<? extends UltimateSheepWarsEventListener>... classes) {
         try {
             for (final Class<? extends UltimateSheepWarsEventListener> clazz : classes) {
                 final Constructor<? extends UltimateSheepWarsEventListener> constructor = clazz.getConstructor(SheepWarsPlugin.class);
@@ -288,20 +286,6 @@ public class SheepWarsPlugin extends JavaPlugin {
         this.setupProviders();
         boolean ecop = (economyProvider != null);
         boolean permp = (permissionProvider != null);
-
-        /** Setup Soft-Depends (LeaderHeads) **/
-        leaderHeadsInstalled = Bukkit.getPluginManager().isPluginEnabled("LeaderHeads");
-        if (leaderHeadsInstalled)
-            getLogger().info("LeaderHeads hooked !");
-        if (this.leaderHeadsInstalled && DataManager.isConnected()) {
-            String[] list = {"Deaths", "Games", "KDRatio", "Kills", "SheepKilled", "SheepThrown", "TotalTime", "WinRate", "Wins"};
-            try {
-                for (String strng : list)
-                    loadLeaderHeadsModule("UltimateSheepWars" + strng);
-            } catch (ReflectiveOperationException ex) {
-                ExceptionManager.register(ex, true);
-            }
-        }
 
         /** Check for config issues **/
         if (ConfigManager.getBoolean(ConfigManager.Field.ENABLE_INGAME_SHOP)) {

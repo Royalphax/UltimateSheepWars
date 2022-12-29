@@ -31,7 +31,6 @@ public class PacketHandlerEntityStatus extends AbstractPacketHandler {
 	/**
 	 * Build
 	 */
-	@SuppressWarnings("deprecation")
 	@Override
 	public Object build() {
 		try {

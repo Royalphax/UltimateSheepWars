@@ -17,11 +17,9 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 
 public enum CustomEntityType {
-	@SuppressWarnings({"unchecked", "rawtypes"})
+	
 	SHEEP("CustomSheep", 91, EntityType.SHEEP, EntitySheep.class, CustomSheep.class),
-	@SuppressWarnings({"unchecked", "rawtypes"})
 	CANCEL_MOVE("CancelMoveEntity", 30, EntityType.ARMOR_STAND, EntityArmorStand.class, EntityCancelMove.class),
-	@SuppressWarnings({"unchecked", "rawtypes"})
 	METEOR("Meteor", 12, EntityType.FIREBALL, EntityFireball.class, EntityMeteor.class);
 
 	private String name;

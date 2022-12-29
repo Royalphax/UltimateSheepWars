@@ -21,6 +21,7 @@ import com.mojang.authlib.properties.Property;
 import fr.royalpha.sheepwars.core.SheepWarsPlugin;
 import net.md_5.bungee.api.ChatColor;
 
+@SuppressWarnings("deprecation")
 public class ItemBuilder {
 	private ItemStack is;
 
@@ -52,7 +53,6 @@ public class ItemBuilder {
 		is = item.getItemStack();
 	}
 	
-	@SuppressWarnings("deprecation")
 	public ItemBuilder setData(byte data) {
 		is = new MaterialData(is.getType(), data).toItemStack(is.getAmount());
 		return this;

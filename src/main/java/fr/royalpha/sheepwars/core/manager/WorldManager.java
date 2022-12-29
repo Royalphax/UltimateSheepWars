@@ -1,23 +1,10 @@
 package fr.royalpha.sheepwars.core.manager;
 
-import fr.royalpha.sheepwars.api.PlayerData;
-import fr.royalpha.sheepwars.core.SheepWarsPlugin;
-import fr.royalpha.sheepwars.core.exception.PlayableMapException;
-import fr.royalpha.sheepwars.core.handler.MinecraftVersion;
-import fr.royalpha.sheepwars.core.handler.PlayableMap;
-import fr.royalpha.sheepwars.core.util.FileUtils;
-import fr.royalpha.sheepwars.core.util.RandomUtils;
-import fr.royalpha.sheepwars.core.util.ReflectionUtils;
-import net.md_5.bungee.api.ChatColor;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.block.Block;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-
-import javax.annotation.Nullable;
-import java.io.*;
-import java.lang.reflect.InvocationTargetException;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -25,6 +12,23 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.annotation.Nullable;
+
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.block.Block;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+
+import fr.royalpha.sheepwars.api.PlayerData;
+import fr.royalpha.sheepwars.core.SheepWarsPlugin;
+import fr.royalpha.sheepwars.core.exception.PlayableMapException;
+import fr.royalpha.sheepwars.core.handler.PlayableMap;
+import fr.royalpha.sheepwars.core.util.FileUtils;
+import fr.royalpha.sheepwars.core.util.RandomUtils;
+import fr.royalpha.sheepwars.core.util.ReflectionUtils;
+import net.md_5.bungee.api.ChatColor;
 
 public class WorldManager {
 

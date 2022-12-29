@@ -32,11 +32,10 @@ import net.minecraft.server.v1_8_R3.EntityWither;
 
 public enum CustomEntityType {
 	SHEEP("Sheep", 91, EntityType.SHEEP, EntitySheep.class, CustomSheep.class),
-	@SuppressWarnings({"unchecked", "rawtypes"})
-	WITHER("WitherBoss", 64, EntityType.WITHER, (Class) EntityWither.class, (Class) EntityBossBar.class),
-	@SuppressWarnings({"unchecked", "rawtypes"})
+	WITHER("WitherBoss", 64, EntityType.WITHER, EntityWither.class, EntityBossBar.class),
+	@SuppressWarnings({"rawtypes"})
 	CANCEL_MOVE("ArmorStand", 30, EntityType.ARMOR_STAND, (Class) EntityArmorStand.class, (Class) EntityCancelMove.class),
-	@SuppressWarnings({"unchecked", "rawtypes"})
+	@SuppressWarnings({"rawtypes"})
 	METEOR("Fireball", 12, EntityType.FIREBALL, (Class) EntityFireball.class, (Class) EntityMeteor.class);
 
 	private String name;

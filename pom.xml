@@ -52,82 +52,73 @@
             <id>cloudnet-repo</id>
             <url>https://cloudnetservice.eu/repositories</url>
         </repository>
+        <repository>
+            <id>spigot-repo</id>
+            <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
+        </repository>
+        <repository>
+            <id>sonatype-repo</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+        </repository>
+        <repository>
+            <id>destroystokyo-repo</id>
+            <url>https://repo.destroystokyo.com/repository/maven-public//</url>
+        </repository>
     </repositories>
 
     <dependencies>
-        <!-- Spigot
-            DISCLAIMER :
-            I know it's a totally unrelevant way to do multiple version support but it's the only way I found until I learn how to use gradle !
-            When working on the plugin, you will have to edit the <systemPath> for each spigot & LeaderHeadsAPI dependencies.
-        -->
         <dependency>
             <groupId>org.spigotmc</groupId>
-            <artifactId>spigot1.12.2-api</artifactId>
-            <version>1.12.2-R0.1-SNAPSHOT</version>
-            <scope>system</scope>
-            <systemPath>C:/Users/Therence/github/UltimateSheepWars/dependencies/spigot-1.12.2-R1.jar</systemPath>
+            <artifactId>spigot</artifactId>
+            <version>1.13.2-R0.1-SNAPSHOT</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.spigotmc</groupId>
-            <artifactId>spigot1.15.2-api</artifactId>
-            <version>1.15.2-R0.1-SNAPSHOT</version>
-            <scope>system</scope>
-            <systemPath>C:/Users/Therence/github/UltimateSheepWars/dependencies/spigot-1.15.2-R1.jar</systemPath>
-        </dependency>
-        <dependency>
-            <groupId>org.spigotmc</groupId>
-            <artifactId>spigot1.9.4-api</artifactId>
-            <version>1.9.4-R0.1-SNAPSHOT</version>
-            <scope>system</scope>
-            <systemPath>C:/Users/Therence/github/UltimateSheepWars/dependencies/spigot-1.9.4-R2.jar</systemPath>
-        </dependency>
-        <dependency>
-            <groupId>org.spigotmc</groupId>
-            <artifactId>spigot1.9.2-api</artifactId>
-            <version>1.9.2-R0.1-SNAPSHOT</version>
-            <scope>system</scope>
-            <systemPath>C:/Users/Therence/github/UltimateSheepWars/dependencies/spigot-1.9.2-R1.jar</systemPath>
-        </dependency>
-        <dependency>
-            <groupId>org.spigotmc</groupId>
-            <artifactId>spigot1.8.8-api</artifactId>
+            <artifactId>spigot-1.8.8</artifactId>
             <version>1.8.8-R0.1-SNAPSHOT</version>
             <scope>system</scope>
-            <systemPath>C:/Users/Therence/github/UltimateSheepWars/dependencies/spigot-1.8.8-R3.jar</systemPath>
+            <systemPath>${basedir}/jars/spigot-1.8.8.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>org.spigotmc</groupId>
-            <artifactId>spigot1.10.2-api</artifactId>
-            <version>1.10.2-R0.1-SNAPSHOT</version>
+            <artifactId>spigot-1.9.2</artifactId>
+            <version>1.9.2-R0.1-SNAPSHOT</version>
             <scope>system</scope>
-            <systemPath>C:/Users/Therence/github/UltimateSheepWars/dependencies/spigot-1.10.2-R1.jar</systemPath>
+            <systemPath>${basedir}/jars/spigot-1.9.2.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>org.spigotmc</groupId>
-            <artifactId>spigot1.11.2-api</artifactId>
-            <version>1.11.2-R0.1-SNAPSHOT</version>
+            <artifactId>spigot-1.9.4</artifactId>
+            <version>1.9.4-R0.1-SNAPSHOT</version>
             <scope>system</scope>
-            <systemPath>C:/Users/Therence/github/UltimateSheepWars/dependencies/spigot-1.11.2-R1.jar</systemPath>
+            <systemPath>${basedir}/jars/spigot-1.9.4.jar</systemPath>
         </dependency>
-
         <dependency>
             <groupId>org.spigotmc</groupId>
-            <artifactId>spigot1.13.2-api</artifactId>
-            <version>1.13.2-R0.1-SNAPSHOT</version>
+            <artifactId>spigot-1.12.2</artifactId>
+            <version>1.12.2-R0.1-SNAPSHOT</version>
             <scope>system</scope>
-            <systemPath>C:/Users/Therence/github/UltimateSheepWars/dependencies/spigot-1.13.2-R2.jar</systemPath>
+            <systemPath>${basedir}/jars/spigot-1.12.2.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>org.spigotmc</groupId>
+            <artifactId>spigot-1.15.2</artifactId>
+            <version>1.15.2-R0.1-SNAPSHOT</version>
+            <scope>system</scope>
+            <systemPath>${basedir}/jars/spigot-1.15.2.jar</systemPath>
         </dependency>
 
         <!-- LeaderHeadsAPI
             The developer hasn't provided any maven dependency patern to use its plugin.
         -->
-        <dependency>
+        <!--dependency>
             <groupId>me.robin</groupId>
             <artifactId>leaderheads-api</artifactId>
             <version>1.0-SNAPSHOT</version>
             <scope>system</scope>
             <systemPath>C:/Users/Therence/github/UltimateSheepWars/dependencies/LeaderHeadsAPI.jar</systemPath>
-        </dependency>
+        </dependency-->
         <!-- Vault -->
         <dependency>
             <groupId>com.github.MilkBowl</groupId>
@@ -151,10 +142,10 @@
         </dependency>
         <!-- bStats -->
         <dependency>
-            <groupId>org.bstats</groupId>
-            <artifactId>bstats-bukkit</artifactId>
-            <version>1.7</version>
-            <scope>compile</scope>
+          <groupId>org.bstats</groupId>
+          <artifactId>bstats-bukkit</artifactId>
+          <version>3.0.0</version>
+          <scope>compile</scope>
         </dependency>
     </dependencies>
 </project>

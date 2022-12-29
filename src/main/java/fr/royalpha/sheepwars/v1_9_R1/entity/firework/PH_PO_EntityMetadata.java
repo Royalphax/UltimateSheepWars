@@ -35,7 +35,7 @@ public class PH_PO_EntityMetadata extends aPacketHandler{
 	/**
 	 * Build
 	 */
-	@SuppressWarnings({"rawtypes", "unchecked"})
+	@SuppressWarnings({"rawtypes"})
 	@Override
 	public Object build()throws Exception{
 		Object packet=PH_PO_EntityMetadata.clazz.newInstance();
