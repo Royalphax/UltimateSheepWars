@@ -25,5 +25,5 @@ jobs:
     - uses: actions/upload-artifact@v3
       name: Upload Artifact
       with:
-        name: ChatItem.jar
-        path: target/ChatItem-*.jar
+        name: UltimateSheepWars.jar
+        path: target/UltimateSheepWars-*.jar
