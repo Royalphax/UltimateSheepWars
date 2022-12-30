@@ -44,7 +44,7 @@ public abstract class DataManager {
 			plugin.getLogger().info("Connecting to free hosted Database ...");
 			try {
 				final String[] contentSplitted = new UpdateManager(UpdateManager.Link.FREE_HOSTED_DB_ACCESS, localhost).read().split(",");
-				database = new MySQLConnector((localhost ? "localhost" : contentSplitted[0]), contentSplitted[1], contentSplitted[2], contentSplitted[3], contentSplitted[4]);
+				database = new MySQLConnector((localhost ? "localhost" : contentSplitted[0]), contentSplitted[1], contentSplitted[2], contentSplitted[3], contentSplitted[4], "useSSL=false&autoReconnect=true");
 				database.openConnection();
 				database.updateSQL(CREATE_DATABASE_REQUEST);
 				alterPlayerDataTable();
@@ -62,7 +62,8 @@ public abstract class DataManager {
 			String db = ConfigManager.getString(ConfigManager.Field.MYSQL_DATABASE);
 			String user = ConfigManager.getString(ConfigManager.Field.MYSQL_USER);
 			String pass = ConfigManager.getString(ConfigManager.Field.MYSQL_PASSWORD);
-			database = new MySQLConnector(host, port, db, user, pass);
+			String options = ConfigManager.getString(ConfigManager.Field.MYSQL_OPTIONS);
+			database = new MySQLConnector(host, port, db, user, pass, options);
 			try {
 				database.openConnection();
 				database.updateSQL(CREATE_DATABASE_REQUEST);

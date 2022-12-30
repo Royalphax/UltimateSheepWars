@@ -65,6 +65,7 @@ public class ConfigManager {
         MYSQL_TABLE("mysql.table", FieldType.STRING, "players"),
         MYSQL_USER("mysql.user", FieldType.STRING, "root"),
         MYSQL_PASSWORD("mysql.pass", FieldType.STRING, "root"),
+        MYSQL_OPTIONS("mysql.options", FieldType.STRING, "useSSL=false&autoReconnect=true"),
         RANKING_TOP("ranking-top", FieldType.INT, 10),
         LOBBY_MAP_NAME("lobby-map-folder-name", FieldType.STRING, "sheepwars-backup"),
         WAITING_GAME_STATE_MOTD("game-state.waiting", FieldType.STRING, "&2\\u2714 &aWaiting &2\\u2714"),

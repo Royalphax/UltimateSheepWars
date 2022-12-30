@@ -158,6 +158,7 @@ mysql:
   table: players
   user: root
   pass: root
+  options: "useSSL=false&autoReconnect=true"
 #If database was enabled, put the amount of players to show in the ranking.
 ranking-top: 10
 #===============# MOTD states #===============#
