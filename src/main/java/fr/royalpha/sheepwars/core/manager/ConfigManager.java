@@ -61,11 +61,11 @@ public class ConfigManager {
         ENABLE_MYSQL_FREE_HOST("mysql.free-host", FieldType.BOOLEAN, false),
         MYSQL_HOST("mysql.host", FieldType.STRING, "localhost"),
         MYSQL_PORT("mysql.port", FieldType.INT, 3306),
-        MYSQL_DATABASE("mysql.database", FieldType.STRING, "sheepwars"),
-        MYSQL_TABLE("mysql.table", FieldType.STRING, "players"),
-        MYSQL_USER("mysql.user", FieldType.STRING, "root"),
-        MYSQL_PASSWORD("mysql.pass", FieldType.STRING, "root"),
-        MYSQL_OPTIONS("mysql.options", FieldType.STRING, "useSSL=false&autoReconnect=true"),
+        MYSQL_DATABASE("mysql.database", FieldType.STRING_LITTERAL, "sheepwars"),
+        MYSQL_TABLE("mysql.table", FieldType.STRING_LITTERAL, "players"),
+        MYSQL_USER("mysql.user", FieldType.STRING_LITTERAL, "root"),
+        MYSQL_PASSWORD("mysql.pass", FieldType.STRING_LITTERAL, "root"),
+        MYSQL_OPTIONS("mysql.options", FieldType.STRING_LITTERAL, "useSSL=false&autoReconnect=true"),
         RANKING_TOP("ranking-top", FieldType.INT, 10),
         LOBBY_MAP_NAME("lobby-map-folder-name", FieldType.STRING, "sheepwars-backup"),
         WAITING_GAME_STATE_MOTD("game-state.waiting", FieldType.STRING, "&2\\u2714 &aWaiting &2\\u2714"),
@@ -188,6 +188,9 @@ public class ConfigManager {
                     case STRING:
                         field.setValue(ChatColor.translateAlternateColorCodes('&', config.getString(field.getPath(), (String) field.getDefault())));
                         break;
+                    case STRING_LITTERAL:
+                        field.setValue(config.getString(field.getPath(), (String) field.getDefault()));
+                        break;
                     case VIRTUAL_LOCATION:
                         final VirtualLocation location = VirtualLocation.fromString(config.getString(field.getPath(), ((VirtualLocation) field.getDefault()).toString()));
                         field.setValue(location);
@@ -217,6 +220,7 @@ public class ConfigManager {
 
     private enum FieldType {
         STRING("String"),
+        STRING_LITTERAL("StringLitteral"),
         BOOLEAN("Boolean"),
         DOUBLE("Double"),
         INT("Integer"),
