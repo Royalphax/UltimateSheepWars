@@ -1,35 +1,39 @@
 package fr.royalpha.sheepwars.core.data;
 
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 
 import fr.royalpha.sheepwars.api.PlayerData;
 import fr.royalpha.sheepwars.core.SheepWarsPlugin;
 import fr.royalpha.sheepwars.core.manager.ConfigManager;
+import fr.royalpha.sheepwars.core.manager.ConfigManager.Field;
 import fr.royalpha.sheepwars.core.manager.ExceptionManager;
 import fr.royalpha.sheepwars.core.manager.UpdateManager;
 import fr.royalpha.sheepwars.core.util.Utils;
 
 public abstract class DataManager {
 
-	private static final String       CREATE_DATABASE_REQUEST = "CREATE TABLE IF NOT EXISTS `players` ( `id` int(11) NOT NULL AUTO_INCREMENT, `name` varchar(16) NOT NULL, `uuid` varchar(32) NOT NULL, `wins` int(11) NOT NULL, `kills` int(11) NOT NULL, `deaths` int(11) NOT NULL, `games` int(11) NOT NULL, `sheep_thrown` int(11) NOT NULL DEFAULT '0', `sheep_killed` int(11) NOT NULL DEFAULT '0', `total_time` int(11) NOT NULL DEFAULT '0', `particles` int(1) NOT NULL DEFAULT '1', `kits` text NOT NULL, `created_at` datetime NOT NULL, `updated_at` datetime NOT NULL, PRIMARY KEY (`id`) ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;";
-
-	protected static MySQLConnector   database;
-	protected static boolean          connectedToDatabase;
-	private static boolean            tryingToConnect         = false;
-	private static SheepWarsPlugin    plugin;
-	//protected static List<PlayerData> uploadingData           = new ArrayList<>();
-
-	public DataManager() {
-		// Do nothing
+	private static String createDatabaseRequest(String table) {
+		return "CREATE TABLE IF NOT EXISTS `" + table + "` (`id` int(11) NOT NULL AUTO_INCREMENT, `name` varchar(16) NOT NULL, `uuid` varchar(36) NOT NULL, `wins` int(11) NOT NULL DEFAULT '0', `kills` int(11) NOT NULL DEFAULT '0',"
+				+ "`deaths` int(11) NOT NULL DEFAULT '0', `games` int(11) NOT NULL DEFAULT '0', `sheep_thrown` int(11) NOT NULL DEFAULT '0', `sheep_killed` int(11) NOT NULL DEFAULT '0', `total_time` int(11) NOT NULL DEFAULT '0',"
+				+ "`particles` int(1) NOT NULL DEFAULT '1', `kits` text NOT NULL, `created_at` datetime NOT NULL, `updated_at` datetime NOT NULL, primary key (`id`)) ENGINE=InnoDB DEFAULT CHARSET=latin1;";
 	}
+	
+	protected static MySQLConnector database;
+	protected static boolean connectedToDatabase;
+	private static boolean tryingToConnect = false;
+	private static SheepWarsPlugin plugin;
 
 	public abstract void loadData();
 
@@ -44,9 +48,10 @@ public abstract class DataManager {
 			plugin.getLogger().info("Connecting to free hosted Database ...");
 			try {
 				final String[] contentSplitted = new UpdateManager(UpdateManager.Link.FREE_HOSTED_DB_ACCESS, localhost).read().split(",");
-				database = new MySQLConnector((localhost ? "localhost" : contentSplitted[0]), contentSplitted[1], contentSplitted[2], contentSplitted[3], contentSplitted[4], "useSSL=false&autoReconnect=true");
+				database = new MySQLConnector((localhost ? "localhost" : contentSplitted[0]), contentSplitted[1], contentSplitted[2], contentSplitted[3], contentSplitted[4],
+						"useSSL=false&autoReconnect=true");
 				database.openConnection();
-				database.updateSQL(CREATE_DATABASE_REQUEST);
+				database.updateSQL(createDatabaseRequest("players"));
 				alterPlayerDataTable();
 				Double stop = (double) (System.currentTimeMillis() - start) / 1000.0;
 				plugin.getLogger().log(Level.INFO, "Connected to Free hosted Database (" + stop + "s)!");
@@ -66,7 +71,6 @@ public abstract class DataManager {
 			database = new MySQLConnector(host, port, db, user, pass, options);
 			try {
 				database.openConnection();
-				database.updateSQL(CREATE_DATABASE_REQUEST);
 				alterPlayerDataTable();
 				Double stop = (double) (System.currentTimeMillis() - start) / 1000.0;
 				plugin.getLogger().log(Level.INFO, "Connected to Database (" + stop + "s)!");
@@ -90,50 +94,45 @@ public abstract class DataManager {
 	private static void alterPlayerDataTable() {
 		final String table = ConfigManager.getString(ConfigManager.Field.MYSQL_TABLE);
 		Calendar cal = Calendar.getInstance();
-		try {
-			database.updateSQL("DROP TABLE IF EXISTS " + table + "_monthly" + ((cal.get(Calendar.MONTH) - 1 < 0 ? 11 : cal.get(Calendar.MONTH) - 1)) + "_backup;");
-		} catch (ClassNotFoundException | SQLException exception) {
-			// Do nothing
+		if (ConfigManager.getBoolean(Field.ENABLE_MYSQL_BACKUP)) {
+			try {
+				database.updateSQL("DROP TABLE IF EXISTS " + table + "_monthly" + ((cal.get(Calendar.MONTH) - 1 < 0 ? 11 : cal.get(Calendar.MONTH) - 1)) + "_backup;");
+				database.updateSQL("CREATE TABLE IF NOT EXISTS " + table + "_monthly" + cal.get(Calendar.MONTH) + "_backup SELECT * FROM players;");
+			} catch (ClassNotFoundException | SQLException exception) {
+				// Do nothing
+			}
 		}
 		try {
-			database.updateSQL("CREATE TABLE IF NOT EXISTS " + table + "_monthly" + cal.get(Calendar.MONTH) + "_backup SELECT * FROM players;");
-		} catch (ClassNotFoundException | SQLException exception) {
-			// Do nothing
-		}
-		try {
-			database.updateSQL("ALTER TABLE `" + table + "` DROP `lang`;");
-		} catch (ClassNotFoundException | SQLException exception) {
-			// Do nothing
-		}
-		try {
-			database.updateSQL("ALTER TABLE `" + table + "` ADD `total_time` INT(11) NOT NULL DEFAULT '0' AFTER `games`;");
-		} catch (ClassNotFoundException | SQLException exception) {
-			// Do nothing
-		}
-		try {
-			database.updateSQL("ALTER TABLE `" + table + "` ADD `sheep_killed` INT(11) NOT NULL DEFAULT '0' AFTER `games`;");
-		} catch (ClassNotFoundException | SQLException exception) {
-			// Do nothing
-		}
-		try {
-			database.updateSQL("ALTER TABLE `" + table + "` ADD `sheep_thrown` INT(11) NOT NULL DEFAULT '0' AFTER `games`;");
-		} catch (ClassNotFoundException | SQLException exception) {
-			// Do nothing
-		}
-		/*try {
-			database.updateSQL("ALTER TABLE `" + table + "` ADD `last_kit` INT(1) NOT NULL DEFAULT '0' AFTER `particles`;");
-		} catch (ClassNotFoundException | SQLException exception) {
-			// Do nothing
-		}*/
-		try {
-			database.updateSQL("ALTER TABLE `" + table + "` DROP `last_kit`;");
-		} catch (ClassNotFoundException | SQLException exception) {
-			// Do nothing
-		}
-		try {
-			database.updateSQL("ALTER TABLE `" + table + "` CHANGE `kits` `kits` TEXT NOT NULL;");
-		} catch (ClassNotFoundException | SQLException exception) {
-			// Do nothing
+			Connection co = database.getConnection();
+			PreparedStatement stm = co.prepareStatement("SELECT column_name FROM information_schema.columns WHERE table_schema = ? AND table_name = ?;");
+			stm.setString(1, ConfigManager.getString(Field.MYSQL_DATABASE));
+			stm.setString(2, ConfigManager.getString(Field.MYSQL_TABLE));
+			ResultSet rs = stm.executeQuery();
+			List<String> columns = new ArrayList<>();
+			while (rs.next())
+				columns.add(rs.getString("column_name"));
+
+			if (columns.isEmpty()) { // should create
+				database.updateSQL(createDatabaseRequest(table));
+			} else {
+				// remove old columns
+				if (columns.contains("lang"))
+					database.updateSQL("ALTER TABLE `" + table + "` DROP `lang`;");
+				if (columns.contains("last_kit"))
+					database.updateSQL("ALTER TABLE `" + table + "` DROP `last_kit`;");
+				// add latest
+				if (!columns.contains("total_time"))
+					database.updateSQL("ALTER TABLE `" + table + "` ADD `total_time` INT(11) NOT NULL DEFAULT '0' AFTER `games`;");
+				if (!columns.contains("sheep_killed"))
+					database.updateSQL("ALTER TABLE `" + table + "` ADD `sheep_killed` INT(11) NOT NULL DEFAULT '0' AFTER `games`;");
+				if (!columns.contains("sheep_thrown"))
+					database.updateSQL("ALTER TABLE `" + table + "` ADD `sheep_thrown` INT(11) NOT NULL DEFAULT '0' AFTER `games`;");
+				// change
+				if (columns.contains("kits"))
+					database.updateSQL("ALTER TABLE `" + table + "` CHANGE `kits` `kits` TEXT NOT NULL;");
+			}
+		} catch (Exception e) {
+			plugin.getLogger().log(Level.SEVERE, "Failed to load database tables.", e);
 		}
 		try {
 			ResultSet resultSet = database.querySQL("SELECT * FROM " + table + ";");
@@ -149,7 +148,7 @@ public abstract class DataManager {
 					map.put(name, hexUuid);
 					SheepWarsPlugin.debug(name + " <-> " + hexUuid);
 				}
-				database.updateSQL("ALTER TABLE `" + table + "` CHANGE `uuid` `uuid` VARCHAR(32) NOT NULL;");
+				database.updateSQL("ALTER TABLE `" + table + "` CHANGE `uuid` `uuid` VARCHAR(36) NOT NULL;");
 				for (String name : map.keySet()) {
 					String hexUuid = map.get(name);
 					database.updateSQL("UPDATE " + table + " SET uuid='" + hexUuid + "' WHERE name='" + name + "';");
@@ -197,7 +196,7 @@ public abstract class DataManager {
 		}
 	}
 
-	/*public static boolean isUploadingData() {
-		return uploadingData.size() > 0;
-	}*/
+	/*
+	 * public static boolean isUploadingData() { return uploadingData.size() > 0; }
+	 */
 }

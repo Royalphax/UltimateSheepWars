@@ -8,6 +8,7 @@ import fr.royalpha.sheepwars.core.handler.Sounds;
 import fr.royalpha.sheepwars.core.kit.NoneKit;
 import fr.royalpha.sheepwars.core.kit.RandomKit;
 import fr.royalpha.sheepwars.core.manager.ConfigManager;
+import fr.royalpha.sheepwars.core.manager.ConfigManager.Field;
 import fr.royalpha.sheepwars.core.manager.ExceptionManager;
 import fr.royalpha.sheepwars.core.message.Message;
 import org.bukkit.Bukkit;
@@ -22,6 +23,7 @@ import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.concurrent.CompletableFuture;
 
 public class PlayerData extends DataManager {
 
@@ -448,14 +450,14 @@ public class PlayerData extends DataManager {
     public void loadData() {
         if (connectedToDatabase) {
             SheepWarsPlugin.debug("Fetching data for " + player.getName() + " ...");
-            final String table = ConfigManager.getString(ConfigManager.Field.MYSQL_TABLE);
-            new Thread(() -> {
+            CompletableFuture.runAsync(() -> {
                 // Check validity
                 checkConnection();
                 // Select identifier
                 String identifier = getIdentifier();
                 // Manage data
                 try {
+                    final String table = ConfigManager.getString(ConfigManager.Field.MYSQL_TABLE);
                     ResultSet res = database.querySQL("SELECT * FROM " + table + " WHERE " + identifier);
                     if (res.first()) {
                         setDeaths(res.getInt("deaths"));
@@ -502,7 +504,7 @@ public class PlayerData extends DataManager {
                     ExceptionManager.register(ex, true);
                 }
                 this.loaded = true;
-            }).start();
+            });
             SheepWarsPlugin.debug("Data fetched for " + player.getName() + "!");
         } else {
             this.loaded = true;
@@ -543,9 +545,7 @@ public class PlayerData extends DataManager {
     }
 
     public void asyncUploadData() {
-        new Thread(() -> {
-            uploadData();
-        }).start();
+    	CompletableFuture.runAsync(this::uploadData);
     }
 
     public String getIdentifier() {
@@ -638,7 +638,7 @@ public class PlayerData extends DataManager {
         public void generateRanking() {
             ResultSet res = null;
             try {
-                res = database.querySQL("SELECT `name`,`" + this.tableColumn + "` FROM `players` ORDER BY `" + this.tableColumn + "` DESC ;");
+                res = database.querySQL("SELECT `name`,`" + this.tableColumn + "` FROM `" + ConfigManager.getString(Field.MYSQL_TABLE) + "` ORDER BY `" + this.tableColumn + "` DESC ;");
                 while (res.next()) {
                     this.playerTop.put(res.getString("name"), res.getInt(this.tableColumn)); // Il voit la bonne liste, dans l'ordre
                 }
