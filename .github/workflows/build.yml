@@ -26,4 +26,4 @@ jobs:
       name: Upload Artifact
       with:
         name: UltimateSheepWars.jar
-        path: target/UltimateSheepWars-*.jar
+        path: target/sheepwars-*.jar
