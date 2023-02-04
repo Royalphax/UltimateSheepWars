@@ -58,6 +58,7 @@ public class ConfigManager {
         ENABLE_ALL_KITS("enable-all-kits", FieldType.BOOLEAN, true),
         ENABLE_KIT_REQUIRED_WINS("enable-required-wins", FieldType.BOOLEAN, false),
         ENABLE_MYSQL("mysql.enable", FieldType.BOOLEAN, false),
+        ENABLE_MYSQL_BACKUP("mysql.backup_table", FieldType.BOOLEAN, false),
         ENABLE_MYSQL_FREE_HOST("mysql.free-host", FieldType.BOOLEAN, false),
         MYSQL_HOST("mysql.host", FieldType.STRING, "localhost"),
         MYSQL_PORT("mysql.port", FieldType.INT, 3306),
@@ -65,12 +66,13 @@ public class ConfigManager {
         MYSQL_TABLE("mysql.table", FieldType.STRING, "players"),
         MYSQL_USER("mysql.user", FieldType.STRING, "root"),
         MYSQL_PASSWORD("mysql.pass", FieldType.STRING, "root"),
+        MYSQL_OPTIONS("mysql.options", FieldType.STRING, "useSSL=false&autoReconnect=true"),
         RANKING_TOP("ranking-top", FieldType.INT, 10),
         LOBBY_MAP_NAME("lobby-map-folder-name", FieldType.STRING, "sheepwars-backup"),
-        WAITING_GAME_STATE_MOTD("game-state.waiting", FieldType.STRING, "&2\\u2714 &aWaiting &2\\u2714"),
-        INGAME_GAME_STATE_MOTD("game-state.in-game", FieldType.STRING, "&4\\u2716 &cRunning &4\\u2716"),
-        TERMINATED_GAME_STATE_MOTD("game-state.terminated", FieldType.STRING, "&6\\u2261 &eTerminated &6\\u2261"),
-        RESTARTING_GAME_STATE_MOTD("game-state.restarting", FieldType.STRING, "&5\\u26A0 &dRestarting &5\\u26A0"),
+        WAITING_GAME_STATE_MOTD("game-state.waiting", FieldType.STRING_COLORED, "&2\\u2714 &aWaiting &2\\u2714"),
+        INGAME_GAME_STATE_MOTD("game-state.in-game", FieldType.STRING_COLORED, "&4\\u2716 &cRunning &4\\u2716"),
+        TERMINATED_GAME_STATE_MOTD("game-state.terminated", FieldType.STRING_COLORED, "&6\\u2261 &eTerminated &6\\u2261"),
+        RESTARTING_GAME_STATE_MOTD("game-state.restarting", FieldType.STRING_COLORED, "&5\\u26A0 &dRestarting &5\\u26A0"),
 
         LOBBY("lobby", FieldType.VIRTUAL_LOCATION, VirtualLocation.getDefault(), SETTINGS_FILE),
         //OFFLINE_UUID("offline-mode-db-uuid", FieldType.STRING, UUID.randomUUID().toString().replace("-", ""), SETTINGS_FILE),
@@ -184,8 +186,11 @@ public class ConfigManager {
                     case MATERIAL:
                         field.setValue(Material.matchMaterial(config.getString(field.getPath(), (String) field.getDefault())));
                         break;
-                    case STRING:
+                    case STRING_COLORED:
                         field.setValue(ChatColor.translateAlternateColorCodes('&', config.getString(field.getPath(), (String) field.getDefault())));
+                        break;
+                    case STRING:
+                        field.setValue(config.getString(field.getPath(), (String) field.getDefault()));
                         break;
                     case VIRTUAL_LOCATION:
                         final VirtualLocation location = VirtualLocation.fromString(config.getString(field.getPath(), ((VirtualLocation) field.getDefault()).toString()));
@@ -216,6 +221,7 @@ public class ConfigManager {
 
     private enum FieldType {
         STRING("String"),
+        STRING_COLORED("StringLitteral"),
         BOOLEAN("Boolean"),
         DOUBLE("Double"),
         INT("Integer"),
@@ -256,7 +262,6 @@ public class ConfigManager {
         field.setValue(arg0);
     }
 
-    @SuppressWarnings("unchecked")
     public static void addLocation(Field field, Location arg0) {
         checkForException(field, FieldType.VIRTUAL_LOCATION_LIST);
         ((List<VirtualLocation>) field.getValue()).add(VirtualLocation.fromBukkitLocation(arg0));
@@ -267,7 +272,6 @@ public class ConfigManager {
         field.setValue(new ArrayList<VirtualLocation>());
     }
 
-    @SuppressWarnings("unchecked")
     public static void clearLocations(Field field, World filter) {
         checkForException(field, FieldType.VIRTUAL_LOCATION_LIST);
         List<VirtualLocation> locations = (List<VirtualLocation>) field.getValue();
@@ -279,6 +283,11 @@ public class ConfigManager {
 
     public static String getString(Field field) {
         checkForException(field, FieldType.STRING);
+        return (String) field.getValue();
+    }
+
+    public static String getStringColored(Field field) {
+        checkForException(field, FieldType.STRING_COLORED);
         return (String) field.getValue();
     }
 
@@ -326,7 +335,6 @@ public class ConfigManager {
 		return locations;
 	}*/
 
-    @SuppressWarnings("unchecked")
     public static List<VirtualLocation> getLocations(Field field) {
         checkForException(field, FieldType.VIRTUAL_LOCATION_LIST);
         List<VirtualLocation> locations = new ArrayList<>((List<VirtualLocation>) field.getValue());

@@ -40,7 +40,7 @@ public class VoteMapInventory extends GuiScreen {
         }
         LinkedHashMap<PlayableMap, Integer> sortedMap = Utils.sortMapByValue(unsortedMap);
 
-        Iterator iterator = sortedMap.entrySet().iterator();
+        Iterator<Map.Entry<PlayableMap, Integer>> iterator = sortedMap.entrySet().iterator();
 
         List<PlayableMap> mostWantedMaps = new ArrayList<>();
         Map.Entry<PlayableMap, Integer> entry = (Map.Entry<PlayableMap, Integer>) iterator.next();

@@ -82,7 +82,6 @@ public class CustomEntityType<T extends Entity> {
         registered = true;
     }
 
-    @SuppressWarnings("unchecked")
     public void unregister() throws IllegalStateException {
         if (!registered) {
             throw new IllegalArgumentException(String.format

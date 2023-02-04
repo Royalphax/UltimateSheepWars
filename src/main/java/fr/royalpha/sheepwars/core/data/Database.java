@@ -3,7 +3,6 @@ package fr.royalpha.sheepwars.core.data;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 
 public abstract class Database {
 	protected Connection connection;
@@ -22,6 +21,12 @@ public abstract class Database {
 		return this.connection;
 	}
 
+	public Connection getCheckedConnection() throws SQLException, ClassNotFoundException {
+		if (!checkConnection())
+			openConnection();
+		return this.connection;
+	}
+
 	public boolean closeConnection() throws SQLException {
 		if (this.connection == null) {
 			return false;
@@ -31,18 +36,10 @@ public abstract class Database {
 	}
 
 	public ResultSet querySQL(String query) throws SQLException, ClassNotFoundException {
-		if (!checkConnection()) {
-			openConnection();
-		}
-		Statement statement = this.connection.createStatement();
-		return statement.executeQuery(query);
+		return getCheckedConnection().createStatement().executeQuery(query);
 	}
 
 	public int updateSQL(String query) throws SQLException, ClassNotFoundException {
-		if (!checkConnection()) {
-			openConnection();
-		}
-		Statement statement = this.connection.createStatement();
-		return statement.executeUpdate(query);
+		return getCheckedConnection().createStatement().executeUpdate(query);
 	}
 }

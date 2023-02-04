@@ -148,6 +148,7 @@ enable-required-wins: false
 mysql:
   #Enable or not mysql settings ?
   enable: false
+  backup_table: false
   free-host: false
   #If you have no database and you want to save stats, you just have to put free-host to true.
   #[!] THE FREE-HOST FEATURE ISN'T OBLIGATED TO WORK AT ALL TIME.
@@ -158,6 +159,7 @@ mysql:
   table: players
   user: root
   pass: root
+  options: "useSSL=false&autoReconnect=true"
 #If database was enabled, put the amount of players to show in the ranking.
 ranking-top: 10
 #===============# MOTD states #===============#

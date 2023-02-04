@@ -33,7 +33,7 @@ public class PacketHandlerEntityMetadata extends AbstractPacketHandler {
 	/**
 	 * Build
 	 */
-	@SuppressWarnings({ "rawtypes", "unchecked", "deprecation" })
+	@SuppressWarnings({ "rawtypes" })
 	@Override
 	public Object build() {
 		try {

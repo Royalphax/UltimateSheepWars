@@ -68,7 +68,6 @@ public class PacketHandlerSpawnEntity extends AbstractPacketHandler {
 	/**
 	 * Build
 	 */
-	@SuppressWarnings("deprecation")
 	@Override
 	public Object build() {
 		try {

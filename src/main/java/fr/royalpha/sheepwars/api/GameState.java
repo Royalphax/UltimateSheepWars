@@ -2,14 +2,13 @@ package fr.royalpha.sheepwars.api;
 
 import fr.royalpha.sheepwars.core.SheepWarsPlugin;
 import fr.royalpha.sheepwars.core.manager.ConfigManager;
-import org.bukkit.entity.Sheep;
 
 public enum GameState {
 	
-	WAITING(ConfigManager.getString(ConfigManager.Field.WAITING_GAME_STATE_MOTD)),
-	INGAME(ConfigManager.getString(ConfigManager.Field.INGAME_GAME_STATE_MOTD)),
-	TERMINATED(ConfigManager.getString(ConfigManager.Field.TERMINATED_GAME_STATE_MOTD)),
-	RESTARTING(ConfigManager.getString(ConfigManager.Field.RESTARTING_GAME_STATE_MOTD));
+	WAITING(ConfigManager.getStringColored(ConfigManager.Field.WAITING_GAME_STATE_MOTD)),
+	INGAME(ConfigManager.getStringColored(ConfigManager.Field.INGAME_GAME_STATE_MOTD)),
+	TERMINATED(ConfigManager.getStringColored(ConfigManager.Field.TERMINATED_GAME_STATE_MOTD)),
+	RESTARTING(ConfigManager.getStringColored(ConfigManager.Field.RESTARTING_GAME_STATE_MOTD));
 
 	private static GameState currentStep = GameState.RESTARTING;
 	private String motd;

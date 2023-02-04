@@ -1,6 +1,5 @@
 package fr.royalpha.sheepwars.core.version;
 
-import org.bukkit.DyeColor;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;

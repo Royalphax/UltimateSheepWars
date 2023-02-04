@@ -6,23 +6,20 @@ import java.sql.SQLException;
 
 public class MySQLConnector extends Database {
 
-	private final String user;
-	private final String database;
-	private final String password;
-	private final String port;
-	private final String hostname;
+	private final String user, database, password, port, hostname, options;
 
-	public MySQLConnector(String hostname, Integer port, String database, String username, String password) {
-		this(hostname, Integer.toString(port), database, username, password);
+	public MySQLConnector(String hostname, Integer port, String database, String username, String password, String options) {
+		this(hostname, Integer.toString(port), database, username, password, options);
 	}
 	
-	public MySQLConnector(String hostname, String port, String database, String username, String password) {
+	public MySQLConnector(String hostname, String port, String database, String username, String password, String options) {
 		super();
 		this.hostname = hostname;
 		this.port = port;
 		this.database = database;
 		this.user = username;
 		this.password = password;
+		this.options = options;
 	}
 	
 	public Connection openConnection() throws SQLException, ClassNotFoundException {
@@ -30,7 +27,7 @@ public class MySQLConnector extends Database {
 			return this.connection;
 		}
 		Class.forName("com.mysql.jdbc.Driver");
-		this.connection = DriverManager.getConnection("jdbc:mysql://" + this.hostname + ":" + this.port + "/" + this.database + "?useSSL=false&autoReconnect=true", this.user, this.password);
+		this.connection = DriverManager.getConnection("jdbc:mysql://" + this.hostname + ":" + this.port + "/" + this.database + (options != null && options != "" ? "?" + options : ""), this.user, this.password);
 		return this.connection;
 	}
 }

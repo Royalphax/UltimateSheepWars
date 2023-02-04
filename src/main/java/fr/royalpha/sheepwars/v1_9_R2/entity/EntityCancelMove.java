@@ -1,10 +1,16 @@
 package fr.royalpha.sheepwars.v1_9_R2.entity;
 
-import net.minecraft.server.v1_9_R2.*;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_9_R2.CraftWorld;
 import org.bukkit.entity.Player;
+
+import net.minecraft.server.v1_9_R2.EntityArmorStand;
+import net.minecraft.server.v1_9_R2.Packet;
+import net.minecraft.server.v1_9_R2.PacketPlayOutEntityDestroy;
+import net.minecraft.server.v1_9_R2.PacketPlayOutEntityTeleport;
+import net.minecraft.server.v1_9_R2.PacketPlayOutMount;
+import net.minecraft.server.v1_9_R2.PacketPlayOutSpawnEntityLiving;
+import net.minecraft.server.v1_9_R2.World;
 
 public class EntityCancelMove extends EntityArmorStand
 {
